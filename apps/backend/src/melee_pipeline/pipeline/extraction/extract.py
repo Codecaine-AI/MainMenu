@@ -3,15 +3,16 @@ from __future__ import annotations
 import json
 import math
 import re
+import shutil
 import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 
-from ..io.logging import RunLogger
-from ..io.paths import prompt_path
-from ..model_adapters import edit_image, write_text_prompt
-from ..prompting import read_prompt
-from ..schemas import (
+from ...io.logging import RunLogger
+from ...io.paths import prompt_path
+from ...model_adapters import edit_image, write_text_prompt
+from ...prompting import read_prompt
+from ...schemas import (
     ExtractionRequest,
     ExtractionResult,
     PromptGenerationRequest,
@@ -61,7 +62,7 @@ def write_extraction_request(
         canvas_height=manifest.canvas.height,
     )
     aspect_ratio = closest_supported_aspect_ratio(asset_width, asset_height)
-    prompt_file = prompt_path("asset-extraction-prompt-generation.md")
+    prompt_file = prompt_path("extraction", "asset-extraction-prompt-generation.md")
     prompt_template = read_prompt(prompt_file)
 
     prompt_generation_prompt = (
@@ -264,145 +265,139 @@ def extract_assets(
                 level="error",
                 **counts,
             )
+        return results
     except Exception as exc:
         update_manifest(manifest_path, status="failed")
         logger.update_status(stage="extraction", status="failed", last_error=str(exc))
-        logger.event(
-            "extraction.failed",
-            "extraction",
-            "Asset extraction failed",
-            level="error",
-            error=str(exc),
-        )
+        logger.event("extraction.failed", "extraction", "Asset extraction failed", level="error", error=str(exc))
         raise
-
-    return results
 
 
 def _extract_parallel(
     requests: list[ExtractionRequest],
     max_workers: int,
-    logger: RunLogger,
+    logger: RunLogger | None = None,
 ) -> list[ExtractionResult]:
+    logger = logger or RunLogger(Path(requests[0].output_path).resolve().parents[2])
+    started = time.monotonic()
     results: list[ExtractionResult] = []
-    active_asset_ids = {request.asset_id for request in requests}
-    logger.update_status(
-        stage="image_extraction",
-        status="running",
-        active_asset_ids=sorted(active_asset_ids),
-        counts={"assets": len(requests), "completed": 0, "dry_run": 0, "failed": 0},
-    )
+
     with ThreadPoolExecutor(max_workers=max_workers) as executor:
-        future_map = {executor.submit(_extract_one, request, logger): request for request in requests}
-        for future in as_completed(future_map):
-            result = future.result()
-            results.append(result)
-            active_asset_ids.discard(result.asset_id)
-            logger.update_status(
-                stage="image_extraction",
-                status="running",
-                active_asset_ids=sorted(active_asset_ids),
-                counts={
-                    "assets": len(requests),
-                    "completed": sum(item.status == "completed" for item in results),
-                    "dry_run": 0,
-                    "failed": sum(item.status == "failed" for item in results),
-                },
-            )
-    return sorted(results, key=lambda result: result.asset_id)
+        future_to_request = {
+            executor.submit(_run_single_extraction, request, logger): request for request in requests
+        }
+        for future in as_completed(future_to_request):
+            request = future_to_request[future]
+            try:
+                results.append(future.result())
+            except Exception as exc:  # noqa: BLE001
+                results.append(
+                    ExtractionResult(
+                        asset_id=request.asset_id,
+                        model=request.model,
+                        output_path=request.output_path,
+                        status="failed",
+                        error=str(exc),
+                    )
+                )
 
-
-def _extract_one(request: ExtractionRequest, logger: RunLogger) -> ExtractionResult:
-    start = time.perf_counter()
+    order = {request.asset_id: index for index, request in enumerate(requests)}
+    results.sort(key=lambda result: order[result.asset_id])
     logger.event(
-        "image.model_call.started",
+        "extraction.parallel_finished",
+        "image_extraction",
+        "Parallel extraction finished",
+        duration_seconds=round(time.monotonic() - started, 3),
+        workers=max_workers,
+    )
+    return results
+
+
+def _run_single_extraction(request: ExtractionRequest, logger: RunLogger) -> ExtractionResult:
+    asset_id = request.asset_id
+    output_path = Path(request.output_path)
+    asset_dir = output_path.parent
+
+    with logger.span(
+        "image.model_call",
         "image_extraction",
         "Image extraction model call",
-        asset_id=request.asset_id,
+        asset_id=asset_id,
         model=request.model,
-        output_path=request.output_path,
-        size=request.size,
-        quality=request.quality,
-        aspect_ratio=request.aspect_ratio,
-    )
-    try:
-        edit_image(
+        output_path=output_path,
+    ):
+        temp_path = edit_image(
             source_image=Path(request.source_image),
             prompt=request.prompt,
-            output_path=Path(request.output_path),
             model=request.model,
+            output_path=output_path,
             size=request.size,
             quality=request.quality,
             aspect_ratio=request.aspect_ratio,
         )
-        duration_ms = int((time.perf_counter() - start) * 1000)
-        logger.event(
-            "image.model_call.completed",
-            "image_extraction",
-            "Image extraction model call completed",
-            asset_id=request.asset_id,
-            model=request.model,
-            output_path=request.output_path,
-            duration_ms=duration_ms,
-            aspect_ratio=request.aspect_ratio,
-        )
-        return ExtractionResult(
-            asset_id=request.asset_id,
-            model=request.model,
-            output_path=request.output_path,
-            status="completed",
-        )
-    except Exception as exc:  # noqa: BLE001 - recorded per asset for run inspection.
-        duration_ms = int((time.perf_counter() - start) * 1000)
-        logger.event(
-            "image.model_call.failed",
-            "image_extraction",
-            "Image extraction model call failed",
-            level="error",
-            asset_id=request.asset_id,
-            model=request.model,
-            output_path=request.output_path,
-            duration_ms=duration_ms,
-            aspect_ratio=request.aspect_ratio,
-            error=str(exc),
-        )
-        return ExtractionResult(
-            asset_id=request.asset_id,
-            model=request.model,
-            output_path=request.output_path,
-            status="failed",
-            error=str(exc),
-        )
+
+    normalized_path = normalize_extracted_file(temp_path, output_path, asset_dir=asset_dir)
+    logger.event(
+        "image.completed",
+        "image_extraction",
+        "Image extraction completed",
+        asset_id=asset_id,
+        path=normalized_path,
+    )
+    return ExtractionResult(
+        asset_id=asset_id,
+        model=request.model,
+        output_path=str(normalized_path),
+        status="completed",
+    )
 
 
-def asset_dimensions_from_bounds(
-    bounds: str,
-    canvas_width: int,
-    canvas_height: int,
-) -> tuple[float, float]:
-    if bounds.strip().lower() == "full_image":
-        return float(canvas_width), float(canvas_height)
+def normalize_extracted_file(temp_path: Path, output_path: Path, asset_dir: Path | None = None) -> Path:
+    temp_path = temp_path.resolve()
+    output_path = output_path.resolve()
+    asset_dir = asset_dir.resolve() if asset_dir else output_path.parent.resolve()
+    asset_dir.mkdir(parents=True, exist_ok=True)
+    raw_path = asset_dir / "raw-extracted.png"
 
-    match = re.search(r"\[([^\]]+)\]", bounds)
+    for path in {output_path, raw_path, asset_dir / "alpha-mask.png"}:
+        if path.exists() and path.resolve() != temp_path:
+            if path.is_dir():
+                shutil.rmtree(path)
+            else:
+                path.unlink()
+
+    if temp_path != raw_path:
+        shutil.copyfile(temp_path, raw_path)
+
+    if temp_path != output_path:
+        shutil.move(temp_path, output_path)
+
+    return output_path
+
+
+def asset_dimensions_from_bounds(bounds: str, canvas_width: int, canvas_height: int) -> tuple[int, int]:
+    if bounds == "full_image":
+        return canvas_width, canvas_height
+
+    match = re.search(r"\[\s*([0-9]+)\s*,\s*([0-9]+)\s*,\s*([0-9]+)\s*,\s*([0-9]+)\s*\]", bounds)
     if match:
-        numbers = [
-            float(number)
-            for number in re.findall(r"-?\d+(?:\.\d+)?", match.group(1))
-        ]
-        if len(numbers) >= 4 and numbers[2] > 0 and numbers[3] > 0:
-            return numbers[2], numbers[3]
+        width = max(int(match.group(3)), 1)
+        height = max(int(match.group(4)), 1)
+        return width, height
 
-    return float(canvas_width), float(canvas_height)
+    return max(canvas_width, 1), max(canvas_height, 1)
 
 
-def closest_supported_aspect_ratio(width: float, height: float) -> str:
-    if width <= 0 or height <= 0:
-        return "1:1"
-
+def closest_supported_aspect_ratio(width: int, height: int) -> str:
+    width = max(width, 1)
+    height = max(height, 1)
     target = width / height
 
-    def score(ratio: str) -> float:
-        ratio_width, ratio_height = (float(part) for part in ratio.split(":", 1))
-        return abs(math.log(target / (ratio_width / ratio_height)))
+    def parse_ratio(value: str) -> float:
+        w_str, h_str = value.split(":", 1)
+        return int(w_str) / int(h_str)
 
-    return min(SUPPORTED_GEMINI_IMAGE_ASPECT_RATIOS, key=score)
+    return min(
+        SUPPORTED_GEMINI_IMAGE_ASPECT_RATIOS,
+        key=lambda ratio: abs(math.log(target) - math.log(parse_ratio(ratio))),
+    )

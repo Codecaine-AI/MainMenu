@@ -4,8 +4,7 @@ from pathlib import Path
 
 from ..io.logging import RunLogger
 from ..io.paths import init_run
-from .catalog import catalog_run
-from .extract import extract_assets
+from .extraction import catalog_run, extract_assets
 
 
 def run_two_step_pipeline(

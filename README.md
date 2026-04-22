@@ -6,10 +6,14 @@ MELEE is an experiment in recreating the Super Smash Bros. Melee main menu in CS
 
 ```text
 apps/
-  backend/              Python pipeline app for image cataloging and asset extraction
-    prompts/            Backend-owned prompt templates
+  backend/              Python pipeline app for phased extraction/composition work
     src/melee_pipeline/
-      pipeline/         Catalog, extraction, and run orchestration stages
+      pipeline/
+        extraction/     Cataloging + extraction code and prompts
+        asset_generation/
+                         Asset recreation prompts and loop-specific code
+        asset_combining/
+                         Screen composition prompts and loop-specific code
       model_adapters/   Mirascope text routing and image provider adapters
       io/               Run paths and validation
 assets/                 Reference images, videos, and curated source material
@@ -24,7 +28,13 @@ Generated pipeline output is written under `runs/`, which is ignored by git.
 
 ## Backend Pipeline
 
-The backend starts with a two-step flow:
+The backend is being organized into three pipeline phases:
+
+1. Extraction phase.
+2. Asset generation phase.
+3. Asset combining phase.
+
+The implemented code today covers the extraction phase:
 
 1. Catalog the major visual assets in a source image.
 2. For each cataloged asset, use a text model through Mirascope to generate an extraction prompt, then extract the assets in parallel with an image model.

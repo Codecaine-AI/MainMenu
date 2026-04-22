@@ -15,12 +15,20 @@ def backend_root() -> Path:
     return Path(__file__).resolve().parents[3]
 
 
+def pipeline_root() -> Path:
+    return backend_root() / "src" / "melee_pipeline" / "pipeline"
+
+
 def default_runs_dir() -> Path:
     return repo_root() / "runs"
 
 
-def prompt_path(name: str) -> Path:
-    return backend_root() / "prompts" / name
+def pipeline_phase_root(name: str) -> Path:
+    return pipeline_root() / name
+
+
+def prompt_path(phase: str, name: str) -> Path:
+    return pipeline_phase_root(phase) / "prompts" / name
 
 
 def make_run_id(source_image: Path) -> str:

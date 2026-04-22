@@ -1,0 +1,1 @@
+"""Asset combining pipeline phase."""
