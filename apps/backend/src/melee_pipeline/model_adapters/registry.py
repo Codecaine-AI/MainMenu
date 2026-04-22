@@ -41,6 +41,7 @@ def edit_image(
     model: str,
     size: str,
     quality: str,
+    aspect_ratio: str | None = None,
 ) -> None:
     provider, model_name = split_model(model, default_provider="openai-image")
     if provider in {"openai", "openai-image"}:
@@ -49,6 +50,6 @@ def edit_image(
     if provider == "gemini-image":
         from .gemini_image import edit_image as edit_gemini_image
 
-        edit_gemini_image(source_image, prompt, output_path, model_name, size, quality)
+        edit_gemini_image(source_image, prompt, output_path, model_name, size, quality, aspect_ratio)
         return
     raise ValueError(f"Unsupported image model provider: {provider}")

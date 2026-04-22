@@ -10,7 +10,7 @@ from .io.validation import validate_run
 
 DEFAULT_CATALOG_MODEL = "openai/gpt-5.4"
 DEFAULT_PROMPT_MODEL = "anthropic/claude-opus-4-6"
-DEFAULT_IMAGE_MODEL = "openai-image/gpt-image-2"
+DEFAULT_IMAGE_MODEL = "gemini-image/gemini-3.1-flash-image-preview"
 
 
 def main() -> None:
