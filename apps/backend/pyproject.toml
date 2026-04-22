@@ -1,0 +1,27 @@
+[project]
+name = "melee-backend"
+version = "0.1.0"
+description = "Backend pipeline for cataloging and extracting Melee menu visual assets."
+requires-python = ">=3.12"
+dependencies = [
+  "anthropic>=0.64.0",
+  "mirascope>=1.25.0",
+  "openai>=1.99.0",
+  "pillow>=10.4.0",
+  "pydantic>=2.8.0",
+  "python-dotenv>=1.0.1",
+]
+
+[project.scripts]
+melee-pipeline = "melee_pipeline.cli:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/melee_pipeline"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
