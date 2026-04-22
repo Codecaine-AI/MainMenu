@@ -18,8 +18,11 @@ The repo currently has the beginnings of the pipeline, but most of the automatio
 
 | Area | Current files | Status |
 | --- | --- | --- |
-| Prompting | `apps/backend/prompts/asset-catalog.md` | Defines the screen-to-asset inventory prompt and JSON shape. |
-| Prompting | `apps/backend/prompts/asset-extraction-prompt-generation.md` | Defines how to turn one asset entry into an image-editing extraction prompt. |
+| Extraction phase | `apps/backend/src/melee_pipeline/pipeline/extraction/prompts/asset-catalog.md` | Defines the screen-to-asset inventory prompt and JSON shape. |
+| Extraction phase | `apps/backend/src/melee_pipeline/pipeline/extraction/prompts/asset-extraction-prompt-generation.md` | Defines how to turn one asset entry into an image-editing extraction prompt. |
+| Asset generation phase | `apps/backend/src/melee_pipeline/pipeline/asset_generation/prompts/css-asset-recreation.md` | Defines the per-asset HTML/CSS recreation loop prompt. |
+| Asset generation phase | `apps/backend/src/melee_pipeline/pipeline/asset_generation/prompts/css-asset-critique.md` | Defines the strict per-asset critique report prompt. |
+| Asset combining phase | `apps/backend/src/melee_pipeline/pipeline/asset_combining/prompts/screen-composition.md` | Draft composition prompt for rebuilding the full screen from accepted assets. |
 | Prompting | `prompts/claude-design-system-prompt.md` | General HTML/design artifact prompt, not yet wired into this pipeline. |
 | Reference assets | `assets/` | Contains Melee menu background loops and several thumbnail JPGs. |
 | Iteration screenshots | `screenshots/` | Contains several saved prototype screenshots. |
@@ -64,11 +67,11 @@ sequenceDiagram
   participant Composer as Composition Agent Loop
 
   User->>Orchestrator: Provide source menu image
-  Orchestrator->>CatalogModel: Run apps/backend/prompts/asset-catalog.md with source image
+  Orchestrator->>CatalogModel: Run apps/backend/src/melee_pipeline/pipeline/extraction/prompts/asset-catalog.md with source image
   CatalogModel-->>Orchestrator: Return asset catalog JSON
 
   loop For each catalog asset
-    Orchestrator->>ExtractPrompt: Run apps/backend/prompts/asset-extraction-prompt-generation.md with one asset JSON
+    Orchestrator->>ExtractPrompt: Run apps/backend/src/melee_pipeline/pipeline/extraction/prompts/asset-extraction-prompt-generation.md with one asset JSON
     ExtractPrompt-->>Orchestrator: Return extraction prompt
     Orchestrator->>ImageModel: Run source image + extraction prompt
     ImageModel-->>Orchestrator: Return transparent asset image
@@ -113,13 +116,13 @@ runs/
       report.json
 ```
 
-Backend-owned pipeline prompts live in `apps/backend/prompts/`. The new `runs/` directory holds generated artifacts and should be ignored by git if runs become large or disposable.
+Backend-owned pipeline prompts live inside `apps/backend/src/melee_pipeline/pipeline/<phase>/prompts/`. The new `runs/` directory holds generated artifacts and should be ignored by git if runs become large or disposable.
 
 ## Data Contracts
 
 ### Asset Catalog
 
-`apps/backend/prompts/asset-catalog.md` already defines the first contract:
+`apps/backend/src/melee_pipeline/pipeline/extraction/prompts/asset-catalog.md` already defines the first contract:
 
 ```json
 {
@@ -180,7 +183,7 @@ Responsibilities:
 
 - Accept a source image path.
 - Create a `runs/<screen-id>/` folder.
-- Call the catalog model with `apps/backend/prompts/asset-catalog.md`.
+- Call the catalog model with `apps/backend/src/melee_pipeline/pipeline/extraction/prompts/asset-catalog.md`.
 - Validate and save `catalog.json`.
 - Fan out per-asset extraction and CSS generation work.
 - Track status so interrupted runs can resume.
@@ -235,7 +238,7 @@ Outputs:
 - `diff.png`
 - `report.json`
 
-This is where `prompts/claude-design-system-prompt.md` might be adapted, but it is too broad as-is. The pipeline likely needs a narrower prompt specifically for "recreate this one asset as CSS/HTML."
+This is where `apps/backend/src/melee_pipeline/pipeline/asset_generation/prompts/css-asset-recreation.md` should be used. `prompts/claude-design-system-prompt.md` is still too broad to serve as the pipeline contract directly.
 
 ### 6. Visual Comparison Harness
 
