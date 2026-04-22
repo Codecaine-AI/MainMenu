@@ -50,7 +50,7 @@ export ANTHROPIC_API_KEY=...
 uv run melee-pipeline run ../../assets/Super-Smash-Bros-Melee07292023-112856-24048_thumb.jpg --run-id first-pass
 ```
 
-Text model ids use Mirascope provider prefixes such as `anthropic/claude-opus-4-6`, `openai/gpt-5.4`, or `google/gemini-3-pro`. Image model ids currently use `openai-image/gpt-image-2`; a `gemini-image/` adapter slot exists but is not implemented yet.
+Text model ids use Mirascope provider prefixes such as `anthropic/claude-opus-4-6`, `openai/gpt-5.4`, or `google/gemini-3-pro`. Image extraction defaults to `gemini-image/gemini-3.1-flash-image-preview`; `openai-image/gpt-image-2` remains available as an alternate image model.
 
 Validate a run folder:
 
@@ -64,6 +64,9 @@ The pipeline writes artifacts like:
 runs/first-pass/
   run.json
   source.png
+  run.log
+  events.jsonl
+  status.json
   catalog.json
   catalog-request.json
   assets/
@@ -74,6 +77,17 @@ runs/first-pass/
       extracted.png
       extraction-result.json
 ```
+
+While a run is active, use these files to track progress:
+
+```bash
+tail -f runs/first-pass/run.log
+tail -f runs/first-pass/events.jsonl
+cat runs/first-pass/status.json
+```
+
+`run.log` is the readable timeline, `events.jsonl` is structured event data, and
+`status.json` is the latest stage/count snapshot for quick inspection.
 
 ## Current Status
 

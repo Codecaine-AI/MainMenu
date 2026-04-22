@@ -93,6 +93,7 @@ class ExtractionRequest(BaseModel):
     prompt: str
     size: str = "auto"
     quality: str = "high"
+    aspect_ratio: str | None = None
 
 
 class PromptGenerationRequest(BaseModel):
