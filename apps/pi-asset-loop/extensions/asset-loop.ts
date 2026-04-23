@@ -5,10 +5,10 @@
  *   pi -e apps/pi-asset-loop/extensions/asset-loop.ts \
  *      --asset runs/test-1/assets/asset_03
  *
- * The agent writes component.html + component.css into the asset dir, calls the
- * custom `render` tool to produce render.png, sees the reference and the new
- * render inline in the tool result, iterates, and calls `accept` when it would
- * ship. Hard cap of 10 render calls per session.
+ * The main agent writes component.html + component.css, calls `render` to
+ * produce render.png, then calls `critique` — an isolated vision-capable
+ * sub-agent that returns a structured issue list. The main agent fixes every
+ * issue and renders again. Loop terminates on empty issue list or iteration cap.
  */
 
 import { readFileSync, writeFileSync } from "node:fs";
@@ -21,15 +21,12 @@ import { buildRenderWrapper } from "../src/wrapper.ts";
 import { renderWithPlaywright } from "../src/renderer.ts";
 import { buildSystemPrompt } from "../src/systemPrompt.ts";
 import { readPngSize } from "../src/pngSize.ts";
+import { runCritique, type CritiqueIssue, type CritiqueResult, type IssueSeverity } from "../src/critic.ts";
 
 const MAX_ITERATIONS = 15;
-const MIN_ACCEPT_SCORE = 0.95;
 const MODEL_CANDIDATES: Array<{ provider: string; id: string }> = [
   { provider: "anthropic", id: "claude-opus-4-7" },
 ];
-
-const formatScore = (score: number | null): string =>
-  score === null ? "—" : score.toFixed(2);
 
 export default function assetLoop(pi: ExtensionAPI) {
   pi.registerFlag("asset", {
@@ -46,23 +43,37 @@ export default function assetLoop(pi: ExtensionAPI) {
   let referenceWidth = 0;
   let referenceHeight = 0;
   let assetJsonText = "";
+  let extractionPromptText = "";
   let iteration = 0;
   let accepted = false;
-  let reviewedSinceLastWrite = false;
-  let latestScore: number | null = null;
+  let lastCritique: CritiqueResult | null = null;
+  let renderedSinceLastCritique = false;
+  let critiquedSinceLastRender = false;
+  let toolsLine = "tools: —";
+
+  const issueCountsLine = (): string => {
+    if (!lastCritique) return "issues: —";
+    if (lastCritique.issues.length === 0) return "issues: none";
+    return `issues: ${countBy(lastCritique.issues, "blocking")} blocking · ${countBy(lastCritique.issues, "major")} major · ${countBy(lastCritique.issues, "minor")} minor`;
+  };
+
+  const issueStatusSuffix = (): string => {
+    if (!lastCritique) return "";
+    if (lastCritique.issues.length === 0) return " · issues: none";
+    return ` · b:${countBy(lastCritique.issues, "blocking")} m:${countBy(lastCritique.issues, "major")} mn:${countBy(lastCritique.issues, "minor")}`;
+  };
 
   const refreshWidget = (ctx: ExtensionContext) => {
     if (!resolved) return;
-    const scoreStr = formatScore(latestScore);
     const lines = [
       `asset: ${resolved.assetId}`,
       `iter:  ${iteration}/${MAX_ITERATIONS}${accepted ? "  (accepted)" : ""}`,
-      `score: ${scoreStr} / ${MIN_ACCEPT_SCORE.toFixed(2)}`,
-      `dir:   ${resolved.assetDir}`,
+      issueCountsLine(),
+      toolsLine,
     ];
     ctx.ui.setStatus(
       "asset-loop",
-      `${resolved.assetId} · iter ${iteration}/${MAX_ITERATIONS} · score ${scoreStr}/${MIN_ACCEPT_SCORE.toFixed(2)}${accepted ? " ✓" : ""}`,
+      `${resolved.assetId} · iter ${iteration}/${MAX_ITERATIONS}${issueStatusSuffix()}${accepted ? " ✓" : ""}`,
     );
     ctx.ui.setWidget("asset-loop-progress", lines, { placement: "belowEditor" });
   };
@@ -82,15 +93,19 @@ export default function assetLoop(pi: ExtensionAPI) {
     referenceHeight = dims.height;
 
     const sourceBase64 = readFileSync(resolved.sourcePngPath).toString("base64");
-    const extractionPromptText = readFileSync(resolved.extractionPromptPath, "utf8");
+    extractionPromptText = readFileSync(resolved.extractionPromptPath, "utf8");
 
     await pickModel(pi, ctx);
     pi.setThinkingLevel("high");
+
+    const allNames = pi.getAllTools().map((t) => t.name).sort();
+    const activeNames = new Set(pi.getActiveTools());
+    toolsLine = `tools: ${allNames
+      .map((n) => (activeNames.has(n) ? n : `${n}*`))
+      .join(", ")}`;
     refreshWidget(ctx);
 
-    // Kick off the first turn with all four inputs the system prompt expects:
-    // source screenshot, extracted asset, extraction prompt, asset metadata
-    // (metadata is already baked into the system prompt by before_agent_start).
+    // Kick off the first turn with all four inputs the system prompt expects.
     pi.sendUserMessage([
       {
         type: "text",
@@ -112,36 +127,26 @@ export default function assetLoop(pi: ExtensionAPI) {
       referenceWidth,
       referenceHeight,
       maxIterations: MAX_ITERATIONS,
-      minAcceptScore: MIN_ACCEPT_SCORE,
     });
     return { systemPrompt: prompt };
   });
 
   pi.on("tool_call", async (event, _ctx) => {
-    if (event.toolName === "render") {
-      if (!reviewedSinceLastWrite) {
-        return {
-          block: true,
-          reason:
-            "Call the `review` tool first. Post a code-only critique of the current component.html and component.css before spending a render call.",
-        };
-      }
-      if (iteration >= MAX_ITERATIONS) {
-        return {
-          block: true,
-          reason: `Max iterations (${MAX_ITERATIONS}) reached. Call \`accept\` with your current result or stop.`,
-        };
-      }
+    if (event.toolName === "render" && iteration >= MAX_ITERATIONS) {
+      return {
+        block: true,
+        reason: `Max iterations (${MAX_ITERATIONS}) reached. Call \`accept\` with your current result.`,
+      };
     }
 
-    // Re-lock the review gate on any write/edit that touches the component files.
+    // Any write/edit to component files invalidates the last critique.
     if (event.toolName === "write" || event.toolName === "edit") {
       const path = (event.input as { path?: unknown } | undefined)?.path;
       if (
         typeof path === "string" &&
         (path.endsWith("component.html") || path.endsWith("component.css"))
       ) {
-        reviewedSinceLastWrite = false;
+        critiquedSinceLastRender = false;
       }
     }
 
@@ -151,31 +156,6 @@ export default function assetLoop(pi: ExtensionAPI) {
   pi.on("session_shutdown", async (_event, ctx) => {
     ctx.ui.setStatus("asset-loop", undefined);
     ctx.ui.setWidget("asset-loop-progress", undefined);
-  });
-
-  pi.registerTool({
-    name: "review",
-    label: "Pre-render review",
-    description:
-      "Post a code-only self-critique of the current component.html and component.css BEFORE calling render. Required before every render. Editing component.html or component.css after review re-locks the render gate.",
-    parameters: Type.Object({
-      critique: Type.String({
-        description:
-          "Prose critique covering: does the code attempt every element in visual_description; are sizes/colors/borders sourced from the reference or invented (name the values); structural errors; a concrete prediction of what will be wrong in the next render.",
-      }),
-    }),
-    async execute(_toolCallId, _params, _signal, _onUpdate, _ctx) {
-      reviewedSinceLastWrite = true;
-      return {
-        content: [
-          {
-            type: "text" as const,
-            text: "Review recorded. Render gate open. Editing component.html or component.css will re-lock it.",
-          },
-        ],
-        details: { reviewedSinceLastWrite: true },
-      };
-    },
   });
 
   pi.registerTool({
@@ -217,14 +197,15 @@ export default function assetLoop(pi: ExtensionAPI) {
 
       const renderBase64 = readFileSync(resolved.renderPath).toString("base64");
       iteration += 1;
-      reviewedSinceLastWrite = false;
+      renderedSinceLastCritique = true;
+      critiquedSinceLastRender = false;
       refreshWidget(ctx);
 
       return {
         content: [
           {
             type: "text" as const,
-            text: `Iteration ${iteration}/${MAX_ITERATIONS}. Reference (native ${referenceWidth}x${referenceHeight}) first, current render second.`,
+            text: `Iteration ${iteration}/${MAX_ITERATIONS}. Reference (native ${referenceWidth}x${referenceHeight}) first, current render second. Call \`critique\` to get the issue list.`,
           },
           { type: "image" as const, data: referenceBase64, mimeType: "image/png" },
           { type: "image" as const, data: renderBase64, mimeType: "image/png" },
@@ -239,32 +220,60 @@ export default function assetLoop(pi: ExtensionAPI) {
   });
 
   pi.registerTool({
-    name: "score",
-    label: "Record fidelity score",
+    name: "critique",
+    label: "Critique render",
     description:
-      "Record a self-assessed fidelity score for the most recent render, in [0, 1]. Call after your post-render critique. The score is shown in the UI and gates `accept`: you cannot accept until the score reaches the threshold or the iteration cap is hit. 1.0 means nearly exact; 0.9 means minor visible drift; 0.7 means shippable but clearly imperfect.",
-    parameters: Type.Object({
-      fidelity: Type.Number({
-        description: "Self-assessed fidelity in [0, 1], grounded in your post-render critique.",
-      }),
-      rationale: Type.String({
-        description:
-          "One or two sentences justifying the score against the defects you named in the post-render critique.",
-      }),
-    }),
-    async execute(_toolCallId, params, _signal, _onUpdate, ctx) {
-      const clamped = Math.max(0, Math.min(1, params.fidelity));
-      latestScore = clamped;
+      "Launch an isolated critic agent with the source screenshot, extracted reference, the current render.png, the extraction prompt, and asset.json. Returns a structured JSON issue list (blocking/major/minor severities). The critic is the scoring authority — fix every issue it reports, then render + critique again. Loop terminates when issues is empty. Gate: you must have rendered since the last critique.",
+    parameters: Type.Object({}),
+    async execute(_toolCallId, _params, _signal, _onUpdate, ctx) {
+      if (!resolved) {
+        throw new Error("Extension not initialized; asset not resolved.");
+      }
+      if (!renderedSinceLastCritique) {
+        throw new Error(
+          "No new render since the last critique. Call `render` first, then `critique`.",
+        );
+      }
+      if (!ctx.model) {
+        throw new Error("No model configured; cannot run critic.");
+      }
+      const auth = await ctx.modelRegistry.getApiKeyAndHeaders(ctx.model);
+      if (!auth.ok) {
+        throw new Error(`Cannot resolve credentials for critic: ${auth.error}`);
+      }
+
+      const result = await runCritique({
+        model: ctx.model,
+        auth: { apiKey: auth.apiKey, headers: auth.headers },
+        sourcePngPath: resolved.sourcePngPath,
+        extractedPngPath: resolved.extractedPngPath,
+        renderPngPath: resolved.renderPath,
+        extractionPromptText,
+        assetJson: assetJsonText,
+        signal: ctx.signal,
+      });
+
+      lastCritique = result;
+      renderedSinceLastCritique = false;
+      critiquedSinceLastRender = true;
+
+      const persisted = {
+        iteration,
+        verdict: result.verdict,
+        issues: result.issues,
+      };
+      writeFileSync(resolved.critiqueJsonPath, `${JSON.stringify(persisted, null, 2)}\n`);
+
       refreshWidget(ctx);
-      const gateMsg =
-        clamped >= MIN_ACCEPT_SCORE
-          ? `Score ${clamped.toFixed(2)} meets the acceptance bar (${MIN_ACCEPT_SCORE.toFixed(2)}). You may call \`accept\`.`
-          : iteration >= MAX_ITERATIONS
-            ? `Score ${clamped.toFixed(2)} is below the acceptance bar (${MIN_ACCEPT_SCORE.toFixed(2)}), but you are out of render budget. Call \`accept\` and record residual defects in notes.`
-            : `Score ${clamped.toFixed(2)} is below the acceptance bar (${MIN_ACCEPT_SCORE.toFixed(2)}). Iterate: fix the defects named in your critique, then review + render again.`;
+
       return {
-        content: [{ type: "text" as const, text: gateMsg }],
-        details: { fidelity: clamped, rationale: params.rationale, threshold: MIN_ACCEPT_SCORE },
+        content: [
+          {
+            type: "text" as const,
+            text: formatCritiqueForAgent(result, iteration, MAX_ITERATIONS),
+          },
+        ],
+        details: persisted,
       };
     },
   });
@@ -273,34 +282,37 @@ export default function assetLoop(pi: ExtensionAPI) {
     name: "accept",
     label: "Accept asset",
     description:
-      "Call when the current component.html + component.css + render.png are good enough to ship. Writes accepted.json and shuts down the session.",
+      "Call when the critic returns zero issues, or when you have hit the iteration cap. Writes accepted.json and shuts down the session. Blocked if there is no fresh critique for the current render, or if the critic still has issues and you have iterations remaining.",
     parameters: Type.Object({
-      score: Type.Number({
-        description: "Self-assessed fidelity in [0, 1]. 1.0 means nearly exact visual match.",
-      }),
       notes: Type.Array(Type.String(), {
         description:
-          "Short notes for the record: residual defects, raster fallbacks used, anything a later reviewer should know.",
+          "Short notes for the record: residual defects (if accepting at cap), raster fallbacks used, anything a later reviewer should know.",
       }),
     }),
     async execute(_toolCallId, params, _signal, _onUpdate, ctx) {
       if (!resolved) {
         throw new Error("Extension not initialized; asset not resolved.");
       }
-      const clamped = Math.max(0, Math.min(1, params.score));
-      if (clamped < MIN_ACCEPT_SCORE && iteration < MAX_ITERATIONS) {
+      if (!critiquedSinceLastRender || !lastCritique) {
         throw new Error(
-          `Cannot accept at score ${clamped.toFixed(2)}: below acceptance bar ${MIN_ACCEPT_SCORE.toFixed(2)} and render budget not exhausted (${iteration}/${MAX_ITERATIONS}). Keep iterating.`,
+          "No fresh critique for the current render. Call `render` then `critique` before accepting.",
         );
       }
-      latestScore = clamped;
+      const outstandingIssues = lastCritique.issues;
+      const hitEmpty = outstandingIssues.length === 0;
+      if (!hitEmpty && iteration < MAX_ITERATIONS) {
+        throw new Error(
+          `Critic still reports ${outstandingIssues.length} issue(s) and you have ${MAX_ITERATIONS - iteration} render(s) left. Fix the issues, render, and critique again.`,
+        );
+      }
+
       const payload = {
         asset_id: resolved.assetId,
         iterations: iteration,
         max_iterations: MAX_ITERATIONS,
-        score: clamped,
-        min_accept_score: MIN_ACCEPT_SCORE,
-        hit_threshold: clamped >= MIN_ACCEPT_SCORE,
+        hit_empty_issues: hitEmpty,
+        residual_issues: outstandingIssues,
+        verdict: lastCritique.verdict,
         notes: params.notes,
         accepted_at: new Date().toISOString(),
       };
@@ -308,17 +320,59 @@ export default function assetLoop(pi: ExtensionAPI) {
       accepted = true;
       refreshWidget(ctx);
       ctx.shutdown();
+
+      const reason = hitEmpty
+        ? "critic returned zero issues"
+        : `iteration cap reached with ${outstandingIssues.length} residual issue(s)`;
       return {
         content: [
           {
             type: "text" as const,
-            text: `Accepted asset ${resolved.assetId} after ${iteration} iteration(s) at score ${clamped.toFixed(2)} (bar ${MIN_ACCEPT_SCORE.toFixed(2)}). Wrote ${resolved.acceptedJsonPath}.`,
+            text: `Accepted asset ${resolved.assetId} after ${iteration} iteration(s) — ${reason}. Wrote ${resolved.acceptedJsonPath}.`,
           },
         ],
         details: payload,
       };
     },
   });
+}
+
+function countBy(issues: CritiqueIssue[], severity: IssueSeverity): number {
+  let n = 0;
+  for (const i of issues) if (i.severity === severity) n++;
+  return n;
+}
+
+function formatCritiqueForAgent(
+  result: CritiqueResult,
+  iteration: number,
+  maxIterations: number,
+): string {
+  const lines: string[] = [];
+  lines.push(`Critique for iteration ${iteration}/${maxIterations}.`);
+  lines.push(`Verdict: ${result.verdict || "(none)"}`);
+  lines.push("");
+  if (result.issues.length === 0) {
+    lines.push("Issues: none. The critic has no defects to report — call `accept`.");
+    return lines.join("\n");
+  }
+  const b = countBy(result.issues, "blocking");
+  const m = countBy(result.issues, "major");
+  const mn = countBy(result.issues, "minor");
+  lines.push(`Issues: ${b} blocking · ${m} major · ${mn} minor. Fix every blocking and major issue, and every minor unless fixing would regress something else. Then call \`render\` and \`critique\` again.`);
+  lines.push("");
+  for (const severity of ["blocking", "major", "minor"] as const) {
+    const group = result.issues.filter((i) => i.severity === severity);
+    if (group.length === 0) continue;
+    lines.push(`${severity.toUpperCase()}:`);
+    for (const issue of group) {
+      lines.push(`  [${issue.id}] region=${issue.region}`);
+      lines.push(`    ${issue.description}`);
+      if (issue.fix_hint) lines.push(`    fix_hint: ${issue.fix_hint}`);
+    }
+    lines.push("");
+  }
+  return lines.join("\n").trimEnd();
 }
 
 async function pickModel(pi: ExtensionAPI, ctx: ExtensionContext): Promise<void> {
@@ -337,7 +391,7 @@ async function pickModel(pi: ExtensionAPI, ctx: ExtensionContext): Promise<void>
     }
   }
   ctx.ui.notify(
-    "claude-opus-4-6 unavailable. Falling back to current model.",
+    `${MODEL_CANDIDATES[0]!.id} unavailable. Falling back to current model.`,
     "error",
   );
 }

@@ -16,6 +16,7 @@ export interface ResolvedAsset {
   renderPath: string;
   wrapperPath: string;
   acceptedJsonPath: string;
+  critiqueJsonPath: string;
 }
 
 export interface ResolveInput {
@@ -57,6 +58,7 @@ export function resolveAsset(input: ResolveInput): ResolvedAsset {
     renderPath: resolve(assetDir, "render.png"),
     wrapperPath: resolve(assetDir, "wrapper.html"),
     acceptedJsonPath: resolve(assetDir, "accepted.json"),
+    critiqueJsonPath: resolve(assetDir, "critique.json"),
   };
 }
 
