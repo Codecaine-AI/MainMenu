@@ -129,73 +129,9 @@ class ExtractionResult(BaseModel):
     completed_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
 
-class ComponentGenerationRequest(BaseModel):
-    asset_id: str
-    model: str
-    prompt_file: str
-    reference_image: str
-    target_size: ImageSize | None = None
-    output_html: str = "component.html"
-    output_css: str = "component.css"
-    implementation_mode: ImplementationMode = ImplementationMode.CSS_SVG_HYBRID
-    iteration: int = 1
-    prompt: str
-
-
-class ComponentGenerationResult(BaseModel):
-    implementation_mode: ImplementationMode = ImplementationMode.CSS_SVG_HYBRID
-    html: str
-    css: str
-    notes: list[str] = Field(default_factory=list)
-    raster_dependencies: list[str] = Field(default_factory=list)
-
-
-class ComponentIssue(BaseModel):
-    category: str = Field(min_length=1)
-    severity: str = Field(min_length=1)
-    summary: str
-    region: str | None = None
-    evidence: str | None = None
-    suggested_fix: str | None = None
-
-
-class AssetComponentReport(BaseModel):
-    asset_id: str
-    iteration: int = 1
-    implementation_mode: ImplementationMode = ImplementationMode.CSS_SVG_HYBRID
-    component_html: str = "component.html"
-    component_css: str = "component.css"
-    reference_image: str = "extracted.png"
-    render: str = "render.png"
-    score: float = Field(ge=0.0, le=1.0)
-    threshold: float = Field(ge=0.0, le=1.0)
-    accepted: bool
-    notes: list[str] = Field(default_factory=list)
-    raster_dependencies: list[str] = Field(default_factory=list)
-    issues: list[ComponentIssue] = Field(default_factory=list)
-
-
-class ComponentCritiqueRequest(BaseModel):
-    asset_id: str
-    model: str
-    prompt_file: str
-    reference_image: str
-    render_image: str
-    iteration: int = 1
-    prompt: str
-
-
 class ImageSize(BaseModel):
     width: int
     height: int
-
-
-class ComponentRenderResult(BaseModel):
-    asset_id: str
-    browser: str = "safari"
-    wrapper_path: str = "_render-wrapper.html"
-    render_path: str = "render.png"
-    image_size: ImageSize
 
 
 def update_manifest(path: Path, **changes: object) -> RunManifest:

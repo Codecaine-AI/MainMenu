@@ -2,12 +2,12 @@ from __future__ import annotations
 
 from pathlib import Path
 
+from ..pipeline.asset_generation.steps.critique_models import AssetComponentReport
+from ..pipeline.asset_generation.steps.generate_models import ComponentGenerationResult
+from ..pipeline.asset_generation.steps.render_models import ComponentRenderResult
 from ..schemas import (
     AssetCatalog,
-    AssetComponentReport,
     AssetEntry,
-    ComponentGenerationResult,
-    ComponentRenderResult,
     RunManifest,
 )
 

@@ -8,12 +8,7 @@ from ....io.logging import RunLogger
 from ....io.prompt_loader import parse_json_object, render_prompt
 from ....io.paths import prompt_path
 from ....model_adapters import write_text_prompt
-from ....schemas import (
-    ComponentGenerationRequest,
-    ComponentGenerationResult,
-    ImageSize,
-    ImplementationMode,
-)
+from ....schemas import ImageSize, ImplementationMode
 from .common import (
     asset_dir_for,
     iteration_step_dir,
@@ -22,6 +17,7 @@ from .common import (
     reference_image_path,
     relative_to_asset,
 )
+from .generate_models import ComponentGenerationRequest, ComponentGenerationResult
 
 
 def generate_component(
@@ -92,6 +88,9 @@ def generate_component(
         )
         return None
 
+    # This is the actual LLM boundary for generation: one reference image plus the
+    # prompt go to the text model, and the model must return JSON matching
+    # ComponentGenerationResult.
     with logger.span(
         "asset_generation.model_call",
         "asset_generation",
@@ -101,6 +100,9 @@ def generate_component(
         iteration=iteration,
     ):
         response_text = write_text_prompt(reference_image, prompt_body, model)
+
+    # The model returns JSON text, not files. We validate that payload, then the
+    # pipeline materializes component.html/component.css from the parsed fields.
     result = ComponentGenerationResult.model_validate(parse_json_object(response_text))
 
     (generation_dir / "component.html").write_text(result.html.rstrip() + "\n")

@@ -2,7 +2,8 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from ....schemas import AssetComponentReport, AssetEntry
+from ....schemas import AssetEntry
+from .critique_models import AssetComponentReport
 
 
 def asset_dir_for(run_dir: Path, asset_id: str) -> Path:

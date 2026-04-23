@@ -8,8 +8,9 @@ from playwright.sync_api import Error as PlaywrightError
 from playwright.sync_api import sync_playwright
 
 from ....io.logging import RunLogger
-from ....schemas import ComponentRenderResult, ImageSize
+from ....schemas import ImageSize
 from .common import asset_dir_for, iteration_step_dir, reference_image_path, resolve_iteration, relative_to_asset
+from .render_models import ComponentRenderResult
 
 
 def render_component(
