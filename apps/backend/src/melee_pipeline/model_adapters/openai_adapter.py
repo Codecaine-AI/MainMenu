@@ -19,7 +19,7 @@ def edit_image(
     model: str,
     size: str,
     quality: str,
-) -> None:
+) -> Path:
     kwargs: dict[str, object] = {
         "model": model,
         "image": source_image.open("rb"),
@@ -37,5 +37,7 @@ def edit_image(
         if image_file is not None:
             image_file.close()
 
+    output_path.parent.mkdir(parents=True, exist_ok=True)
     image_base64 = result.data[0].b64_json
     output_path.write_bytes(base64.b64decode(image_base64))
+    return output_path

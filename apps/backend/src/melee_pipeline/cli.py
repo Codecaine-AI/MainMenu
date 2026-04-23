@@ -7,7 +7,6 @@ from .io.paths import default_runs_dir, init_run
 from .pipeline import (
     catalog_run,
     critique_component,
-    diff_component,
     extract_assets,
     generate_component,
     render_component,
@@ -21,7 +20,7 @@ from .schemas import ImplementationMode
 DEFAULT_CATALOG_MODEL = "openai/gpt-5.4"
 DEFAULT_PROMPT_MODEL = "anthropic/claude-opus-4-6"
 DEFAULT_IMAGE_MODEL = "gemini-image/gemini-3.1-flash-image-preview"
-DEFAULT_COMPONENT_MODEL = "anthropic/claude-opus-4-6"
+DEFAULT_COMPONENT_MODEL = "anthropic/claude-opus-4-7"
 DEFAULT_CRITIQUE_MODEL = "openai/gpt-5.4"
 
 
@@ -68,13 +67,8 @@ def main() -> None:
     render_parser.add_argument("run", type=Path)
     render_parser.add_argument("asset_id")
     render_parser.add_argument("--browser", default="chromium")
+    render_parser.add_argument("--iteration", type=int)
     render_parser.add_argument("--settle-ms", type=int, default=350)
-
-    diff_parser = subparsers.add_parser(
-        "diff-component", help="Diff a rendered component PNG against its extracted asset."
-    )
-    diff_parser.add_argument("run", type=Path)
-    diff_parser.add_argument("asset_id")
 
     critique_parser = subparsers.add_parser(
         "critique-component", help="Produce a strict critique report for one rendered asset."
@@ -87,7 +81,7 @@ def main() -> None:
 
     loop_parser = subparsers.add_parser(
         "run-asset-loop",
-        help="Run generate -> render -> diff -> critique for one asset until accepted or capped.",
+        help="Run generate -> render -> critique for one asset until accepted or capped.",
     )
     loop_parser.add_argument("run", type=Path)
     loop_parser.add_argument("asset_id")
@@ -149,22 +143,26 @@ def main() -> None:
             iteration=args.iteration,
             dry_run=args.dry_run,
         )
-        print("dry_run" if result is None else args.run / "assets" / args.asset_id / "component.html")
+        print(
+            "dry_run"
+            if result is None
+            else args.run
+            / "assets"
+            / args.asset_id
+            / "asset_generation"
+            / f"iteration_{args.iteration:02d}"
+            / "generation"
+            / "component.html"
+        )
     elif args.command == "render-component":
         result = render_component(
             args.run,
             asset_id=args.asset_id,
             browser=args.browser,
+            iteration=args.iteration,
             settle_ms=args.settle_ms,
         )
         print(args.run / "assets" / args.asset_id / result.render_path)
-    elif args.command == "diff-component":
-        metrics = diff_component(args.run, asset_id=args.asset_id)
-        print(
-            f"pixel_mismatch={metrics.pixel_mismatch_ratio:.6f} "
-            f"alpha_mismatch={metrics.alpha_mismatch_ratio:.6f} "
-            f"mean_delta={metrics.mean_abs_channel_delta:.3f}"
-        )
     elif args.command == "critique-component":
         report = critique_component(
             args.run,

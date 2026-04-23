@@ -12,14 +12,7 @@ from PIL import Image
 
 
 SUPPORTED_IMAGE_SIZES = {"512", "1K", "2K", "4K"}
-QUALITY_TO_IMAGE_SIZE = {
-    "low": "512",
-    "standard": "1K",
-    "medium": "1K",
-    "high": "2K",
-    "hd": "2K",
-    "ultra": "4K",
-}
+DEFAULT_AUTO_IMAGE_SIZE = "1K"
 
 
 def client() -> genai.Client:
@@ -35,8 +28,8 @@ def edit_image(
     size: str,
     quality: str,
     aspect_ratio: str | None = None,
-) -> None:
-    image_size = _resolve_image_size(size=size, quality=quality)
+) -> Path:
+    image_size = resolve_image_size(size=size, quality=quality)
     config_kwargs: dict[str, Any] = {"response_modalities": ["TEXT", "IMAGE"]}
     image_config_kwargs: dict[str, str] = {}
     api_client = client()
@@ -60,7 +53,7 @@ def edit_image(
         image = part.as_image() if hasattr(part, "as_image") else None
         if image is not None:
             image.save(output_path)
-            return
+            return output_path
 
         inline_data = getattr(part, "inline_data", None)
         if inline_data is None:
@@ -74,7 +67,7 @@ def edit_image(
         if isinstance(data, str):
             data = base64.b64decode(data)
         _save_image_bytes(data, output_path)
-        return
+        return output_path
 
     text_parts = [
         getattr(part, "text", None)
@@ -85,7 +78,7 @@ def edit_image(
     raise RuntimeError(f"Gemini image response did not include an image part.{detail}")
 
 
-def _resolve_image_size(size: str, quality: str) -> str:
+def resolve_image_size(size: str, quality: str) -> str:
     normalized_size = (size or "").strip().upper()
     if normalized_size and normalized_size not in {"AUTO", "DEFAULT"}:
         if normalized_size in SUPPORTED_IMAGE_SIZES:
@@ -97,8 +90,7 @@ def _resolve_image_size(size: str, quality: str) -> str:
             f"such as 1024x1024; got {size!r}."
         )
 
-    normalized_quality = (quality or "").strip().lower()
-    return QUALITY_TO_IMAGE_SIZE.get(normalized_quality, "2K")
+    return DEFAULT_AUTO_IMAGE_SIZE
 
 
 def _image_size_from_dimensions(size: str) -> str:

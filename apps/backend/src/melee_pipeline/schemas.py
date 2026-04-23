@@ -32,29 +32,6 @@ class ImplementationMode(StrEnum):
     VIDEO_BACKGROUND = "video_background"
 
 
-class IssueSeverity(StrEnum):
-    BLOCKER = "blocker"
-    MAJOR = "major"
-    MINOR = "minor"
-    NIT = "nit"
-
-
-class IssueCategory(StrEnum):
-    SILHOUETTE = "silhouette"
-    PERSPECTIVE = "perspective"
-    BORDER = "border"
-    GLOW = "glow"
-    GRADIENT = "gradient"
-    COLOR = "color"
-    SHADOW = "shadow"
-    TEXTURE = "texture"
-    ALIGNMENT = "alignment"
-    TYPOGRAPHY = "typography"
-    ALPHA_EDGE = "alpha_edge"
-    MOTION = "motion"
-    OTHER = "other"
-
-
 class Canvas(BaseModel):
     width: int
     height: int
@@ -124,6 +101,8 @@ class ExtractionRequest(BaseModel):
     size: str = "auto"
     quality: str = "high"
     aspect_ratio: str | None = None
+    target_size: ImageSize
+    resolved_image_size: str | None = None
 
 
 class PromptGenerationRequest(BaseModel):
@@ -141,6 +120,12 @@ class ExtractionResult(BaseModel):
     output_path: str
     status: Literal["dry_run", "completed", "failed"]
     error: str | None = None
+    raw_output_path: str | None = None
+    raw_size: ImageSize | None = None
+    normalized_size: ImageSize | None = None
+    target_size: ImageSize | None = None
+    aspect_ratio: str | None = None
+    resolved_image_size: str | None = None
     completed_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
 
@@ -149,6 +134,7 @@ class ComponentGenerationRequest(BaseModel):
     model: str
     prompt_file: str
     reference_image: str
+    target_size: ImageSize | None = None
     output_html: str = "component.html"
     output_css: str = "component.css"
     implementation_mode: ImplementationMode = ImplementationMode.CSS_SVG_HYBRID
@@ -165,8 +151,8 @@ class ComponentGenerationResult(BaseModel):
 
 
 class ComponentIssue(BaseModel):
-    category: IssueCategory
-    severity: IssueSeverity
+    category: str = Field(min_length=1)
+    severity: str = Field(min_length=1)
     summary: str
     region: str | None = None
     evidence: str | None = None
@@ -181,7 +167,6 @@ class AssetComponentReport(BaseModel):
     component_css: str = "component.css"
     reference_image: str = "extracted.png"
     render: str = "render.png"
-    diff: str = "diff.png"
     score: float = Field(ge=0.0, le=1.0)
     threshold: float = Field(ge=0.0, le=1.0)
     accepted: bool
@@ -196,7 +181,6 @@ class ComponentCritiqueRequest(BaseModel):
     prompt_file: str
     reference_image: str
     render_image: str
-    diff_image: str
     iteration: int = 1
     prompt: str
 
@@ -206,36 +190,12 @@ class ImageSize(BaseModel):
     height: int
 
 
-class BoundingBox(BaseModel):
-    left: int
-    top: int
-    right: int
-    bottom: int
-
-
 class ComponentRenderResult(BaseModel):
     asset_id: str
     browser: str = "safari"
     wrapper_path: str = "_render-wrapper.html"
     render_path: str = "render.png"
     image_size: ImageSize
-
-
-class ComponentDiffMetrics(BaseModel):
-    asset_id: str
-    reference_image: str = "extracted.png"
-    render_image: str = "render.png"
-    diff_image: str = "diff.png"
-    reference_size: ImageSize
-    render_size: ImageSize
-    compare_size: ImageSize
-    pixel_mismatch_ratio: float = Field(ge=0.0, le=1.0)
-    alpha_mismatch_ratio: float = Field(ge=0.0, le=1.0)
-    mean_abs_channel_delta: float = Field(ge=0.0, le=255.0)
-    dominant_color_delta: float = Field(ge=0.0)
-    reference_bbox: BoundingBox | None = None
-    render_bbox: BoundingBox | None = None
-    bbox_delta: dict[str, int] = Field(default_factory=dict)
 
 
 def update_manifest(path: Path, **changes: object) -> RunManifest:

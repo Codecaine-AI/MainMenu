@@ -1,18 +1,27 @@
 from __future__ import annotations
 
-import json
 from pathlib import Path
 
-from ...io.logging import RunLogger
-from ...io.paths import prompt_path
-from ...model_adapters import write_text_prompt
-from ...prompting import parse_json_object, read_prompt
-from ...schemas import (
+from PIL import Image
+
+from ....io.logging import RunLogger
+from ....io.prompt_loader import parse_json_object, render_prompt
+from ....io.paths import prompt_path
+from ....model_adapters import write_text_prompt
+from ....schemas import (
     ComponentGenerationRequest,
     ComponentGenerationResult,
+    ImageSize,
     ImplementationMode,
 )
-from .common import asset_dir_for, load_asset_entry, load_existing_report, reference_image_path
+from .common import (
+    asset_dir_for,
+    iteration_step_dir,
+    load_asset_entry,
+    load_existing_report,
+    reference_image_path,
+    relative_to_asset,
+)
 
 
 def generate_component(
@@ -27,17 +36,20 @@ def generate_component(
     run_dir = run_dir.resolve()
     logger = logger or RunLogger(run_dir)
     asset_dir = asset_dir_for(run_dir, asset_id)
+    generation_dir = iteration_step_dir(run_dir, asset_id, iteration, "generation")
     asset = load_asset_entry(run_dir, asset_id)
     reference_image = reference_image_path(run_dir, asset_id)
+    with Image.open(reference_image) as reference:
+        target_size = ImageSize(width=reference.width, height=reference.height)
     previous_report = load_existing_report(run_dir, asset_id) if iteration > 1 else None
-    prompt_file = prompt_path("asset_generation", "css-asset-recreation.md")
-    prompt_template = read_prompt(prompt_file)
-    prompt_body = build_generation_prompt(
-        prompt_template=prompt_template,
+    prompt_file = prompt_path("asset_generation", "css-asset-recreation.py")
+    prompt_body = render_prompt(
+        prompt_file,
         asset=asset,
         implementation_mode=implementation_mode,
         iteration=iteration,
         previous_report=previous_report,
+        target_size=target_size,
     )
 
     request = ComponentGenerationRequest(
@@ -45,12 +57,15 @@ def generate_component(
         model=model,
         prompt_file=str(prompt_file),
         reference_image=str(reference_image),
+        target_size=target_size,
+        output_html=relative_to_asset(asset_dir, generation_dir / "component.html"),
+        output_css=relative_to_asset(asset_dir, generation_dir / "component.css"),
         implementation_mode=implementation_mode,
         iteration=iteration,
         prompt=prompt_body,
     )
-    request_path = asset_dir / "component-request.json"
-    prompt_path_out = asset_dir / "component-prompt.md"
+    request_path = generation_dir / "request.json"
+    prompt_path_out = generation_dir / "prompt.md"
     request_path.write_text(request.model_dump_json(indent=2) + "\n")
     prompt_path_out.write_text(prompt_body)
     logger.event(
@@ -62,6 +77,8 @@ def generate_component(
         model=model,
         iteration=iteration,
         implementation_mode=implementation_mode,
+        target_width=target_size.width,
+        target_height=target_size.height,
     )
 
     if dry_run:
@@ -86,9 +103,9 @@ def generate_component(
         response_text = write_text_prompt(reference_image, prompt_body, model)
     result = ComponentGenerationResult.model_validate(parse_json_object(response_text))
 
-    (asset_dir / "component.html").write_text(result.html.rstrip() + "\n")
-    (asset_dir / "component.css").write_text(result.css.rstrip() + "\n")
-    (asset_dir / "component-generation-result.json").write_text(
+    (generation_dir / "component.html").write_text(result.html.rstrip() + "\n")
+    (generation_dir / "component.css").write_text(result.css.rstrip() + "\n")
+    (generation_dir / "result.json").write_text(
         result.model_dump_json(indent=2) + "\n"
     )
     logger.event(
@@ -98,51 +115,6 @@ def generate_component(
         asset_id=asset_id,
         iteration=iteration,
         implementation_mode=result.implementation_mode,
+        path=generation_dir,
     )
     return result
-
-
-def build_generation_prompt(
-    *,
-    prompt_template: str,
-    asset: object,
-    implementation_mode: ImplementationMode,
-    iteration: int,
-    previous_report: object | None,
-) -> str:
-    parts = [
-        prompt_template,
-        "",
-        "Return JSON only with this shape:",
-        json.dumps(
-            {
-                "implementation_mode": implementation_mode.value,
-                "html": "<div>...</div>",
-                "css": ".component { }",
-                "notes": ["short implementation note"],
-                "raster_dependencies": [],
-            },
-            indent=2,
-        ),
-        "",
-        "Constraints:",
-        "- `html` must be a snippet suitable for insertion inside a wrapper div, not a full document.",
-        "- `css` must contain all styles needed for the snippet.",
-        "- Keep the implementation tight to the asset bounds.",
-        "- Use inline SVG inside the HTML snippet when needed for silhouette precision.",
-        "",
-        f"Iteration: {iteration}",
-        f"Requested implementation mode: {implementation_mode.value}",
-        "",
-        "Asset metadata JSON:",
-        json.dumps(asset.model_dump(mode='json'), indent=2),
-    ]
-    if previous_report is not None:
-        parts.extend(
-            [
-                "",
-                "Previous critique report JSON. Fix these issues directly unless the structure is unsalvageable:",
-                previous_report.model_dump_json(indent=2),
-            ]
-        )
-    return "\n".join(parts).strip() + "\n"

@@ -3,9 +3,9 @@ from __future__ import annotations
 from pathlib import Path
 
 from ...io.logging import RunLogger
+from ...io.prompt_loader import render_prompt
 from ...io.paths import prompt_path
 from ...model_adapters import catalog_image
-from ...prompting import read_prompt
 from ...schemas import AssetCatalog, CatalogRequest, RunManifest, update_manifest
 
 
@@ -20,8 +20,8 @@ def catalog_run(
     manifest_path = run_dir / "run.json"
     manifest = RunManifest.model_validate_json(manifest_path.read_text())
     source_image = run_dir / manifest.source_image
-    prompt_file = prompt_path("extraction", "asset-catalog.md")
-    prompt = read_prompt(prompt_file)
+    prompt_file = prompt_path("extraction", "asset-catalog.py")
+    prompt = render_prompt(prompt_file)
 
     logger.update_status(
         run_id=manifest.run_id,
