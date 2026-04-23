@@ -3,8 +3,9 @@ from __future__ import annotations
 from pathlib import Path
 
 from ...io.logging import RunLogger
-from ...schemas import AssetComponentReport, ImplementationMode
+from ...schemas import ImplementationMode
 from .steps.critique import critique_component
+from .steps.critique_models import AssetComponentReport
 from .steps.generate import generate_component
 from .steps.render import render_component
 

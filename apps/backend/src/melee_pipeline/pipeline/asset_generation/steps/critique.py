@@ -6,7 +6,6 @@ from ....io.logging import RunLogger
 from ....io.prompt_loader import parse_json_object, render_prompt
 from ....io.paths import prompt_path
 from ....model_adapters import write_text_prompt
-from ....schemas import AssetComponentReport, ComponentCritiqueRequest
 from .common import (
     asset_dir_for,
     iteration_step_dir,
@@ -15,6 +14,7 @@ from .common import (
     resolve_iteration,
     relative_to_asset,
 )
+from .critique_models import AssetComponentReport, ComponentCritiqueRequest
 
 
 def critique_component(
@@ -65,6 +65,8 @@ def critique_component(
         threshold=threshold,
     )
 
+    # This is the actual LLM boundary for critique: the reference image and the
+    # current render are sent to the text model, which returns a JSON critique.
     with logger.span(
         "asset_critique.model_call",
         "asset_generation",
@@ -74,6 +76,10 @@ def critique_component(
         iteration=resolved_iteration,
     ):
         response_text = write_text_prompt([reference_path, render_path], prompt_body, model)
+
+    # The model does not generate files or paths here. It returns critique fields
+    # like score/issues, and the pipeline fills in the local artifact paths and
+    # threshold before validating the final report shape.
     data = parse_json_object(response_text)
     data = normalize_report_payload(data)
     data["threshold"] = threshold
