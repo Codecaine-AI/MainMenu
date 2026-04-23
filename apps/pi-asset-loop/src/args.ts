@@ -9,6 +9,8 @@ export interface ResolvedAsset {
   assetDir: string;
   assetJsonPath: string;
   extractedPngPath: string;
+  sourcePngPath: string;
+  extractionPromptPath: string;
   componentHtmlPath: string;
   componentCssPath: string;
   renderPath: string;
@@ -38,6 +40,8 @@ export function resolveAsset(input: ResolveInput): ResolvedAsset {
   }
 
   const extractedPngPath = resolveExtractedPng(assetDir);
+  const sourcePngPath = resolveSourcePng(assetDir);
+  const extractionPromptPath = resolveExtractionPrompt(assetDir);
 
   const assetId = parseAssetId(assetJsonPath) ?? assetDir.split("/").pop() ?? "asset";
 
@@ -46,12 +50,30 @@ export function resolveAsset(input: ResolveInput): ResolvedAsset {
     assetDir,
     assetJsonPath,
     extractedPngPath,
+    sourcePngPath,
+    extractionPromptPath,
     componentHtmlPath: resolve(assetDir, "component.html"),
     componentCssPath: resolve(assetDir, "component.css"),
     renderPath: resolve(assetDir, "render.png"),
     wrapperPath: resolve(assetDir, "wrapper.html"),
     acceptedJsonPath: resolve(assetDir, "accepted.json"),
   };
+}
+
+function resolveSourcePng(assetDir: string): string {
+  const candidate = resolve(assetDir, "..", "..", "source.png");
+  if (!existsSync(candidate)) {
+    throw new Error(`Missing source screenshot: ${candidate}`);
+  }
+  return candidate;
+}
+
+function resolveExtractionPrompt(assetDir: string): string {
+  const candidate = resolve(assetDir, "extraction", "prompt_generation", "prompt.txt");
+  if (!existsSync(candidate)) {
+    throw new Error(`Missing extraction prompt: ${candidate}`);
+  }
+  return candidate;
 }
 
 function resolveAssetDir(asset: string, run: string | undefined, cwd: string): string {
