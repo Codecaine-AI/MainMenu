@@ -2,7 +2,6 @@
 
 from .asset_generation import (
     critique_component,
-    diff_component,
     generate_component,
     render_component,
     run_asset_loop,
@@ -13,7 +12,6 @@ from .run import run_two_step_pipeline
 __all__ = [
     "catalog_run",
     "critique_component",
-    "diff_component",
     "extract_assets",
     "generate_component",
     "load_catalog",

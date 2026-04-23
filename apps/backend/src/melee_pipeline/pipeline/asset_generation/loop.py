@@ -4,10 +4,9 @@ from pathlib import Path
 
 from ...io.logging import RunLogger
 from ...schemas import AssetComponentReport, ImplementationMode
-from .critique import critique_component
-from .diff import diff_component
-from .generate import generate_component
-from .render import render_component
+from .steps.critique import critique_component
+from .steps.generate import generate_component
+from .steps.render import render_component
 
 
 def run_asset_loop(
@@ -18,7 +17,7 @@ def run_asset_loop(
     implementation_mode: ImplementationMode = ImplementationMode.CSS_SVG_HYBRID,
     max_iterations: int = 3,
     threshold: float = 0.95,
-    browser: str = "safari",
+    browser: str = "chromium",
     dry_run: bool = False,
     logger: RunLogger | None = None,
 ) -> AssetComponentReport | None:
@@ -62,8 +61,7 @@ def run_asset_loop(
                 counts={"iterations": iteration, "max_iterations": max_iterations},
             )
             return None
-        render_component(run_dir, asset_id=asset_id, browser=browser, logger=logger)
-        diff_component(run_dir, asset_id=asset_id, logger=logger)
+        render_component(run_dir, asset_id=asset_id, browser=browser, iteration=iteration, logger=logger)
         report = critique_component(
             run_dir,
             asset_id=asset_id,

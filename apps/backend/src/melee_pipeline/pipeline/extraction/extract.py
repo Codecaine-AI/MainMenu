@@ -6,19 +6,26 @@ import re
 import shutil
 import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
+from dataclasses import dataclass
 from pathlib import Path
 
+from PIL import Image, ImageOps
+
 from ...io.logging import RunLogger
+from ...io.prompt_loader import render_prompt
 from ...io.paths import prompt_path
 from ...model_adapters import edit_image, write_text_prompt
-from ...prompting import read_prompt
+from ...model_adapters.gemini_image import resolve_image_size as resolve_gemini_image_size
+from ...model_adapters.registry import split_model
 from ...schemas import (
     ExtractionRequest,
     ExtractionResult,
+    ImageSize,
     PromptGenerationRequest,
     RunManifest,
     update_manifest,
 )
+from ..asset_generation.steps.common import extraction_step_dir, relative_to_asset
 from .catalog import load_catalog
 
 
@@ -40,6 +47,14 @@ SUPPORTED_GEMINI_IMAGE_ASPECT_RATIOS = (
 )
 
 
+@dataclass(frozen=True)
+class NormalizedExtractionArtifacts:
+    output_path: Path
+    raw_output_path: Path
+    raw_size: ImageSize
+    normalized_size: ImageSize
+
+
 def write_extraction_request(
     run_dir: Path,
     asset_id: str,
@@ -55,6 +70,8 @@ def write_extraction_request(
     manifest = RunManifest.model_validate_json((run_dir / "run.json").read_text())
     source_image = run_dir / manifest.source_image
     asset_dir = run_dir / "assets" / asset_id
+    prompt_generation_dir = extraction_step_dir(run_dir, asset_id, "prompt_generation")
+    image_extraction_dir = extraction_step_dir(run_dir, asset_id, "image_extraction")
     asset = load_catalog(run_dir).assets_by_id()[asset_id]
     asset_width, asset_height = asset_dimensions_from_bounds(
         bounds=asset.bounds,
@@ -62,15 +79,10 @@ def write_extraction_request(
         canvas_height=manifest.canvas.height,
     )
     aspect_ratio = closest_supported_aspect_ratio(asset_width, asset_height)
-    prompt_file = prompt_path("extraction", "asset-extraction-prompt-generation.md")
-    prompt_template = read_prompt(prompt_file)
-
-    prompt_generation_prompt = (
-        f"{prompt_template}\n\n"
-        "Original source image is attached. Generate the extraction prompt for this single "
-        "asset entry JSON:\n\n"
-        f"{json.dumps(asset.model_dump(mode='json'), indent=2)}"
-    )
+    target_size = ImageSize(width=asset_width, height=asset_height)
+    resolved_image_size = resolve_requested_image_size(image_model, size=size, quality=quality)
+    prompt_file = prompt_path("extraction", "asset-extraction-prompt-generation.py")
+    prompt_generation_prompt = render_prompt(prompt_file, asset=asset)
     prompt_request = PromptGenerationRequest(
         asset_id=asset_id,
         model=prompt_model,
@@ -80,7 +92,7 @@ def write_extraction_request(
         prompt=prompt_generation_prompt,
     )
     asset_dir.mkdir(parents=True, exist_ok=True)
-    prompt_request_path = asset_dir / "prompt-generation-request.json"
+    prompt_request_path = prompt_generation_dir / "request.json"
     prompt_request_path.write_text(prompt_request.model_dump_json(indent=2) + "\n")
     logger.event(
         "prompt.request_written",
@@ -112,7 +124,7 @@ def write_extraction_request(
             model=prompt_model,
         ):
             extraction_prompt = write_text_prompt(source_image, prompt_generation_prompt, prompt_model)
-    extraction_prompt_path = asset_dir / "extraction-prompt.txt"
+    extraction_prompt_path = prompt_generation_dir / "prompt.txt"
     extraction_prompt_path.write_text(extraction_prompt.strip() + "\n")
     logger.event(
         "prompt.written",
@@ -122,7 +134,7 @@ def write_extraction_request(
         path=extraction_prompt_path,
     )
 
-    output_path = asset_dir / "extracted.png"
+    output_path = image_extraction_dir / "extracted.png"
     request = ExtractionRequest(
         asset_id=asset_id,
         model=image_model,
@@ -132,8 +144,10 @@ def write_extraction_request(
         size=size,
         quality=quality,
         aspect_ratio=aspect_ratio,
+        target_size=target_size,
+        resolved_image_size=resolved_image_size,
     )
-    image_request_path = asset_dir / "image-request.json"
+    image_request_path = image_extraction_dir / "request.json"
     image_request_path.write_text(request.model_dump_json(indent=2) + "\n")
     logger.event(
         "image.request_written",
@@ -145,6 +159,9 @@ def write_extraction_request(
         size=size,
         quality=quality,
         aspect_ratio=aspect_ratio,
+        resolved_image_size=resolved_image_size,
+        target_width=target_size.width,
+        target_height=target_size.height,
     )
     return request
 
@@ -220,6 +237,9 @@ def extract_assets(
                     model=image_model,
                     output_path=request.output_path,
                     status="dry_run",
+                    target_size=request.target_size,
+                    aspect_ratio=request.aspect_ratio,
+                    resolved_image_size=request.resolved_image_size,
                 )
                 for request in requests
             ]
@@ -234,7 +254,7 @@ def extract_assets(
 
         for result in results:
             asset_dir = run_dir / "assets" / result.asset_id
-            result_path = asset_dir / "extraction-result.json"
+            result_path = extraction_step_dir(run_dir, result.asset_id, "image_extraction") / "result.json"
             result_path.write_text(result.model_dump_json(indent=2) + "\n")
             logger.event(
                 "extraction.result_written",
@@ -336,23 +356,48 @@ def _run_single_extraction(request: ExtractionRequest, logger: RunLogger) -> Ext
             aspect_ratio=request.aspect_ratio,
         )
 
-    normalized_path = normalize_extracted_file(temp_path, output_path, asset_dir=asset_dir)
+    artifacts = normalize_extracted_file(
+        temp_path,
+        output_path,
+        target_size=request.target_size,
+        asset_dir=asset_dir,
+    )
     logger.event(
         "image.completed",
         "image_extraction",
         "Image extraction completed",
         asset_id=asset_id,
-        path=normalized_path,
+        path=artifacts.output_path,
+        raw_output_path=artifacts.raw_output_path,
+        raw_width=artifacts.raw_size.width,
+        raw_height=artifacts.raw_size.height,
+        normalized_width=artifacts.normalized_size.width,
+        normalized_height=artifacts.normalized_size.height,
+        target_width=request.target_size.width,
+        target_height=request.target_size.height,
+        aspect_ratio=request.aspect_ratio,
+        resolved_image_size=request.resolved_image_size,
     )
     return ExtractionResult(
         asset_id=asset_id,
         model=request.model,
-        output_path=str(normalized_path),
+        output_path=str(artifacts.output_path),
         status="completed",
+        raw_output_path=str(artifacts.raw_output_path),
+        raw_size=artifacts.raw_size,
+        normalized_size=artifacts.normalized_size,
+        target_size=request.target_size,
+        aspect_ratio=request.aspect_ratio,
+        resolved_image_size=request.resolved_image_size,
     )
 
 
-def normalize_extracted_file(temp_path: Path, output_path: Path, asset_dir: Path | None = None) -> Path:
+def normalize_extracted_file(
+    temp_path: Path,
+    output_path: Path,
+    target_size: ImageSize,
+    asset_dir: Path | None = None,
+) -> NormalizedExtractionArtifacts:
     temp_path = temp_path.resolve()
     output_path = output_path.resolve()
     asset_dir = asset_dir.resolve() if asset_dir else output_path.parent.resolve()
@@ -366,13 +411,50 @@ def normalize_extracted_file(temp_path: Path, output_path: Path, asset_dir: Path
             else:
                 path.unlink()
 
-    if temp_path != raw_path:
-        shutil.copyfile(temp_path, raw_path)
+    with Image.open(temp_path).convert("RGBA") as extracted_image:
+        raw_size = ImageSize(width=extracted_image.width, height=extracted_image.height)
+        extracted_image.save(raw_path)
+        normalized_image = normalize_extracted_image(extracted_image, target_size)
+        normalized_size = ImageSize(width=normalized_image.width, height=normalized_image.height)
+        normalized_image.save(output_path)
 
-    if temp_path != output_path:
-        shutil.move(temp_path, output_path)
+    if temp_path not in {raw_path, output_path} and temp_path.exists():
+        temp_path.unlink()
 
-    return output_path
+    return NormalizedExtractionArtifacts(
+        output_path=output_path,
+        raw_output_path=raw_path,
+        raw_size=raw_size,
+        normalized_size=normalized_size,
+    )
+
+
+def normalize_extracted_image(image: Image.Image, target_size: ImageSize) -> Image.Image:
+    source = image.convert("RGBA")
+    target_width = max(target_size.width, 1)
+    target_height = max(target_size.height, 1)
+    if source.size == (target_width, target_height):
+        return source.copy()
+
+    fitted = ImageOps.contain(
+        source,
+        (target_width, target_height),
+        method=Image.Resampling.LANCZOS,
+    )
+    canvas = Image.new("RGBA", (target_width, target_height), (0, 0, 0, 0))
+    x = (target_width - fitted.width) // 2
+    y = (target_height - fitted.height) // 2
+    canvas.paste(fitted, (x, y), fitted)
+    return canvas
+
+
+def resolve_requested_image_size(model: str, *, size: str, quality: str) -> str | None:
+    provider, _ = split_model(model, default_provider="openai-image")
+    if provider == "gemini-image":
+        return resolve_gemini_image_size(size=size, quality=quality)
+
+    normalized_size = (size or "").strip()
+    return normalized_size or None
 
 
 def asset_dimensions_from_bounds(bounds: str, canvas_width: int, canvas_height: int) -> tuple[int, int]:

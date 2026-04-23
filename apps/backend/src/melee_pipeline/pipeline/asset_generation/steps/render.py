@@ -7,32 +7,36 @@ from PIL import Image
 from playwright.sync_api import Error as PlaywrightError
 from playwright.sync_api import sync_playwright
 
-from ...io.logging import RunLogger
-from ...schemas import ComponentRenderResult, ImageSize
-from .common import asset_dir_for, reference_image_path
+from ....io.logging import RunLogger
+from ....schemas import ComponentRenderResult, ImageSize
+from .common import asset_dir_for, iteration_step_dir, reference_image_path, resolve_iteration, relative_to_asset
 
 
 def render_component(
     run_dir: Path,
     asset_id: str,
     browser: str = "chromium",
+    iteration: int | None = None,
     settle_ms: int = 350,
     logger: RunLogger | None = None,
 ) -> ComponentRenderResult:
     run_dir = run_dir.resolve()
     logger = logger or RunLogger(run_dir)
     asset_dir = asset_dir_for(run_dir, asset_id)
+    resolved_iteration = resolve_iteration(run_dir, asset_id, iteration)
+    generation_dir = iteration_step_dir(run_dir, asset_id, resolved_iteration, "generation")
+    render_dir = iteration_step_dir(run_dir, asset_id, resolved_iteration, "render")
     reference_image = reference_image_path(run_dir, asset_id)
-    component_html = asset_dir / "component.html"
-    component_css = asset_dir / "component.css"
+    component_html = generation_dir / "component.html"
+    component_css = generation_dir / "component.css"
     if not component_html.exists():
         raise FileNotFoundError(f"Missing component HTML: {component_html}")
     if not component_css.exists():
         raise FileNotFoundError(f"Missing component CSS: {component_css}")
 
-    wrapper_path = asset_dir / "_render-wrapper.html"
-    render_path = asset_dir / "render.png"
-    wrapper_path.write_text(build_render_wrapper(component_html.read_text()))
+    wrapper_path = render_dir / "wrapper.html"
+    render_path = render_dir / "render.png"
+    wrapper_path.write_text(build_render_wrapper(component_html.read_text(), component_css.read_text()))
 
     with Image.open(reference_image) as image:
         width, height = image.size
@@ -59,11 +63,11 @@ def render_component(
         render_result = ComponentRenderResult(
             asset_id=asset_id,
             browser=browser,
-            wrapper_path=wrapper_path.name,
-            render_path=render_path.name,
+            wrapper_path=relative_to_asset(asset_dir, wrapper_path),
+            render_path=relative_to_asset(asset_dir, render_path),
             image_size=ImageSize(width=render.width, height=render.height),
         )
-    (asset_dir / "render-result.json").write_text(render_result.model_dump_json(indent=2) + "\n")
+    (render_dir / "result.json").write_text(render_result.model_dump_json(indent=2) + "\n")
     logger.event(
         "asset_render.completed",
         "asset_generation",
@@ -73,18 +77,20 @@ def render_component(
         width=render_result.image_size.width,
         height=render_result.image_size.height,
         browser=browser,
+        iteration=resolved_iteration,
     )
     return render_result
 
 
-def build_render_wrapper(component_markup: str) -> str:
+def build_render_wrapper(component_markup: str, component_css: str) -> str:
     return f"""<!doctype html>
 <html lang="en">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <link rel="stylesheet" href="component.css" />
   <style>
+    {component_css}
+
     html, body {{
       margin: 0;
       padding: 0;

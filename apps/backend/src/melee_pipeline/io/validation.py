@@ -6,7 +6,6 @@ from ..schemas import (
     AssetCatalog,
     AssetComponentReport,
     AssetEntry,
-    ComponentDiffMetrics,
     ComponentGenerationResult,
     ComponentRenderResult,
     RunManifest,
@@ -46,34 +45,44 @@ def validate_run(run_dir: Path) -> list[str]:
                 except Exception as exc:  # noqa: BLE001
                     errors.append(f"invalid {asset_path}: {exc}")
 
-                report_path = run_dir / "assets" / asset.id / "report.json"
+                report_path = run_dir / "assets" / asset.id / "asset_generation"
                 if report_path.exists():
-                    try:
-                        AssetComponentReport.model_validate_json(report_path.read_text())
-                    except Exception as exc:  # noqa: BLE001
-                        errors.append(f"invalid {report_path}: {exc}")
+                    for iteration_dir in sorted(path for path in report_path.iterdir() if path.is_dir()):
+                        critique_report = iteration_dir / "critique" / "report.json"
+                        if critique_report.exists():
+                            try:
+                                AssetComponentReport.model_validate_json(
+                                    critique_report.read_text()
+                                )
+                            except Exception as exc:  # noqa: BLE001
+                                errors.append(f"invalid {critique_report}: {exc}")
 
-                generation_result_path = run_dir / "assets" / asset.id / "component-generation-result.json"
-                if generation_result_path.exists():
+                legacy_report_path = run_dir / "assets" / asset.id / "report.json"
+                if legacy_report_path.exists():
                     try:
-                        ComponentGenerationResult.model_validate_json(
-                            generation_result_path.read_text()
-                        )
+                        AssetComponentReport.model_validate_json(legacy_report_path.read_text())
                     except Exception as exc:  # noqa: BLE001
-                        errors.append(f"invalid {generation_result_path}: {exc}")
+                        errors.append(f"invalid {legacy_report_path}: {exc}")
 
-                render_result_path = run_dir / "assets" / asset.id / "render-result.json"
-                if render_result_path.exists():
-                    try:
-                        ComponentRenderResult.model_validate_json(render_result_path.read_text())
-                    except Exception as exc:  # noqa: BLE001
-                        errors.append(f"invalid {render_result_path}: {exc}")
+                generation_root = run_dir / "assets" / asset.id / "asset_generation"
+                if generation_root.exists():
+                    for iteration_dir in sorted(path for path in generation_root.iterdir() if path.is_dir()):
+                        generation_result_path = iteration_dir / "generation" / "result.json"
+                        if generation_result_path.exists():
+                            try:
+                                ComponentGenerationResult.model_validate_json(
+                                    generation_result_path.read_text()
+                                )
+                            except Exception as exc:  # noqa: BLE001
+                                errors.append(f"invalid {generation_result_path}: {exc}")
 
-                diff_metrics_path = run_dir / "assets" / asset.id / "diff-metrics.json"
-                if diff_metrics_path.exists():
-                    try:
-                        ComponentDiffMetrics.model_validate_json(diff_metrics_path.read_text())
-                    except Exception as exc:  # noqa: BLE001
-                        errors.append(f"invalid {diff_metrics_path}: {exc}")
+                        render_result_path = iteration_dir / "render" / "result.json"
+                        if render_result_path.exists():
+                            try:
+                                ComponentRenderResult.model_validate_json(
+                                    render_result_path.read_text()
+                                )
+                            except Exception as exc:  # noqa: BLE001
+                                errors.append(f"invalid {render_result_path}: {exc}")
 
     return errors
