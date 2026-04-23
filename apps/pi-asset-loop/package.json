@@ -1,0 +1,22 @@
+{
+  "name": "pi-asset-loop",
+  "private": true,
+  "type": "module",
+  "description": "Pi coding-agent extension that reconstructs MELEE assets as HTML/CSS in a render-edit loop.",
+  "scripts": {
+    "postinstall": "playwright install chromium",
+    "pi": "pi -e ./extensions/asset-loop.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "playwright": "^1.48.0"
+  },
+  "devDependencies": {
+    "@mariozechner/pi-ai": "*",
+    "@mariozechner/pi-coding-agent": "*",
+    "@mariozechner/pi-tui": "*",
+    "@sinclair/typebox": "^0.34.0",
+    "@types/node": "^22.0.0",
+    "typescript": "^5.6.0"
+  }
+}

@@ -247,7 +247,7 @@ Deliverables:
 Flow:
 
 1. Normalize the source screenshot.
-2. Send it to a vision model with `apps/backend/src/melee_pipeline/pipeline/extraction/prompts/asset-catalog.md`.
+2. Send it to a vision model with `apps/asset-extraction-pipeline/asset_extraction_pipeline/prompts/asset_catalog.py`.
 3. Validate the JSON.
 4. Split catalog assets into per-asset folders.
 5. Write each `asset.json`.
@@ -270,7 +270,7 @@ Deliverables:
 Flow:
 
 1. Read `asset.json`.
-2. Use `apps/backend/src/melee_pipeline/pipeline/extraction/prompts/asset-extraction-prompt-generation.md`.
+2. Use `apps/asset-extraction-pipeline/asset_extraction_pipeline/prompts/asset_extraction_prompt_generation.py`.
 3. Write the exact extraction prompt to disk.
 4. Optionally run a prompt review pass with Claude Opus.
 
@@ -347,7 +347,7 @@ Do this before the CSS loop. Otherwise we cannot measure improvement.
 
 Deliverables:
 
-- `apps/backend/src/melee_pipeline/pipeline/asset_generation/prompts/css-asset-recreation.md`
+- `apps/pi-asset-loop/src/systemPrompt.ts` (per-asset HTML/CSS reconstruction + self-critique brief, now owned by the pi coding-agent extension)
 - `scripts/run_asset_loop.py`
 - `component.html`
 - `component.css`
@@ -374,7 +374,7 @@ Recommended policy:
 
 Deliverables:
 
-- `apps/backend/src/melee_pipeline/pipeline/asset_combining/prompts/screen-composition.md`
+- (asset combining / screen composition phase is not yet implemented; the draft prompt has been removed pending a dedicated app)
 - `scripts/compose_screen.py`
 - `composition/screen.html`
 - `composition/screen.css`
@@ -448,7 +448,7 @@ Success looks like:
 2. Add `schemas/` with the first Pydantic models.
 3. Add `scripts/init_run.py` to create `runs/<screen-id>/` from a source image.
 4. Add `scripts/render_component.py` and `scripts/diff_images.py` before any model-heavy automation.
-5. Create `apps/backend/src/melee_pipeline/pipeline/asset_generation/prompts/css-asset-recreation.md`.
+5. ~~Create the asset-recreation prompt~~ done — it lives in `apps/pi-asset-loop/src/systemPrompt.ts`.
 6. Run a manual first vertical slice with one asset before automating the full orchestration.
 
 ## Non-Goals For Now

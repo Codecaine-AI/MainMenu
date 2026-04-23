@@ -18,11 +18,10 @@ The repo currently has the beginnings of the pipeline, but most of the automatio
 
 | Area | Current files | Status |
 | --- | --- | --- |
-| Extraction phase | `apps/backend/src/melee_pipeline/pipeline/extraction/prompts/asset-catalog.md` | Defines the screen-to-asset inventory prompt and JSON shape. |
-| Extraction phase | `apps/backend/src/melee_pipeline/pipeline/extraction/prompts/asset-extraction-prompt-generation.md` | Defines how to turn one asset entry into an image-editing extraction prompt. |
-| Asset generation phase | `apps/backend/src/melee_pipeline/pipeline/asset_generation/prompts/css-asset-recreation.md` | Defines the per-asset HTML/CSS recreation loop prompt. |
-| Asset generation phase | `apps/backend/src/melee_pipeline/pipeline/asset_generation/prompts/css-asset-critique.md` | Defines the strict per-asset critique report prompt. |
-| Asset combining phase | `apps/backend/src/melee_pipeline/pipeline/asset_combining/prompts/screen-composition.md` | Draft composition prompt for rebuilding the full screen from accepted assets. |
+| Extraction phase | `apps/asset-extraction-pipeline/asset_extraction_pipeline/prompts/asset_catalog.py` | Defines the screen-to-asset inventory prompt and JSON shape. |
+| Extraction phase | `apps/asset-extraction-pipeline/asset_extraction_pipeline/prompts/asset_extraction_prompt_generation.py` | Defines how to turn one asset entry into an image-editing extraction prompt. |
+| Asset generation phase | `apps/pi-asset-loop/src/systemPrompt.ts` | Pi coding-agent system prompt: per-asset HTML/CSS reconstruction + self-critique brief. |
+| Asset combining phase | _(not yet implemented; the draft composition prompt has been removed pending a dedicated app)_ |
 | Prompting | `prompts/claude-design-system-prompt.md` | General HTML/design artifact prompt, not yet wired into this pipeline. |
 | Reference assets | `assets/` | Contains Melee menu background loops and several thumbnail JPGs. |
 | Iteration screenshots | `screenshots/` | Contains several saved prototype screenshots. |
@@ -67,11 +66,11 @@ sequenceDiagram
   participant Composer as Composition Agent Loop
 
   User->>Orchestrator: Provide source menu image
-  Orchestrator->>CatalogModel: Run apps/backend/src/melee_pipeline/pipeline/extraction/prompts/asset-catalog.md with source image
+  Orchestrator->>CatalogModel: Run asset_extraction_pipeline/prompts/asset_catalog.py with source image
   CatalogModel-->>Orchestrator: Return asset catalog JSON
 
   loop For each catalog asset
-    Orchestrator->>ExtractPrompt: Run apps/backend/src/melee_pipeline/pipeline/extraction/prompts/asset-extraction-prompt-generation.md with one asset JSON
+    Orchestrator->>ExtractPrompt: Run asset_extraction_pipeline/prompts/asset_extraction_prompt_generation.py with one asset JSON
     ExtractPrompt-->>Orchestrator: Return extraction prompt
     Orchestrator->>ImageModel: Run source image + extraction prompt
     ImageModel-->>Orchestrator: Return transparent asset image
@@ -116,13 +115,13 @@ runs/
       report.json
 ```
 
-Backend-owned pipeline prompts live inside `apps/backend/src/melee_pipeline/pipeline/<phase>/prompts/`. The new `runs/` directory holds generated artifacts and should be ignored by git if runs become large or disposable.
+Extraction prompts live inside `apps/asset-extraction-pipeline/asset_extraction_pipeline/prompts/`. The per-asset recreation prompt lives in `apps/pi-asset-loop/src/systemPrompt.ts`. The `runs/` directory holds generated artifacts and should be ignored by git if runs become large or disposable.
 
 ## Data Contracts
 
 ### Asset Catalog
 
-`apps/backend/src/melee_pipeline/pipeline/extraction/prompts/asset-catalog.md` already defines the first contract:
+`apps/asset-extraction-pipeline/asset_extraction_pipeline/prompts/asset_catalog.py` already defines the first contract:
 
 ```json
 {
@@ -183,7 +182,7 @@ Responsibilities:
 
 - Accept a source image path.
 - Create a `runs/<screen-id>/` folder.
-- Call the catalog model with `apps/backend/src/melee_pipeline/pipeline/extraction/prompts/asset-catalog.md`.
+- Call the catalog model with `apps/asset-extraction-pipeline/asset_extraction_pipeline/prompts/asset_catalog.py`.
 - Validate and save `catalog.json`.
 - Fan out per-asset extraction and CSS generation work.
 - Track status so interrupted runs can resume.
@@ -238,7 +237,7 @@ Outputs:
 - `diff.png`
 - `report.json`
 
-This is where `apps/backend/src/melee_pipeline/pipeline/asset_generation/prompts/css-asset-recreation.md` should be used. `prompts/claude-design-system-prompt.md` is still too broad to serve as the pipeline contract directly.
+This is where `apps/pi-asset-loop/src/systemPrompt.ts` is used. `prompts/claude-design-system-prompt.md` is still too broad to serve as the pipeline contract directly.
 
 ### 6. Visual Comparison Harness
 
