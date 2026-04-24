@@ -1,7 +1,7 @@
 #!/usr/bin/env bun
 // Thin CLI entry: parse --asset/--run from argv, delegate to runAssetLoop.
 
-import { runAssetLoop } from "../src/orchestrator.ts";
+import { runAssetLoop } from "../src/agent/orchestrator.ts";
 
 interface ParsedArgs {
   asset?: string;

@@ -180,6 +180,20 @@ component.css contains every style the snippet needs. No external stylesheets.
 Web fonts via @import are fine if the asset has text.
 </file_contracts>
 
+<coordinate_system>
+The asset is rendered at ${input.referenceWidth}x${input.referenceHeight}px.
+Pixel (0,0) is top-left. The critic describes defect locations in this
+coordinate system using approximate pixel coordinates, edge angles, and
+distances. When you modify SVG paths, viewBox coordinates, or CSS positions,
+work in these same pixel coordinates.
+
+When the critic says "at approximately (x, y)" that maps directly to your SVG
+viewBox or CSS coordinate space. Use the reference_geometry and render_geometry
+fields to understand EXACTLY what needs to change — the reference_geometry is
+what the output should look like, the render_geometry is what it currently
+looks like. The affected_element_hint tells you which code element to modify.
+</coordinate_system>
+
 <fix_step_instruction>
 Exactly one critic issue follows in the user turn. component.html and
 component.css already exist in your workspace — read them. Apply only the fix

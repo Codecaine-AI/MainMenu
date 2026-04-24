@@ -13,9 +13,10 @@ import {
   SessionManager,
 } from "@mariozechner/pi-coding-agent";
 
-import { type ResolvedAsset } from "./args.ts";
+import { type ResolvedAsset } from "../args.ts";
 import { type CritiqueIssue } from "./critic.ts";
 import { buildFixStepSystemPrompt } from "./systemPrompt.ts";
+import type { ToolActivityEvent } from "../tui/tui.ts";
 
 export interface RunFixStepInput {
   resolved: ResolvedAsset;
@@ -32,6 +33,7 @@ export interface RunFixStepInput {
   authStorage: AuthStorage;
   modelRegistry: ModelRegistry;
   onUsage?: (usage: Usage) => void;
+  onToolActivity?: (event: ToolActivityEvent) => void;
 }
 
 export async function runFixStep(input: RunFixStepInput): Promise<void> {
@@ -70,11 +72,27 @@ export async function runFixStep(input: RunFixStepInput): Promise<void> {
     ) {
       input.onUsage?.(event.message.usage);
     }
+    if (event.type === "tool_execution_start") {
+      input.onToolActivity?.({
+        type: "start",
+        toolCallId: event.toolCallId,
+        toolName: event.toolName,
+        args: event.args,
+      });
+    }
+    if (event.type === "tool_execution_end") {
+      input.onToolActivity?.({
+        type: "end",
+        toolCallId: event.toolCallId,
+        toolName: event.toolName,
+        isError: event.isError,
+      });
+    }
   });
 
   const kickoffText = [
     `Fix step for asset "${input.resolved.assetId}" at iteration ${input.iteration}.`,
-    `Native size: ${input.referenceWidth}x${input.referenceHeight}px.`,
+    `Native size: ${input.referenceWidth}x${input.referenceHeight}px. Coordinate system: (0,0) is top-left.`,
     "",
     "Three images follow in this order:",
     "  1. source.png — original screenshot the asset was extracted from (ground truth in situ).",
@@ -91,6 +109,11 @@ export async function runFixStep(input: RunFixStepInput): Promise<void> {
     `  region: ${input.issue.region}`,
     `  severity: ${input.issue.severity}`,
     `  description: ${input.issue.description}`,
+    "",
+    `  REFERENCE shows: ${input.issue.reference_geometry}`,
+    `  RENDER shows:    ${input.issue.render_geometry}`,
+    `  Element to fix:  ${input.issue.affected_element_hint}`,
+    "",
     `  fix_hint: ${input.issue.fix_hint}`,
     "",
     "Read component.html and component.css in the working directory, then apply only this fix. No other changes, no refactors, no prose reply. When the edit is written, stop.",

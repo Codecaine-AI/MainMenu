@@ -17,15 +17,15 @@ import {
   SessionManager,
 } from "@mariozechner/pi-coding-agent";
 
-import { resolveAsset, type ResolvedAsset, type ResolveInput } from "./args.ts";
+import { resolveAsset, type ResolvedAsset, type ResolveInput } from "../args.ts";
 import { runCritique, type CritiqueIssue } from "./critic.ts";
 import { runFixStep } from "./fixStep.ts";
-import { readPngSize } from "./pngSize.ts";
-import { renderWithPlaywright } from "./renderer.ts";
+import { readPngSize } from "../render/pngSize.ts";
+import { renderWithPlaywright } from "../render/renderer.ts";
 import { buildSystemPrompt } from "./systemPrompt.ts";
-import { AssetLoopTUI } from "./tui.ts";
-import { UsageAggregator, formatUsageSnapshot, type UsageSnapshot } from "./usage.ts";
-import { buildRenderWrapper } from "./wrapper.ts";
+import { AssetLoopTUI, type ToolActivityEvent } from "../tui/tui.ts";
+import { UsageAggregator, formatUsageSnapshot, type UsageSnapshot } from "../tui/usage.ts";
+import { buildRenderWrapper } from "../render/wrapper.ts";
 
 const MODEL_PROVIDER = "anthropic" as const;
 const MODEL_ID = "claude-opus-4-7" as const;
@@ -159,6 +159,22 @@ export async function runAssetLoop(input: ResolveInput): Promise<void> {
       usage.add(event.message.usage);
       tui.setUsage(usage.snapshot());
     }
+    if (event.type === "tool_execution_start") {
+      tui.addToolActivity({
+        type: "start",
+        toolCallId: event.toolCallId,
+        toolName: event.toolName,
+        args: event.args,
+      });
+    }
+    if (event.type === "tool_execution_end") {
+      tui.addToolActivity({
+        type: "end",
+        toolCallId: event.toolCallId,
+        toolName: event.toolName,
+        isError: event.isError,
+      });
+    }
   });
 
   const kickoffText = [
@@ -290,6 +306,7 @@ export async function runAssetLoop(input: ResolveInput): Promise<void> {
     }
 
     console.log(`phase: fix iter ${iteration} — ${outcome.result.issues.length} issues`);
+    let fixRenderBase64 = renderBase64;
     for (const [issueIndex, issue] of outcome.result.issues.entries()) {
       tui.setPhase("fix", issue);
       tui.setCurrentIssue(issueIndex);
@@ -304,7 +321,7 @@ export async function runAssetLoop(input: ResolveInput): Promise<void> {
         referenceHeight,
         sourceBase64,
         extractedBase64: referenceBase64,
-        currentRenderBase64: renderBase64,
+        currentRenderBase64: fixRenderBase64,
         model,
         authStorage,
         modelRegistry,
@@ -312,7 +329,23 @@ export async function runAssetLoop(input: ResolveInput): Promise<void> {
           usage.add(u);
           tui.setUsage(usage.snapshot());
         },
+        onToolActivity: (e) => tui.addToolActivity(e),
       });
+
+      if (issueIndex < outcome.result.issues.length - 1) {
+        console.log(`re-render after fix ${issue.id}`);
+        const freshHtml = readFileSync(resolved.componentHtmlPath, "utf8");
+        const freshCss = readFileSync(resolved.componentCssPath, "utf8");
+        writeFileSync(resolved.wrapperPath, buildRenderWrapper(freshHtml, freshCss));
+        await renderWithPlaywright({
+          wrapperPath: resolved.wrapperPath,
+          renderPath: resolved.renderPath,
+          referenceWidth,
+          referenceHeight,
+        });
+        fixRenderBase64 = readFileSync(resolved.renderPath).toString("base64");
+        tui.setRender(fixRenderBase64, "image/png");
+      }
     }
   }
   } finally {

@@ -234,11 +234,18 @@ parse_stream() {
 
       result)
         local cost duration subtype
-        cost=$(echo "$line" | jq -r '.total_cost_usd // "?"' 2>/dev/null)
+        cost=$(echo "$line" | jq -r '.total_cost_usd // "0"' 2>/dev/null)
         duration=$(echo "$line" | jq -r '.duration_ms // 0' 2>/dev/null)
         subtype=$(echo "$line" | jq -r '.subtype // "unknown"' 2>/dev/null)
         local duration_s
         duration_s=$(echo "scale=1; ${duration:-0} / 1000" | bc 2>/dev/null || echo "?")
+
+        # Accumulate totals (parse_stream runs in a subshell, so use temp file)
+        if [[ -f "$TOTALS_FILE" ]]; then
+          local prev_cost prev_dur
+          read -r prev_cost prev_dur < "$TOTALS_FILE"
+          echo "$(echo "$prev_cost + ${cost:-0}" | bc 2>/dev/null) $(( ${prev_dur:-0} + ${duration:-0} ))" > "$TOTALS_FILE"
+        fi
 
         echo -e "  ${C_DIM}│${C_RESET}"
         if [[ "$subtype" == "success" ]]; then
@@ -309,6 +316,12 @@ if is_paused_or_failed; then
 fi
 
 ITERATION=0
+TOTAL_COST=0
+TOTAL_DURATION_MS=0
+RUNNER_START=$(date +%s)
+TOTALS_FILE=$(mktemp)
+echo "0 0" > "$TOTALS_FILE"
+trap 'rm -f "$TOTALS_FILE"' EXIT
 
 while true; do
   ITERATION=$((ITERATION + 1))
@@ -316,7 +329,20 @@ while true; do
   if is_done; then
     echo ""
     show_status
+
+    # Calculate totals
+    local final_cost final_dur_ms
+    read -r final_cost final_dur_ms < "$TOTALS_FILE" 2>/dev/null || { final_cost=0; final_dur_ms=0; }
+    local wall_secs=$(( $(date +%s) - RUNNER_START ))
+    local wall_min=$(( wall_secs / 60 ))
+    local wall_sec_rem=$(( wall_secs % 60 ))
+    local api_min api_sec_rem
+    api_min=$(( ${final_dur_ms:-0} / 60000 ))
+    api_sec_rem=$(( (${final_dur_ms:-0} % 60000) / 1000 ))
+
     echo -e "  ${C_GREEN}[OK]${C_RESET} Build complete after $ITERATION iteration(s)."
+    echo -e "  ${C_BOLD}Total time:${C_RESET}  ${wall_min}m ${wall_sec_rem}s wall, ${api_min}m ${api_sec_rem}s API"
+    echo -e "  ${C_BOLD}Total cost:${C_RESET}  \$${final_cost:-0}"
     echo -e "  ${C_DIM}Full logs: $LOG_DIR/${C_RESET}"
     echo ""
     exit 0
@@ -353,8 +379,9 @@ while true; do
   if claude -p \
     --dangerously-skip-permissions \
     --model opus \
+    --verbose \
     --output-format stream-json \
-    "$PROMPT" 2>/dev/null | parse_stream "$LOG_FILE"; then
+    "$PROMPT" 2>"${LOG_FILE%.jsonl}.stderr" | parse_stream "$LOG_FILE"; then
     echo ""
     echo -e "  ${C_CYAN}[$(timestamp)]${C_RESET} Invocation completed successfully"
   else
