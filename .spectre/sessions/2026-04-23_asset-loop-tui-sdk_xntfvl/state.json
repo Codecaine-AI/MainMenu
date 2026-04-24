@@ -72,21 +72,21 @@
     "status": "finalized",
     "checkpoints_total": 5,
     "checkpoints_detailed": 5,
-    "current_checkpoint": 2,
-    "last_updated": "2026-04-23T22:30:00Z",
-    "checkpoints_completed": [1],
-    "summary": "CP1 complete: system prompt stripped to initial-gen only, src/orchestrator.ts thin slice created (initial-gen + render + critique), bin/asset-loop.ts CLI entry added, `bun run asset-loop` script wired. Typecheck passes."
+    "current_checkpoint": 3,
+    "last_updated": "2026-04-23T23:00:00Z",
+    "checkpoints_completed": [1, 2],
+    "summary": "CP2 complete: runCritique now returns CritiqueOutcome (parse-failure aborts the loop), buildFixStepSystemPrompt added, src/fixStep.ts opens a fresh in-memory SDK session per critic issue, orchestrator.ts wraps initial-gen in a deterministic render → critique → batch-fix loop bounded by MAX_ITERATIONS=15 with writeAcceptedJson on hit_empty/cap. Extension critique tool unwraps the new shape. Typecheck passes."
   },
   "build": {
     "status": "in_progress",
     "started_at": "2026-04-23T22:30:00Z",
     "completed_at": null,
-    "last_updated": "2026-04-23T22:30:00Z",
+    "last_updated": "2026-04-23T23:00:00Z",
     "data": {
-      "current_checkpoint": 2,
+      "current_checkpoint": 3,
       "current_task_group": null,
       "current_task": null,
-      "checkpoints_completed": [1]
+      "checkpoints_completed": [1, 2]
     }
   },
   "docs": {
@@ -102,6 +102,13 @@
     "branch": "build-run-test",
     "worktree": null,
     "base_branch": "main",
-    "commits": []
+    "commits": [
+      {
+        "checkpoint_id": 1,
+        "sha": "fbad6e7a282eef5e300c262b50470f1bf71bfa60",
+        "message": "checkpoint-1: End-to-end thin slice via Pi SDK",
+        "created_at": "2026-04-23T22:30:00Z"
+      }
+    ]
   }
 }

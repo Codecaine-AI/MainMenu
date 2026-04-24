@@ -17,8 +17,9 @@ import {
   SessionManager,
 } from "@mariozechner/pi-coding-agent";
 
-import { resolveAsset, type ResolveInput } from "./args.ts";
-import { runCritique } from "./critic.ts";
+import { resolveAsset, type ResolvedAsset, type ResolveInput } from "./args.ts";
+import { runCritique, type CritiqueIssue } from "./critic.ts";
+import { runFixStep } from "./fixStep.ts";
 import { readPngSize } from "./pngSize.ts";
 import { renderWithPlaywright } from "./renderer.ts";
 import { buildSystemPrompt } from "./systemPrompt.ts";
@@ -26,6 +27,35 @@ import { buildRenderWrapper } from "./wrapper.ts";
 
 const MODEL_PROVIDER = "anthropic" as const;
 const MODEL_ID = "claude-opus-4-7" as const;
+const MAX_ITERATIONS = 15;
+
+function writeAcceptedJson(
+  resolved: ResolvedAsset,
+  payload: {
+    iterations: number;
+    hitEmpty: boolean;
+    residualIssues: CritiqueIssue[];
+    verdict: string;
+  },
+): void {
+  const notes: string[] = payload.hitEmpty
+    ? [`converged at iteration ${payload.iterations}`]
+    : [
+        `iteration cap reached at ${payload.iterations} renders`,
+        `${payload.residualIssues.length} residual issue(s)`,
+      ];
+  const output = {
+    asset_id: resolved.assetId,
+    iterations: payload.iterations,
+    max_iterations: MAX_ITERATIONS,
+    hit_empty_issues: payload.hitEmpty,
+    residual_issues: payload.residualIssues,
+    verdict: payload.verdict,
+    notes,
+    accepted_at: new Date().toISOString(),
+  };
+  writeFileSync(resolved.acceptedJsonPath, `${JSON.stringify(output, null, 2)}\n`);
+}
 
 export async function runAssetLoop(input: ResolveInput): Promise<void> {
   const resolved = resolveAsset(input);
@@ -92,38 +122,91 @@ export async function runAssetLoop(input: ResolveInput): Promise<void> {
   await session.agent.waitForIdle();
   session.dispose();
 
-  console.log("phase: render");
-  const componentHtml = readFileSync(resolved.componentHtmlPath, "utf8");
-  const componentCss = readFileSync(resolved.componentCssPath, "utf8");
-  writeFileSync(resolved.wrapperPath, buildRenderWrapper(componentHtml, componentCss));
-  await renderWithPlaywright({
-    wrapperPath: resolved.wrapperPath,
-    renderPath: resolved.renderPath,
-    referenceWidth,
-    referenceHeight,
-  });
+  for (let iteration = 1; iteration <= MAX_ITERATIONS; iteration++) {
+    console.log(`phase: render iter ${iteration}/${MAX_ITERATIONS}`);
+    const componentHtml = readFileSync(resolved.componentHtmlPath, "utf8");
+    const componentCss = readFileSync(resolved.componentCssPath, "utf8");
+    writeFileSync(resolved.wrapperPath, buildRenderWrapper(componentHtml, componentCss));
+    await renderWithPlaywright({
+      wrapperPath: resolved.wrapperPath,
+      renderPath: resolved.renderPath,
+      referenceWidth,
+      referenceHeight,
+    });
+    const renderBase64 = readFileSync(resolved.renderPath).toString("base64");
 
-  console.log("phase: critique");
-  const auth = await modelRegistry.getApiKeyAndHeaders(model);
-  if (!auth.ok) {
-    throw new Error(`Cannot resolve credentials for critic: ${auth.error}`);
+    console.log(`phase: critique iter ${iteration}`);
+    const auth = await modelRegistry.getApiKeyAndHeaders(model);
+    if (!auth.ok) {
+      throw new Error(`Cannot resolve credentials for critic: ${auth.error}`);
+    }
+    const outcome = await runCritique({
+      model,
+      auth: { apiKey: auth.apiKey, headers: auth.headers },
+      sourcePngPath: resolved.sourcePngPath,
+      extractedPngPath: resolved.extractedPngPath,
+      renderPngPath: resolved.renderPath,
+      extractionPromptText,
+      assetJson: assetJsonText,
+    });
+
+    if (!outcome.ok) {
+      console.error(
+        `aborted: critic parse failure — ${truncate(outcome.rawSecond, 400)}`,
+      );
+      throw new Error("critic parse failure");
+    }
+
+    writeFileSync(
+      resolved.critiqueJsonPath,
+      `${JSON.stringify({ iteration, verdict: outcome.result.verdict, issues: outcome.result.issues }, null, 2)}\n`,
+    );
+
+    if (outcome.result.issues.length === 0) {
+      console.log("accepted — hit_empty");
+      writeAcceptedJson(resolved, {
+        iterations: iteration,
+        hitEmpty: true,
+        residualIssues: [],
+        verdict: outcome.result.verdict,
+      });
+      return;
+    }
+
+    if (iteration === MAX_ITERATIONS) {
+      console.log("accepted — cap");
+      writeAcceptedJson(resolved, {
+        iterations: iteration,
+        hitEmpty: false,
+        residualIssues: outcome.result.issues,
+        verdict: outcome.result.verdict,
+      });
+      return;
+    }
+
+    console.log(`phase: fix iter ${iteration} — ${outcome.result.issues.length} issues`);
+    for (const issue of outcome.result.issues) {
+      console.log(`fix ${issue.id}: ${issue.severity} ${issue.region}`);
+      await runFixStep({
+        resolved,
+        issue,
+        iteration,
+        assetJsonText,
+        extractionPromptText,
+        referenceWidth,
+        referenceHeight,
+        sourceBase64,
+        extractedBase64: referenceBase64,
+        currentRenderBase64: renderBase64,
+        model,
+        authStorage,
+        modelRegistry,
+      });
+    }
   }
-  const critique = await runCritique({
-    model,
-    auth: { apiKey: auth.apiKey, headers: auth.headers },
-    sourcePngPath: resolved.sourcePngPath,
-    extractedPngPath: resolved.extractedPngPath,
-    renderPngPath: resolved.renderPath,
-    extractionPromptText,
-    assetJson: assetJsonText,
-  });
+}
 
-  writeFileSync(
-    resolved.critiqueJsonPath,
-    `${JSON.stringify({ iteration: 1, verdict: critique.verdict, issues: critique.issues }, null, 2)}\n`,
-  );
-
-  console.log(
-    `iteration 1 complete — verdict: ${critique.verdict || "(none)"}, issues: ${critique.issues.length}`,
-  );
+function truncate(s: string, max: number): string {
+  if (s.length <= max) return s;
+  return `${s.slice(0, max)}…`;
 }

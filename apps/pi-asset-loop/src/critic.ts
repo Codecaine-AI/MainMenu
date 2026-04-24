@@ -31,6 +31,10 @@ export interface CritiqueResult {
   raw: string;
 }
 
+export type CritiqueOutcome =
+  | { ok: true; result: CritiqueResult }
+  | { ok: false; reason: "parse_failed"; rawFirst: string; rawSecond: string };
+
 export interface RunCritiqueInput {
   model: Model<Api>;
   auth: { apiKey?: string; headers?: Record<string, string> };
@@ -179,7 +183,7 @@ const REPLY_INSTRUCTION = `Walk every check in <what_to_check> against the three
 
 export async function runCritique(
   input: RunCritiqueInput,
-): Promise<CritiqueResult> {
+): Promise<CritiqueOutcome> {
   const sourceBase64 = readFileSync(input.sourcePngPath).toString("base64");
   const extractedBase64 = readFileSync(input.extractedPngPath).toString(
     "base64",
@@ -226,7 +230,7 @@ export async function runCritique(
   const firstText = extractText(first.content);
   const firstParsed = tryParse(firstText);
   if (firstParsed) {
-    return { ...firstParsed, raw: firstText };
+    return { ok: true, result: { ...firstParsed, raw: firstText } };
   }
 
   // One retry with stricter instruction.
@@ -266,22 +270,14 @@ export async function runCritique(
   const secondText = extractText(second.content);
   const secondParsed = tryParse(secondText);
   if (secondParsed) {
-    return { ...secondParsed, raw: secondText };
+    return { ok: true, result: { ...secondParsed, raw: secondText } };
   }
 
   return {
-    issues: [
-      {
-        id: "I1",
-        region: "other",
-        severity: "blocking",
-        description: `Critic returned unparseable JSON twice. Raw reply: ${truncate(secondText, 400)}`,
-        fix_hint:
-          "Render again and call critique; the next critic call starts fresh.",
-      },
-    ],
-    verdict: "Critic parse failure — treat as unconverged.",
-    raw: secondText,
+    ok: false,
+    reason: "parse_failed",
+    rawFirst: truncate(firstText, 400),
+    rawSecond: truncate(secondText, 400),
   };
 }
 

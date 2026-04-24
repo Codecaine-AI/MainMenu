@@ -1,0 +1,27 @@
+{
+  "$schema": "DevNotes log — deviations, discoveries, decisions captured during build",
+  "session_id": "2026-04-23_asset-loop-tui-sdk_xntfvl",
+  "notes": [
+    {
+      "checkpoint_id": 2,
+      "task_id": "2.2.4",
+      "scope": { "type": "task", "ref": "2.2.4" },
+      "category": "deviation",
+      "content": "Image payload format: plan specified `{ type: 'image', source: { type: 'base64', mediaType: 'image/png', data } }` (anthropic SDK shape) but the canonical pi-coding-agent ImageContent shape (per node_modules/.../docs/rpc.md and what CP1's orchestrator.ts uses) is `{ type: 'image', data, mimeType: 'image/png' }`. Used the latter to match CP1 and the typed PromptOptions.images: ImageContent[]."
+    },
+    {
+      "checkpoint_id": 2,
+      "task_id": "2.2.4",
+      "scope": { "type": "task", "ref": "2.2.4" },
+      "category": "deviation",
+      "content": "Plan action 11 said pass `tools: createCodingTools(input.resolved.assetDir)` to createAgentSession. CreateAgentSessionOptions.tools is typed as `string[]` (an allowlist of tool names), not `Tool[]`. Omitted the tools param entirely — matches CP1's working pattern where the default coding tools are auto-enabled and resolve paths against the explicit `cwd: resolved.assetDir`."
+    },
+    {
+      "checkpoint_id": 2,
+      "task_id": "2.1.1",
+      "scope": { "type": "task", "ref": "2.1.1" },
+      "category": "decision",
+      "content": "Truncated rawFirst/rawSecond to 400 chars before stuffing into the parse_failed CritiqueOutcome variant (per the read-before note recommending reuse of the existing truncate helper)."
+    }
+  ]
+}
