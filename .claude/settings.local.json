@@ -1,0 +1,20 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git push)",
+      "Bash(cat:*)",
+      "Bash(gh pr view:*)",
+      "Bash(npx tsc:*)",
+      "mcp__browsermcp__browser_snapshot",
+      "mcp__browsermcp__browser_click",
+      "mcp__browsermcp__browser_screenshot",
+      "Bash(uv sync:*)",
+      "Skill(session:spec)",
+      "Bash(python3 -c \"import json; d=json.load\\(open\\('.spectre/sessions/2026-04-15_backend-file-structure-rearrangement_0oh6km/plan.json'\\)\\); cps=d['checkpoints']; tg=sum\\(len\\(c['task_groups']\\) for c in cps\\); t=sum\\(len\\(g['tasks']\\) for c in cps for g in c['task_groups']\\); a=sum\\(len\\(tk['actions']\\) for c in cps for g in c['task_groups'] for tk in g['tasks']\\); print\\(f'cps={len\\(cps\\)} tg={tg} tasks={t} actions={a}'\\)\")",
+      "Bash(bun run:*)",
+      "Bash(bunx tsc:*)"
+    ]
+  }
+}

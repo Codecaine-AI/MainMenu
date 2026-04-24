@@ -8,16 +8,6 @@ from typing import Literal
 from pydantic import BaseModel, ConfigDict, Field
 
 
-class AssetType(StrEnum):
-    BACKGROUND = "background"
-    FRAME = "frame"
-    PANEL = "panel"
-    BANNER = "banner"
-    SIDE_ELEMENT = "side_element"
-    DECORATION = "decoration"
-    OVERLAY = "overlay"
-
-
 class ZOrder(StrEnum):
     BACK = "back"
     MID = "mid"
@@ -38,17 +28,25 @@ class Canvas(BaseModel):
     aspect_ratio: str
 
 
-class AssetEntry(BaseModel):
+class AssetInstance(BaseModel):
     model_config = ConfigDict(extra="allow")
 
-    id: str = Field(pattern=r"^asset_[0-9A-Za-z_-]+$")
-    name: str
-    type: AssetType
-    visual_description: str
     location: str
     bounds: str
     z_order: ZOrder
-    extraction_hint: str
+    notes: str | None = None
+
+
+class AssetEntry(BaseModel):
+    model_config = ConfigDict(extra="allow")
+
+    id: str
+    name: str
+    type: str
+    visual_description: str
+    includes: str | None = None
+    instance_count: int = 1
+    instances: list[AssetInstance] = Field(default_factory=list)
 
 
 class AssetCatalog(BaseModel):
@@ -56,6 +54,7 @@ class AssetCatalog(BaseModel):
 
     image_summary: str
     assets: list[AssetEntry]
+    extraction_candidates: list[str] = Field(default_factory=list)
     screen_id: str | None = None
     source_image: str | None = None
     canvas: Canvas | None = None

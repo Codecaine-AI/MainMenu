@@ -3,7 +3,6 @@ from __future__ import annotations
 from collections.abc import Sequence
 from pathlib import Path
 
-from ..io.json_utils import parse_json_object
 from ..schemas import AssetCatalog
 from . import mirascope_text
 from . import openai_adapter
@@ -31,8 +30,15 @@ def write_text_prompt(source_images: Path | Sequence[Path], prompt: str, model: 
 
 
 def catalog_image(source_image: Path, prompt: str, model: str) -> AssetCatalog:
-    text = write_text_prompt(source_image, prompt, model)
-    return AssetCatalog.model_validate(parse_json_object(text))
+    provider, _ = split_model(model, default_provider="openai")
+    if provider not in {"anthropic", "google", "openai"}:
+        raise ValueError(f"Unsupported Mirascope text model provider: {provider}")
+    return mirascope_text.structured_call(
+        source_image,
+        prompt,
+        normalize_model(model, default_provider="openai"),
+        AssetCatalog,
+    )
 
 
 def edit_image(
