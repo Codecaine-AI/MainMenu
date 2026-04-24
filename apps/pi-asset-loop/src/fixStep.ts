@@ -3,7 +3,7 @@
 // coding tools, feed it the four-image grounding plus exactly one issue,
 // wait for idle, dispose. Cross-issue state is never carried over.
 
-import { type Api, type Model } from "@mariozechner/pi-ai";
+import { type Api, type Model, type Usage } from "@mariozechner/pi-ai";
 import {
   AuthStorage,
   createAgentSession,
@@ -31,6 +31,7 @@ export interface RunFixStepInput {
   model: Model<Api>;
   authStorage: AuthStorage;
   modelRegistry: ModelRegistry;
+  onUsage?: (usage: Usage) => void;
 }
 
 export async function runFixStep(input: RunFixStepInput): Promise<void> {
@@ -59,6 +60,16 @@ export async function runFixStep(input: RunFixStepInput): Promise<void> {
     modelRegistry: input.modelRegistry,
     resourceLoader,
     sessionManager: SessionManager.inMemory(),
+  });
+
+  session.subscribe((event) => {
+    if (
+      event.type === "message_end" &&
+      event.message?.role === "assistant" &&
+      event.message.usage
+    ) {
+      input.onUsage?.(event.message.usage);
+    }
   });
 
   const kickoffText = [

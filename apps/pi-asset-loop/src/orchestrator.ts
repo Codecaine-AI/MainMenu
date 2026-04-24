@@ -23,6 +23,7 @@ import { runFixStep } from "./fixStep.ts";
 import { readPngSize } from "./pngSize.ts";
 import { renderWithPlaywright } from "./renderer.ts";
 import { buildSystemPrompt } from "./systemPrompt.ts";
+import { UsageAggregator, formatUsageSnapshot } from "./usage.ts";
 import { buildRenderWrapper } from "./wrapper.ts";
 
 const MODEL_PROVIDER = "anthropic" as const;
@@ -59,6 +60,7 @@ function writeAcceptedJson(
 
 export async function runAssetLoop(input: ResolveInput): Promise<void> {
   const resolved = resolveAsset(input);
+  const usage = new UsageAggregator();
 
   const referenceBuf = readFileSync(resolved.extractedPngPath);
   const { width: referenceWidth, height: referenceHeight } = readPngSize(referenceBuf);
@@ -100,6 +102,16 @@ export async function runAssetLoop(input: ResolveInput): Promise<void> {
     modelRegistry,
     resourceLoader,
     sessionManager: SessionManager.inMemory(),
+  });
+
+  session.subscribe((event) => {
+    if (
+      event.type === "message_end" &&
+      event.message?.role === "assistant" &&
+      event.message.usage
+    ) {
+      usage.add(event.message.usage);
+    }
   });
 
   const kickoffText = [
@@ -149,11 +161,13 @@ export async function runAssetLoop(input: ResolveInput): Promise<void> {
       extractionPromptText,
       assetJson: assetJsonText,
     });
+    for (const u of outcome.usages) usage.add(u);
 
     if (!outcome.ok) {
       console.error(
         `aborted: critic parse failure — ${truncate(outcome.rawSecond, 400)}`,
       );
+      console.log(formatUsageSnapshot(usage.snapshot()));
       throw new Error("critic parse failure");
     }
 
@@ -170,6 +184,7 @@ export async function runAssetLoop(input: ResolveInput): Promise<void> {
         residualIssues: [],
         verdict: outcome.result.verdict,
       });
+      console.log(formatUsageSnapshot(usage.snapshot()));
       return;
     }
 
@@ -181,6 +196,7 @@ export async function runAssetLoop(input: ResolveInput): Promise<void> {
         residualIssues: outcome.result.issues,
         verdict: outcome.result.verdict,
       });
+      console.log(formatUsageSnapshot(usage.snapshot()));
       return;
     }
 
@@ -201,6 +217,7 @@ export async function runAssetLoop(input: ResolveInput): Promise<void> {
         model,
         authStorage,
         modelRegistry,
+        onUsage: (u) => usage.add(u),
       });
     }
   }
