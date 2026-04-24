@@ -22,6 +22,47 @@
       "scope": { "type": "task", "ref": "2.1.1" },
       "category": "decision",
       "content": "Truncated rawFirst/rawSecond to 400 chars before stuffing into the parse_failed CritiqueOutcome variant (per the read-before note recommending reuse of the existing truncate helper)."
+    },
+    {
+      "checkpoint_id": 4,
+      "task_id": "4.1.1",
+      "scope": { "type": "task", "ref": "4.1.1" },
+      "category": "deviation",
+      "content": "Used `.ts` module specifiers in src/tui.ts imports (./critic.ts, ./usage.ts) rather than the plan's `.js` specifiers, to match the existing convention in src/orchestrator.ts, src/fixStep.ts, etc. tsconfig has allowImportingTsExtensions=true and noEmit=true so this is well-supported."
+    },
+    {
+      "checkpoint_id": 4,
+      "task_id": "4.1.1",
+      "scope": { "type": "task", "ref": "4.1.1" },
+      "category": "decision",
+      "content": "Added a private issuesBox Box field on AssetLoopTUI rather than reaching into this.tui.children[4] by index — functionally equivalent to the plan's swap-via-index approach but less brittle if panel ordering ever changes. setIssues/setCurrentIssue mutate this.issuesList and re-home it via issuesBox.clear()+addChild(this.issuesList), exactly as the plan prescribed."
+    },
+    {
+      "checkpoint_id": 4,
+      "task_id": "4.2.2",
+      "scope": { "type": "task", "ref": "4.2.2" },
+      "category": "deviation",
+      "content": "Plan action 6 called for inserting `const renderBase64 = readFileSync(resolved.renderPath).toString(\"base64\"); tui.setRender(...); tui.setPhase(\"critique\");` after renderWithPlaywright. Orchestrator already declared renderBase64 at that exact spot (from CP1/CP2/CP3), so redeclaring would be a TS2451 error. Reused the existing renderBase64 and inserted only `tui.setRender(renderBase64, \"image/png\"); tui.setPhase(\"critique\");` after it."
+    },
+    {
+      "checkpoint_id": 4,
+      "task_id": "4.2.2",
+      "scope": { "type": "task", "ref": "4.2.2" },
+      "category": "discovery",
+      "content": "Left the legacy `console.log(\"phase: ...\")` and `console.log(\"fix I1: ...\")` and `console.log(\"accepted — ...\")` lines in place this checkpoint — plan did not call for their removal and they still produce useful logs when the TUI is not attached to a TTY. They may visually interfere with the pi-tui differential render in a live terminal; CP5 `cleanup, summary, end-to-end validation` is the natural place to purge or gate them."
+    },
+    {
+      "checkpoint_id": 4,
+      "task_id": "4.2.3",
+      "scope": { "type": "task", "ref": "4.2.3" },
+      "category": "decision",
+      "content": "try/finally wraps the remainder of runAssetLoop after `process.once('SIGINT', sigintHandler)`. The body is intentionally left at its original indent (one level shallow of the new try{}) to minimize diff churn; finally only unregisters the SIGINT listener and deliberately does not call tui.stop() — the three terminal branches (hit_empty, cap, parse-failure) plus the SIGINT handler itself already handle teardown, and pi-tui TUI.stop is idempotent per its `stopped` flag."
+    },
+    {
+      "checkpoint_id": 4,
+      "scope": { "type": "checkpoint", "ref": "4" },
+      "category": "deviation",
+      "content": "Verification step 'Manual end-to-end in a Kitty/Ghostty/iTerm2/WezTerm terminal' cannot be performed in background build mode — no interactive terminal, no credentials vetted for a fresh asset dir, no network egress guarantees. Typecheck (npm run typecheck) passes cleanly, which is the only automated gate available. Manual TUI validation is deferred to the human operator (same pattern as CP1–CP3)."
     }
   ]
 }

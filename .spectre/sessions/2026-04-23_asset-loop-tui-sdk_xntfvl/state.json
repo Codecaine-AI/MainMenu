@@ -72,21 +72,21 @@
     "status": "finalized",
     "checkpoints_total": 5,
     "checkpoints_detailed": 5,
-    "current_checkpoint": 4,
-    "last_updated": "2026-04-23T23:30:00Z",
-    "checkpoints_completed": [1, 2, 3],
-    "summary": "CP3 complete: src/usage.ts introduces UsageAggregator + formatUsageSnapshot (pure, zero SDK imports). CritiqueOutcome gains usages: Usage[] on both variants; runCritique populates first.usage on happy path, [first,second] on retry-success and parse-failure. runFixStep accepts optional onUsage and subscribes to session message_end to forward assistant usage. Orchestrator instantiates one UsageAggregator, subscribes initial-gen session, folds outcome.usages every iteration, passes onUsage to every runFixStep, and console.logs formatUsageSnapshot before hit_empty return, cap return, and parse-failure throw. Typecheck passes."
+    "current_checkpoint": 5,
+    "last_updated": "2026-04-24T00:00:00Z",
+    "checkpoints_completed": [1, 2, 3, 4],
+    "summary": "CP4 complete: src/tui.ts exports AssetLoopTUI — one TUI(ProcessTerminal) wired to five stacked panels (header, status line, pending-issues SelectList, side-by-side extracted/render Images, usage footer) with a narrow imperative API (start, stop, setIteration, setPhase, setIssues, setCurrentIssue, setRender, setUsage, showSummary). runAssetLoop instantiates it right after extractedBase64 and the UsageAggregator, calls tui.start()+setPhase('initial_gen'), installs a one-shot SIGINT handler that tears down the TUI and exits 130, and wraps the remainder in try{...}finally{process.off('SIGINT',handler)}. Every transition (per-iteration setIteration+setPhase('render'), setRender+setPhase('critique') after render, setIssues after critique, setPhase('fix',issue)+setCurrentIssue(i) per issue) is wired. Usage snapshots are pushed into the TUI from the initial-gen subscribe handler, after each critique (for-of on outcome.usages), and inside every runFixStep onUsage callback. Three termination sites (hit_empty, cap, parse-failure) swap CP3's stdout console.log(formatUsageSnapshot) for tui.showSummary([...])+tui.stop() (parse-failure uses stderr then tui.stop before re-throw). accepted.json + critique.json shapes unchanged. Typecheck passes."
   },
   "build": {
     "status": "in_progress",
     "started_at": "2026-04-23T22:30:00Z",
     "completed_at": null,
-    "last_updated": "2026-04-23T23:30:00Z",
+    "last_updated": "2026-04-24T00:00:00Z",
     "data": {
-      "current_checkpoint": 4,
+      "current_checkpoint": 5,
       "current_task_group": null,
       "current_task": null,
-      "checkpoints_completed": [1, 2, 3]
+      "checkpoints_completed": [1, 2, 3, 4]
     }
   },
   "docs": {
@@ -117,7 +117,7 @@
       },
       {
         "checkpoint_id": 3,
-        "sha": "PENDING",
+        "sha": "0291225e004b1f08fb766aed56637c3a2fb3191c",
         "message": "checkpoint-3: Usage aggregator (tokens + cost)",
         "created_at": "2026-04-23T23:30:00Z"
       }
