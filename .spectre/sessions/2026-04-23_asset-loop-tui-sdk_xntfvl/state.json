@@ -7,8 +7,8 @@
   "prior_sessions": [],
   "session_type": "full",
   "created_at": "2026-04-23T21:23:44+00:00",
-  "updated_at": "2026-04-23T22:30:00Z",
-  "current_phase": "build",
+  "updated_at": "2026-04-24T00:30:00Z",
+  "current_phase": "docs",
   "status": "active",
   "intake": {
     "status": "completed",
@@ -72,21 +72,21 @@
     "status": "finalized",
     "checkpoints_total": 5,
     "checkpoints_detailed": 5,
-    "current_checkpoint": 5,
-    "last_updated": "2026-04-24T00:00:00Z",
-    "checkpoints_completed": [1, 2, 3, 4],
-    "summary": "CP4 complete: src/tui.ts exports AssetLoopTUI — one TUI(ProcessTerminal) wired to five stacked panels (header, status line, pending-issues SelectList, side-by-side extracted/render Images, usage footer) with a narrow imperative API (start, stop, setIteration, setPhase, setIssues, setCurrentIssue, setRender, setUsage, showSummary). runAssetLoop instantiates it right after extractedBase64 and the UsageAggregator, calls tui.start()+setPhase('initial_gen'), installs a one-shot SIGINT handler that tears down the TUI and exits 130, and wraps the remainder in try{...}finally{process.off('SIGINT',handler)}. Every transition (per-iteration setIteration+setPhase('render'), setRender+setPhase('critique') after render, setIssues after critique, setPhase('fix',issue)+setCurrentIssue(i) per issue) is wired. Usage snapshots are pushed into the TUI from the initial-gen subscribe handler, after each critique (for-of on outcome.usages), and inside every runFixStep onUsage callback. Three termination sites (hit_empty, cap, parse-failure) swap CP3's stdout console.log(formatUsageSnapshot) for tui.showSummary([...])+tui.stop() (parse-failure uses stderr then tui.stop before re-throw). accepted.json + critique.json shapes unchanged. Typecheck passes."
+    "current_checkpoint": null,
+    "last_updated": "2026-04-24T00:30:00Z",
+    "checkpoints_completed": [1, 2, 3, 4, 5],
+    "summary": "CP5 complete: orchestrator.ts gains buildTerminationSummary(input) — a module-level helper between writeAcceptedJson and runAssetLoop that returns string[] composed of asset id, iter N/MAX, termination kind, residual count + per-issue '[severity] region: description' lines, optional accepted.json path, and the formatted usage line. The three termination sites (hit_empty, cap_reached, parse_failure) all build the summary via this helper, call tui.showSummary(summary) (skipped on parse_failure), then tui.stop(), then console.log(summary.join('\\n')) so the canonical block survives in scrollback after pi-tui restores the terminal. parse_failure additionally mirrors the block to console.error to keep error context next to the existing 'aborted: critic parse failure …' line. Legacy pi-extension surface retired: apps/pi-asset-loop/extensions/asset-loop.ts deleted, the now-empty extensions/ directory removed, and the 'pi' script stripped from apps/pi-asset-loop/package.json — scripts is now exactly { postinstall, asset-loop, typecheck }. README Run section updated to invoke 'bun run asset-loop' so 'rg extensions/asset-loop apps/pi-asset-loop' returns zero matches. Static verification gates pass: typecheck exit 0, ripgrep cleanliness check zero matches, extensions/ directory gone, package.json scripts shape correct. Runtime end-to-end (interactive terminal + live API credentials) deferred to operator. UsageSnapshot type imported into orchestrator. One deviation from plan action 9: formatUsageSnapshot already prefixes its return with 'usage: ', so the helper appends formatUsageSnapshot(usage) directly instead of the doubled `usage: ${formatUsageSnapshot(usage)}` from the plan."
   },
   "build": {
-    "status": "in_progress",
+    "status": "completed",
     "started_at": "2026-04-23T22:30:00Z",
-    "completed_at": null,
-    "last_updated": "2026-04-24T00:00:00Z",
+    "completed_at": "2026-04-24T00:30:00Z",
+    "last_updated": "2026-04-24T00:30:00Z",
     "data": {
-      "current_checkpoint": 5,
+      "current_checkpoint": null,
       "current_task_group": null,
       "current_task": null,
-      "checkpoints_completed": [1, 2, 3, 4]
+      "checkpoints_completed": [1, 2, 3, 4, 5]
     }
   },
   "docs": {
@@ -120,6 +120,18 @@
         "sha": "0291225e004b1f08fb766aed56637c3a2fb3191c",
         "message": "checkpoint-3: Usage aggregator (tokens + cost)",
         "created_at": "2026-04-23T23:30:00Z"
+      },
+      {
+        "checkpoint_id": 4,
+        "sha": "4893bf2",
+        "message": "checkpoint-4: pi-tui observe-only dashboard",
+        "created_at": "2026-04-24T00:00:00Z"
+      },
+      {
+        "checkpoint_id": 5,
+        "sha": "ac1c4d172914ecc19f43e46c42878bcfb4f8140b",
+        "message": "checkpoint-5: cleanup, summary, end-to-end validation",
+        "created_at": "2026-04-24T00:30:00Z"
       }
     ]
   }
