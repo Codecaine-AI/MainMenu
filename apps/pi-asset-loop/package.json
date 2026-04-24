@@ -6,14 +6,15 @@
   "scripts": {
     "postinstall": "playwright install chromium",
     "pi": "pi -e ./extensions/asset-loop.ts",
+    "asset-loop": "bun run ./bin/asset-loop.ts",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@mariozechner/pi-coding-agent": "*",
     "playwright": "^1.48.0"
   },
   "devDependencies": {
     "@mariozechner/pi-ai": "*",
-    "@mariozechner/pi-coding-agent": "*",
     "@mariozechner/pi-tui": "*",
     "@sinclair/typebox": "^0.34.0",
     "@types/node": "^22.0.0",
