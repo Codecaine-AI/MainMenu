@@ -24,7 +24,7 @@ import { readPngSize } from "./pngSize.ts";
 import { renderWithPlaywright } from "./renderer.ts";
 import { buildSystemPrompt } from "./systemPrompt.ts";
 import { AssetLoopTUI } from "./tui.ts";
-import { UsageAggregator, formatUsageSnapshot } from "./usage.ts";
+import { UsageAggregator, formatUsageSnapshot, type UsageSnapshot } from "./usage.ts";
 import { buildRenderWrapper } from "./wrapper.ts";
 
 const MODEL_PROVIDER = "anthropic" as const;
@@ -57,6 +57,32 @@ function writeAcceptedJson(
     accepted_at: new Date().toISOString(),
   };
   writeFileSync(resolved.acceptedJsonPath, `${JSON.stringify(output, null, 2)}\n`);
+}
+
+function buildTerminationSummary(input: {
+  kind: "hit_empty" | "cap_reached" | "parse_failure";
+  assetId: string;
+  iteration: number;
+  maxIterations: number;
+  residualIssues: CritiqueIssue[];
+  acceptedJsonPath: string | null;
+  usage: UsageSnapshot;
+}): string[] {
+  const lines: string[] = [];
+  lines.push(`asset: ${input.assetId}`);
+  lines.push(`iter: ${input.iteration}/${input.maxIterations}`);
+  lines.push(`termination: ${input.kind}`);
+  lines.push(`residual: ${input.residualIssues.length}`);
+  if (input.residualIssues.length > 0) {
+    for (const issue of input.residualIssues) {
+      lines.push(`  - [${issue.severity}] ${issue.region}: ${issue.description}`);
+    }
+  }
+  if (input.acceptedJsonPath !== null) {
+    lines.push(`accepted: ${input.acceptedJsonPath}`);
+  }
+  lines.push(formatUsageSnapshot(input.usage));
+  return lines;
 }
 
 export async function runAssetLoop(input: ResolveInput): Promise<void> {
@@ -193,8 +219,18 @@ export async function runAssetLoop(input: ResolveInput): Promise<void> {
       console.error(
         `aborted: critic parse failure — ${truncate(outcome.rawSecond, 400)}`,
       );
-      console.error(formatUsageSnapshot(usage.snapshot()));
+      const summary = buildTerminationSummary({
+        kind: "parse_failure",
+        assetId: resolved.assetId,
+        iteration,
+        maxIterations: MAX_ITERATIONS,
+        residualIssues: [],
+        acceptedJsonPath: null,
+        usage: usage.snapshot(),
+      });
       tui.stop();
+      console.error(summary.join("\n"));
+      console.log(summary.join("\n"));
       throw new Error("critic parse failure");
     }
 
@@ -214,13 +250,18 @@ export async function runAssetLoop(input: ResolveInput): Promise<void> {
         verdict: outcome.result.verdict,
       });
       tui.setPhase("done");
-      tui.showSummary([
-        "hit_empty: true",
-        `iter ${iteration}/${MAX_ITERATIONS}`,
-        formatUsageSnapshot(usage.snapshot()),
-        `accepted: ${resolved.acceptedJsonPath}`,
-      ]);
+      const summary = buildTerminationSummary({
+        kind: "hit_empty",
+        assetId: resolved.assetId,
+        iteration,
+        maxIterations: MAX_ITERATIONS,
+        residualIssues: [],
+        acceptedJsonPath: resolved.acceptedJsonPath,
+        usage: usage.snapshot(),
+      });
+      tui.showSummary(summary);
       tui.stop();
+      console.log(summary.join("\n"));
       return;
     }
 
@@ -233,13 +274,18 @@ export async function runAssetLoop(input: ResolveInput): Promise<void> {
         verdict: outcome.result.verdict,
       });
       tui.setPhase("done");
-      tui.showSummary([
-        "cap_reached",
-        `iter ${iteration}/${MAX_ITERATIONS}`,
-        formatUsageSnapshot(usage.snapshot()),
-        `accepted: ${resolved.acceptedJsonPath}`,
-      ]);
+      const summary = buildTerminationSummary({
+        kind: "cap_reached",
+        assetId: resolved.assetId,
+        iteration,
+        maxIterations: MAX_ITERATIONS,
+        residualIssues: outcome.result.issues,
+        acceptedJsonPath: resolved.acceptedJsonPath,
+        usage: usage.snapshot(),
+      });
+      tui.showSummary(summary);
       tui.stop();
+      console.log(summary.join("\n"));
       return;
     }
 

@@ -63,6 +63,26 @@
       "scope": { "type": "checkpoint", "ref": "4" },
       "category": "deviation",
       "content": "Verification step 'Manual end-to-end in a Kitty/Ghostty/iTerm2/WezTerm terminal' cannot be performed in background build mode — no interactive terminal, no credentials vetted for a fresh asset dir, no network egress guarantees. Typecheck (npm run typecheck) passes cleanly, which is the only automated gate available. Manual TUI validation is deferred to the human operator (same pattern as CP1–CP3)."
+    },
+    {
+      "checkpoint_id": 5,
+      "task_id": "5.1.1",
+      "scope": { "type": "task", "ref": "5.1.1" },
+      "category": "deviation",
+      "content": "Plan action 9 prescribed `lines.push(\\`usage: ${formatUsageSnapshot(input.usage)}\\`)` but formatUsageSnapshot already returns a string starting with the literal `usage: ` prefix (apps/pi-asset-loop/src/usage.ts:80). Following the plan literally would yield a doubled prefix `usage: usage: calls=...`, which contradicts the CP5 verification (TG3 T5 action 4) that expects a single `usage: calls=...` line. Pushed `formatUsageSnapshot(input.usage)` directly so the helper emits one canonical usage line."
+    },
+    {
+      "checkpoint_id": 5,
+      "task_id": "5.2.3",
+      "scope": { "type": "task", "ref": "5.2.3" },
+      "category": "discovery",
+      "content": "After deleting extensions/asset-loop.ts, the verification check `rg 'extensions/asset-loop' apps/pi-asset-loop` (TG3 T5 action 6) still matched apps/pi-asset-loop/README.md line 19, which documented the legacy `pi -e ./extensions/asset-loop.ts` invocation. Made a minimal edit to the Run section (now `cd apps/pi-asset-loop && bun run asset-loop --asset ../../runs/<run>/assets/<id>`) so the cleanliness assertion passes. The rest of README.md is broadly stale (still calls the project a 'Pi coding-agent extension', references a 10-iteration cap instead of 15, and describes the old accepted.json `{score, notes}` shape) — left for the docs phase to rewrite holistically rather than a piecemeal patch in build."
+    },
+    {
+      "checkpoint_id": 5,
+      "scope": { "type": "checkpoint", "ref": "5" },
+      "category": "deviation",
+      "content": "TG3 T5 runtime verification (actions 2–5: pick a fresh asset dir, `bun run asset-loop` end-to-end in a Kitty/Ghostty/iTerm2/WezTerm terminal, eyeball the post-stop summary block in scrollback, `jq 'keys | sort' accepted.json` for the 8-key shape) cannot run in background build mode — needs an interactive terminal for the pi-tui Image components, vetted Anthropic credentials, and the operator's consent to spend real LLM dollars on a 1–15 iteration loop. The four static assertions ran cleanly: (1) `npm run typecheck` exit 0, (6) `rg 'extensions/asset-loop' apps/pi-asset-loop` zero matches after the README minor edit, (7) `test ! -d apps/pi-asset-loop/extensions` exit 0, (8) `jq '.scripts | keys | sort' apps/pi-asset-loop/package.json` exactly `[\"asset-loop\",\"postinstall\",\"typecheck\"]`. Marking CP5 complete on the static gates with the runtime verification deferred to the operator (same pattern as CP1–CP4)."
     }
   ]
 }
