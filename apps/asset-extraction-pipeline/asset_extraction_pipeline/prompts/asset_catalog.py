@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from textwrap import dedent
 
 ASSET_CATALOG_PROMPT = """<purpose>
 Inventory distinct visual assets in a UI screenshot at extraction granularity. Each listed asset is a visually self-contained region an extraction pipeline will isolate as one piece.
@@ -49,6 +48,22 @@ Incorrect: merging main_menu_frame with tilted_side_panel as "menu_system" (over
 - Never skip background and frame layers — most commonly missed.
 - If bounds are uncertain, state "approximate" or "unknown". Do not fabricate precision.
 </rules>
+
+<asset_type_vocabulary>
+`type` is a free-form snake_case string. Prefer one of the canonical values below; only invent a new one if none of these fit, and still keep it short, lowercase, snake_case, and purely visual.
+
+Canonical values and when to use each:
+- background: the backmost scene/backdrop layer (grids, gradients, skybox, scene art behind everything).
+- panel_frame: a self-contained titled/bordered panel that reads as one connected banner graphic (border + title + backing plate bundled).
+- container: a plain holding region inside a panel (a list backing, a stack backdrop, a grouping box without its own titled frame).
+- composite_button: an interactive element bundled with its label/icon as one unit (button + text + icon glyph = one asset).
+- selector_overlay: an active-state/highlight graphic that sits on top of a base element (yellow glow on the selected button, cursor ring, focus indicator).
+- decoration: a visually substantial but non-interactive ornament (logo, corner flourish, character portrait, emblem).
+- divider: a thin separator line or strip between regions (horizontal rule, vertical splitter).
+
+Good `type` values: "background", "panel_frame", "container", "composite_button", "selector_overlay", "decoration", "divider".
+Bad `type` values: "menu" (functional, not visual), "UI" (too generic), "Panel Frame" (wrong case/spacing), "button_text" (sub-part of composite_button — should be bundled).
+</asset_type_vocabulary>
 
 <process>
 1. Scan back-to-front: background → distinct panel regions → containers inside panels → composite interactive elements → overlays.

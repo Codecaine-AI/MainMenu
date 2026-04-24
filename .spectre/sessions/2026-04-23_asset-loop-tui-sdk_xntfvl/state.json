@@ -1,0 +1,106 @@
+{
+  "$schema": "Session state manifest v3 - vertical phase slices, programmatic updates only",
+  "session_id": "2026-04-23_asset-loop-tui-sdk_xntfvl",
+  "session_uuid": "{{SESSION_UUID}}",
+  "topic": "asset-loop-tui-sdk",
+  "description": "Transition the current pi-extension asset loop into a standalone TUI application that uses the Pi SDK to deterministically orchestrate the render-critique-fix loop",
+  "prior_sessions": [],
+  "session_type": "full",
+  "created_at": "2026-04-23T21:23:44+00:00",
+  "updated_at": "2026-04-23T22:18:32Z",
+  "current_phase": "plan",
+  "status": "active",
+  "intake": {
+    "status": "completed",
+    "started_at": "2026-04-23T21:23:44+00:00",
+    "completed_at": "2026-04-23T21:24:00+00:00",
+    "last_updated": "2026-04-23T21:24:00+00:00",
+    "data": {}
+  },
+  "link_priors": {
+    "status": "completed",
+    "started_at": "2026-04-23T21:24:00+00:00",
+    "completed_at": "2026-04-23T21:24:00+00:00",
+    "last_updated": "2026-04-23T21:24:00+00:00",
+    "data": {
+      "prior_session": null
+    }
+  },
+  "spec": {
+    "status": "finalized",
+    "started_at": "2026-04-23T21:24:00+00:00",
+    "completed_at": "2026-04-23T21:40:00+00:00",
+    "last_updated": "2026-04-23T21:40:00+00:00",
+    "data": {
+      "open_questions": [
+        "Exact Usage aggregation shape from pi-ai complete()",
+        "pi-tui Image fallback behavior in non-supporting terminals",
+        "Whether bun run asset-loop needs a top-level workspace alias"
+      ],
+      "key_decisions": [
+        "Use Pi SDK rather than Pi extension",
+        "One LLM session per fix-step (in-memory)",
+        "Reuse existing src/ modules unchanged",
+        "TUI is observe-only (no pause/skip/edit)",
+        "Each fix-step receives full context (4 images + files + 1 issue)",
+        "Batch fix, single verify per critique cycle",
+        "TUI shows inline images via pi-tui Image component",
+        "Orchestrator writes accepted.json directly (no LLM accept tool)",
+        "Critic parse failure aborts the loop",
+        "Replace extension in-place under apps/pi-asset-loop",
+        "Launch via bun run asset-loop",
+        "Initial gen is single SDK call with write tools",
+        "TUI surfaces iter/phase/current issue, pending issues queue, token+cost meter",
+        "Print summary and exit on termination"
+      ]
+    }
+  },
+  "plan": {
+    "status": "finalized",
+    "started_at": "2026-04-23T21:38:50Z",
+    "completed_at": "2026-04-23T22:18:32Z",
+    "last_updated": "2026-04-23T22:18:32Z",
+    "data": {
+      "oversight_mode": "stepped",
+      "current_level": "task_groups",
+      "current_checkpoint": 5,
+      "current_task_group": null,
+      "current_task": null
+    }
+  },
+  "plan_state": {
+    "status": "finalized",
+    "checkpoints_total": 5,
+    "checkpoints_detailed": 5,
+    "current_checkpoint": 5,
+    "last_updated": "2026-04-23T22:18:32Z",
+    "checkpoints_completed": []
+  },
+  "build": {
+    "status": "pending",
+    "started_at": null,
+    "completed_at": null,
+    "last_updated": null,
+    "data": {
+      "current_checkpoint": null,
+      "current_task_group": null,
+      "current_task": null,
+      "checkpoints_completed": []
+    }
+  },
+  "docs": {
+    "status": "pending",
+    "started_at": null,
+    "completed_at": null,
+    "last_updated": null,
+    "data": {
+      "updates": []
+    }
+  },
+  "git": {
+    "branch": "main",
+    "worktree": null,
+    "base_branch": null,
+    "commits": []
+  }
+}

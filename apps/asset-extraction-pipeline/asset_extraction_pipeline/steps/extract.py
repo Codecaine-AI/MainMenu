@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import json
 import math
 import re
 import shutil
@@ -11,7 +10,7 @@ from pathlib import Path
 
 from PIL import Image, ImageOps
 
-from ..common import extraction_step_dir, relative_to_asset
+from ..common import extraction_step_dir
 from ..io.logging import RunLogger
 from ..model_adapters import edit_image, write_text_prompt
 from ..model_adapters.gemini_image import resolve_image_size as resolve_gemini_image_size
@@ -72,8 +71,9 @@ def write_extraction_request(
     prompt_generation_dir = extraction_step_dir(run_dir, asset_id, "prompt_generation")
     image_extraction_dir = extraction_step_dir(run_dir, asset_id, "image_extraction")
     asset = load_catalog(run_dir).assets_by_id()[asset_id]
+    bounds = asset.instances[0].bounds if asset.instances else "unknown"
     asset_width, asset_height = asset_dimensions_from_bounds(
-        bounds=asset.bounds,
+        bounds=bounds,
         canvas_width=manifest.canvas.width,
         canvas_height=manifest.canvas.height,
     )

@@ -4,7 +4,7 @@ from pathlib import Path
 
 from ..io.logging import RunLogger
 from ..model_adapters import catalog_image
-from ..prompts.asset_catalog import build_prompt as build_catalog_prompt
+from ..prompts.asset_catalog import ASSET_CATALOG_PROMPT
 from ..schemas import AssetCatalog, CatalogRequest, RunManifest, update_manifest
 
 
@@ -20,7 +20,7 @@ def catalog_run(
     manifest = RunManifest.model_validate_json(manifest_path.read_text())
     source_image = run_dir / manifest.source_image
     prompt_module = "asset_extraction_pipeline.prompts.asset_catalog"
-    prompt = build_catalog_prompt().strip() + "\n"
+    prompt = ASSET_CATALOG_PROMPT.strip() + "\n"
 
     logger.update_status(
         run_id=manifest.run_id,

@@ -5,12 +5,7 @@ RUNS_DIR ?= runs
 IMAGE ?= assets/Super-Smash-Bros-Melee07292023-112856-24048_thumb.jpg
 RUN_ID ?= first-pass
 RUN_DIR ?= $(RUNS_DIR)/$(RUN_ID)
-CATALOG_MODEL ?= openai/gpt-5.4
-PROMPT_MODEL ?= anthropic/claude-opus-4-6
-IMAGE_MODEL ?= openai-image/gpt-image-2
 MAX_WORKERS ?= 4
-IMAGE_SIZE ?= auto
-IMAGE_QUALITY ?= high
 
 .PHONY: help pipeline-help init dry-run run catalog extract extract-dry-run validate compile clean-runs
 
@@ -37,9 +32,6 @@ help:
 	@printf '%s\n' '  IMAGE=$(IMAGE)'
 	@printf '%s\n' '  RUN_ID=$(RUN_ID)'
 	@printf '%s\n' '  RUN_DIR=$(RUN_DIR)'
-	@printf '%s\n' '  CATALOG_MODEL=$(CATALOG_MODEL)'
-	@printf '%s\n' '  PROMPT_MODEL=$(PROMPT_MODEL)'
-	@printf '%s\n' '  IMAGE_MODEL=$(IMAGE_MODEL)'
 	@printf '%s\n' '  MAX_WORKERS=$(MAX_WORKERS)'
 
 pipeline-help:
@@ -49,19 +41,19 @@ init:
 	@cd $(PIPELINE_DIR) && uv run extract-assets --runs-dir ../../$(RUNS_DIR) init ../../$(IMAGE) --run-id $(RUN_ID)
 
 dry-run:
-	@cd $(PIPELINE_DIR) && uv run extract-assets --runs-dir ../../$(RUNS_DIR) run ../../$(IMAGE) --run-id $(RUN_ID) --catalog-model $(CATALOG_MODEL) --prompt-model $(PROMPT_MODEL) --image-model $(IMAGE_MODEL) --max-workers $(MAX_WORKERS) --image-size $(IMAGE_SIZE) --image-quality $(IMAGE_QUALITY) --dry-run
+	@cd $(PIPELINE_DIR) && uv run extract-assets --runs-dir ../../$(RUNS_DIR) run ../../$(IMAGE) --run-id $(RUN_ID) --max-workers $(MAX_WORKERS) --dry-run
 
 run:
-	@cd $(PIPELINE_DIR) && uv run extract-assets --runs-dir ../../$(RUNS_DIR) run ../../$(IMAGE) --run-id $(RUN_ID) --catalog-model $(CATALOG_MODEL) --prompt-model $(PROMPT_MODEL) --image-model $(IMAGE_MODEL) --max-workers $(MAX_WORKERS) --image-size $(IMAGE_SIZE) --image-quality $(IMAGE_QUALITY)
+	@cd $(PIPELINE_DIR) && uv run extract-assets --runs-dir ../../$(RUNS_DIR) run ../../$(IMAGE) --run-id $(RUN_ID) --max-workers $(MAX_WORKERS)
 
 catalog:
-	@cd $(PIPELINE_DIR) && uv run extract-assets catalog ../../$(RUN_DIR) --model $(CATALOG_MODEL)
+	@cd $(PIPELINE_DIR) && uv run extract-assets catalog ../../$(RUN_DIR)
 
 extract:
-	@cd $(PIPELINE_DIR) && uv run extract-assets extract-assets ../../$(RUN_DIR) --image-model $(IMAGE_MODEL) --prompt-model $(PROMPT_MODEL) --max-workers $(MAX_WORKERS) --image-size $(IMAGE_SIZE) --image-quality $(IMAGE_QUALITY)
+	@cd $(PIPELINE_DIR) && uv run extract-assets extract-assets ../../$(RUN_DIR) --max-workers $(MAX_WORKERS)
 
 extract-dry-run:
-	@cd $(PIPELINE_DIR) && uv run extract-assets extract-assets ../../$(RUN_DIR) --image-model $(IMAGE_MODEL) --prompt-model $(PROMPT_MODEL) --max-workers $(MAX_WORKERS) --image-size $(IMAGE_SIZE) --image-quality $(IMAGE_QUALITY) --dry-run
+	@cd $(PIPELINE_DIR) && uv run extract-assets extract-assets ../../$(RUN_DIR) --max-workers $(MAX_WORKERS) --dry-run
 
 validate:
 	@cd $(PIPELINE_DIR) && uv run extract-assets validate ../../$(RUN_DIR)
