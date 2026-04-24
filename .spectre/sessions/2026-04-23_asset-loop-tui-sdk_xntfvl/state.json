@@ -7,8 +7,8 @@
   "prior_sessions": [],
   "session_type": "full",
   "created_at": "2026-04-23T21:23:44+00:00",
-  "updated_at": "2026-04-23T22:18:32Z",
-  "current_phase": "plan",
+  "updated_at": "2026-04-24T00:30:00Z",
+  "current_phase": "docs",
   "status": "active",
   "intake": {
     "status": "completed",
@@ -72,20 +72,21 @@
     "status": "finalized",
     "checkpoints_total": 5,
     "checkpoints_detailed": 5,
-    "current_checkpoint": 5,
-    "last_updated": "2026-04-23T22:18:32Z",
-    "checkpoints_completed": []
+    "current_checkpoint": null,
+    "last_updated": "2026-04-24T00:30:00Z",
+    "checkpoints_completed": [1, 2, 3, 4, 5],
+    "summary": "CP5 complete: orchestrator.ts gains buildTerminationSummary(input) — a module-level helper between writeAcceptedJson and runAssetLoop that returns string[] composed of asset id, iter N/MAX, termination kind, residual count + per-issue '[severity] region: description' lines, optional accepted.json path, and the formatted usage line. The three termination sites (hit_empty, cap_reached, parse_failure) all build the summary via this helper, call tui.showSummary(summary) (skipped on parse_failure), then tui.stop(), then console.log(summary.join('\\n')) so the canonical block survives in scrollback after pi-tui restores the terminal. parse_failure additionally mirrors the block to console.error to keep error context next to the existing 'aborted: critic parse failure …' line. Legacy pi-extension surface retired: apps/pi-asset-loop/extensions/asset-loop.ts deleted, the now-empty extensions/ directory removed, and the 'pi' script stripped from apps/pi-asset-loop/package.json — scripts is now exactly { postinstall, asset-loop, typecheck }. README Run section updated to invoke 'bun run asset-loop' so 'rg extensions/asset-loop apps/pi-asset-loop' returns zero matches. Static verification gates pass: typecheck exit 0, ripgrep cleanliness check zero matches, extensions/ directory gone, package.json scripts shape correct. Runtime end-to-end (interactive terminal + live API credentials) deferred to operator. UsageSnapshot type imported into orchestrator. One deviation from plan action 9: formatUsageSnapshot already prefixes its return with 'usage: ', so the helper appends formatUsageSnapshot(usage) directly instead of the doubled `usage: ${formatUsageSnapshot(usage)}` from the plan."
   },
   "build": {
-    "status": "pending",
-    "started_at": null,
-    "completed_at": null,
-    "last_updated": null,
+    "status": "completed",
+    "started_at": "2026-04-23T22:30:00Z",
+    "completed_at": "2026-04-24T00:30:00Z",
+    "last_updated": "2026-04-24T00:30:00Z",
     "data": {
       "current_checkpoint": null,
       "current_task_group": null,
       "current_task": null,
-      "checkpoints_completed": []
+      "checkpoints_completed": [1, 2, 3, 4, 5]
     }
   },
   "docs": {
@@ -98,9 +99,40 @@
     }
   },
   "git": {
-    "branch": "main",
+    "branch": "build-run-test",
     "worktree": null,
-    "base_branch": null,
-    "commits": []
+    "base_branch": "main",
+    "commits": [
+      {
+        "checkpoint_id": 1,
+        "sha": "fbad6e7a282eef5e300c262b50470f1bf71bfa60",
+        "message": "checkpoint-1: End-to-end thin slice via Pi SDK",
+        "created_at": "2026-04-23T22:30:00Z"
+      },
+      {
+        "checkpoint_id": 2,
+        "sha": "1ababb5",
+        "message": "checkpoint-2: Deterministic loop with per-issue fix sessions",
+        "created_at": "2026-04-23T23:00:00Z"
+      },
+      {
+        "checkpoint_id": 3,
+        "sha": "0291225e004b1f08fb766aed56637c3a2fb3191c",
+        "message": "checkpoint-3: Usage aggregator (tokens + cost)",
+        "created_at": "2026-04-23T23:30:00Z"
+      },
+      {
+        "checkpoint_id": 4,
+        "sha": "4893bf2",
+        "message": "checkpoint-4: pi-tui observe-only dashboard",
+        "created_at": "2026-04-24T00:00:00Z"
+      },
+      {
+        "checkpoint_id": 5,
+        "sha": "ac1c4d172914ecc19f43e46c42878bcfb4f8140b",
+        "message": "checkpoint-5: cleanup, summary, end-to-end validation",
+        "created_at": "2026-04-24T00:30:00Z"
+      }
+    ]
   }
 }

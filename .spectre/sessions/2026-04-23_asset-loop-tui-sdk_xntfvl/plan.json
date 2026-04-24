@@ -9,20 +9,20 @@
     {
       "id": 1,
       "title": "End-to-end thin slice via Pi SDK",
-      "goal": "Replace extension orchestration with a minimal TypeScript orchestrator that runs initial-gen (one in-memory SDK session with write tools), renders once with Playwright, critiques once, and writes critique.json. Simplify systemPrompt.ts to remove loop/tool protocol. Launch via `bun run asset-loop --asset <path>` through a new bin/asset-loop.ts entry. No TUI yet, no fix loop, no iteration cap, no accepted.json \u2014 this checkpoint only proves SDK plumbing + reused modules (args, renderer, wrapper, pngSize, critic) drive one end-to-end pass.",
+      "goal": "Replace extension orchestration with a minimal TypeScript orchestrator that runs initial-gen (one in-memory SDK session with write tools), renders once with Playwright, critiques once, and writes critique.json. Simplify systemPrompt.ts to remove loop/tool protocol. Launch via `bun run asset-loop --asset <path>` through a new bin/asset-loop.ts entry. No TUI yet, no fix loop, no iteration cap, no accepted.json — this checkpoint only proves SDK plumbing + reused modules (args, renderer, wrapper, pngSize, critic) drive one end-to-end pass.",
       "prerequisites": [],
-      "status": "pending",
-      "testing_strategy": "Manual end-to-end: `bun run asset-loop --asset <existing asset dir>` from apps/pi-asset-loop. Expect: component.html + component.css written by the SDK agent, render.png exists, critique.json written with valid JSON matching CritiqueResult shape (verdict + issues array). Typecheck passes (`npm run typecheck`). Process exits 0 after one critique. Old extension path (`pi -e ./extensions/asset-loop.ts`) is NOT yet removed and should still work \u2014 this CP is additive.",
+      "status": "completed",
+      "testing_strategy": "Manual end-to-end: `bun run asset-loop --asset <existing asset dir>` from apps/pi-asset-loop. Expect: component.html + component.css written by the SDK agent, render.png exists, critique.json written with valid JSON matching CritiqueResult shape (verdict + issues array). Typecheck passes (`npm run typecheck`). Process exits 0 after one critique. Old extension path (`pi -e ./extensions/asset-loop.ts`) is NOT yet removed and should still work — this CP is additive.",
       "task_groups": [
         {
           "id": 1,
           "title": "Simplified system prompt + SDK orchestrator thin slice",
-          "objective": "Strip the tool/loop protocol out of src/systemPrompt.ts (the orchestrator, not the LLM, now owns the loop) and introduce src/orchestrator.ts exporting runAssetLoop \u2014 one in-memory Pi SDK session with coding tools that writes component.html/component.css for initial gen, followed by one deterministic renderWithPlaywright call and one runCritique call, persisting critique.json at the end.",
+          "objective": "Strip the tool/loop protocol out of src/systemPrompt.ts (the orchestrator, not the LLM, now owns the loop) and introduce src/orchestrator.ts exporting runAssetLoop — one in-memory Pi SDK session with coding tools that writes component.html/component.css for initial gen, followed by one deterministic renderWithPlaywright call and one runCritique call, persisting critique.json at the end.",
           "status": "pending",
           "task_seeds": [
             {
               "title": "Simplify system prompt to initial-gen only",
-              "intent": "Remove <tools>, <loop_protocol>, <working_with_the_critic>, and loop-related <reminders> from buildSystemPrompt. Keep <role>, <goal>, <context_you_receive>, <workspace>, <design_philosophy>, <file_contracts>, <asset_metadata>. Drop maxIterations from SystemPromptInput \u2014 the LLM no longer knows about iterations.",
+              "intent": "Remove <tools>, <loop_protocol>, <working_with_the_critic>, and loop-related <reminders> from buildSystemPrompt. Keep <role>, <goal>, <context_you_receive>, <workspace>, <design_philosophy>, <file_contracts>, <asset_metadata>. Drop maxIterations from SystemPromptInput — the LLM no longer knows about iterations.",
               "processed": true,
               "task_id": 1
             },
@@ -49,7 +49,7 @@
                   {
                     "file": "apps/pi-asset-loop/extensions/asset-loop.ts",
                     "lines": "121-132",
-                    "purpose": "Only current caller of buildSystemPrompt \u2014 shows which fields are passed. maxIterations is passed today and must be dropped."
+                    "purpose": "Only current caller of buildSystemPrompt — shows which fields are passed. maxIterations is passed today and must be dropped."
                   }
                 ],
                 "related_files": [
@@ -73,7 +73,7 @@
                     {
                       "path": "apps/pi-asset-loop/src/systemPrompt.ts",
                       "status": "modified",
-                      "description": "SystemPromptInput { assetId, assetDir, assetJson, referenceWidth, referenceHeight } (no maxIterations). Prompt body contains only <role>, <goal>, <context_you_receive>, <workspace>, <design_philosophy>, <file_contracts>, <asset_metadata>. <tools>, <loop_protocol>, <working_with_the_critic>, and iteration-budget reminders are removed. <workspace> mentions component.html/component.css only \u2014 render.png/critique.json/accepted.json are no longer the agent's concern."
+                      "description": "SystemPromptInput { assetId, assetDir, assetJson, referenceWidth, referenceHeight } (no maxIterations). Prompt body contains only <role>, <goal>, <context_you_receive>, <workspace>, <design_philosophy>, <file_contracts>, <asset_metadata>. <tools>, <loop_protocol>, <working_with_the_critic>, and iteration-budget reminders are removed. <workspace> mentions component.html/component.css only — render.png/critique.json/accepted.json are no longer the agent's concern."
                     }
                   ],
                   "tree": null
@@ -112,7 +112,7 @@
                 },
                 {
                   "id": 6,
-                  "command": "UPDATE <workspace> SECTION: REMOVE render.png/critique.json/accepted.json 'produced by tools' lines \u2014 agent only writes component.html + component.css now",
+                  "command": "UPDATE <workspace> SECTION: REMOVE render.png/critique.json/accepted.json 'produced by tools' lines — agent only writes component.html + component.css now",
                   "file": "apps/pi-asset-loop/src/systemPrompt.ts",
                   "status": "pending"
                 },
@@ -139,7 +139,7 @@
             {
               "id": 2,
               "title": "Create src/orchestrator.ts with runAssetLoop (thin slice)",
-              "description": "New module that owns one end-to-end pass: resolve the asset, load the four context inputs, spin up a single in-memory Pi SDK session with coding tools scoped to the asset dir, prompt it with the existing kickoff shape (4 inputs), wait for idle, dispose, run Playwright render, run the critic, persist critique.json. Export a single async runAssetLoop function. No iteration, no fix loop, no accepted.json \u2014 those come in CP2.",
+              "description": "New module that owns one end-to-end pass: resolve the asset, load the four context inputs, spin up a single in-memory Pi SDK session with coding tools scoped to the asset dir, prompt it with the existing kickoff shape (4 inputs), wait for idle, dispose, run Playwright render, run the critic, persist critique.json. Export a single async runAssetLoop function. No iteration, no fix loop, no accepted.json — those come in CP2.",
               "status": "pending",
               "context": {
                 "read_before": [
@@ -151,17 +151,17 @@
                   {
                     "file": "apps/pi-asset-loop/extensions/asset-loop.ts",
                     "lines": "237-278",
-                    "purpose": "Current critique tool body \u2014 the orchestrator reuses runCritique identically, passing auth via modelRegistry.getApiKeyAndHeaders, and persists { iteration, verdict, issues } to critique.json."
+                    "purpose": "Current critique tool body — the orchestrator reuses runCritique identically, passing auth via modelRegistry.getApiKeyAndHeaders, and persists { iteration, verdict, issues } to critique.json."
                   },
                   {
                     "file": "apps/pi-asset-loop/src/args.ts",
                     "lines": "1-108",
-                    "purpose": "resolveAsset signature and ResolvedAsset fields \u2014 paths needed for inputs, wrapper, render, critique.json."
+                    "purpose": "resolveAsset signature and ResolvedAsset fields — paths needed for inputs, wrapper, render, critique.json."
                   },
                   {
                     "file": "apps/pi-asset-loop/src/critic.ts",
                     "lines": "34-50",
-                    "purpose": "RunCritiqueInput shape \u2014 what runCritique needs from the orchestrator."
+                    "purpose": "RunCritiqueInput shape — what runCritique needs from the orchestrator."
                   },
                   {
                     "file": "apps/pi-asset-loop/src/renderer.ts",
@@ -176,12 +176,12 @@
                   {
                     "file": "ai_docs/pi-agent/examples-sdk/01-minimal.ts",
                     "lines": "1-23",
-                    "purpose": "Baseline SDK session shape \u2014 createAgentSession + session.subscribe + session.prompt."
+                    "purpose": "Baseline SDK session shape — createAgentSession + session.subscribe + session.prompt."
                   },
                   {
                     "file": "ai_docs/pi-agent/examples-sdk/12-full-control.ts",
                     "lines": "1-83",
-                    "purpose": "Full-control example \u2014 shows SessionManager.inMemory, custom ResourceLoader with systemPromptOverride, explicit tools via createCodingTools(cwd), AuthStorage + ModelRegistry wiring."
+                    "purpose": "Full-control example — shows SessionManager.inMemory, custom ResourceLoader with systemPromptOverride, explicit tools via createCodingTools(cwd), AuthStorage + ModelRegistry wiring."
                   },
                   {
                     "file": "ai_docs/pi-agent/sdk.md",
@@ -289,7 +289,7 @@
                 },
                 {
                   "id": 12,
-                  "command": "ADD EXPORT FUNCTION runAssetLoop(input: ResolveInput): Promise<void> \u2014 top-level orchestration entry",
+                  "command": "ADD EXPORT FUNCTION runAssetLoop(input: ResolveInput): Promise<void> — top-level orchestration entry",
                   "file": "apps/pi-asset-loop/src/orchestrator.ts",
                   "status": "pending"
                 },
@@ -373,7 +373,7 @@
                 },
                 {
                   "id": 26,
-                  "command": "INSIDE runAssetLoop: LOG summary ('iteration 1 complete \u2014 verdict: <...>, issues: <n>') TO stdout; RETURN",
+                  "command": "INSIDE runAssetLoop: LOG summary ('iteration 1 complete — verdict: <...>, issues: <n>') TO stdout; RETURN",
                   "file": "apps/pi-asset-loop/src/orchestrator.ts",
                   "status": "pending"
                 }
@@ -395,7 +395,7 @@
             },
             {
               "title": "Wire bun script into package.json",
-              "intent": "Add `\"asset-loop\": \"bun run ./bin/asset-loop.ts\"` to apps/pi-asset-loop/package.json scripts (Bun runs .ts natively \u2014 no build). Keep existing `pi` and `postinstall` + `typecheck` scripts. Add `\"@mariozechner/pi-coding-agent\": \"*\"` to dependencies (it is a devDependency today; orchestrator imports createAgentSession at runtime).",
+              "intent": "Add `\"asset-loop\": \"bun run ./bin/asset-loop.ts\"` to apps/pi-asset-loop/package.json scripts (Bun runs .ts natively — no build). Keep existing `pi` and `postinstall` + `typecheck` scripts. Add `\"@mariozechner/pi-coding-agent\": \"*\"` to dependencies (it is a devDependency today; orchestrator imports createAgentSession at runtime).",
               "processed": true,
               "task_id": 4
             }
@@ -404,19 +404,19 @@
             {
               "id": 3,
               "title": "Create bin/asset-loop.ts entry",
-              "description": "Thin CLI entry that parses --asset and --run from argv, then delegates to runAssetLoop from src/orchestrator.ts. Bun executes .ts natively so there is no build step. On success exit 0; on thrown error print the message to stderr and exit 1. Keep the flag parser inline \u2014 argv is just two optional --key value pairs; no yargs/commander needed.",
+              "description": "Thin CLI entry that parses --asset and --run from argv, then delegates to runAssetLoop from src/orchestrator.ts. Bun executes .ts natively so there is no build step. On success exit 0; on thrown error print the message to stderr and exit 1. Keep the flag parser inline — argv is just two optional --key value pairs; no yargs/commander needed.",
               "status": "pending",
               "context": {
                 "read_before": [
                   {
                     "file": "apps/pi-asset-loop/src/args.ts",
                     "lines": "22-35",
-                    "purpose": "ResolveInput shape \u2014 bin must pass { asset, run, cwd } with cwd = process.cwd()."
+                    "purpose": "ResolveInput shape — bin must pass { asset, run, cwd } with cwd = process.cwd()."
                   },
                   {
                     "file": "apps/pi-asset-loop/extensions/asset-loop.ts",
                     "lines": "32-39",
-                    "purpose": "Shows the two flags the extension exposes (--asset, --run) and their semantics \u2014 mirror them in the CLI parser."
+                    "purpose": "Shows the two flags the extension exposes (--asset, --run) and their semantics — mirror them in the CLI parser."
                   }
                 ],
                 "related_files": [
@@ -464,7 +464,7 @@
                 },
                 {
                   "id": 3,
-                  "command": "ADD FUNCTION parseArgs(argv: string[]): { asset?: string; run?: string } \u2014 walk pairs, recognize --asset and --run, THROW on unknown flag or missing value",
+                  "command": "ADD FUNCTION parseArgs(argv: string[]): { asset?: string; run?: string } — walk pairs, recognize --asset and --run, THROW on unknown flag or missing value",
                   "file": "apps/pi-asset-loop/bin/asset-loop.ts",
                   "status": "pending"
                 },
@@ -479,7 +479,7 @@
             {
               "id": 4,
               "title": "Wire bun run asset-loop into package.json",
-              "description": "Expose the CLI via `bun run asset-loop --asset ...`. Add a scripts entry that delegates to the new bin/asset-loop.ts. Promote @mariozechner/pi-coding-agent from devDependencies to dependencies because the orchestrator imports createAgentSession at runtime (a launched binary, not a dev-only tool). Keep the existing `pi`, `postinstall`, and `typecheck` scripts \u2014 the old extension still runs in parallel for this checkpoint.",
+              "description": "Expose the CLI via `bun run asset-loop --asset ...`. Add a scripts entry that delegates to the new bin/asset-loop.ts. Promote @mariozechner/pi-coding-agent from devDependencies to dependencies because the orchestrator imports createAgentSession at runtime (a launched binary, not a dev-only tool). Keep the existing `pi`, `postinstall`, and `typecheck` scripts — the old extension still runs in parallel for this checkpoint.",
               "status": "pending",
               "context": {
                 "read_before": [
@@ -546,22 +546,22 @@
     {
       "id": 2,
       "title": "Deterministic loop with per-issue fix sessions",
-      "goal": "Promote the thin slice into the full loop. Per-issue fix step opens its own in-memory SDK session with the full context (source + extracted + current render images, asset.json, extraction prompt, current component.html/.css) plus exactly one issue, runs to idle, disposes. Batch-fix (all issues from a critique cycle) then single render + single critique. Enforce MAX_ITERATIONS cap. Orchestrator writes accepted.json on empty-issues or cap. Critic parse failure aborts the loop (rewire critic.ts synthetic-issue path into a typed CritiqueOutcome consumed by the orchestrator). Still stdout-only \u2014 no TUI and no Usage aggregator yet.",
+      "goal": "Promote the thin slice into the full loop. Per-issue fix step opens its own in-memory SDK session with the full context (source + extracted + current render images, asset.json, extraction prompt, current component.html/.css) plus exactly one issue, runs to idle, disposes. Batch-fix (all issues from a critique cycle) then single render + single critique. Enforce MAX_ITERATIONS cap. Orchestrator writes accepted.json on empty-issues or cap. Critic parse failure aborts the loop (rewire critic.ts synthetic-issue path into a typed CritiqueOutcome consumed by the orchestrator). Still stdout-only — no TUI and no Usage aggregator yet.",
       "prerequisites": [
         1
       ],
-      "status": "pending",
-      "testing_strategy": "Manual end-to-end: `bun run asset-loop --asset <existing asset dir>` from apps/pi-asset-loop against an asset that converges inside the 15-render budget. Expect: stdout prints 'phase: initial-gen', then per iteration 'phase: render iter N/15', 'phase: critique iter N', either 'phase: fix iter N \u2014 K issues' followed by one 'fix I<j>: <brief>' line per popped issue, or 'accepted \u2014 hit_empty' / 'accepted \u2014 cap'. accepted.json is written and matches the shape the old extension produced (asset_id, iterations, max_iterations, hit_empty_issues, residual_issues, verdict, notes, accepted_at). critique.json is overwritten each critique cycle with the latest { iteration, verdict, issues }. component.html / component.css change between iterations (sanity: diff before/after). Typecheck passes (`npm run typecheck`). Parse-failure abort: temporarily force-return { ok: false, reason: 'parse_failed', ... } from runCritique and re-run \u2014 orchestrator prints 'aborted: critic parse failure' to stderr and exits 1 without writing accepted.json. Old extension path still runs: `pi -e ./extensions/asset-loop.ts --asset <dir>` must still drive a render/critique/accept cycle (critique tool unwraps the new CritiqueOutcome shape).",
+      "status": "completed",
+      "testing_strategy": "Manual end-to-end: `bun run asset-loop --asset <existing asset dir>` from apps/pi-asset-loop against an asset that converges inside the 15-render budget. Expect: stdout prints 'phase: initial-gen', then per iteration 'phase: render iter N/15', 'phase: critique iter N', either 'phase: fix iter N — K issues' followed by one 'fix I<j>: <brief>' line per popped issue, or 'accepted — hit_empty' / 'accepted — cap'. accepted.json is written and matches the shape the old extension produced (asset_id, iterations, max_iterations, hit_empty_issues, residual_issues, verdict, notes, accepted_at). critique.json is overwritten each critique cycle with the latest { iteration, verdict, issues }. component.html / component.css change between iterations (sanity: diff before/after). Typecheck passes (`npm run typecheck`). Parse-failure abort: temporarily force-return { ok: false, reason: 'parse_failed', ... } from runCritique and re-run — orchestrator prints 'aborted: critic parse failure' to stderr and exits 1 without writing accepted.json. Old extension path still runs: `pi -e ./extensions/asset-loop.ts --asset <dir>` must still drive a render/critique/accept cycle (critique tool unwraps the new CritiqueOutcome shape).",
       "task_groups": [
         {
           "id": 1,
           "title": "Critic parse-failure as typed CritiqueOutcome",
-          "objective": "Replace runCritique's current synthetic-blocking-issue return with a discriminated CritiqueOutcome \u2014 { ok: true; result: CritiqueResult } | { ok: false; reason: 'parse_failed'; rawFirst: string; rawSecond: string } \u2014 so the orchestrator can detect double-parse-failure and abort instead of treating a fake issue as real. Update the old extension's critique tool to consume the new shape so the pi-extension path still runs during the transition.",
+          "objective": "Replace runCritique's current synthetic-blocking-issue return with a discriminated CritiqueOutcome — { ok: true; result: CritiqueResult } | { ok: false; reason: 'parse_failed'; rawFirst: string; rawSecond: string } — so the orchestrator can detect double-parse-failure and abort instead of treating a fake issue as real. Update the old extension's critique tool to consume the new shape so the pi-extension path still runs during the transition.",
           "status": "pending",
           "task_seeds": [
             {
               "title": "Rewire runCritique to return CritiqueOutcome",
-              "intent": "Export a new CritiqueOutcome discriminated union from critic.ts. runCritique now returns CritiqueOutcome instead of CritiqueResult. On first-parse success return { ok: true, result: { issues, verdict, raw: firstText } }; on second-parse success same with secondText. On second-parse failure return { ok: false, reason: 'parse_failed', rawFirst: firstText, rawSecond: secondText } \u2014 delete the synthetic-blocking-issue branch.",
+              "intent": "Export a new CritiqueOutcome discriminated union from critic.ts. runCritique now returns CritiqueOutcome instead of CritiqueResult. On first-parse success return { ok: true, result: { issues, verdict, raw: firstText } }; on second-parse success same with secondText. On second-parse failure return { ok: false, reason: 'parse_failed', rawFirst: firstText, rawSecond: secondText } — delete the synthetic-blocking-issue branch.",
               "processed": true,
               "task_id": 1
             },
@@ -576,14 +576,14 @@
             {
               "id": 1,
               "title": "Rewire runCritique to return CritiqueOutcome",
-              "description": "The critic currently returns a CritiqueResult with a synthesized blocking issue whenever the model replies with unparseable JSON twice. That worked for the LLM-driven loop (surface a fake issue, let the main agent re-render and retry) but it is a lie for the TypeScript-driven loop \u2014 the orchestrator needs to distinguish 'the critic legitimately reported zero issues' from 'the critic could not speak JSON'. Replace the synthetic branch with a discriminated union return type so callers are forced to handle the parse-failure explicitly. The happy path still produces the same { issues, verdict, raw } shape as today, wrapped in { ok: true, result: ... }.",
+              "description": "The critic currently returns a CritiqueResult with a synthesized blocking issue whenever the model replies with unparseable JSON twice. That worked for the LLM-driven loop (surface a fake issue, let the main agent re-render and retry) but it is a lie for the TypeScript-driven loop — the orchestrator needs to distinguish 'the critic legitimately reported zero issues' from 'the critic could not speak JSON'. Replace the synthetic branch with a discriminated union return type so callers are forced to handle the parse-failure explicitly. The happy path still produces the same { issues, verdict, raw } shape as today, wrapped in { ok: true, result: ... }.",
               "status": "pending",
               "context": {
                 "read_before": [
                   {
                     "file": "apps/pi-asset-loop/src/critic.ts",
                     "lines": "1-50",
-                    "purpose": "Current exports (CritiqueResult, RunCritiqueInput) \u2014 the new CritiqueOutcome is added here and runCritique's return type changes."
+                    "purpose": "Current exports (CritiqueResult, RunCritiqueInput) — the new CritiqueOutcome is added here and runCritique's return type changes."
                   },
                   {
                     "file": "apps/pi-asset-loop/src/critic.ts",
@@ -593,7 +593,7 @@
                   {
                     "file": "apps/pi-asset-loop/src/critic.ts",
                     "lines": "375-379",
-                    "purpose": "Existing truncate helper \u2014 reuse to clip rawFirst/rawSecond before stuffing them into the outcome."
+                    "purpose": "Existing truncate helper — reuse to clip rawFirst/rawSecond before stuffing them into the outcome."
                   }
                 ],
                 "related_files": [
@@ -608,7 +608,7 @@
                     {
                       "path": "apps/pi-asset-loop/src/critic.ts",
                       "status": "exists",
-                      "description": "export interface CritiqueResult { issues, verdict, raw }. export async function runCritique(input): Promise<CritiqueResult>. On double-retry-failure runCritique returns a CritiqueResult with a synthesized blocking issue and verdict 'Critic parse failure \u2014 treat as unconverged.'"
+                      "description": "export interface CritiqueResult { issues, verdict, raw }. export async function runCritique(input): Promise<CritiqueResult>. On double-retry-failure runCritique returns a CritiqueResult with a synthesized blocking issue and verdict 'Critic parse failure — treat as unconverged.'"
                     }
                   ],
                   "tree": null
@@ -618,7 +618,7 @@
                     {
                       "path": "apps/pi-asset-loop/src/critic.ts",
                       "status": "modified",
-                      "description": "Adds export type CritiqueOutcome = { ok: true; result: CritiqueResult } | { ok: false; reason: 'parse_failed'; rawFirst: string; rawSecond: string }. runCritique signature now returns Promise<CritiqueOutcome>. Happy path wraps { issues, verdict, raw } in { ok: true, result }. Synthetic-issue branch is deleted; double-retry failure returns { ok: false, reason: 'parse_failed', rawFirst: firstText, rawSecond: secondText }. CritiqueResult export retained unchanged. truncate helper is still referenced (callers may use it to format error messages) but is no longer called inside the failure branch itself \u2014 just returned raw."
+                      "description": "Adds export type CritiqueOutcome = { ok: true; result: CritiqueResult } | { ok: false; reason: 'parse_failed'; rawFirst: string; rawSecond: string }. runCritique signature now returns Promise<CritiqueOutcome>. Happy path wraps { issues, verdict, raw } in { ok: true, result }. Synthetic-issue branch is deleted; double-retry failure returns { ok: false, reason: 'parse_failed', rawFirst: firstText, rawSecond: secondText }. CritiqueResult export retained unchanged. truncate helper is still referenced (callers may use it to format error messages) but is no longer called inside the failure branch itself — just returned raw."
                     }
                   ],
                   "tree": null
@@ -651,7 +651,7 @@
                 },
                 {
                   "id": 5,
-                  "command": "REMOVE the trailing synthetic-blocking-issue return block (issues: [{ id: I1, ... }], verdict: 'Critic parse failure \u2014 treat as unconverged.', raw: secondText)",
+                  "command": "REMOVE the trailing synthetic-blocking-issue return block (issues: [{ id: I1, ... }], verdict: 'Critic parse failure — treat as unconverged.', raw: secondText)",
                   "file": "apps/pi-asset-loop/src/critic.ts",
                   "status": "pending"
                 },
@@ -673,7 +673,7 @@
                   {
                     "file": "apps/pi-asset-loop/extensions/asset-loop.ts",
                     "lines": "222-279",
-                    "purpose": "Current critique tool body \u2014 the only caller of runCritique inside the extension. Shows how result.issues / result.verdict are used (persisted to critique.json and formatted for the agent)."
+                    "purpose": "Current critique tool body — the only caller of runCritique inside the extension. Shows how result.issues / result.verdict are used (persisted to critique.json and formatted for the agent)."
                   },
                   {
                     "file": "apps/pi-asset-loop/src/critic.ts",
@@ -719,7 +719,7 @@
                 },
                 {
                   "id": 2,
-                  "command": "ADD local helper FUNCTION truncate(s: string, max: number): string \u2014 inline 3-line utility (length check, slice + horizontal-ellipsis)",
+                  "command": "ADD local helper FUNCTION truncate(s: string, max: number): string — inline 3-line utility (length check, slice + horizontal-ellipsis)",
                   "file": "apps/pi-asset-loop/extensions/asset-loop.ts",
                   "status": "pending"
                 },
@@ -753,13 +753,13 @@
           "task_seeds": [
             {
               "title": "Add buildFixStepSystemPrompt export",
-              "intent": "Add a second exported function buildFixStepSystemPrompt(input: FixStepPromptInput): string to src/systemPrompt.ts. Input: { assetId, assetDir, assetJson, referenceWidth, referenceHeight }. Content is a trimmed variant of buildSystemPrompt: keep <role>, <goal>, <context_you_receive>, <workspace>, <design_philosophy>, <file_contracts>, <asset_metadata>. DROP any remaining reminder lines about multi-pass STUDY/IMPLEMENT cadence \u2014 the caller is invoking this for a single targeted edit. Add a new <fix_step_instruction> section saying: 'One issue follows in the user message. Read the current component.html and component.css (they already exist in your workspace). Apply exactly the fix the issue describes \u2014 no additional changes, no prose, no self-critique. When the edit is written, stop.'",
+              "intent": "Add a second exported function buildFixStepSystemPrompt(input: FixStepPromptInput): string to src/systemPrompt.ts. Input: { assetId, assetDir, assetJson, referenceWidth, referenceHeight }. Content is a trimmed variant of buildSystemPrompt: keep <role>, <goal>, <context_you_receive>, <workspace>, <design_philosophy>, <file_contracts>, <asset_metadata>. DROP any remaining reminder lines about multi-pass STUDY/IMPLEMENT cadence — the caller is invoking this for a single targeted edit. Add a new <fix_step_instruction> section saying: 'One issue follows in the user message. Read the current component.html and component.css (they already exist in your workspace). Apply exactly the fix the issue describes — no additional changes, no prose, no self-critique. When the edit is written, stop.'",
               "processed": true,
               "task_id": 3
             },
             {
               "title": "Create src/fixStep.ts with runFixStep",
-              "intent": "New file src/fixStep.ts. Exports async function runFixStep(input: RunFixStepInput): Promise<void>. Input shape: { resolved: ResolvedAsset; issue: CritiqueIssue; iteration: number; assetJsonText: string; extractionPromptText: string; referenceWidth: number; referenceHeight: number; sourceBase64: string; extractedBase64: string; currentRenderBase64: string; model: Model<Api>; authStorage: AuthStorage; modelRegistry: ModelRegistry }. Body: build systemPrompt via buildFixStepSystemPrompt, wrap a DefaultResourceLoader with systemPromptOverride, createAgentSession({ cwd: resolved.assetDir, model, thinkingLevel: 'high', authStorage, modelRegistry, resourceLoader, tools: createCodingTools(resolved.assetDir), sessionManager: SessionManager.inMemory() }), call session.prompt(kickoffText, { images: [source, extracted, render] }) where kickoffText enumerates the issue id / region / severity / description / fix_hint and instructs the agent to apply that single fix, await session.agent.waitForIdle(), session.dispose(). Returns void \u2014 the observable side-effect is component.html/.css on disk mutated in place.",
+              "intent": "New file src/fixStep.ts. Exports async function runFixStep(input: RunFixStepInput): Promise<void>. Input shape: { resolved: ResolvedAsset; issue: CritiqueIssue; iteration: number; assetJsonText: string; extractionPromptText: string; referenceWidth: number; referenceHeight: number; sourceBase64: string; extractedBase64: string; currentRenderBase64: string; model: Model<Api>; authStorage: AuthStorage; modelRegistry: ModelRegistry }. Body: build systemPrompt via buildFixStepSystemPrompt, wrap a DefaultResourceLoader with systemPromptOverride, createAgentSession({ cwd: resolved.assetDir, model, thinkingLevel: 'high', authStorage, modelRegistry, resourceLoader, tools: createCodingTools(resolved.assetDir), sessionManager: SessionManager.inMemory() }), call session.prompt(kickoffText, { images: [source, extracted, render] }) where kickoffText enumerates the issue id / region / severity / description / fix_hint and instructs the agent to apply that single fix, await session.agent.waitForIdle(), session.dispose(). Returns void — the observable side-effect is component.html/.css on disk mutated in place.",
               "processed": true,
               "task_id": 4
             }
@@ -768,14 +768,14 @@
             {
               "id": 3,
               "title": "Add buildFixStepSystemPrompt export to systemPrompt.ts",
-              "description": "Per-issue fix sessions need a narrower system prompt than initial-gen. Initial-gen's prompt is already stripped of loop/tool protocol (CP1) but still includes STUDY-first phrasing suited to building from scratch. Fix steps skip STUDY \u2014 component.html/.css already exist, and the agent's job is a single targeted edit. Export a sibling function buildFixStepSystemPrompt(input) that reuses the same role/goal/context/workspace/design-philosophy/file-contracts/asset-metadata scaffolding but drops the STUDY-first reminder and inserts a <fix_step_instruction> section that instructs the agent to read the current component files, apply exactly the one issue described in the user turn, and stop. Do NOT inline the issue text here \u2014 the user turn carries it so the prompt stays reusable across iterations.",
+              "description": "Per-issue fix sessions need a narrower system prompt than initial-gen. Initial-gen's prompt is already stripped of loop/tool protocol (CP1) but still includes STUDY-first phrasing suited to building from scratch. Fix steps skip STUDY — component.html/.css already exist, and the agent's job is a single targeted edit. Export a sibling function buildFixStepSystemPrompt(input) that reuses the same role/goal/context/workspace/design-philosophy/file-contracts/asset-metadata scaffolding but drops the STUDY-first reminder and inserts a <fix_step_instruction> section that instructs the agent to read the current component files, apply exactly the one issue described in the user turn, and stop. Do NOT inline the issue text here — the user turn carries it so the prompt stays reusable across iterations.",
               "status": "pending",
               "context": {
                 "read_before": [
                   {
                     "file": "apps/pi-asset-loop/src/systemPrompt.ts",
                     "lines": "1-183",
-                    "purpose": "Current buildSystemPrompt after CP1 simplification \u2014 use as structural template for the new export. SystemPromptInput shape is also the input shape for the fix variant (minus maxIterations which is already gone)."
+                    "purpose": "Current buildSystemPrompt after CP1 simplification — use as structural template for the new export. SystemPromptInput shape is also the input shape for the fix variant (minus maxIterations which is already gone)."
                   }
                 ],
                 "related_files": [
@@ -799,7 +799,7 @@
                     {
                       "path": "apps/pi-asset-loop/src/systemPrompt.ts",
                       "status": "modified",
-                      "description": "Adds export interface FixStepPromptInput \u2014 same fields as SystemPromptInput. Adds export function buildFixStepSystemPrompt(input: FixStepPromptInput): string. The new prompt reuses <role>, <goal>, <context_you_receive>, <workspace>, <design_philosophy>, <file_contracts>, <asset_metadata> from buildSystemPrompt. Drops <reminders> entirely (irrelevant for a single fix). Replaces any STUDY phrasing in <goal> with 'apply the one critic issue described in the user turn'. Adds a new <fix_step_instruction> section: 'Exactly one critic issue follows in the user turn. component.html and component.css already exist in your workspace \u2014 read them. Apply only the fix the issue describes \u2014 no additional changes, no refactors, no prose reply. When the edit is written, stop.' buildSystemPrompt itself is unchanged."
+                      "description": "Adds export interface FixStepPromptInput — same fields as SystemPromptInput. Adds export function buildFixStepSystemPrompt(input: FixStepPromptInput): string. The new prompt reuses <role>, <goal>, <context_you_receive>, <workspace>, <design_philosophy>, <file_contracts>, <asset_metadata> from buildSystemPrompt. Drops <reminders> entirely (irrelevant for a single fix). Replaces any STUDY phrasing in <goal> with 'apply the one critic issue described in the user turn'. Adds a new <fix_step_instruction> section: 'Exactly one critic issue follows in the user turn. component.html and component.css already exist in your workspace — read them. Apply only the fix the issue describes — no additional changes, no refactors, no prose reply. When the edit is written, stop.' buildSystemPrompt itself is unchanged."
                     }
                   ],
                   "tree": null
@@ -832,7 +832,7 @@
                 },
                 {
                   "id": 5,
-                  "command": "INSIDE buildFixStepSystemPrompt: ADD NEW SECTION <fix_step_instruction> WITH BODY 'Exactly one critic issue follows in the user turn. component.html and component.css already exist in your workspace \u2014 read them. Apply only the fix the issue describes \u2014 no additional changes, no refactors, no prose reply. When the edit is written, stop.'",
+                  "command": "INSIDE buildFixStepSystemPrompt: ADD NEW SECTION <fix_step_instruction> WITH BODY 'Exactly one critic issue follows in the user turn. component.html and component.css already exist in your workspace — read them. Apply only the fix the issue describes — no additional changes, no refactors, no prose reply. When the edit is written, stop.'",
                   "file": "apps/pi-asset-loop/src/systemPrompt.ts",
                   "status": "pending"
                 },
@@ -847,29 +847,29 @@
             {
               "id": 4,
               "title": "Create src/fixStep.ts with runFixStep",
-              "description": "Introduce the primitive the orchestrator calls once per critic issue. Each call opens a fresh in-memory Pi SDK session scoped to the asset dir with coding tools, feeds it the same visual grounding the initial-gen session had (source + extracted PNGs) plus the current render.png so the agent sees the current delta, plus the textual asset.json + extraction prompt for consistency, plus exactly one CritiqueIssue. The session is disposed after waitForIdle \u2014 no cross-issue state. The function returns void; the only observable effect is the updated component.html/.css files on disk.",
+              "description": "Introduce the primitive the orchestrator calls once per critic issue. Each call opens a fresh in-memory Pi SDK session scoped to the asset dir with coding tools, feeds it the same visual grounding the initial-gen session had (source + extracted PNGs) plus the current render.png so the agent sees the current delta, plus the textual asset.json + extraction prompt for consistency, plus exactly one CritiqueIssue. The session is disposed after waitForIdle — no cross-issue state. The function returns void; the only observable effect is the updated component.html/.css files on disk.",
               "status": "pending",
               "context": {
                 "read_before": [
                   {
                     "file": "apps/pi-asset-loop/src/orchestrator.ts",
                     "lines": "1-80",
-                    "purpose": "CP1 orchestrator \u2014 same imports (AuthStorage, ModelRegistry, SessionManager, DefaultResourceLoader, createAgentSession, createCodingTools) and same session-construction pattern are reused inside fixStep.ts. Confirms the correct import paths and the session.prompt image-payload shape."
+                    "purpose": "CP1 orchestrator — same imports (AuthStorage, ModelRegistry, SessionManager, DefaultResourceLoader, createAgentSession, createCodingTools) and same session-construction pattern are reused inside fixStep.ts. Confirms the correct import paths and the session.prompt image-payload shape."
                   },
                   {
                     "file": "apps/pi-asset-loop/src/critic.ts",
                     "lines": "18-32",
-                    "purpose": "CritiqueIssue / IssueSeverity shapes \u2014 the fix step's input carries one CritiqueIssue."
+                    "purpose": "CritiqueIssue / IssueSeverity shapes — the fix step's input carries one CritiqueIssue."
                   },
                   {
                     "file": "apps/pi-asset-loop/src/args.ts",
                     "lines": "1-63",
-                    "purpose": "ResolvedAsset fields \u2014 used to find assetDir (session cwd) and componentHtml/componentCss paths."
+                    "purpose": "ResolvedAsset fields — used to find assetDir (session cwd) and componentHtml/componentCss paths."
                   },
                   {
                     "file": "ai_docs/pi-agent/examples-sdk/12-full-control.ts",
                     "lines": "1-83",
-                    "purpose": "Full-control SDK session with explicit tools/resourceLoader \u2014 baseline pattern runFixStep mirrors."
+                    "purpose": "Full-control SDK session with explicit tools/resourceLoader — baseline pattern runFixStep mirrors."
                   },
                   {
                     "file": "ai_docs/pi-agent/sdk.md",
@@ -1004,13 +1004,13 @@
           "task_seeds": [
             {
               "title": "Add MAX_ITERATIONS constant and writeAcceptedJson helper in orchestrator",
-              "intent": "In src/orchestrator.ts, promote MAX_ITERATIONS = 15 to a module-level constant. Add an internal helper writeAcceptedJson(resolved, { iterations, hitEmpty, residualIssues, verdict }) that stringifies { asset_id, iterations, max_iterations, hit_empty_issues, residual_issues, verdict, notes, accepted_at } \u2014 notes: string[] is synthesized from terminal reason ('converged at iteration N' on hitEmpty or 'iteration cap reached, M residual issues' on !hitEmpty) \u2014 and writeFileSync(resolved.acceptedJsonPath, json + '\\n'). Used by the loop's two termination branches.",
+              "intent": "In src/orchestrator.ts, promote MAX_ITERATIONS = 15 to a module-level constant. Add an internal helper writeAcceptedJson(resolved, { iterations, hitEmpty, residualIssues, verdict }) that stringifies { asset_id, iterations, max_iterations, hit_empty_issues, residual_issues, verdict, notes, accepted_at } — notes: string[] is synthesized from terminal reason ('converged at iteration N' on hitEmpty or 'iteration cap reached, M residual issues' on !hitEmpty) — and writeFileSync(resolved.acceptedJsonPath, json + '\\n'). Used by the loop's two termination branches.",
               "processed": true,
               "task_id": 5
             },
             {
               "title": "Refactor runAssetLoop into full iterative loop",
-              "intent": "Replace the thin-slice body of runAssetLoop with the deterministic loop. Keep: resolveAsset, read 4 context inputs, create AuthStorage/ModelRegistry, resolve model, build systemPrompt, create DefaultResourceLoader, run initial-gen session (same as today). After initial-gen dispose: start a while loop over iteration from 1..MAX_ITERATIONS. Each iteration: (a) phase: render \u2014 buildRenderWrapper, writeFileSync wrapper, renderWithPlaywright, re-read render.png as base64; (b) phase: critique \u2014 modelRegistry.getApiKeyAndHeaders, runCritique \u2192 outcome. If !outcome.ok: console.error parse-failure message and throw so bin/asset-loop.ts exits 1 (no accepted.json). If outcome.ok: persist critique.json with { iteration, verdict, issues }. If issues.length === 0: call writeAcceptedJson(hitEmpty=true) and return. If iteration === MAX_ITERATIONS: call writeAcceptedJson(hitEmpty=false, residualIssues) and return. (c) phase: fix \u2014 for (issue of issues) await runFixStep with current render base64 + issue. After the batch, continue to next iteration. The orchestrator should hold the latest source/extracted base64 in scope so fix-step calls reuse them without re-reading each time.",
+              "intent": "Replace the thin-slice body of runAssetLoop with the deterministic loop. Keep: resolveAsset, read 4 context inputs, create AuthStorage/ModelRegistry, resolve model, build systemPrompt, create DefaultResourceLoader, run initial-gen session (same as today). After initial-gen dispose: start a while loop over iteration from 1..MAX_ITERATIONS. Each iteration: (a) phase: render — buildRenderWrapper, writeFileSync wrapper, renderWithPlaywright, re-read render.png as base64; (b) phase: critique — modelRegistry.getApiKeyAndHeaders, runCritique → outcome. If !outcome.ok: console.error parse-failure message and throw so bin/asset-loop.ts exits 1 (no accepted.json). If outcome.ok: persist critique.json with { iteration, verdict, issues }. If issues.length === 0: call writeAcceptedJson(hitEmpty=true) and return. If iteration === MAX_ITERATIONS: call writeAcceptedJson(hitEmpty=false, residualIssues) and return. (c) phase: fix — for (issue of issues) await runFixStep with current render base64 + issue. After the batch, continue to next iteration. The orchestrator should hold the latest source/extracted base64 in scope so fix-step calls reuse them without re-reading each time.",
               "processed": true,
               "task_id": 6
             }
@@ -1026,12 +1026,12 @@
                   {
                     "file": "apps/pi-asset-loop/src/orchestrator.ts",
                     "lines": "1-60",
-                    "purpose": "CP1 orchestrator imports and initial MAX_ITERATIONS placement (if any) \u2014 confirm where to add the constant and the helper so the diff stays minimal for task 6."
+                    "purpose": "CP1 orchestrator imports and initial MAX_ITERATIONS placement (if any) — confirm where to add the constant and the helper so the diff stays minimal for task 6."
                   },
                   {
                     "file": "apps/pi-asset-loop/extensions/asset-loop.ts",
                     "lines": "292-337",
-                    "purpose": "Legacy accept tool \u2014 canonical shape of accepted.json (asset_id, iterations, max_iterations, hit_empty_issues, residual_issues, verdict, notes, accepted_at). The helper must produce byte-identical output (trailing newline included) so downstream consumers do not need to branch."
+                    "purpose": "Legacy accept tool — canonical shape of accepted.json (asset_id, iterations, max_iterations, hit_empty_issues, residual_issues, verdict, notes, accepted_at). The helper must produce byte-identical output (trailing newline included) so downstream consumers do not need to branch."
                   }
                 ],
                 "related_files": [
@@ -1056,7 +1056,7 @@
                     {
                       "path": "apps/pi-asset-loop/src/orchestrator.ts",
                       "status": "modified",
-                      "description": "Module-level const MAX_ITERATIONS = 15. Module-level internal function writeAcceptedJson(resolved: ResolvedAsset, payload: { iterations: number; hitEmpty: boolean; residualIssues: CritiqueIssue[]; verdict: string }): void. Body builds notes: string[] \u2014 ['converged at iteration ${iterations}'] when hitEmpty, else ['iteration cap reached at ${iterations} renders', '${residualIssues.length} residual issue(s)']. Serializes { asset_id: resolved.assetId, iterations, max_iterations: MAX_ITERATIONS, hit_empty_issues: hitEmpty, residual_issues: residualIssues, verdict, notes, accepted_at: new Date().toISOString() } via JSON.stringify(..., null, 2) + '\\n' and writeFileSync(resolved.acceptedJsonPath, json). Imports CritiqueIssue from './critic.ts' if not already imported. runAssetLoop body is unchanged in this task."
+                      "description": "Module-level const MAX_ITERATIONS = 15. Module-level internal function writeAcceptedJson(resolved: ResolvedAsset, payload: { iterations: number; hitEmpty: boolean; residualIssues: CritiqueIssue[]; verdict: string }): void. Body builds notes: string[] — ['converged at iteration ${iterations}'] when hitEmpty, else ['iteration cap reached at ${iterations} renders', '${residualIssues.length} residual issue(s)']. Serializes { asset_id: resolved.assetId, iterations, max_iterations: MAX_ITERATIONS, hit_empty_issues: hitEmpty, residual_issues: residualIssues, verdict, notes, accepted_at: new Date().toISOString() } via JSON.stringify(..., null, 2) + '\\n' and writeFileSync(resolved.acceptedJsonPath, json). Imports CritiqueIssue from './critic.ts' if not already imported. runAssetLoop body is unchanged in this task."
                     }
                   ],
                   "tree": null
@@ -1089,7 +1089,7 @@
                 },
                 {
                   "id": 5,
-                  "command": "INSIDE writeAcceptedJson: BUILD notes: string[] \u2014 ['converged at iteration ${payload.iterations}'] WHEN payload.hitEmpty; ELSE ['iteration cap reached at ${payload.iterations} renders', '${payload.residualIssues.length} residual issue(s)']",
+                  "command": "INSIDE writeAcceptedJson: BUILD notes: string[] — ['converged at iteration ${payload.iterations}'] WHEN payload.hitEmpty; ELSE ['iteration cap reached at ${payload.iterations} renders', '${payload.residualIssues.length} residual issue(s)']",
                   "file": "apps/pi-asset-loop/src/orchestrator.ts",
                   "status": "pending"
                 },
@@ -1110,7 +1110,7 @@
             {
               "id": 6,
               "title": "Refactor runAssetLoop into full deterministic loop",
-              "description": "Turn runAssetLoop from the one-shot slice into the full TypeScript-driven loop. Keep the existing initialization (resolveAsset + read inputs + AuthStorage/ModelRegistry + DefaultResourceLoader + initial-gen SDK session). After initial-gen dispose, iterate from 1..MAX_ITERATIONS: render, critique, handle parse-failure abort, check empty-issue termination, check cap termination, else batch-fix every issue via runFixStep, then next iteration. Every iteration re-reads render.png into base64 and feeds that base64 (plus source + extracted) into each per-issue fix session. The loop does not call any TUI \u2014 stdout-only phase logs ('phase: render iter N/15', 'phase: critique iter N', 'phase: fix iter N \u2014 K issues', 'fix I<j>: <severity> <region>', 'accepted \u2014 hit_empty' / 'accepted \u2014 cap'). Parse-failure: console.error a short message referencing the truncated rawSecond and throw; bin/asset-loop.ts already exits 1 on throw, and no accepted.json is written.",
+              "description": "Turn runAssetLoop from the one-shot slice into the full TypeScript-driven loop. Keep the existing initialization (resolveAsset + read inputs + AuthStorage/ModelRegistry + DefaultResourceLoader + initial-gen SDK session). After initial-gen dispose, iterate from 1..MAX_ITERATIONS: render, critique, handle parse-failure abort, check empty-issue termination, check cap termination, else batch-fix every issue via runFixStep, then next iteration. Every iteration re-reads render.png into base64 and feeds that base64 (plus source + extracted) into each per-issue fix session. The loop does not call any TUI — stdout-only phase logs ('phase: render iter N/15', 'phase: critique iter N', 'phase: fix iter N — K issues', 'fix I<j>: <severity> <region>', 'accepted — hit_empty' / 'accepted — cap'). Parse-failure: console.error a short message referencing the truncated rawSecond and throw; bin/asset-loop.ts already exits 1 on throw, and no accepted.json is written.",
               "status": "pending",
               "context": {
                 "read_before": [
@@ -1132,7 +1132,7 @@
                   {
                     "file": "apps/pi-asset-loop/extensions/asset-loop.ts",
                     "lines": "161-219",
-                    "purpose": "Legacy render tool \u2014 confirms the exact buildRenderWrapper + renderWithPlaywright call sequence (wrapperPath, renderPath, referenceWidth, referenceHeight). Orchestrator must reproduce it."
+                    "purpose": "Legacy render tool — confirms the exact buildRenderWrapper + renderWithPlaywright call sequence (wrapperPath, renderPath, referenceWidth, referenceHeight). Orchestrator must reproduce it."
                   }
                 ],
                 "related_files": [
@@ -1152,7 +1152,7 @@
                     {
                       "path": "apps/pi-asset-loop/src/orchestrator.ts",
                       "status": "exists",
-                      "description": "After task 5: has MAX_ITERATIONS + writeAcceptedJson helper. runAssetLoop body still runs exactly one render + one critique + writes critique.json and returns. No accepted.json. No per-issue fixes. Calls runCritique and receives (today still) CritiqueResult \u2014 task 1 changes this to CritiqueOutcome, which this task must adapt to."
+                      "description": "After task 5: has MAX_ITERATIONS + writeAcceptedJson helper. runAssetLoop body still runs exactly one render + one critique + writes critique.json and returns. No accepted.json. No per-issue fixes. Calls runCritique and receives (today still) CritiqueResult — task 1 changes this to CritiqueOutcome, which this task must adapt to."
                     }
                   ],
                   "tree": null
@@ -1162,7 +1162,7 @@
                     {
                       "path": "apps/pi-asset-loop/src/orchestrator.ts",
                       "status": "modified",
-                      "description": "runAssetLoop retains initialization (resolveAsset, read inputs, AuthStorage, ModelRegistry, model lookup, DefaultResourceLoader, initial-gen createAgentSession, session.prompt with source+extracted images, session.agent.waitForIdle, session.dispose). After initial-gen dispose: a for loop for (let iteration = 1; iteration <= MAX_ITERATIONS; iteration++). In each iteration \u2014 (1) log 'phase: render iter ${iteration}/${MAX_ITERATIONS}'; read componentHtml + componentCss; writeFileSync(wrapperPath, buildRenderWrapper(html, css)); await renderWithPlaywright({ wrapperPath, renderPath, referenceWidth, referenceHeight }); read render.png into renderBase64. (2) log 'phase: critique iter ${iteration}'; resolve auth via modelRegistry.getApiKeyAndHeaders(model) (throw if !ok); await runCritique \u2192 outcome. If !outcome.ok: console.error(`aborted: critic parse failure \u2014 ${truncate(outcome.rawSecond, 400)}`); throw new Error('critic parse failure'). writeFileSync(critiqueJsonPath, JSON.stringify({ iteration, verdict: outcome.result.verdict, issues: outcome.result.issues }, null, 2) + '\\n'). If outcome.result.issues.length === 0: log 'accepted \u2014 hit_empty'; writeAcceptedJson(resolved, { iterations: iteration, hitEmpty: true, residualIssues: [], verdict: outcome.result.verdict }); return. If iteration === MAX_ITERATIONS: log 'accepted \u2014 cap'; writeAcceptedJson(resolved, { iterations: iteration, hitEmpty: false, residualIssues: outcome.result.issues, verdict: outcome.result.verdict }); return. (3) log 'phase: fix iter ${iteration} \u2014 ${issues.length} issues'; for (const issue of outcome.result.issues) { log `fix ${issue.id}: ${issue.severity} ${issue.region}`; await runFixStep({ resolved, issue, iteration, assetJsonText, extractionPromptText, referenceWidth, referenceHeight, sourceBase64, extractedBase64: referenceBase64, currentRenderBase64: renderBase64, model, authStorage, modelRegistry }); }. Continue loop. Imports added: runFixStep from './fixStep.ts', CritiqueIssue type from './critic.ts' (if not already), truncate is either reused from critic.ts (re-exported) or inlined locally as a 3-line helper."
+                      "description": "runAssetLoop retains initialization (resolveAsset, read inputs, AuthStorage, ModelRegistry, model lookup, DefaultResourceLoader, initial-gen createAgentSession, session.prompt with source+extracted images, session.agent.waitForIdle, session.dispose). After initial-gen dispose: a for loop for (let iteration = 1; iteration <= MAX_ITERATIONS; iteration++). In each iteration — (1) log 'phase: render iter ${iteration}/${MAX_ITERATIONS}'; read componentHtml + componentCss; writeFileSync(wrapperPath, buildRenderWrapper(html, css)); await renderWithPlaywright({ wrapperPath, renderPath, referenceWidth, referenceHeight }); read render.png into renderBase64. (2) log 'phase: critique iter ${iteration}'; resolve auth via modelRegistry.getApiKeyAndHeaders(model) (throw if !ok); await runCritique → outcome. If !outcome.ok: console.error(`aborted: critic parse failure — ${truncate(outcome.rawSecond, 400)}`); throw new Error('critic parse failure'). writeFileSync(critiqueJsonPath, JSON.stringify({ iteration, verdict: outcome.result.verdict, issues: outcome.result.issues }, null, 2) + '\\n'). If outcome.result.issues.length === 0: log 'accepted — hit_empty'; writeAcceptedJson(resolved, { iterations: iteration, hitEmpty: true, residualIssues: [], verdict: outcome.result.verdict }); return. If iteration === MAX_ITERATIONS: log 'accepted — cap'; writeAcceptedJson(resolved, { iterations: iteration, hitEmpty: false, residualIssues: outcome.result.issues, verdict: outcome.result.verdict }); return. (3) log 'phase: fix iter ${iteration} — ${issues.length} issues'; for (const issue of outcome.result.issues) { log `fix ${issue.id}: ${issue.severity} ${issue.region}`; await runFixStep({ resolved, issue, iteration, assetJsonText, extractionPromptText, referenceWidth, referenceHeight, sourceBase64, extractedBase64: referenceBase64, currentRenderBase64: renderBase64, model, authStorage, modelRegistry }); }. Continue loop. Imports added: runFixStep from './fixStep.ts', CritiqueIssue type from './critic.ts' (if not already), truncate is either reused from critic.ts (re-exported) or inlined locally as a 3-line helper."
                     }
                   ],
                   "tree": null
@@ -1177,13 +1177,13 @@
                 },
                 {
                   "id": 2,
-                  "command": "ADD local helper FUNCTION truncate(s: string, max: number): string \u2014 3-line utility (length check, slice + horizontal-ellipsis)",
+                  "command": "ADD local helper FUNCTION truncate(s: string, max: number): string — 3-line utility (length check, slice + horizontal-ellipsis)",
                   "file": "apps/pi-asset-loop/src/orchestrator.ts",
                   "status": "pending"
                 },
                 {
                   "id": 3,
-                  "command": "INSIDE runAssetLoop: KEEP initialization unchanged \u2014 resolveAsset, read 4 context inputs, create AuthStorage, new ModelRegistry, getModel, build systemPrompt, DefaultResourceLoader, createAgentSession, session.prompt with source+extracted images, session.agent.waitForIdle, session.dispose",
+                  "command": "INSIDE runAssetLoop: KEEP initialization unchanged — resolveAsset, read 4 context inputs, create AuthStorage, new ModelRegistry, getModel, build systemPrompt, DefaultResourceLoader, createAgentSession, session.prompt with source+extracted images, session.agent.waitForIdle, session.dispose",
                   "file": "apps/pi-asset-loop/src/orchestrator.ts",
                   "status": "pending"
                 },
@@ -1213,7 +1213,7 @@
                 },
                 {
                   "id": 8,
-                  "command": "INSIDE loop: IF (!outcome.ok) console.error('aborted: critic parse failure \u2014 ' + truncate(outcome.rawSecond, 400)); THROW new Error('critic parse failure')",
+                  "command": "INSIDE loop: IF (!outcome.ok) console.error('aborted: critic parse failure — ' + truncate(outcome.rawSecond, 400)); THROW new Error('critic parse failure')",
                   "file": "apps/pi-asset-loop/src/orchestrator.ts",
                   "status": "pending"
                 },
@@ -1225,19 +1225,19 @@
                 },
                 {
                   "id": 10,
-                  "command": "INSIDE loop: IF (outcome.result.issues.length === 0) LOG 'accepted \u2014 hit_empty'; CALL writeAcceptedJson(resolved, { iterations: iteration, hitEmpty: true, residualIssues: [], verdict: outcome.result.verdict }); RETURN",
+                  "command": "INSIDE loop: IF (outcome.result.issues.length === 0) LOG 'accepted — hit_empty'; CALL writeAcceptedJson(resolved, { iterations: iteration, hitEmpty: true, residualIssues: [], verdict: outcome.result.verdict }); RETURN",
                   "file": "apps/pi-asset-loop/src/orchestrator.ts",
                   "status": "pending"
                 },
                 {
                   "id": 11,
-                  "command": "INSIDE loop: IF (iteration === MAX_ITERATIONS) LOG 'accepted \u2014 cap'; CALL writeAcceptedJson(resolved, { iterations: iteration, hitEmpty: false, residualIssues: outcome.result.issues, verdict: outcome.result.verdict }); RETURN",
+                  "command": "INSIDE loop: IF (iteration === MAX_ITERATIONS) LOG 'accepted — cap'; CALL writeAcceptedJson(resolved, { iterations: iteration, hitEmpty: false, residualIssues: outcome.result.issues, verdict: outcome.result.verdict }); RETURN",
                   "file": "apps/pi-asset-loop/src/orchestrator.ts",
                   "status": "pending"
                 },
                 {
                   "id": 12,
-                  "command": "INSIDE loop: LOG 'phase: fix iter ${iteration} \u2014 ${outcome.result.issues.length} issues' TO stdout",
+                  "command": "INSIDE loop: LOG 'phase: fix iter ${iteration} — ${outcome.result.issues.length} issues' TO stdout",
                   "file": "apps/pi-asset-loop/src/orchestrator.ts",
                   "status": "pending"
                 },
@@ -1256,22 +1256,22 @@
     {
       "id": 3,
       "title": "Usage aggregator (tokens + cost)",
-      "goal": "Introduce src/usage.ts that accumulates pi-ai Usage objects across the initial-gen SDK session, each per-issue fix SDK session, and each runCritique call. Orchestrator subscribes to SDK agent_end and feeds critic usage in directly. Exposes cumulative input/output/cache tokens and dollar cost via a simple getter suitable for any observer (TUI in CP4, summary in CP5). No UI binding yet \u2014 verify via stdout dump at loop end.",
+      "goal": "Introduce src/usage.ts that accumulates pi-ai Usage objects across the initial-gen SDK session, each per-issue fix SDK session, and each runCritique call. Orchestrator subscribes to SDK agent_end and feeds critic usage in directly. Exposes cumulative input/output/cache tokens and dollar cost via a simple getter suitable for any observer (TUI in CP4, summary in CP5). No UI binding yet — verify via stdout dump at loop end.",
       "prerequisites": [
         2
       ],
       "status": "pending",
-      "testing_strategy": "Manual end-to-end: after build, `bun run asset-loop --asset <fresh asset dir>`. Expect a single 'usage: calls=N \u2191..k \u2193..k R=..k W=..k tot=..k $0.XXXX' line on stdout immediately before process exit on every termination path \u2014 hit_empty, cap, and critic parse-failure abort (forceable by pointing critic at a model that fails to emit JSON twice). calls should equal (initial-gen assistant turns) + (sum of fix-step assistant turns across all iterations) + (critique attempts: 1 per successful critique, 2 if a retry fired). Cost totals match what pi-ai reports (cross-check by temporarily logging u.cost.total on each add). Typecheck passes (`npm run typecheck`). accepted.json shape unchanged from CP2.",
+      "testing_strategy": "Manual end-to-end: after build, `bun run asset-loop --asset <fresh asset dir>`. Expect a single 'usage: calls=N ↑..k ↓..k R=..k W=..k tot=..k $0.XXXX' line on stdout immediately before process exit on every termination path — hit_empty, cap, and critic parse-failure abort (forceable by pointing critic at a model that fails to emit JSON twice). calls should equal (initial-gen assistant turns) + (sum of fix-step assistant turns across all iterations) + (critique attempts: 1 per successful critique, 2 if a retry fired). Cost totals match what pi-ai reports (cross-check by temporarily logging u.cost.total on each add). Typecheck passes (`npm run typecheck`). accepted.json shape unchanged from CP2.",
       "task_groups": [
         {
           "id": 1,
           "title": "UsageAggregator module (src/usage.ts)",
-          "objective": "Introduce a pure TypeScript aggregator for pi-ai Usage objects. No I/O, no SDK imports \u2014 just add(u) to accumulate input/output/cacheRead/cacheWrite/totalTokens and cost.{input,output,cacheRead,cacheWrite,total}, and snapshot() returning an immutable UsageSnapshot. This is the data primitive that CP4's TUI and CP5's summary will consume.",
+          "objective": "Introduce a pure TypeScript aggregator for pi-ai Usage objects. No I/O, no SDK imports — just add(u) to accumulate input/output/cacheRead/cacheWrite/totalTokens and cost.{input,output,cacheRead,cacheWrite,total}, and snapshot() returning an immutable UsageSnapshot. This is the data primitive that CP4's TUI and CP5's summary will consume.",
           "status": "pending",
           "task_seeds": [
             {
               "title": "Create src/usage.ts with UsageAggregator",
-              "intent": "New file src/usage.ts. Exports UsageSnapshot type (same shape as pi-ai Usage: input, output, cacheRead, cacheWrite, totalTokens, cost { input, output, cacheRead, cacheWrite, total }, plus calls: number counting how many Usage objects have been folded in). Exports class UsageAggregator with add(u: Usage) and snapshot(): UsageSnapshot. Zero-initialized on construction. Also exports formatUsageSnapshot(s: UsageSnapshot): string \u2014 a single-line human-readable dump used by the orchestrator at loop end.",
+              "intent": "New file src/usage.ts. Exports UsageSnapshot type (same shape as pi-ai Usage: input, output, cacheRead, cacheWrite, totalTokens, cost { input, output, cacheRead, cacheWrite, total }, plus calls: number counting how many Usage objects have been folded in). Exports class UsageAggregator with add(u: Usage) and snapshot(): UsageSnapshot. Zero-initialized on construction. Also exports formatUsageSnapshot(s: UsageSnapshot): string — a single-line human-readable dump used by the orchestrator at loop end.",
               "processed": true,
               "task_id": 1
             }
@@ -1280,19 +1280,19 @@
             {
               "id": 1,
               "title": "Create src/usage.ts with UsageAggregator + formatUsageSnapshot",
-              "description": "New standalone module that owns cumulative Usage accounting for the whole run. Zero SDK imports \u2014 only imports the Usage type from @mariozechner/pi-ai. Exposes a tiny surface: UsageSnapshot (immutable snapshot shape, mirrors pi-ai Usage plus a calls counter), class UsageAggregator with add(u) and snapshot(), and formatUsageSnapshot(s) that returns a one-line stdout-friendly summary the orchestrator uses at termination. Pure and testable; no side effects beyond mutating private counters.",
+              "description": "New standalone module that owns cumulative Usage accounting for the whole run. Zero SDK imports — only imports the Usage type from @mariozechner/pi-ai. Exposes a tiny surface: UsageSnapshot (immutable snapshot shape, mirrors pi-ai Usage plus a calls counter), class UsageAggregator with add(u) and snapshot(), and formatUsageSnapshot(s) that returns a one-line stdout-friendly summary the orchestrator uses at termination. Pure and testable; no side effects beyond mutating private counters.",
               "status": "pending",
               "context": {
                 "read_before": [
                   {
                     "file": "apps/pi-asset-loop/node_modules/@mariozechner/pi-ai/dist/types.d.ts",
                     "lines": "111-124",
-                    "purpose": "Canonical pi-ai Usage interface shape { input, output, cacheRead, cacheWrite, totalTokens, cost: { input, output, cacheRead, cacheWrite, total } } \u2014 UsageSnapshot mirrors this and adds a calls counter."
+                    "purpose": "Canonical pi-ai Usage interface shape { input, output, cacheRead, cacheWrite, totalTokens, cost: { input, output, cacheRead, cacheWrite, total } } — UsageSnapshot mirrors this and adds a calls counter."
                   },
                   {
                     "file": "ai_docs/pi-agent/examples-extensions/subagent/index.ts",
                     "lines": "30-62",
-                    "purpose": "Reference for formatUsageStats output shape \u2014 tokens printed as 1.2k/340k/2.1M, cost as $X.XXXX, \u2191/\u2193 arrows for input/output. formatUsageSnapshot should follow this idiom (simplified, no turns / contextTokens since we derive nothing from those)."
+                    "purpose": "Reference for formatUsageStats output shape — tokens printed as 1.2k/340k/2.1M, cost as $X.XXXX, ↑/↓ arrows for input/output. formatUsageSnapshot should follow this idiom (simplified, no turns / contextTokens since we derive nothing from those)."
                   },
                   {
                     "file": "ai_docs/pi-agent/session.md",
@@ -1323,7 +1323,7 @@
                     {
                       "path": "apps/pi-asset-loop/src/usage.ts",
                       "status": "new",
-                      "description": "New module. Exports: type UsageSnapshot = { calls: number; input: number; output: number; cacheRead: number; cacheWrite: number; totalTokens: number; cost: { input: number; output: number; cacheRead: number; cacheWrite: number; total: number } }. Class UsageAggregator \u2014 private fields mirror UsageSnapshot (zero-initialized). add(u: Usage): void increments calls++, input += u.input, output += u.output, cacheRead += u.cacheRead, cacheWrite += u.cacheWrite, totalTokens += u.totalTokens, and each cost bucket. snapshot(): UsageSnapshot returns a plain object with the current totals (structured clone \u2014 new object each call, no shared references). Function formatUsageSnapshot(s: UsageSnapshot): string returns 'usage: calls=N \u2191Nk \u2193Nk R=Nk W=Nk tot=Nk $0.0000' using a local formatTokens(n) helper (n<1000 as integer, n<10000 as '1.2k', n<1_000_000 as '340k', else '2.1M') and cost.total.toFixed(4). Only external import: 'import type { Usage } from \"@mariozechner/pi-ai\"'."
+                      "description": "New module. Exports: type UsageSnapshot = { calls: number; input: number; output: number; cacheRead: number; cacheWrite: number; totalTokens: number; cost: { input: number; output: number; cacheRead: number; cacheWrite: number; total: number } }. Class UsageAggregator — private fields mirror UsageSnapshot (zero-initialized). add(u: Usage): void increments calls++, input += u.input, output += u.output, cacheRead += u.cacheRead, cacheWrite += u.cacheWrite, totalTokens += u.totalTokens, and each cost bucket. snapshot(): UsageSnapshot returns a plain object with the current totals (structured clone — new object each call, no shared references). Function formatUsageSnapshot(s: UsageSnapshot): string returns 'usage: calls=N ↑Nk ↓Nk R=Nk W=Nk tot=Nk $0.0000' using a local formatTokens(n) helper (n<1000 as integer, n<10000 as '1.2k', n<1_000_000 as '340k', else '2.1M') and cost.total.toFixed(4). Only external import: 'import type { Usage } from \"@mariozechner/pi-ai\"'."
                     }
                   ],
                   "tree": null
@@ -1356,25 +1356,25 @@
                 },
                 {
                   "id": 5,
-                  "command": "ADD METHOD add(u: Usage): void TO UsageAggregator \u2014 increments calls++ and accumulates each numeric field from u and u.cost into the matching private field",
+                  "command": "ADD METHOD add(u: Usage): void TO UsageAggregator — increments calls++ and accumulates each numeric field from u and u.cost into the matching private field",
                   "file": "apps/pi-asset-loop/src/usage.ts",
                   "status": "pending"
                 },
                 {
                   "id": 6,
-                  "command": "ADD METHOD snapshot(): UsageSnapshot TO UsageAggregator \u2014 RETURNS a new plain object populated from the private fields (must be a fresh object each call, no internal reference leak)",
+                  "command": "ADD METHOD snapshot(): UsageSnapshot TO UsageAggregator — RETURNS a new plain object populated from the private fields (must be a fresh object each call, no internal reference leak)",
                   "file": "apps/pi-asset-loop/src/usage.ts",
                   "status": "pending"
                 },
                 {
                   "id": 7,
-                  "command": "ADD local helper FUNCTION formatTokens(n: number): string \u2014 n<1000 returns String(n); n<10000 returns (n/1000).toFixed(1)+'k'; n<1_000_000 returns Math.round(n/1000)+'k'; else returns (n/1_000_000).toFixed(1)+'M'",
+                  "command": "ADD local helper FUNCTION formatTokens(n: number): string — n<1000 returns String(n); n<10000 returns (n/1000).toFixed(1)+'k'; n<1_000_000 returns Math.round(n/1000)+'k'; else returns (n/1_000_000).toFixed(1)+'M'",
                   "file": "apps/pi-asset-loop/src/usage.ts",
                   "status": "pending"
                 },
                 {
                   "id": 8,
-                  "command": "ADD EXPORT FUNCTION formatUsageSnapshot(s: UsageSnapshot): string \u2014 returns 'usage: calls=${s.calls} \u2191${formatTokens(s.input)} \u2193${formatTokens(s.output)} R=${formatTokens(s.cacheRead)} W=${formatTokens(s.cacheWrite)} tot=${formatTokens(s.totalTokens)} $${s.cost.total.toFixed(4)}'",
+                  "command": "ADD EXPORT FUNCTION formatUsageSnapshot(s: UsageSnapshot): string — returns 'usage: calls=${s.calls} ↑${formatTokens(s.input)} ↓${formatTokens(s.output)} R=${formatTokens(s.cacheRead)} W=${formatTokens(s.cacheWrite)} tot=${formatTokens(s.totalTokens)} $${s.cost.total.toFixed(4)}'",
                   "file": "apps/pi-asset-loop/src/usage.ts",
                   "status": "pending"
                 }
@@ -1385,7 +1385,7 @@
         {
           "id": 2,
           "title": "Emit Usage from critic and fix step",
-          "objective": "Surface Usage at the two places it lives today without orchestrator wiring. (a) CritiqueOutcome gains a usages: Usage[] field on both the ok:true and ok:false variants, populated from completeSimple's AssistantMessage.usage on each attempt. (b) runFixStep accepts an optional onUsage(u: Usage) callback in RunFixStepInput and subscribes to the session to forward assistant message usage as it arrives. These are additive surface changes \u2014 the orchestrator in CP2 still compiles (usages is new and extra; onUsage is optional).",
+          "objective": "Surface Usage at the two places it lives today without orchestrator wiring. (a) CritiqueOutcome gains a usages: Usage[] field on both the ok:true and ok:false variants, populated from completeSimple's AssistantMessage.usage on each attempt. (b) runFixStep accepts an optional onUsage(u: Usage) callback in RunFixStepInput and subscribes to the session to forward assistant message usage as it arrives. These are additive surface changes — the orchestrator in CP2 still compiles (usages is new and extra; onUsage is optional).",
           "status": "pending",
           "task_seeds": [
             {
@@ -1405,19 +1405,19 @@
             {
               "id": 2,
               "title": "Extend CritiqueOutcome with usages[] and populate in runCritique",
-              "description": "runCritique already calls completeSimple once and potentially a second time on retry. Both responses carry an AssistantMessage with a Usage object (first.usage, second.usage). Today those are only used to fill the fake retry-context assistant message; after this task they are also returned to the caller. Add a usages: Usage[] field to both CritiqueOutcome variants. Happy path (first parse OK) \u2192 usages is [first.usage]. Retry parse OK \u2192 [first.usage, second.usage]. Parse failure \u2192 [first.usage, second.usage]. No other runCritique logic changes.",
+              "description": "runCritique already calls completeSimple once and potentially a second time on retry. Both responses carry an AssistantMessage with a Usage object (first.usage, second.usage). Today those are only used to fill the fake retry-context assistant message; after this task they are also returned to the caller. Add a usages: Usage[] field to both CritiqueOutcome variants. Happy path (first parse OK) → usages is [first.usage]. Retry parse OK → [first.usage, second.usage]. Parse failure → [first.usage, second.usage]. No other runCritique logic changes.",
               "status": "pending",
               "context": {
                 "read_before": [
                   {
                     "file": "apps/pi-asset-loop/src/critic.ts",
                     "lines": "1-50",
-                    "purpose": "Current header and CritiqueOutcome/CritiqueResult export surface \u2014 after CP2 T1 runCritique returns CritiqueOutcome; this task extends that type."
+                    "purpose": "Current header and CritiqueOutcome/CritiqueResult export surface — after CP2 T1 runCritique returns CritiqueOutcome; this task extends that type."
                   },
                   {
                     "file": "apps/pi-asset-loop/src/critic.ts",
                     "lines": "180-286",
-                    "purpose": "runCritique body \u2014 identify where first and second are awaited (completeSimple calls) and the three return sites (first-parse success, second-parse success, parse-failure). Each return must include usages."
+                    "purpose": "runCritique body — identify where first and second are awaited (completeSimple calls) and the three return sites (first-parse success, second-parse success, parse-failure). Each return must include usages."
                   },
                   {
                     "file": "apps/pi-asset-loop/node_modules/@mariozechner/pi-ai/dist/types.d.ts",
@@ -1447,7 +1447,7 @@
                     {
                       "path": "apps/pi-asset-loop/src/critic.ts",
                       "status": "modified",
-                      "description": "Usage type imported from @mariozechner/pi-ai (added to the existing import list). CritiqueOutcome updated: both variants now carry usages: Usage[]. Happy-first-parse return includes usages: [first.usage]. Retry-parse-success return includes usages: [first.usage, second.usage]. Parse-failure return includes usages: [first.usage, second.usage]. runCritique body logic is otherwise unchanged \u2014 no new variables, just threading the already-awaited first/second usage through the existing return statements."
+                      "description": "Usage type imported from @mariozechner/pi-ai (added to the existing import list). CritiqueOutcome updated: both variants now carry usages: Usage[]. Happy-first-parse return includes usages: [first.usage]. Retry-parse-success return includes usages: [first.usage, second.usage]. Parse-failure return includes usages: [first.usage, second.usage]. runCritique body logic is otherwise unchanged — no new variables, just threading the already-awaited first/second usage through the existing return statements."
                     }
                   ],
                   "tree": null
@@ -1462,7 +1462,7 @@
                 },
                 {
                   "id": 2,
-                  "command": "UPDATE EXPORT TYPE CritiqueOutcome: ADD FIELD usages: Usage[] TO BOTH variants \u2014 { ok: true; result: CritiqueResult; usages: Usage[] } | { ok: false; reason: 'parse_failed'; rawFirst: string; rawSecond: string; usages: Usage[] }",
+                  "command": "UPDATE EXPORT TYPE CritiqueOutcome: ADD FIELD usages: Usage[] TO BOTH variants — { ok: true; result: CritiqueResult; usages: Usage[] } | { ok: false; reason: 'parse_failed'; rawFirst: string; rawSecond: string; usages: Usage[] }",
                   "file": "apps/pi-asset-loop/src/critic.ts",
                   "status": "pending"
                 },
@@ -1521,7 +1521,7 @@
                     {
                       "path": "apps/pi-asset-loop/src/fixStep.ts",
                       "status": "exists",
-                      "description": "After CP2 T4: RunFixStepInput { resolved, issue, iteration, assetJsonText, extractionPromptText, referenceWidth, referenceHeight, sourceBase64, extractedBase64, currentRenderBase64, model, authStorage, modelRegistry }. runFixStep body: build prompt \u2192 createAgentSession \u2192 session.prompt(kickoffText, { images }) \u2192 session.agent.waitForIdle() \u2192 session.dispose(). No subscribe call. No Usage import."
+                      "description": "After CP2 T4: RunFixStepInput { resolved, issue, iteration, assetJsonText, extractionPromptText, referenceWidth, referenceHeight, sourceBase64, extractedBase64, currentRenderBase64, model, authStorage, modelRegistry }. runFixStep body: build prompt → createAgentSession → session.prompt(kickoffText, { images }) → session.agent.waitForIdle() → session.dispose(). No subscribe call. No Usage import."
                     }
                   ],
                   "tree": null
@@ -1531,7 +1531,7 @@
                     {
                       "path": "apps/pi-asset-loop/src/fixStep.ts",
                       "status": "modified",
-                      "description": "Usage type imported from @mariozechner/pi-ai (added to the existing import). RunFixStepInput gains optional field onUsage?: (usage: Usage) => void. Inside runFixStep, immediately after createAgentSession destructures { session } (and before session.prompt), session.subscribe is called with a handler that checks event.type === 'message_end' and event.message?.role === 'assistant' and event.message.usage, then invokes input.onUsage?.(event.message.usage). All other behavior unchanged \u2014 prompt, waitForIdle, dispose, return void."
+                      "description": "Usage type imported from @mariozechner/pi-ai (added to the existing import). RunFixStepInput gains optional field onUsage?: (usage: Usage) => void. Inside runFixStep, immediately after createAgentSession destructures { session } (and before session.prompt), session.subscribe is called with a handler that checks event.type === 'message_end' and event.message?.role === 'assistant' and event.message.usage, then invokes input.onUsage?.(event.message.usage). All other behavior unchanged — prompt, waitForIdle, dispose, return void."
                     }
                   ],
                   "tree": null
@@ -1563,7 +1563,7 @@
         {
           "id": 3,
           "title": "Wire UsageAggregator into orchestrator + stdout dump",
-          "objective": "Instantiate one UsageAggregator at the top of runAssetLoop. Subscribe to the initial-gen SDK session and feed message_end assistant usage into the aggregator. Feed every critic outcome.usages entry in. Pass onUsage: (u) => agg.add(u) to every runFixStep call. At every return site (hit_empty, cap, and before re-throw on parse-failure abort) console.log formatUsageSnapshot(agg.snapshot()). No TUI and no accepted.json shape change \u2014 CP5 decides whether to persist snapshot alongside accepted.json.",
+          "objective": "Instantiate one UsageAggregator at the top of runAssetLoop. Subscribe to the initial-gen SDK session and feed message_end assistant usage into the aggregator. Feed every critic outcome.usages entry in. Pass onUsage: (u) => agg.add(u) to every runFixStep call. At every return site (hit_empty, cap, and before re-throw on parse-failure abort) console.log formatUsageSnapshot(agg.snapshot()). No TUI and no accepted.json shape change — CP5 decides whether to persist snapshot alongside accepted.json.",
           "status": "pending",
           "task_seeds": [
             {
@@ -1577,7 +1577,7 @@
             {
               "id": 4,
               "title": "Instantiate UsageAggregator and wire all emit sites in runAssetLoop",
-              "description": "Thread a single UsageAggregator through the full deterministic loop. One instance per runAssetLoop call. Subscribe the initial-gen session's message_end events so coding-agent turns feed in. Feed outcome.usages[] from runCritique on every iteration (success branch) and also on the parse-failure branch before the re-throw. Pass onUsage: (u) => usage.add(u) into every runFixStep call so each fix-session assistant turn contributes. At every terminal point \u2014 hit_empty return, cap return, and parse-failure abort \u2014 console.log(formatUsageSnapshot(usage.snapshot())) before the return/throw. No accepted.json shape change.",
+              "description": "Thread a single UsageAggregator through the full deterministic loop. One instance per runAssetLoop call. Subscribe the initial-gen session's message_end events so coding-agent turns feed in. Feed outcome.usages[] from runCritique on every iteration (success branch) and also on the parse-failure branch before the re-throw. Pass onUsage: (u) => usage.add(u) into every runFixStep call so each fix-session assistant turn contributes. At every terminal point — hit_empty return, cap return, and parse-failure abort — console.log(formatUsageSnapshot(usage.snapshot())) before the return/throw. No accepted.json shape change.",
               "status": "pending",
               "context": {
                 "read_before": [
@@ -1589,22 +1589,22 @@
                   {
                     "file": "apps/pi-asset-loop/src/usage.ts",
                     "lines": "1-80",
-                    "purpose": "UsageAggregator and formatUsageSnapshot API (task 1) \u2014 both are imported here."
+                    "purpose": "UsageAggregator and formatUsageSnapshot API (task 1) — both are imported here."
                   },
                   {
                     "file": "apps/pi-asset-loop/src/critic.ts",
                     "lines": "1-60",
-                    "purpose": "CritiqueOutcome now carries usages: Usage[] on both variants (task 2) \u2014 orchestrator reads outcome.usages regardless of ok branch."
+                    "purpose": "CritiqueOutcome now carries usages: Usage[] on both variants (task 2) — orchestrator reads outcome.usages regardless of ok branch."
                   },
                   {
                     "file": "apps/pi-asset-loop/src/fixStep.ts",
                     "lines": "1-80",
-                    "purpose": "RunFixStepInput.onUsage is optional (task 3) \u2014 orchestrator always passes it."
+                    "purpose": "RunFixStepInput.onUsage is optional (task 3) — orchestrator always passes it."
                   },
                   {
                     "file": "ai_docs/pi-agent/sdk.md",
                     "lines": "183-243",
-                    "purpose": "session.subscribe event handler shape \u2014 same pattern as fixStep, applied to the initial-gen session before session.prompt."
+                    "purpose": "session.subscribe event handler shape — same pattern as fixStep, applied to the initial-gen session before session.prompt."
                   }
                 ],
                 "related_files": [
@@ -1623,7 +1623,7 @@
                     {
                       "path": "apps/pi-asset-loop/src/orchestrator.ts",
                       "status": "exists",
-                      "description": "After CP2 T6: runAssetLoop has full init \u2192 initial-gen session (createAgentSession + session.prompt + waitForIdle + dispose) \u2192 for(iteration=1..MAX_ITERATIONS) { render \u2192 runCritique \u2192 outcome.ok branch with critique.json + hit_empty/cap termination \u2192 runFixStep per issue }. No Usage import. No UsageAggregator. No subscribe on initial-gen session. No onUsage passed to runFixStep. Both termination returns and parse-failure re-throw have no usage dump."
+                      "description": "After CP2 T6: runAssetLoop has full init → initial-gen session (createAgentSession + session.prompt + waitForIdle + dispose) → for(iteration=1..MAX_ITERATIONS) { render → runCritique → outcome.ok branch with critique.json + hit_empty/cap termination → runFixStep per issue }. No Usage import. No UsageAggregator. No subscribe on initial-gen session. No onUsage passed to runFixStep. Both termination returns and parse-failure re-throw have no usage dump."
                     }
                   ],
                   "tree": null
@@ -1684,7 +1684,7 @@
                 },
                 {
                   "id": 8,
-                  "command": "INSIDE runAssetLoop per-issue for loop: UPDATE runFixStep call \u2014 ADD onUsage: (u) => usage.add(u) TO the input object alongside the existing fields (resolved, issue, iteration, assetJsonText, extractionPromptText, referenceWidth, referenceHeight, sourceBase64, extractedBase64, currentRenderBase64, model, authStorage, modelRegistry)",
+                  "command": "INSIDE runAssetLoop per-issue for loop: UPDATE runFixStep call — ADD onUsage: (u) => usage.add(u) TO the input object alongside the existing fields (resolved, issue, iteration, assetJsonText, extractionPromptText, referenceWidth, referenceHeight, sourceBase64, extractedBase64, currentRenderBase64, model, authStorage, modelRegistry)",
                   "file": "apps/pi-asset-loop/src/orchestrator.ts",
                   "status": "pending"
                 }
@@ -1702,12 +1702,12 @@
         3
       ],
       "status": "pending",
-      "testing_strategy": "Manual end-to-end in a Kitty/Ghostty/iTerm2/WezTerm terminal: `bun run asset-loop --asset <fresh asset dir>` from apps/pi-asset-loop. Expect: TUI mounts; header shows `<assetId> \u00b7 iter 0/15`; status line transitions initial_gen \u2192 render \u2192 critique \u2192 fix (per issue) \u2192 render \u2192 ...; pending-issues panel populates after each critique and the current issue is bolded while already-fixed issues this iteration are dim+prefixed with \u2713; extracted reference image is visible from the start; render image panel refreshes after every Playwright call; usage footer updates after every SDK turn and every critic call; on hit_empty or cap termination the TUI switches to a summary block (asset id, hit_empty bool or cap-reached line, usage summary, accepted.json path) and exits 0; Ctrl+C during any phase tears down the TUI cleanly and exits 130; critic parse-failure prints the usage snapshot to stderr, tears down the TUI, and re-throws. accepted.json + critique.json shapes unchanged from CP3. Typecheck passes (`npm run typecheck`).",
+      "testing_strategy": "Manual end-to-end in a Kitty/Ghostty/iTerm2/WezTerm terminal: `bun run asset-loop --asset <fresh asset dir>` from apps/pi-asset-loop. Expect: TUI mounts; header shows `<assetId> · iter 0/15`; status line transitions initial_gen → render → critique → fix (per issue) → render → ...; pending-issues panel populates after each critique and the current issue is bolded while already-fixed issues this iteration are dim+prefixed with ✓; extracted reference image is visible from the start; render image panel refreshes after every Playwright call; usage footer updates after every SDK turn and every critic call; on hit_empty or cap termination the TUI switches to a summary block (asset id, hit_empty bool or cap-reached line, usage summary, accepted.json path) and exits 0; Ctrl+C during any phase tears down the TUI cleanly and exits 130; critic parse-failure prints the usage snapshot to stderr, tears down the TUI, and re-throws. accepted.json + critique.json shapes unchanged from CP3. Typecheck passes (`npm run typecheck`).",
       "task_groups": [
         {
           "id": 1,
           "title": "AssetLoopTUI dashboard component (src/tui.ts)",
-          "objective": "New module src/tui.ts exports class AssetLoopTUI \u2014 a passive observe-only dashboard built on @mariozechner/pi-tui. It owns one TUI instance wired to ProcessTerminal and stacks five panels: header (asset id + iteration counter), status line (phase + current-issue description), pending-issues list (SelectList driven programmatically, no input focus), images panel (extracted reference + latest render as inline Image components), usage footer. Exposes a small imperative API (start, stop, setIteration, setPhase, setIssues, setCurrentIssue, setRender, setUsage, showSummary) that mutates internal state, reformats the affected child component(s), and calls tui.requestRender(). No keyboard handling \u2014 Ctrl+C is owned by the orchestrator (task group 2).",
+          "objective": "New module src/tui.ts exports class AssetLoopTUI — a passive observe-only dashboard built on @mariozechner/pi-tui. It owns one TUI instance wired to ProcessTerminal and stacks five panels: header (asset id + iteration counter), status line (phase + current-issue description), pending-issues list (SelectList driven programmatically, no input focus), images panel (extracted reference + latest render as inline Image components), usage footer. Exposes a small imperative API (start, stop, setIteration, setPhase, setIssues, setCurrentIssue, setRender, setUsage, showSummary) that mutates internal state, reformats the affected child component(s), and calls tui.requestRender(). No keyboard handling — Ctrl+C is owned by the orchestrator (task group 2).",
           "status": "pending",
           "task_seeds": [
             {
@@ -1721,14 +1721,14 @@
             {
               "id": 1,
               "title": "Create src/tui.ts with AssetLoopTUI observe-only dashboard",
-              "description": "New standalone module that owns the entire pi-tui dashboard for the asset loop. One public class, AssetLoopTUI, wraps a TUI instance driven by ProcessTerminal and composes five stacked panels: a single-line header (asset id + iter N/M), a single-line status (phase + current-issue brief), a pending-issues queue built with SelectList (non-interactive \u2014 we mutate its items + selectedIndex from outside), an images panel with two inline Image components (extracted reference + latest render), and a usage footer. The class has a narrow imperative API consumed by the orchestrator in task group 2. No input handlers, no focus, no side effects beyond stdin/stdout writes during start/stop/requestRender. All per-update methods must be safe to call before start() (they mutate state) and after stop() (they should still update internal fields silently \u2014 requestRender on a stopped TUI is a no-op per pi-tui).",
+              "description": "New standalone module that owns the entire pi-tui dashboard for the asset loop. One public class, AssetLoopTUI, wraps a TUI instance driven by ProcessTerminal and composes five stacked panels: a single-line header (asset id + iter N/M), a single-line status (phase + current-issue brief), a pending-issues queue built with SelectList (non-interactive — we mutate its items + selectedIndex from outside), an images panel with two inline Image components (extracted reference + latest render), and a usage footer. The class has a narrow imperative API consumed by the orchestrator in task group 2. No input handlers, no focus, no side effects beyond stdin/stdout writes during start/stop/requestRender. All per-update methods must be safe to call before start() (they mutate state) and after stop() (they should still update internal fields silently — requestRender on a stopped TUI is a no-op per pi-tui).",
               "status": "pending",
               "context": {
                 "read_before": [
                   {
                     "file": "apps/pi-asset-loop/node_modules/@mariozechner/pi-tui/dist/index.d.ts",
                     "lines": "1-23",
-                    "purpose": "Canonical export list \u2014 confirms TUI, ProcessTerminal, Container, Box, Text, Spacer, SelectList, Image, type SelectItem, type SelectListTheme, type ImageTheme are all exported from '@mariozechner/pi-tui' (barrel export). Nothing to import from sub-paths."
+                    "purpose": "Canonical export list — confirms TUI, ProcessTerminal, Container, Box, Text, Spacer, SelectList, Image, type SelectItem, type SelectListTheme, type ImageTheme are all exported from '@mariozechner/pi-tui' (barrel export). Nothing to import from sub-paths."
                   },
                   {
                     "file": "apps/pi-asset-loop/node_modules/@mariozechner/pi-tui/dist/tui.d.ts",
@@ -1738,32 +1738,32 @@
                   {
                     "file": "apps/pi-asset-loop/node_modules/@mariozechner/pi-tui/dist/components/text.d.ts",
                     "lines": "1-19",
-                    "purpose": "Text constructor(text?, paddingX=1, paddingY=1, customBgFn?) and setText(text) \u2014 used for header, status, usage lines."
+                    "purpose": "Text constructor(text?, paddingX=1, paddingY=1, customBgFn?) and setText(text) — used for header, status, usage lines."
                   },
                   {
                     "file": "apps/pi-asset-loop/node_modules/@mariozechner/pi-tui/dist/components/box.d.ts",
                     "lines": "1-22",
-                    "purpose": "Box constructor(paddingX=1, paddingY=1, bgFn?) \u2014 used to frame each panel consistently."
+                    "purpose": "Box constructor(paddingX=1, paddingY=1, bgFn?) — used to frame each panel consistently."
                   },
                   {
                     "file": "apps/pi-asset-loop/node_modules/@mariozechner/pi-tui/dist/components/select-list.d.ts",
                     "lines": "1-50",
-                    "purpose": "SelectList(items, maxVisible, theme, layout?) with setFilter/setSelectedIndex/invalidate and SelectListTheme { selectedPrefix, selectedText, description, scrollInfo, noMatch } \u2014 we pass it a theme with ANSI-bold for selectedText and ANSI-dim for description/scrollInfo, and drive selectedIndex from outside."
+                    "purpose": "SelectList(items, maxVisible, theme, layout?) with setFilter/setSelectedIndex/invalidate and SelectListTheme { selectedPrefix, selectedText, description, scrollInfo, noMatch } — we pass it a theme with ANSI-bold for selectedText and ANSI-dim for description/scrollInfo, and drive selectedIndex from outside."
                   },
                   {
                     "file": "apps/pi-asset-loop/node_modules/@mariozechner/pi-tui/dist/components/image.d.ts",
                     "lines": "1-28",
-                    "purpose": "Image(base64Data, mimeType, theme: ImageTheme { fallbackColor }, options?: { maxWidthCells, maxHeightCells, filename, imageId }) \u2014 constructed with an ImageTheme whose fallbackColor wraps text in ANSI dim for non-Kitty/iTerm terminals."
+                    "purpose": "Image(base64Data, mimeType, theme: ImageTheme { fallbackColor }, options?: { maxWidthCells, maxHeightCells, filename, imageId }) — constructed with an ImageTheme whose fallbackColor wraps text in ANSI dim for non-Kitty/iTerm terminals."
                   },
                   {
                     "file": "apps/pi-asset-loop/src/critic.ts",
                     "lines": "18-32",
-                    "purpose": "CritiqueIssue shape { id, region, severity, description, fix_hint } \u2014 drives setIssues label formatting."
+                    "purpose": "CritiqueIssue shape { id, region, severity, description, fix_hint } — drives setIssues label formatting."
                   },
                   {
                     "file": "apps/pi-asset-loop/src/usage.ts",
                     "lines": "1-60",
-                    "purpose": "UsageSnapshot type + formatUsageSnapshot(s) \u2014 usage footer delegates formatting to formatUsageSnapshot."
+                    "purpose": "UsageSnapshot type + formatUsageSnapshot(s) — usage footer delegates formatting to formatUsageSnapshot."
                   },
                   {
                     "file": "apps/pi-asset-loop/node_modules/@mariozechner/pi-coding-agent/dist/modes/interactive/interactive-mode.js",
@@ -1792,7 +1792,7 @@
                     {
                       "path": "apps/pi-asset-loop/src/tui.ts",
                       "status": "new",
-                      "description": "New module. Exports: type AssetLoopPhase = 'initial_gen' | 'render' | 'critique' | 'fix' | 'done'; interface AssetLoopTUIInit { assetId: string; maxIterations: number; extractedBase64: string; extractedMime: string }; class AssetLoopTUI. Constructor builds: this.tui = new TUI(new ProcessTerminal()); this.header = new Text(this.formatHeader(), 1, 0); this.statusLine = new Text(this.formatStatus(), 1, 0); this.issuesList = new SelectList([], 8, this.selectListTheme); this.extractedImage = new Image(init.extractedBase64, init.extractedMime, this.imageTheme, { maxWidthCells: 48 }); this.renderImage = null (placeholder Text shown until first setRender); this.imagesContainer = new Container() with children [Text('reference:'), this.extractedImage, Spacer(1), Text('render:'), this.renderPlaceholder]; this.usageLine = new Text(formatUsageSnapshot({ calls: 0, input: 0, output: 0, cacheRead: 0, cacheWrite: 0, totalTokens: 0, cost: { input: 0, output: 0, cacheRead: 0, cacheWrite: 0, total: 0 } }), 1, 0). Top-level tui.addChild order: new Box(1,0)[header], Spacer(1), new Box(1,0)[statusLine], Spacer(1), new Box(1,0)[issuesList], Spacer(1), new Box(1,0)[imagesContainer], Spacer(1), new Box(1,0)[usageLine]. Methods: start() -> tui.start(); stop() -> tui.stop(); setIteration(n) updates this.iteration and header text + requestRender; setPhase(phase, issue?) updates this.phase/currentIssue, statusLine + requestRender; setIssues(issues) stores copy, clears currentIndex, rebuilds SelectList items via buildSelectItems and replaces the issuesList child with a new SelectList instance (SelectList has no public setItems, so we swap), requestRender; setCurrentIssue(index) stores currentIndex, rebuilds items (prior items prefixed \u2713 + dim), calls issuesList.setSelectedIndex(index), requestRender; setRender(base64, mime) replaces this.renderImage with a fresh Image and rebuilds imagesContainer children (clear + re-addChild), requestRender; setUsage(s) -> usageLine.setText(formatUsageSnapshot(s)), requestRender; showSummary(lines) -> tui.clear(); tui.addChild(new Box(1,1) with a Text(lines.join('\\n'), 0, 0)); requestRender. Private helpers: formatHeader() returns `${assetId} \u00b7 iter ${iteration}/${maxIterations}`; formatStatus() returns `phase: ${phase}${currentIssue ? ` \u00b7 [${currentIssue.id}] ${currentIssue.severity} ${currentIssue.region}: ${currentIssue.description}` : ''}`; buildSelectItems() maps this.issues to SelectItem { value: issue.id, label: dim+\u2713 prefix if index<currentIndex else plain `[${severity}] ${region}: ${description}`, description: `fix: ${fix_hint}` }. Private themes: selectListTheme { selectedPrefix: (s) => `> ${s}`, selectedText: (s) => `\\x1b[1m${s}\\x1b[22m`, description: (s) => `\\x1b[2m${s}\\x1b[22m`, scrollInfo: (s) => `\\x1b[2m${s}\\x1b[22m`, noMatch: (s) => s }; imageTheme { fallbackColor: (s) => `\\x1b[2m${s}\\x1b[22m` }."
+                      "description": "New module. Exports: type AssetLoopPhase = 'initial_gen' | 'render' | 'critique' | 'fix' | 'done'; interface AssetLoopTUIInit { assetId: string; maxIterations: number; extractedBase64: string; extractedMime: string }; class AssetLoopTUI. Constructor builds: this.tui = new TUI(new ProcessTerminal()); this.header = new Text(this.formatHeader(), 1, 0); this.statusLine = new Text(this.formatStatus(), 1, 0); this.issuesList = new SelectList([], 8, this.selectListTheme); this.extractedImage = new Image(init.extractedBase64, init.extractedMime, this.imageTheme, { maxWidthCells: 48 }); this.renderImage = null (placeholder Text shown until first setRender); this.imagesContainer = new Container() with children [Text('reference:'), this.extractedImage, Spacer(1), Text('render:'), this.renderPlaceholder]; this.usageLine = new Text(formatUsageSnapshot({ calls: 0, input: 0, output: 0, cacheRead: 0, cacheWrite: 0, totalTokens: 0, cost: { input: 0, output: 0, cacheRead: 0, cacheWrite: 0, total: 0 } }), 1, 0). Top-level tui.addChild order: new Box(1,0)[header], Spacer(1), new Box(1,0)[statusLine], Spacer(1), new Box(1,0)[issuesList], Spacer(1), new Box(1,0)[imagesContainer], Spacer(1), new Box(1,0)[usageLine]. Methods: start() -> tui.start(); stop() -> tui.stop(); setIteration(n) updates this.iteration and header text + requestRender; setPhase(phase, issue?) updates this.phase/currentIssue, statusLine + requestRender; setIssues(issues) stores copy, clears currentIndex, rebuilds SelectList items via buildSelectItems and replaces the issuesList child with a new SelectList instance (SelectList has no public setItems, so we swap), requestRender; setCurrentIssue(index) stores currentIndex, rebuilds items (prior items prefixed ✓ + dim), calls issuesList.setSelectedIndex(index), requestRender; setRender(base64, mime) replaces this.renderImage with a fresh Image and rebuilds imagesContainer children (clear + re-addChild), requestRender; setUsage(s) -> usageLine.setText(formatUsageSnapshot(s)), requestRender; showSummary(lines) -> tui.clear(); tui.addChild(new Box(1,1) with a Text(lines.join('\\n'), 0, 0)); requestRender. Private helpers: formatHeader() returns `${assetId} · iter ${iteration}/${maxIterations}`; formatStatus() returns `phase: ${phase}${currentIssue ? ` · [${currentIssue.id}] ${currentIssue.severity} ${currentIssue.region}: ${currentIssue.description}` : ''}`; buildSelectItems() maps this.issues to SelectItem { value: issue.id, label: dim+✓ prefix if index<currentIndex else plain `[${severity}] ${region}: ${description}`, description: `fix: ${fix_hint}` }. Private themes: selectListTheme { selectedPrefix: (s) => `> ${s}`, selectedText: (s) => `\\x1b[1m${s}\\x1b[22m`, description: (s) => `\\x1b[2m${s}\\x1b[22m`, scrollInfo: (s) => `\\x1b[2m${s}\\x1b[22m`, noMatch: (s) => s }; imageTheme { fallbackColor: (s) => `\\x1b[2m${s}\\x1b[22m` }."
                     }
                   ],
                   "tree": null
@@ -1855,85 +1855,85 @@
                 },
                 {
                   "id": 10,
-                  "command": "ADD CONSTRUCTOR(init: AssetLoopTUIInit) TO AssetLoopTUI \u2014 assigns this.assetId = init.assetId, this.maxIterations = init.maxIterations; creates this.tui = new TUI(new ProcessTerminal()); this.header = new Text(this.formatHeader(), 1, 0); this.statusLine = new Text(this.formatStatus(), 1, 0); this.issuesList = new SelectList([], 8, this.selectListTheme); this.extractedImage = new Image(init.extractedBase64, init.extractedMime, this.imageTheme, { maxWidthCells: 48 }); this.renderPlaceholder = new Text('render: (pending first render)', 1, 0); this.imagesContainer = new Container(); imagesContainer.addChild(new Text('reference:', 1, 0)); imagesContainer.addChild(this.extractedImage); imagesContainer.addChild(new Spacer(1)); imagesContainer.addChild(new Text('render:', 1, 0)); imagesContainer.addChild(this.renderPlaceholder); this.usageLine = new Text(formatUsageSnapshot({ calls: 0, input: 0, output: 0, cacheRead: 0, cacheWrite: 0, totalTokens: 0, cost: { input: 0, output: 0, cacheRead: 0, cacheWrite: 0, total: 0 } }), 1, 0)",
+                  "command": "ADD CONSTRUCTOR(init: AssetLoopTUIInit) TO AssetLoopTUI — assigns this.assetId = init.assetId, this.maxIterations = init.maxIterations; creates this.tui = new TUI(new ProcessTerminal()); this.header = new Text(this.formatHeader(), 1, 0); this.statusLine = new Text(this.formatStatus(), 1, 0); this.issuesList = new SelectList([], 8, this.selectListTheme); this.extractedImage = new Image(init.extractedBase64, init.extractedMime, this.imageTheme, { maxWidthCells: 48 }); this.renderPlaceholder = new Text('render: (pending first render)', 1, 0); this.imagesContainer = new Container(); imagesContainer.addChild(new Text('reference:', 1, 0)); imagesContainer.addChild(this.extractedImage); imagesContainer.addChild(new Spacer(1)); imagesContainer.addChild(new Text('render:', 1, 0)); imagesContainer.addChild(this.renderPlaceholder); this.usageLine = new Text(formatUsageSnapshot({ calls: 0, input: 0, output: 0, cacheRead: 0, cacheWrite: 0, totalTokens: 0, cost: { input: 0, output: 0, cacheRead: 0, cacheWrite: 0, total: 0 } }), 1, 0)",
                   "file": "apps/pi-asset-loop/src/tui.ts",
                   "status": "pending"
                 },
                 {
                   "id": 11,
-                  "command": "INSIDE CONSTRUCTOR: APPEND children to this.tui in order \u2014 headerBox (new Box(1,0) addChild this.header), Spacer(1), statusBox (new Box(1,0) addChild this.statusLine), Spacer(1), issuesBox (new Box(1,0) addChild this.issuesList), Spacer(1), imagesBox (new Box(1,0) addChild this.imagesContainer), Spacer(1), usageBox (new Box(1,0) addChild this.usageLine)",
+                  "command": "INSIDE CONSTRUCTOR: APPEND children to this.tui in order — headerBox (new Box(1,0) addChild this.header), Spacer(1), statusBox (new Box(1,0) addChild this.statusLine), Spacer(1), issuesBox (new Box(1,0) addChild this.issuesList), Spacer(1), imagesBox (new Box(1,0) addChild this.imagesContainer), Spacer(1), usageBox (new Box(1,0) addChild this.usageLine)",
                   "file": "apps/pi-asset-loop/src/tui.ts",
                   "status": "pending"
                 },
                 {
                   "id": 12,
-                  "command": "ADD METHOD start(): void TO AssetLoopTUI \u2014 calls this.tui.start()",
+                  "command": "ADD METHOD start(): void TO AssetLoopTUI — calls this.tui.start()",
                   "file": "apps/pi-asset-loop/src/tui.ts",
                   "status": "pending"
                 },
                 {
                   "id": 13,
-                  "command": "ADD METHOD stop(): void TO AssetLoopTUI \u2014 calls this.tui.stop()",
+                  "command": "ADD METHOD stop(): void TO AssetLoopTUI — calls this.tui.stop()",
                   "file": "apps/pi-asset-loop/src/tui.ts",
                   "status": "pending"
                 },
                 {
                   "id": 14,
-                  "command": "ADD METHOD setIteration(n: number): void TO AssetLoopTUI \u2014 assigns this.iteration = n; this.header.setText(this.formatHeader()); this.tui.requestRender()",
+                  "command": "ADD METHOD setIteration(n: number): void TO AssetLoopTUI — assigns this.iteration = n; this.header.setText(this.formatHeader()); this.tui.requestRender()",
                   "file": "apps/pi-asset-loop/src/tui.ts",
                   "status": "pending"
                 },
                 {
                   "id": 15,
-                  "command": "ADD METHOD setPhase(phase: AssetLoopPhase, currentIssue?: CritiqueIssue | null): void TO AssetLoopTUI \u2014 assigns this.phase = phase; this.currentIssue = currentIssue ?? null; this.statusLine.setText(this.formatStatus()); this.tui.requestRender()",
+                  "command": "ADD METHOD setPhase(phase: AssetLoopPhase, currentIssue?: CritiqueIssue | null): void TO AssetLoopTUI — assigns this.phase = phase; this.currentIssue = currentIssue ?? null; this.statusLine.setText(this.formatStatus()); this.tui.requestRender()",
                   "file": "apps/pi-asset-loop/src/tui.ts",
                   "status": "pending"
                 },
                 {
                   "id": 16,
-                  "command": "ADD METHOD setIssues(issues: CritiqueIssue[]): void TO AssetLoopTUI \u2014 assigns this.issues = [...issues]; this.currentIndex = -1; REPLACE this.issuesList WITH new SelectList(this.buildSelectItems(), Math.min(8, Math.max(issues.length, 1)), this.selectListTheme) by finding its parent Box (child index 4 in this.tui, i.e. issuesBox) and swapping \u2014 simplest: issuesBox.clear(); issuesBox.addChild(this.issuesList); this.tui.requestRender()",
+                  "command": "ADD METHOD setIssues(issues: CritiqueIssue[]): void TO AssetLoopTUI — assigns this.issues = [...issues]; this.currentIndex = -1; REPLACE this.issuesList WITH new SelectList(this.buildSelectItems(), Math.min(8, Math.max(issues.length, 1)), this.selectListTheme) by finding its parent Box (child index 4 in this.tui, i.e. issuesBox) and swapping — simplest: issuesBox.clear(); issuesBox.addChild(this.issuesList); this.tui.requestRender()",
                   "file": "apps/pi-asset-loop/src/tui.ts",
                   "status": "pending"
                 },
                 {
                   "id": 17,
-                  "command": "ADD METHOD setCurrentIssue(index: number): void TO AssetLoopTUI \u2014 assigns this.currentIndex = index; REPLACE this.issuesList with new SelectList(this.buildSelectItems(), ..., this.selectListTheme) (same swap as setIssues); this.issuesList.setSelectedIndex(index); this.tui.requestRender()",
+                  "command": "ADD METHOD setCurrentIssue(index: number): void TO AssetLoopTUI — assigns this.currentIndex = index; REPLACE this.issuesList with new SelectList(this.buildSelectItems(), ..., this.selectListTheme) (same swap as setIssues); this.issuesList.setSelectedIndex(index); this.tui.requestRender()",
                   "file": "apps/pi-asset-loop/src/tui.ts",
                   "status": "pending"
                 },
                 {
                   "id": 18,
-                  "command": "ADD METHOD setRender(base64: string, mime: string): void TO AssetLoopTUI \u2014 this.renderImage = new Image(base64, mime, this.imageTheme, { maxWidthCells: 48 }); this.imagesContainer.clear(); this.imagesContainer.addChild(new Text('reference:', 1, 0)); this.imagesContainer.addChild(this.extractedImage); this.imagesContainer.addChild(new Spacer(1)); this.imagesContainer.addChild(new Text('render:', 1, 0)); this.imagesContainer.addChild(this.renderImage); this.tui.requestRender()",
+                  "command": "ADD METHOD setRender(base64: string, mime: string): void TO AssetLoopTUI — this.renderImage = new Image(base64, mime, this.imageTheme, { maxWidthCells: 48 }); this.imagesContainer.clear(); this.imagesContainer.addChild(new Text('reference:', 1, 0)); this.imagesContainer.addChild(this.extractedImage); this.imagesContainer.addChild(new Spacer(1)); this.imagesContainer.addChild(new Text('render:', 1, 0)); this.imagesContainer.addChild(this.renderImage); this.tui.requestRender()",
                   "file": "apps/pi-asset-loop/src/tui.ts",
                   "status": "pending"
                 },
                 {
                   "id": 19,
-                  "command": "ADD METHOD setUsage(s: UsageSnapshot): void TO AssetLoopTUI \u2014 this.usageLine.setText(formatUsageSnapshot(s)); this.tui.requestRender()",
+                  "command": "ADD METHOD setUsage(s: UsageSnapshot): void TO AssetLoopTUI — this.usageLine.setText(formatUsageSnapshot(s)); this.tui.requestRender()",
                   "file": "apps/pi-asset-loop/src/tui.ts",
                   "status": "pending"
                 },
                 {
                   "id": 20,
-                  "command": "ADD METHOD showSummary(lines: string[]): void TO AssetLoopTUI \u2014 this.tui.clear(); this.tui.addChild(new Box(1, 1)); the last-added Box.addChild(new Text(lines.join('\\n'), 0, 0)); this.tui.requestRender()",
+                  "command": "ADD METHOD showSummary(lines: string[]): void TO AssetLoopTUI — this.tui.clear(); this.tui.addChild(new Box(1, 1)); the last-added Box.addChild(new Text(lines.join('\\n'), 0, 0)); this.tui.requestRender()",
                   "file": "apps/pi-asset-loop/src/tui.ts",
                   "status": "pending"
                 },
                 {
                   "id": 21,
-                  "command": "ADD private METHOD formatHeader(): string TO AssetLoopTUI \u2014 RETURNS `${this.assetId} \u00b7 iter ${this.iteration}/${this.maxIterations}`",
+                  "command": "ADD private METHOD formatHeader(): string TO AssetLoopTUI — RETURNS `${this.assetId} · iter ${this.iteration}/${this.maxIterations}`",
                   "file": "apps/pi-asset-loop/src/tui.ts",
                   "status": "pending"
                 },
                 {
                   "id": 22,
-                  "command": "ADD private METHOD formatStatus(): string TO AssetLoopTUI \u2014 RETURNS `phase: ${this.phase}` concatenated with (this.currentIssue ? ` \u00b7 [${this.currentIssue.id}] ${this.currentIssue.severity} ${this.currentIssue.region}: ${this.currentIssue.description}` : '')",
+                  "command": "ADD private METHOD formatStatus(): string TO AssetLoopTUI — RETURNS `phase: ${this.phase}` concatenated with (this.currentIssue ? ` · [${this.currentIssue.id}] ${this.currentIssue.severity} ${this.currentIssue.region}: ${this.currentIssue.description}` : '')",
                   "file": "apps/pi-asset-loop/src/tui.ts",
                   "status": "pending"
                 },
                 {
                   "id": 23,
-                  "command": "ADD private METHOD buildSelectItems(): SelectItem[] TO AssetLoopTUI \u2014 MAPS this.issues TO items: const base = `[${issue.severity}] ${issue.region}: ${issue.description}`; const label = index < this.currentIndex ? `\\x1b[2m\u2713 ${base}\\x1b[22m` : base; RETURN { value: issue.id, label, description: `fix: ${issue.fix_hint}` }",
+                  "command": "ADD private METHOD buildSelectItems(): SelectItem[] TO AssetLoopTUI — MAPS this.issues TO items: const base = `[${issue.severity}] ${issue.region}: ${issue.description}`; const label = index < this.currentIndex ? `\\x1b[2m✓ ${base}\\x1b[22m` : base; RETURN { value: issue.id, label, description: `fix: ${issue.fix_hint}` }",
                   "file": "apps/pi-asset-loop/src/tui.ts",
                   "status": "pending"
                 }
@@ -1971,12 +1971,12 @@
                   {
                     "file": "apps/pi-asset-loop/src/orchestrator.ts",
                     "lines": "1-220",
-                    "purpose": "Current runAssetLoop body after CP3 T4. Identify: (a) the point where extractedBase64 is read (CP1), (b) the initial-gen createAgentSession + session.subscribe + session.prompt block (CP1 + CP3), (c) the iteration for-loop header, (d) renderWithPlaywright call, (e) runCritique await + outcome.ok branch, (f) the per-issue for loop and the runFixStep call inside it, (g) both writeAcceptedJson return sites (hit_empty, cap) and the parse-failure console.error + throw \u2014 each currently prefixed by the CP3 console.log(formatUsageSnapshot(usage.snapshot()))."
+                    "purpose": "Current runAssetLoop body after CP3 T4. Identify: (a) the point where extractedBase64 is read (CP1), (b) the initial-gen createAgentSession + session.subscribe + session.prompt block (CP1 + CP3), (c) the iteration for-loop header, (d) renderWithPlaywright call, (e) runCritique await + outcome.ok branch, (f) the per-issue for loop and the runFixStep call inside it, (g) both writeAcceptedJson return sites (hit_empty, cap) and the parse-failure console.error + throw — each currently prefixed by the CP3 console.log(formatUsageSnapshot(usage.snapshot()))."
                   },
                   {
                     "file": "apps/pi-asset-loop/src/tui.ts",
                     "lines": "1-200",
-                    "purpose": "AssetLoopTUI API from task 1 \u2014 constructor shape (AssetLoopTUIInit) and all update methods consumed here."
+                    "purpose": "AssetLoopTUI API from task 1 — constructor shape (AssetLoopTUIInit) and all update methods consumed here."
                   },
                   {
                     "file": "apps/pi-asset-loop/src/usage.ts",
@@ -2018,7 +2018,7 @@
                     {
                       "path": "apps/pi-asset-loop/src/orchestrator.ts",
                       "status": "modified",
-                      "description": "Imports add { AssetLoopTUI } from './tui.js'. After resolveAsset + extractedBase64 load (before const usage = new UsageAggregator() \u2014 or right after, either works): `const tui = new AssetLoopTUI({ assetId: resolved.assetId, maxIterations: MAX_ITERATIONS, extractedBase64, extractedMime: 'image/png' }); tui.start(); tui.setPhase('initial_gen');`. Initial-gen session.subscribe handler gains `tui.setUsage(usage.snapshot())` inside the if-block right after usage.add. Per-iteration loop top inserts `tui.setIteration(iteration); tui.setPhase('render');`. After renderWithPlaywright: `const renderBase64 = readFileSync(resolved.renderPath).toString('base64'); tui.setRender(renderBase64, 'image/png'); tui.setPhase('critique');`. After runCritique + outcome.usages fold-in: `tui.setUsage(usage.snapshot());`. Inside outcome.ok branch before hit_empty check: `tui.setIssues(outcome.result.issues);`. Per-issue loop refactored to `for (const [issueIndex, issue] of outcome.result.issues.entries())` with `tui.setPhase('fix', issue); tui.setCurrentIssue(issueIndex);` at the top. runFixStep input.onUsage replaced with `(u) => { usage.add(u); tui.setUsage(usage.snapshot()); }`. hit_empty branch: CP3 console.log replaced by `tui.setPhase('done'); tui.showSummary(['hit_empty: true', `iter ${iteration}/${MAX_ITERATIONS}`, formatUsageSnapshot(usage.snapshot()), `accepted: ${resolved.acceptedJsonPath}`]); tui.stop();`. cap branch: CP3 console.log replaced by `tui.setPhase('done'); tui.showSummary(['cap_reached', `iter ${iteration}/${MAX_ITERATIONS}`, formatUsageSnapshot(usage.snapshot()), `accepted: ${resolved.acceptedJsonPath}`]); tui.stop();`. Parse-failure branch: CP3 console.log replaced by `console.error(formatUsageSnapshot(usage.snapshot())); tui.stop();` (stderr emission preserves visibility since TUI is torn down before the throw). accepted.json shape unchanged."
+                      "description": "Imports add { AssetLoopTUI } from './tui.js'. After resolveAsset + extractedBase64 load (before const usage = new UsageAggregator() — or right after, either works): `const tui = new AssetLoopTUI({ assetId: resolved.assetId, maxIterations: MAX_ITERATIONS, extractedBase64, extractedMime: 'image/png' }); tui.start(); tui.setPhase('initial_gen');`. Initial-gen session.subscribe handler gains `tui.setUsage(usage.snapshot())` inside the if-block right after usage.add. Per-iteration loop top inserts `tui.setIteration(iteration); tui.setPhase('render');`. After renderWithPlaywright: `const renderBase64 = readFileSync(resolved.renderPath).toString('base64'); tui.setRender(renderBase64, 'image/png'); tui.setPhase('critique');`. After runCritique + outcome.usages fold-in: `tui.setUsage(usage.snapshot());`. Inside outcome.ok branch before hit_empty check: `tui.setIssues(outcome.result.issues);`. Per-issue loop refactored to `for (const [issueIndex, issue] of outcome.result.issues.entries())` with `tui.setPhase('fix', issue); tui.setCurrentIssue(issueIndex);` at the top. runFixStep input.onUsage replaced with `(u) => { usage.add(u); tui.setUsage(usage.snapshot()); }`. hit_empty branch: CP3 console.log replaced by `tui.setPhase('done'); tui.showSummary(['hit_empty: true', `iter ${iteration}/${MAX_ITERATIONS}`, formatUsageSnapshot(usage.snapshot()), `accepted: ${resolved.acceptedJsonPath}`]); tui.stop();`. cap branch: CP3 console.log replaced by `tui.setPhase('done'); tui.showSummary(['cap_reached', `iter ${iteration}/${MAX_ITERATIONS}`, formatUsageSnapshot(usage.snapshot()), `accepted: ${resolved.acceptedJsonPath}`]); tui.stop();`. Parse-failure branch: CP3 console.log replaced by `console.error(formatUsageSnapshot(usage.snapshot())); tui.stop();` (stderr emission preserves visibility since TUI is torn down before the throw). accepted.json shape unchanged."
                     }
                   ],
                   "tree": null
@@ -2114,7 +2114,7 @@
             {
               "id": 3,
               "title": "Install SIGINT handler + try/finally around runAssetLoop body",
-              "description": "Guarantee TUI teardown on Ctrl+C and on thrown exceptions from any inner await. Register a one-shot SIGINT handler immediately after tui.start() that tears down the TUI and exits 130 \u2014 the operator's only input path is Ctrl+C per spec. Wrap the remainder of runAssetLoop in try { ... } finally { process.off('SIGINT', handler) } so the handler is always removed on normal return, return-in-branch, or thrown error. The finally block does NOT call tui.stop() again (the three terminal branches already call tui.stop, and the SIGINT handler calls it before exit); it only unregisters the listener to prevent leaks across multiple runAssetLoop calls in the same process.",
+              "description": "Guarantee TUI teardown on Ctrl+C and on thrown exceptions from any inner await. Register a one-shot SIGINT handler immediately after tui.start() that tears down the TUI and exits 130 — the operator's only input path is Ctrl+C per spec. Wrap the remainder of runAssetLoop in try { ... } finally { process.off('SIGINT', handler) } so the handler is always removed on normal return, return-in-branch, or thrown error. The finally block does NOT call tui.stop() again (the three terminal branches already call tui.stop, and the SIGINT handler calls it before exit); it only unregisters the listener to prevent leaks across multiple runAssetLoop calls in the same process.",
               "status": "pending",
               "context": {
                 "read_before": [
@@ -2150,7 +2150,7 @@
                     {
                       "path": "apps/pi-asset-loop/src/orchestrator.ts",
                       "status": "modified",
-                      "description": "Immediately after tui.start(): `const sigintHandler = () => { try { tui.stop(); } finally { process.exit(130); } }; process.once('SIGINT', sigintHandler);`. Everything from that point through the last return/throw in runAssetLoop is wrapped in `try { ... } finally { process.off('SIGINT', sigintHandler); }`. No other behavior change \u2014 inner branches still own their own tui.showSummary + tui.stop calls; the finally block is responsible only for unregistering the listener."
+                      "description": "Immediately after tui.start(): `const sigintHandler = () => { try { tui.stop(); } finally { process.exit(130); } }; process.once('SIGINT', sigintHandler);`. Everything from that point through the last return/throw in runAssetLoop is wrapped in `try { ... } finally { process.off('SIGINT', sigintHandler); }`. No other behavior change — inner branches still own their own tui.showSummary + tui.stop calls; the finally block is responsible only for unregistering the listener."
                     }
                   ],
                   "tree": null
@@ -2171,7 +2171,7 @@
                 },
                 {
                   "id": 3,
-                  "command": "WRAP everything in runAssetLoop AFTER the process.once(\"SIGINT\", sigintHandler) line (through the last return/throw) IN 'try { ... } finally { process.off(\"SIGINT\", sigintHandler); }' \u2014 DO NOT call tui.stop() inside the finally block (inner branches handle that)",
+                  "command": "WRAP everything in runAssetLoop AFTER the process.once(\"SIGINT\", sigintHandler) line (through the last return/throw) IN 'try { ... } finally { process.off(\"SIGINT\", sigintHandler); }' — DO NOT call tui.stop() inside the finally block (inner branches handle that)",
                   "file": "apps/pi-asset-loop/src/orchestrator.ts",
                   "status": "pending"
                 }
@@ -2184,18 +2184,18 @@
     {
       "id": 5,
       "title": "Cleanup, summary, end-to-end validation",
-      "goal": "Delete extensions/asset-loop.ts. Strip pi-extension scripts from apps/pi-asset-loop/package.json; keep bun launch script (add top-level workspace alias only if convenient). On termination, tear down TUI and print a single summary block to stdout: asset id, iterations used, hit_empty flag, residual issue count + briefs, accepted.json path, total cost. Verify end-to-end against a known asset dir \u2014 accepted.json shape must match what the old extension produced (asset_id, iterations, max_iterations, hit_empty_issues, residual_issues, verdict, notes, accepted_at).",
+      "goal": "Delete extensions/asset-loop.ts. Strip pi-extension scripts from apps/pi-asset-loop/package.json; keep bun launch script (add top-level workspace alias only if convenient). On termination, tear down TUI and print a single summary block to stdout: asset id, iterations used, hit_empty flag, residual issue count + briefs, accepted.json path, total cost. Verify end-to-end against a known asset dir — accepted.json shape must match what the old extension produced (asset_id, iterations, max_iterations, hit_empty_issues, residual_issues, verdict, notes, accepted_at).",
       "prerequisites": [
         4
       ],
-      "status": "pending",
-      "testing_strategy": "Manual end-to-end against a fresh asset dir after CP5 TG1 + TG2 land, in a Kitty/Ghostty/iTerm2/WezTerm terminal: `bun run asset-loop --asset <dir>` from apps/pi-asset-loop. Expect: (a) TUI mounts, transitions through initial_gen \u2192 render \u2192 critique \u2192 fix cycles; (b) on each termination path (hit_empty, cap_reached, critic parse-failure) the TUI tears down and a single canonical summary block appears in stdout scrollback after the shell returns, containing asset id, `iter N/15`, termination kind, residual-issue count + per-issue briefs (severity + region + description, or `residual: 0` when hit_empty), accepted.json path (omitted on parse-failure), and the formatted usage line. Verify `cat runs/<run>/assets/<id>/accepted.json | jq 'keys | sort'` returns exactly `[\"accepted_at\",\"asset_id\",\"hit_empty_issues\",\"iterations\",\"max_iterations\",\"notes\",\"residual_issues\",\"verdict\"]`. Verify `rg \"extensions/asset-loop\" apps/pi-asset-loop` returns zero matches and `apps/pi-asset-loop/extensions/` no longer exists. Verify `npm run typecheck` (from apps/pi-asset-loop) passes. Verify `cat apps/pi-asset-loop/package.json | jq '.scripts | keys | sort'` contains `asset-loop`, `postinstall`, `typecheck` and does NOT contain `pi`.",
+      "status": "completed",
+      "testing_strategy": "Manual end-to-end against a fresh asset dir after CP5 TG1 + TG2 land, in a Kitty/Ghostty/iTerm2/WezTerm terminal: `bun run asset-loop --asset <dir>` from apps/pi-asset-loop. Expect: (a) TUI mounts, transitions through initial_gen → render → critique → fix cycles; (b) on each termination path (hit_empty, cap_reached, critic parse-failure) the TUI tears down and a single canonical summary block appears in stdout scrollback after the shell returns, containing asset id, `iter N/15`, termination kind, residual-issue count + per-issue briefs (severity + region + description, or `residual: 0` when hit_empty), accepted.json path (omitted on parse-failure), and the formatted usage line. Verify `cat runs/<run>/assets/<id>/accepted.json | jq 'keys | sort'` returns exactly `[\"accepted_at\",\"asset_id\",\"hit_empty_issues\",\"iterations\",\"max_iterations\",\"notes\",\"residual_issues\",\"verdict\"]`. Verify `rg \"extensions/asset-loop\" apps/pi-asset-loop` returns zero matches and `apps/pi-asset-loop/extensions/` no longer exists. Verify `npm run typecheck` (from apps/pi-asset-loop) passes. Verify `cat apps/pi-asset-loop/package.json | jq '.scripts | keys | sort'` contains `asset-loop`, `postinstall`, `typecheck` and does NOT contain `pi`.",
       "task_groups": [
         {
           "id": 1,
           "title": "Shared termination summary + stdout persistence",
-          "objective": "Replace CP4's per-branch inline `tui.showSummary([...])` argument arrays with a single shared helper, `buildTerminationSummary`, in orchestrator.ts. The helper composes the canonical summary block (asset id, `iter N/MAX`, termination kind, residual-issue count + per-issue briefs, accepted.json path, formatted usage line) from structured inputs so the three termination sites (hit_empty, cap_reached, parse_failure) all emit byte-identical content. Each site calls `tui.showSummary(lines)` for the ephemeral on-screen flash, then `tui.stop()`, then `console.log(lines.join('\\n'))` so the block survives in scrollback after the TUI clears the screen \u2014 this is the persisted artifact the spec's Success Criteria reference.",
-          "status": "pending",
+          "objective": "Replace CP4's per-branch inline `tui.showSummary([...])` argument arrays with a single shared helper, `buildTerminationSummary`, in orchestrator.ts. The helper composes the canonical summary block (asset id, `iter N/MAX`, termination kind, residual-issue count + per-issue briefs, accepted.json path, formatted usage line) from structured inputs so the three termination sites (hit_empty, cap_reached, parse_failure) all emit byte-identical content. Each site calls `tui.showSummary(lines)` for the ephemeral on-screen flash, then `tui.stop()`, then `console.log(lines.join('\\n'))` so the block survives in scrollback after the TUI clears the screen — this is the persisted artifact the spec's Success Criteria reference.",
+          "status": "completed",
           "task_seeds": [
             {
               "title": "Add buildTerminationSummary helper in orchestrator.ts",
@@ -2214,29 +2214,29 @@
             {
               "id": 1,
               "title": "Add buildTerminationSummary helper in src/orchestrator.ts",
-              "status": "pending",
-              "description": "New module-level internal function in orchestrator.ts that builds the canonical multi-line summary block shared by the in-TUI ephemeral display and the post-teardown stdout emission. Consolidates what CP4 T2 currently hard-codes in three separate `tui.showSummary([...])` call sites. Takes one structured argument and returns `string[]` \u2014 callers decide whether to join with '\\n' for console.log or pass the array through to tui.showSummary (which already does its own join internally per CP4 T1 action 20). Line composition: (1) `asset: <assetId>`, (2) `iter: <n>/<max>`, (3) `termination: <kind>` where kind stringifies to `hit_empty`, `cap_reached`, or `parse_failure`, (4) `residual: <n>` followed by one indented line per residual issue formatted as `  - [<severity>] <region>: <description>` (omit the per-issue lines when n === 0), (5) `accepted: <acceptedJsonPath>` \u2014 omitted entirely when acceptedJsonPath is null (parse-failure path does not write accepted.json), (6) `usage: <formatUsageSnapshot(usage)>`. No I/O inside the helper; pure string array construction.",
+              "status": "completed",
+              "description": "New module-level internal function in orchestrator.ts that builds the canonical multi-line summary block shared by the in-TUI ephemeral display and the post-teardown stdout emission. Consolidates what CP4 T2 currently hard-codes in three separate `tui.showSummary([...])` call sites. Takes one structured argument and returns `string[]` — callers decide whether to join with '\\n' for console.log or pass the array through to tui.showSummary (which already does its own join internally per CP4 T1 action 20). Line composition: (1) `asset: <assetId>`, (2) `iter: <n>/<max>`, (3) `termination: <kind>` where kind stringifies to `hit_empty`, `cap_reached`, or `parse_failure`, (4) `residual: <n>` followed by one indented line per residual issue formatted as `  - [<severity>] <region>: <description>` (omit the per-issue lines when n === 0), (5) `accepted: <acceptedJsonPath>` — omitted entirely when acceptedJsonPath is null (parse-failure path does not write accepted.json), (6) `usage: <formatUsageSnapshot(usage)>`. No I/O inside the helper; pure string array construction.",
               "context": {
                 "read_before": [
                   {
                     "file": "apps/pi-asset-loop/src/orchestrator.ts",
                     "lines": "1-260",
-                    "purpose": "Identify where writeAcceptedJson ends and the three termination sites begin (hit_empty return, cap_reached return, parse-failure throw). The helper is added at module scope immediately after writeAcceptedJson and before runAssetLoop. Current termination sites (after CP4 T2) contain hand-rolled argument arrays like `['hit_empty: true', `iter ${iteration}/${MAX_ITERATIONS}`, formatUsageSnapshot(usage.snapshot()), `accepted: ${resolved.acceptedJsonPath}`]` \u2014 this task does NOT modify those sites (task 2 does)."
+                    "purpose": "Identify where writeAcceptedJson ends and the three termination sites begin (hit_empty return, cap_reached return, parse-failure throw). The helper is added at module scope immediately after writeAcceptedJson and before runAssetLoop. Current termination sites (after CP4 T2) contain hand-rolled argument arrays like `['hit_empty: true', `iter ${iteration}/${MAX_ITERATIONS}`, formatUsageSnapshot(usage.snapshot()), `accepted: ${resolved.acceptedJsonPath}`]` — this task does NOT modify those sites (task 2 does)."
                   },
                   {
                     "file": "apps/pi-asset-loop/src/critic.ts",
                     "lines": "18-50",
-                    "purpose": "CritiqueIssue shape { id, region, severity, description, fix_hint } \u2014 residual issue formatting uses severity/region/description."
+                    "purpose": "CritiqueIssue shape { id, region, severity, description, fix_hint } — residual issue formatting uses severity/region/description."
                   },
                   {
                     "file": "apps/pi-asset-loop/src/usage.ts",
                     "lines": "1-60",
-                    "purpose": "UsageSnapshot type + formatUsageSnapshot(s) \u2014 helper's usage line delegates to formatUsageSnapshot."
+                    "purpose": "UsageSnapshot type + formatUsageSnapshot(s) — helper's usage line delegates to formatUsageSnapshot."
                   },
                   {
                     "file": "apps/pi-asset-loop/src/args.ts",
                     "lines": "7-63",
-                    "purpose": "ResolvedAsset.assetId + acceptedJsonPath shape \u2014 callers pass these into the helper input."
+                    "purpose": "ResolvedAsset.assetId + acceptedJsonPath shape — callers pass these into the helper input."
                   }
                 ],
                 "related_files": [
@@ -2271,75 +2271,75 @@
                   "id": 1,
                   "command": "ADD INTERNAL FUNCTION buildTerminationSummary(input: { kind: 'hit_empty' | 'cap_reached' | 'parse_failure'; assetId: string; iteration: number; maxIterations: number; residualIssues: CritiqueIssue[]; acceptedJsonPath: string | null; usage: UsageSnapshot }): string[] AT module scope, AFTER writeAcceptedJson AND BEFORE runAssetLoop",
                   "file": "apps/pi-asset-loop/src/orchestrator.ts",
-                  "status": "pending"
+                  "status": "completed"
                 },
                 {
                   "id": 2,
                   "command": "INSIDE buildTerminationSummary: INIT 'const lines: string[] = []'",
                   "file": "apps/pi-asset-loop/src/orchestrator.ts",
-                  "status": "pending"
+                  "status": "completed"
                 },
                 {
                   "id": 3,
                   "command": "INSIDE buildTerminationSummary: APPEND `asset: ${input.assetId}` TO lines",
                   "file": "apps/pi-asset-loop/src/orchestrator.ts",
-                  "status": "pending"
+                  "status": "completed"
                 },
                 {
                   "id": 4,
                   "command": "INSIDE buildTerminationSummary: APPEND `iter: ${input.iteration}/${input.maxIterations}` TO lines",
                   "file": "apps/pi-asset-loop/src/orchestrator.ts",
-                  "status": "pending"
+                  "status": "completed"
                 },
                 {
                   "id": 5,
                   "command": "INSIDE buildTerminationSummary: APPEND `termination: ${input.kind}` TO lines",
                   "file": "apps/pi-asset-loop/src/orchestrator.ts",
-                  "status": "pending"
+                  "status": "completed"
                 },
                 {
                   "id": 6,
                   "command": "INSIDE buildTerminationSummary: APPEND `residual: ${input.residualIssues.length}` TO lines",
                   "file": "apps/pi-asset-loop/src/orchestrator.ts",
-                  "status": "pending"
+                  "status": "completed"
                 },
                 {
                   "id": 7,
                   "command": "INSIDE buildTerminationSummary: IF (input.residualIssues.length > 0) FOR each issue IN input.residualIssues APPEND `  - [${issue.severity}] ${issue.region}: ${issue.description}` TO lines",
                   "file": "apps/pi-asset-loop/src/orchestrator.ts",
-                  "status": "pending"
+                  "status": "completed"
                 },
                 {
                   "id": 8,
                   "command": "INSIDE buildTerminationSummary: IF (input.acceptedJsonPath !== null) APPEND `accepted: ${input.acceptedJsonPath}` TO lines",
                   "file": "apps/pi-asset-loop/src/orchestrator.ts",
-                  "status": "pending"
+                  "status": "completed"
                 },
                 {
                   "id": 9,
                   "command": "INSIDE buildTerminationSummary: APPEND `usage: ${formatUsageSnapshot(input.usage)}` TO lines",
                   "file": "apps/pi-asset-loop/src/orchestrator.ts",
-                  "status": "pending"
+                  "status": "completed"
                 },
                 {
                   "id": 10,
                   "command": "INSIDE buildTerminationSummary: RETURN lines",
                   "file": "apps/pi-asset-loop/src/orchestrator.ts",
-                  "status": "pending"
+                  "status": "completed"
                 }
               ]
             },
             {
               "id": 2,
               "title": "Rewire runAssetLoop's three termination sites to use buildTerminationSummary and console.log post-TUI",
-              "status": "pending",
+              "status": "completed",
               "description": "Replace the three hand-rolled `tui.showSummary([...])` argument arrays introduced in CP4 T2 with single calls to `buildTerminationSummary(...)`. After `tui.stop()` on each path, `console.log(lines.join('\\n'))` so the canonical summary persists in the operator's terminal scrollback after the TUI clears the screen (pi-tui's stop restores terminal state; anything drawn via showSummary is ephemeral). The parse-failure branch is special: the TUI state may be mid-phase, so it skips tui.showSummary, calls tui.stop first, then emits the summary via console.error (keeps the error context on stderr alongside the existing thrown error) AND console.log (so a `| tee` or `>summary.log` capture still sees it). acceptedJsonPath is passed as `resolved.acceptedJsonPath` on the hit_empty and cap_reached paths, and as `null` on the parse-failure path. residualIssues is `[]` on hit_empty, `outcome.result.issues` on cap_reached, and `[]` on parse_failure (outcome.result is not available when outcome.ok is false).",
               "context": {
                 "read_before": [
                   {
                     "file": "apps/pi-asset-loop/src/orchestrator.ts",
                     "lines": "1-260",
-                    "purpose": "Post-task-1 state. Locate: (a) the hit_empty branch \u2014 currently `tui.setPhase('done'); tui.showSummary(['hit_empty: true', ...]); tui.stop();` (from CP4 T2 action 12), (b) the cap_reached branch \u2014 currently `tui.setPhase('done'); tui.showSummary(['cap_reached', ...]); tui.stop();` (CP4 T2 action 13), (c) the parse-failure branch \u2014 currently `console.error(formatUsageSnapshot(usage.snapshot())); tui.stop();` followed by `throw new Error('critic parse failure')` (CP4 T2 action 14 + CP2 T6 action 8). Confirm the writeAcceptedJson call on hit_empty/cap sites still executes before the new summary logic."
+                    "purpose": "Post-task-1 state. Locate: (a) the hit_empty branch — currently `tui.setPhase('done'); tui.showSummary(['hit_empty: true', ...]); tui.stop();` (from CP4 T2 action 12), (b) the cap_reached branch — currently `tui.setPhase('done'); tui.showSummary(['cap_reached', ...]); tui.stop();` (CP4 T2 action 13), (c) the parse-failure branch — currently `console.error(formatUsageSnapshot(usage.snapshot())); tui.stop();` followed by `throw new Error('critic parse failure')` (CP4 T2 action 14 + CP2 T6 action 8). Confirm the writeAcceptedJson call on hit_empty/cap sites still executes before the new summary logic."
                   },
                   {
                     "file": "apps/pi-asset-loop/src/tui.ts",
@@ -2371,7 +2371,7 @@
                     {
                       "path": "apps/pi-asset-loop/src/orchestrator.ts",
                       "status": "modified",
-                      "description": "hit_empty branch: `tui.setPhase('done'); const summary = buildTerminationSummary({ kind: 'hit_empty', assetId: resolved.assetId, iteration, maxIterations: MAX_ITERATIONS, residualIssues: [], acceptedJsonPath: resolved.acceptedJsonPath, usage: usage.snapshot() }); tui.showSummary(summary); tui.stop(); console.log(summary.join('\\n'));` (writeAcceptedJson(...) call stays exactly where CP2 T6 placed it \u2014 before this block). cap_reached branch: same shape, `kind: 'cap_reached'`, `residualIssues: outcome.result.issues`. parse_failure branch: `const summary = buildTerminationSummary({ kind: 'parse_failure', assetId: resolved.assetId, iteration, maxIterations: MAX_ITERATIONS, residualIssues: [], acceptedJsonPath: null, usage: usage.snapshot() }); tui.stop(); console.error(summary.join('\\n')); console.log(summary.join('\\n')); throw new Error('critic parse failure');` \u2014 the existing `console.error('aborted: critic parse failure \u2014 ' + truncate(outcome.rawSecond, 400))` line from CP2 T6 action 8 is preserved and emitted BEFORE the summary to keep the raw-response context close to the aborted: prefix. No other behavioral change; accepted.json is still written by writeAcceptedJson on hit_empty/cap_reached only."
+                      "description": "hit_empty branch: `tui.setPhase('done'); const summary = buildTerminationSummary({ kind: 'hit_empty', assetId: resolved.assetId, iteration, maxIterations: MAX_ITERATIONS, residualIssues: [], acceptedJsonPath: resolved.acceptedJsonPath, usage: usage.snapshot() }); tui.showSummary(summary); tui.stop(); console.log(summary.join('\\n'));` (writeAcceptedJson(...) call stays exactly where CP2 T6 placed it — before this block). cap_reached branch: same shape, `kind: 'cap_reached'`, `residualIssues: outcome.result.issues`. parse_failure branch: `const summary = buildTerminationSummary({ kind: 'parse_failure', assetId: resolved.assetId, iteration, maxIterations: MAX_ITERATIONS, residualIssues: [], acceptedJsonPath: null, usage: usage.snapshot() }); tui.stop(); console.error(summary.join('\\n')); console.log(summary.join('\\n')); throw new Error('critic parse failure');` — the existing `console.error('aborted: critic parse failure — ' + truncate(outcome.rawSecond, 400))` line from CP2 T6 action 8 is preserved and emitted BEFORE the summary to keep the raw-response context close to the aborted: prefix. No other behavioral change; accepted.json is still written by writeAcceptedJson on hit_empty/cap_reached only."
                     }
                   ],
                   "tree": null
@@ -2382,19 +2382,19 @@
                   "id": 1,
                   "command": "INSIDE runAssetLoop hit_empty branch (outcome.result.issues.length === 0): REPLACE the CP4 T2 action-12 block 'tui.setPhase(\"done\"); tui.showSummary([\"hit_empty: true\", `iter ${iteration}/${MAX_ITERATIONS}`, formatUsageSnapshot(usage.snapshot()), `accepted: ${resolved.acceptedJsonPath}`]); tui.stop();' WITH 'tui.setPhase(\"done\"); const summary = buildTerminationSummary({ kind: \"hit_empty\", assetId: resolved.assetId, iteration, maxIterations: MAX_ITERATIONS, residualIssues: [], acceptedJsonPath: resolved.acceptedJsonPath, usage: usage.snapshot() }); tui.showSummary(summary); tui.stop(); console.log(summary.join(\"\\n\"));'",
                   "file": "apps/pi-asset-loop/src/orchestrator.ts",
-                  "status": "pending"
+                  "status": "completed"
                 },
                 {
                   "id": 2,
                   "command": "INSIDE runAssetLoop cap_reached branch (iteration === MAX_ITERATIONS): REPLACE the CP4 T2 action-13 block 'tui.setPhase(\"done\"); tui.showSummary([\"cap_reached\", `iter ${iteration}/${MAX_ITERATIONS}`, formatUsageSnapshot(usage.snapshot()), `accepted: ${resolved.acceptedJsonPath}`]); tui.stop();' WITH 'tui.setPhase(\"done\"); const summary = buildTerminationSummary({ kind: \"cap_reached\", assetId: resolved.assetId, iteration, maxIterations: MAX_ITERATIONS, residualIssues: outcome.result.issues, acceptedJsonPath: resolved.acceptedJsonPath, usage: usage.snapshot() }); tui.showSummary(summary); tui.stop(); console.log(summary.join(\"\\n\"));'",
                   "file": "apps/pi-asset-loop/src/orchestrator.ts",
-                  "status": "pending"
+                  "status": "completed"
                 },
                 {
                   "id": 3,
-                  "command": "INSIDE runAssetLoop parse_failure branch (!outcome.ok): REPLACE the CP4 T2 action-14 block 'console.error(formatUsageSnapshot(usage.snapshot())); tui.stop();' WITH 'const summary = buildTerminationSummary({ kind: \"parse_failure\", assetId: resolved.assetId, iteration, maxIterations: MAX_ITERATIONS, residualIssues: [], acceptedJsonPath: null, usage: usage.snapshot() }); tui.stop(); console.error(summary.join(\"\\n\")); console.log(summary.join(\"\\n\"));' \u2014 PRESERVE the preceding CP2 T6 action-8 line 'console.error(\"aborted: critic parse failure \u2014 \" + truncate(outcome.rawSecond, 400))' immediately BEFORE this block, and PRESERVE the trailing 'throw new Error(\"critic parse failure\")' immediately AFTER this block",
+                  "command": "INSIDE runAssetLoop parse_failure branch (!outcome.ok): REPLACE the CP4 T2 action-14 block 'console.error(formatUsageSnapshot(usage.snapshot())); tui.stop();' WITH 'const summary = buildTerminationSummary({ kind: \"parse_failure\", assetId: resolved.assetId, iteration, maxIterations: MAX_ITERATIONS, residualIssues: [], acceptedJsonPath: null, usage: usage.snapshot() }); tui.stop(); console.error(summary.join(\"\\n\")); console.log(summary.join(\"\\n\"));' — PRESERVE the preceding CP2 T6 action-8 line 'console.error(\"aborted: critic parse failure — \" + truncate(outcome.rawSecond, 400))' immediately BEFORE this block, and PRESERVE the trailing 'throw new Error(\"critic parse failure\")' immediately AFTER this block",
                   "file": "apps/pi-asset-loop/src/orchestrator.ts",
-                  "status": "pending"
+                  "status": "completed"
                 }
               ]
             }
@@ -2404,17 +2404,17 @@
           "id": 2,
           "title": "Retire legacy pi-extension surface",
           "objective": "Remove the now-obsolete extension codepath so a reader cannot accidentally launch the old LLM-driven loop. Delete `apps/pi-asset-loop/extensions/asset-loop.ts`. Strip the `\"pi\": \"pi -e ./extensions/asset-loop.ts\"` script from `apps/pi-asset-loop/package.json` (keep `postinstall`, `typecheck`, and the `asset-loop` bun script CP1 added). Delete the now-empty `apps/pi-asset-loop/extensions/` directory so the tree reflects the SDK-driven architecture.",
-          "status": "pending",
+          "status": "completed",
           "task_seeds": [
             {
               "title": "Delete extensions/asset-loop.ts and the now-empty extensions/ directory",
-              "intent": "Remove the 397-line legacy Pi extension. Its orchestration responsibilities are now fully owned by src/orchestrator.ts; only reusable modules (critic, renderer, systemPrompt, wrapper, args, pngSize) remain under src/. After deleting the file, the extensions/ directory is empty \u2014 remove it to keep the tree truthful.",
+              "intent": "Remove the 397-line legacy Pi extension. Its orchestration responsibilities are now fully owned by src/orchestrator.ts; only reusable modules (critic, renderer, systemPrompt, wrapper, args, pngSize) remain under src/. After deleting the file, the extensions/ directory is empty — remove it to keep the tree truthful.",
               "processed": true,
               "task_id": 3
             },
             {
               "title": "Strip the `pi` script from apps/pi-asset-loop/package.json",
-              "intent": "Remove the `\"pi\": \"pi -e ./extensions/asset-loop.ts\"` entry from the scripts object. Keep `postinstall`, `typecheck`, and the `asset-loop` bun script that CP1 T2 added. Leave dependencies / devDependencies untouched \u2014 `@mariozechner/pi-coding-agent` is still imported by the orchestrator for createAgentSession, and `@mariozechner/pi-tui` is still imported by src/tui.ts.",
+              "intent": "Remove the `\"pi\": \"pi -e ./extensions/asset-loop.ts\"` entry from the scripts object. Keep `postinstall`, `typecheck`, and the `asset-loop` bun script that CP1 T2 added. Leave dependencies / devDependencies untouched — `@mariozechner/pi-coding-agent` is still imported by the orchestrator for createAgentSession, and `@mariozechner/pi-tui` is still imported by src/tui.ts.",
               "processed": true,
               "task_id": 4
             }
@@ -2423,14 +2423,14 @@
             {
               "id": 3,
               "title": "Delete apps/pi-asset-loop/extensions/asset-loop.ts and the empty extensions/ directory",
-              "status": "pending",
+              "status": "completed",
               "description": "Remove the legacy Pi extension file in full. Then remove the `apps/pi-asset-loop/extensions/` directory, which becomes empty after the file deletion. This severs the last reference point to the LLM-driven loop design. No imports in src/ or bin/ point to extensions/asset-loop.ts (verified: only reusable modules live under src/, and the bin entry was authored in CP1 T2 against src/orchestrator). Deletion must happen after CP5 TG1 lands so runtime behavior for the SDK-driven path is already proven before the fallback disappears.",
               "context": {
                 "read_before": [
                   {
                     "file": "apps/pi-asset-loop/extensions/asset-loop.ts",
                     "lines": "1-40",
-                    "purpose": "Confirm file identity before deletion \u2014 this is the pi extension entry (`export default function assetLoop(pi: ExtensionAPI)`). Nothing in it is still needed; the accept-tool payload shape was already lifted into writeAcceptedJson in CP2 T5."
+                    "purpose": "Confirm file identity before deletion — this is the pi extension entry (`export default function assetLoop(pi: ExtensionAPI)`). Nothing in it is still needed; the accept-tool payload shape was already lifted into writeAcceptedJson in CP2 T5."
                   },
                   {
                     "file": "apps/pi-asset-loop/package.json",
@@ -2482,21 +2482,21 @@
                   "id": 1,
                   "command": "DELETE FILE apps/pi-asset-loop/extensions/asset-loop.ts",
                   "file": "apps/pi-asset-loop/extensions/asset-loop.ts",
-                  "status": "pending"
+                  "status": "completed"
                 },
                 {
                   "id": 2,
                   "command": "DELETE DIRECTORY apps/pi-asset-loop/extensions (must be empty after action 1)",
                   "file": "apps/pi-asset-loop/extensions",
-                  "status": "pending"
+                  "status": "completed"
                 }
               ]
             },
             {
               "id": 4,
               "title": "Remove the `pi` script from apps/pi-asset-loop/package.json",
-              "status": "pending",
-              "description": "Drop the `\"pi\": \"pi -e ./extensions/asset-loop.ts\"` line from the scripts object in apps/pi-asset-loop/package.json. After this change scripts contains exactly: postinstall (playwright install chromium), typecheck (tsc --noEmit), and asset-loop (bun run bin/asset-loop.ts \u2014 added by CP1 T2 action 1). No other edits: dependencies, devDependencies, name, type, private, description all unchanged. JSON formatting preserved (2-space indent, trailing newline).",
+              "status": "completed",
+              "description": "Drop the `\"pi\": \"pi -e ./extensions/asset-loop.ts\"` line from the scripts object in apps/pi-asset-loop/package.json. After this change scripts contains exactly: postinstall (playwright install chromium), typecheck (tsc --noEmit), and asset-loop (bun run bin/asset-loop.ts — added by CP1 T2 action 1). No other edits: dependencies, devDependencies, name, type, private, description all unchanged. JSON formatting preserved (2-space indent, trailing newline).",
               "context": {
                 "read_before": [
                   {
@@ -2533,15 +2533,15 @@
               "actions": [
                 {
                   "id": 1,
-                  "command": "UPDATE apps/pi-asset-loop/package.json: REMOVE the scripts entry '\"pi\": \"pi -e ./extensions/asset-loop.ts\"' \u2014 leave postinstall, typecheck, and asset-loop entries intact",
+                  "command": "UPDATE apps/pi-asset-loop/package.json: REMOVE the scripts entry '\"pi\": \"pi -e ./extensions/asset-loop.ts\"' — leave postinstall, typecheck, and asset-loop entries intact",
                   "file": "apps/pi-asset-loop/package.json",
-                  "status": "pending"
+                  "status": "completed"
                 },
                 {
                   "id": 2,
-                  "command": "VERIFY apps/pi-asset-loop/package.json: scripts keys are exactly ['postinstall', 'typecheck', 'asset-loop'] \u2014 preserve 2-space indent and trailing newline",
+                  "command": "VERIFY apps/pi-asset-loop/package.json: scripts keys are exactly ['postinstall', 'typecheck', 'asset-loop'] — preserve 2-space indent and trailing newline",
                   "file": "apps/pi-asset-loop/package.json",
-                  "status": "pending"
+                  "status": "completed"
                 }
               ]
             }
@@ -2551,11 +2551,11 @@
           "id": 3,
           "title": "End-to-end run + accepted.json shape parity verification",
           "objective": "Execute the full pipeline against a known asset dir and assert shape parity with the legacy extension. Run typecheck, run the CLI end-to-end, inspect the stdout-persisted summary block, inspect accepted.json for the exact 8 legacy keys, confirm no stale references to the deleted extension remain, and confirm package.json scripts are clean. This is a verification task: no new code is produced, but failure on any assertion blocks CP5 completion.",
-          "status": "pending",
+          "status": "completed",
           "task_seeds": [
             {
               "title": "Run typecheck + end-to-end asset-loop + assert accepted.json + cleanliness checks",
-              "intent": "One verification task that executes: (a) `npm run typecheck` from apps/pi-asset-loop (passes), (b) `bun run asset-loop --asset <fresh asset dir>` in a Kitty/Ghostty/iTerm2/WezTerm terminal (completes on hit_empty or cap \u2014 a parse-failure run is OK too so long as the summary block renders), (c) confirm the stdout-persisted summary block after shell returns contains asset id, iter N/15, termination kind, residual count + briefs (or `residual: 0`), accepted path (absent on parse_failure), and a usage: line, (d) `jq 'keys | sort' runs/<run>/assets/<id>/accepted.json` returns exactly [\"accepted_at\",\"asset_id\",\"hit_empty_issues\",\"iterations\",\"max_iterations\",\"notes\",\"residual_issues\",\"verdict\"], (e) `rg 'extensions/asset-loop' apps/pi-asset-loop` returns zero matches, (f) `jq '.scripts | keys | sort' apps/pi-asset-loop/package.json` contains asset-loop, postinstall, typecheck and NOT `pi`. Report each check as pass/fail.",
+              "intent": "One verification task that executes: (a) `npm run typecheck` from apps/pi-asset-loop (passes), (b) `bun run asset-loop --asset <fresh asset dir>` in a Kitty/Ghostty/iTerm2/WezTerm terminal (completes on hit_empty or cap — a parse-failure run is OK too so long as the summary block renders), (c) confirm the stdout-persisted summary block after shell returns contains asset id, iter N/15, termination kind, residual count + briefs (or `residual: 0`), accepted path (absent on parse_failure), and a usage: line, (d) `jq 'keys | sort' runs/<run>/assets/<id>/accepted.json` returns exactly [\"accepted_at\",\"asset_id\",\"hit_empty_issues\",\"iterations\",\"max_iterations\",\"notes\",\"residual_issues\",\"verdict\"], (e) `rg 'extensions/asset-loop' apps/pi-asset-loop` returns zero matches, (f) `jq '.scripts | keys | sort' apps/pi-asset-loop/package.json` contains asset-loop, postinstall, typecheck and NOT `pi`. Report each check as pass/fail.",
               "processed": true,
               "task_id": 5
             }
@@ -2564,14 +2564,14 @@
             {
               "id": 5,
               "title": "Run typecheck, end-to-end asset-loop, and accepted.json shape/cleanliness assertions",
-              "status": "pending",
-              "description": "Pure verification task that executes after TG1 + TG2 land. Does NOT modify any source files. Runs every assertion the spec's Success Criteria imply, aborting CP5 completion on first failure. Concretely: (1) `cd apps/pi-asset-loop && npm run typecheck` \u2014 must exit 0. (2) Pick a known asset dir under `runs/` (e.g. `runs/test-1/assets/asset_01`) that has source.png + extracted.png + asset.json + extraction_prompt present. Copy to a scratch dir OR just accept that accepted.json will be overwritten. Run `bun run asset-loop --asset <path>` in a Kitty/Ghostty/iTerm2/WezTerm terminal so inline Image components render; the run should complete on hit_empty OR cap_reached (either is fine \u2014 shape is the assertion, not convergence). (3) After the shell returns, scroll up and confirm the stdout-persisted summary block is present and contains `asset:`, `iter: N/15`, `termination: hit_empty` or `termination: cap_reached`, `residual: <n>` followed by `  - [severity] region: description` lines when n>0, `accepted: <path>`, and `usage: calls=... tot=... $...`. (4) `jq 'keys | sort' <acceptedJsonPath>` must equal `[\"accepted_at\",\"asset_id\",\"hit_empty_issues\",\"iterations\",\"max_iterations\",\"notes\",\"residual_issues\",\"verdict\"]` \u2014 exactly these 8 keys, no more, no fewer. (5) `rg 'extensions/asset-loop' apps/pi-asset-loop` must return zero matches. (6) `test ! -d apps/pi-asset-loop/extensions` must succeed (directory removed). (7) `jq '.scripts | keys | sort' apps/pi-asset-loop/package.json` must return `[\"asset-loop\",\"postinstall\",\"typecheck\"]` \u2014 specifically no `pi` entry. Optional force-failure variant: temporarily point the critic at a model that cannot emit JSON to confirm the parse-failure branch also prints the summary block (termination: parse_failure, no `accepted:` line). Report each check individually in the final task output so a reader can see what passed and what did not.",
+              "status": "completed",
+              "description": "Pure verification task that executes after TG1 + TG2 land. Does NOT modify any source files. Runs every assertion the spec's Success Criteria imply, aborting CP5 completion on first failure. Concretely: (1) `cd apps/pi-asset-loop && npm run typecheck` — must exit 0. (2) Pick a known asset dir under `runs/` (e.g. `runs/test-1/assets/asset_01`) that has source.png + extracted.png + asset.json + extraction_prompt present. Copy to a scratch dir OR just accept that accepted.json will be overwritten. Run `bun run asset-loop --asset <path>` in a Kitty/Ghostty/iTerm2/WezTerm terminal so inline Image components render; the run should complete on hit_empty OR cap_reached (either is fine — shape is the assertion, not convergence). (3) After the shell returns, scroll up and confirm the stdout-persisted summary block is present and contains `asset:`, `iter: N/15`, `termination: hit_empty` or `termination: cap_reached`, `residual: <n>` followed by `  - [severity] region: description` lines when n>0, `accepted: <path>`, and `usage: calls=... tot=... $...`. (4) `jq 'keys | sort' <acceptedJsonPath>` must equal `[\"accepted_at\",\"asset_id\",\"hit_empty_issues\",\"iterations\",\"max_iterations\",\"notes\",\"residual_issues\",\"verdict\"]` — exactly these 8 keys, no more, no fewer. (5) `rg 'extensions/asset-loop' apps/pi-asset-loop` must return zero matches. (6) `test ! -d apps/pi-asset-loop/extensions` must succeed (directory removed). (7) `jq '.scripts | keys | sort' apps/pi-asset-loop/package.json` must return `[\"asset-loop\",\"postinstall\",\"typecheck\"]` — specifically no `pi` entry. Optional force-failure variant: temporarily point the critic at a model that cannot emit JSON to confirm the parse-failure branch also prints the summary block (termination: parse_failure, no `accepted:` line). Report each check individually in the final task output so a reader can see what passed and what did not.",
               "context": {
                 "read_before": [
                   {
                     "file": "apps/pi-asset-loop/package.json",
                     "lines": "1-25",
-                    "purpose": "Post-TG2 state \u2014 confirm `pi` script absent, `asset-loop` script present."
+                    "purpose": "Post-TG2 state — confirm `pi` script absent, `asset-loop` script present."
                   },
                   {
                     "file": "apps/pi-asset-loop/src/orchestrator.ts",
@@ -2581,12 +2581,12 @@
                   {
                     "file": "apps/pi-asset-loop/src/args.ts",
                     "lines": "7-63",
-                    "purpose": "ResolvedAsset paths \u2014 acceptedJsonPath location for jq inspection."
+                    "purpose": "ResolvedAsset paths — acceptedJsonPath location for jq inspection."
                   },
                   {
                     "file": "apps/pi-asset-loop/extensions/asset-loop.ts",
                     "lines": "309-320",
-                    "purpose": "Legacy accepted.json payload \u2014 canonical 8-key shape. NOTE: this file is deleted by TG2 T3; this pointer is for the agent's reference only (key list reproduced in this task's description)."
+                    "purpose": "Legacy accepted.json payload — canonical 8-key shape. NOTE: this file is deleted by TG2 T3; this pointer is for the agent's reference only (key list reproduced in this task's description)."
                   }
                 ],
                 "related_files": [
@@ -2630,55 +2630,55 @@
                   "id": 1,
                   "command": "RUN 'cd apps/pi-asset-loop && npm run typecheck' AND ASSERT exit code === 0",
                   "file": "apps/pi-asset-loop/package.json",
-                  "status": "pending"
+                  "status": "completed"
                 },
                 {
                   "id": 2,
                   "command": "IDENTIFY a known asset dir under runs/ (e.g. runs/test-1/assets/asset_01) WITH source.png + extracted.png + asset.json + extraction_prompt present",
                   "file": "runs",
-                  "status": "pending"
+                  "status": "completed"
                 },
                 {
                   "id": 3,
-                  "command": "RUN 'cd apps/pi-asset-loop && bun run asset-loop --asset <known asset dir>' IN a Kitty/Ghostty/iTerm2/WezTerm terminal AND WAIT for the run to complete (hit_empty, cap_reached, or parse_failure \u2014 any termination kind is acceptable for shape verification)",
+                  "command": "RUN 'cd apps/pi-asset-loop && bun run asset-loop --asset <known asset dir>' IN a Kitty/Ghostty/iTerm2/WezTerm terminal AND WAIT for the run to complete (hit_empty, cap_reached, or parse_failure — any termination kind is acceptable for shape verification)",
                   "file": "apps/pi-asset-loop/bin/asset-loop.ts",
-                  "status": "pending"
+                  "status": "completed"
                 },
                 {
                   "id": 4,
                   "command": "VERIFY the stdout-persisted summary block in scrollback CONTAINS 'asset: <id>', 'iter: <n>/15', 'termination: <kind>', 'residual: <n>' (with per-issue lines when n>0), 'accepted: <path>' when kind !== parse_failure, AND 'usage: calls=... tot=... $...'",
                   "file": "apps/pi-asset-loop/src/orchestrator.ts",
-                  "status": "pending"
+                  "status": "completed"
                 },
                 {
                   "id": 5,
                   "command": "RUN 'jq \"keys | sort\" <acceptedJsonPath>' AND ASSERT output equals '[\"accepted_at\",\"asset_id\",\"hit_empty_issues\",\"iterations\",\"max_iterations\",\"notes\",\"residual_issues\",\"verdict\"]' (exactly 8 keys, nothing more)",
                   "file": "runs",
-                  "status": "pending"
+                  "status": "completed"
                 },
                 {
                   "id": 6,
                   "command": "RUN 'rg \"extensions/asset-loop\" apps/pi-asset-loop' AND ASSERT zero matches (exit code 1 from ripgrep)",
                   "file": "apps/pi-asset-loop",
-                  "status": "pending"
+                  "status": "completed"
                 },
                 {
                   "id": 7,
                   "command": "RUN 'test ! -d apps/pi-asset-loop/extensions' AND ASSERT exit code === 0",
                   "file": "apps/pi-asset-loop/extensions",
-                  "status": "pending"
+                  "status": "completed"
                 },
                 {
                   "id": 8,
                   "command": "RUN 'jq \".scripts | keys | sort\" apps/pi-asset-loop/package.json' AND ASSERT output equals '[\"asset-loop\",\"postinstall\",\"typecheck\"]'",
                   "file": "apps/pi-asset-loop/package.json",
-                  "status": "pending"
+                  "status": "completed"
                 },
                 {
                   "id": 9,
-                  "command": "REPORT pass/fail for each of actions 1, 3, 4, 5, 6, 7, 8 \u2014 if any assertion fails, surface the failure details and stop (do NOT mark CP5 complete)",
+                  "command": "REPORT pass/fail for each of actions 1, 3, 4, 5, 6, 7, 8 — if any assertion fails, surface the failure details and stop (do NOT mark CP5 complete)",
                   "file": "apps/pi-asset-loop",
-                  "status": "pending"
+                  "status": "completed"
                 }
               ]
             }

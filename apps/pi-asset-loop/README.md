@@ -16,7 +16,8 @@ The postinstall hook runs `playwright install chromium`.
 ## Run
 
 ```
-pi -e apps/pi-asset-loop/extensions/asset-loop.ts --asset runs/test-1/assets/asset_03
+cd apps/pi-asset-loop
+bun run asset-loop --asset ../../runs/test-1/assets/asset_03
 ```
 
 - `--asset` — path to an asset directory, or a bare id (`asset_03`) combined with `--run`.
