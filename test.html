@@ -1,0 +1,918 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Melee Main Menu Recreation</title>
+<style>
+  html,
+  body {
+    margin: 0;
+    min-height: 100%;
+    background: #000;
+  }
+
+  body {
+    min-height: 100vh;
+    min-height: 100svh;
+    display: grid;
+    place-items: center;
+    overflow: hidden;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  }
+
+  .shell {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .scene-wrap {
+    width: min(96vw, 112vh, 960px);
+    width: min(96vw, 112svh, 960px);
+    aspect-ratio: 4 / 3;
+    position: relative;
+  }
+
+  canvas {
+    width: 100%;
+    height: 100%;
+    display: block;
+    background: #000;
+    outline: none;
+    touch-action: none;
+  }
+
+</style>
+</head>
+<body>
+  <main class="shell">
+    <div class="scene-wrap">
+      <canvas id="scene" tabindex="0" aria-label="Interactive Super Smash Bros. Melee-style main menu"></canvas>
+    </div>
+  </main>
+
+<script>
+(() => {
+  "use strict";
+
+  /* --------------------------------------------------------------------------
+     Core canvas setup
+  -------------------------------------------------------------------------- */
+
+  const canvas = document.getElementById("scene");
+  const ctx = canvas.getContext("2d", { alpha: false });
+
+  const W = 800;
+  const H = 600;
+  const DPR_LIMIT = 2;
+  const TAU = Math.PI * 2;
+
+  const menuItems = ["1-P Mode", "VS. Mode", "Trophies", "Options", "Data"];
+
+  const submenus = [
+    ["Regular Match", "Event Match", "Stadium", "Training"],
+    ["Melee", "Tournament", "Special Melee", "Custom Rules"],
+    ["Gallery", "Lottery", "Collection"],
+    ["Sound", "Screen", "Rumble", "Erase Data"],
+    ["Records", "Archives", "Snapshots", "Replays"]
+  ];
+
+  const tooltips = [
+    "Solo Smash!",
+    "Battle with friends!",
+    "Collect and admire!",
+    "Customize your game!",
+    "Records and memories!"
+  ];
+
+  const buttonSpec = {
+    x: 104,
+    y: 148,
+    w: 318,
+    h: 48,
+    gap: 13,
+    skew: 28
+  };
+
+  const buttons = menuItems.map((label, i) => ({
+    label,
+    x: buttonSpec.x,
+    y: buttonSpec.y + i * (buttonSpec.h + buttonSpec.gap),
+    w: buttonSpec.w,
+    h: buttonSpec.h,
+    skew: buttonSpec.skew
+  }));
+
+  let selectedIndex = 0;
+  let hoverIndex = -1;
+  let selectorY = buttons[0].y;
+  let submenuFrom = 0;
+  let submenuStart = performance.now();
+  let pulseStart = -10000;
+  let lastTime = performance.now();
+
+  /* --------------------------------------------------------------------------
+     Utility functions
+  -------------------------------------------------------------------------- */
+
+  function clamp01(v) {
+    return Math.max(0, Math.min(1, v));
+  }
+
+  function easeOutCubic(v) {
+    v = clamp01(v);
+    return 1 - Math.pow(1 - v, 3);
+  }
+
+  function resizeCanvas() {
+    const rect = canvas.getBoundingClientRect();
+    const dpr = Math.min(window.devicePixelRatio || 1, DPR_LIMIT);
+    const nextW = Math.max(1, Math.round(rect.width * dpr));
+    const nextH = Math.max(1, Math.round(rect.height * dpr));
+
+    if (canvas.width !== nextW || canvas.height !== nextH) {
+      canvas.width = nextW;
+      canvas.height = nextH;
+      ctx.imageSmoothingEnabled = true;
+    }
+
+    ctx.setTransform(canvas.width / W, 0, 0, canvas.height / H, 0, 0);
+  }
+
+  function roundedRectPath(c, x, y, w, h, r) {
+    r = Math.min(r, w * 0.5, h * 0.5);
+    c.beginPath();
+    c.moveTo(x + r, y);
+    c.lineTo(x + w - r, y);
+    c.quadraticCurveTo(x + w, y, x + w, y + r);
+    c.lineTo(x + w, y + h - r);
+    c.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+    c.lineTo(x + r, y + h);
+    c.quadraticCurveTo(x, y + h, x, y + h - r);
+    c.lineTo(x, y + r);
+    c.quadraticCurveTo(x, y, x + r, y);
+    c.closePath();
+  }
+
+  function buttonPath(c, b, yOverride) {
+    const y = yOverride == null ? b.y : yOverride;
+    c.beginPath();
+    c.moveTo(b.x + b.skew, y);
+    c.lineTo(b.x + b.w + b.skew, y);
+    c.lineTo(b.x + b.w, y + b.h);
+    c.lineTo(b.x, y + b.h);
+    c.closePath();
+  }
+
+  function panelPath(c, x, y, w, h, skew) {
+    c.beginPath();
+    c.moveTo(x + skew, y);
+    c.lineTo(x + w, y - 5);
+    c.lineTo(x + w + 7, y + h);
+    c.lineTo(x, y + h - 13);
+    c.closePath();
+  }
+
+  function frameOuterPath(c) {
+    c.beginPath();
+    c.moveTo(103, 113);
+    c.lineTo(370, 113);
+    c.lineTo(408, 66);
+    c.lineTo(707, 66);
+    c.quadraticCurveTo(740, 66, 751, 103);
+    c.lineTo(751, 492);
+    c.quadraticCurveTo(751, 529, 716, 536);
+    c.lineTo(607, 536);
+    c.lineTo(607, 548);
+    c.lineTo(195, 548);
+    c.lineTo(195, 536);
+    c.lineTo(101, 536);
+    c.quadraticCurveTo(61, 536, 61, 492);
+    c.lineTo(61, 153);
+    c.quadraticCurveTo(61, 113, 103, 113);
+    c.closePath();
+  }
+
+  function frameInnerPath(c) {
+    c.beginPath();
+    c.moveTo(109, 129);
+    c.lineTo(383, 129);
+    c.lineTo(417, 82);
+    c.lineTo(702, 82);
+    c.quadraticCurveTo(728, 82, 734, 108);
+    c.lineTo(734, 478);
+    c.quadraticCurveTo(734, 505, 707, 510);
+    c.lineTo(604, 510);
+    c.lineTo(604, 528);
+    c.lineTo(198, 528);
+    c.lineTo(198, 510);
+    c.lineTo(106, 510);
+    c.quadraticCurveTo(82, 510, 82, 479);
+    c.lineTo(82, 159);
+    c.quadraticCurveTo(82, 129, 109, 129);
+    c.closePath();
+  }
+
+  function topSliceClipPath(c) {
+    c.beginPath();
+    c.moveTo(356, 114);
+    c.lineTo(373, 114);
+    c.lineTo(408, 66);
+    c.lineTo(462, 66);
+    c.lineTo(425, 114);
+    c.closePath();
+  }
+
+  function pointInPolygon(px, py, points) {
+    let inside = false;
+    for (let i = 0, j = points.length - 1; i < points.length; j = i++) {
+      const xi = points[i].x;
+      const yi = points[i].y;
+      const xj = points[j].x;
+      const yj = points[j].y;
+      const intersects = ((yi > py) !== (yj > py)) &&
+        (px < (xj - xi) * (py - yi) / ((yj - yi) || 0.00001) + xi);
+      if (intersects) inside = !inside;
+    }
+    return inside;
+  }
+
+  function hitTestButton(px, py) {
+    for (let i = 0; i < buttons.length; i++) {
+      const b = buttons[i];
+      const points = [
+        { x: b.x + b.skew, y: b.y },
+        { x: b.x + b.w + b.skew, y: b.y },
+        { x: b.x + b.w, y: b.y + b.h },
+        { x: b.x, y: b.y + b.h }
+      ];
+      if (pointInPolygon(px, py, points)) return i;
+    }
+    return -1;
+  }
+
+  function pointerPosition(e) {
+    const rect = canvas.getBoundingClientRect();
+    return {
+      x: (e.clientX - rect.left) * W / rect.width,
+      y: (e.clientY - rect.top) * H / rect.height
+    };
+  }
+
+  function activeVisualIndex() {
+    return hoverIndex >= 0 ? hoverIndex : selectedIndex;
+  }
+
+  /* --------------------------------------------------------------------------
+     Interaction
+  -------------------------------------------------------------------------- */
+
+  function triggerPulse() {
+    pulseStart = performance.now();
+  }
+
+  function setSelected(index, shouldPulse) {
+    index = (index + menuItems.length) % menuItems.length;
+
+    if (index !== selectedIndex) {
+      submenuFrom = selectedIndex;
+      submenuStart = performance.now();
+      selectedIndex = index;
+    }
+
+    if (shouldPulse) triggerPulse();
+  }
+
+  window.addEventListener("keydown", (e) => {
+    if (e.key === "ArrowDown" || e.key === "Down") {
+      e.preventDefault();
+      hoverIndex = -1;
+      setSelected(selectedIndex + 1, false);
+    } else if (e.key === "ArrowUp" || e.key === "Up") {
+      e.preventDefault();
+      hoverIndex = -1;
+      setSelected(selectedIndex - 1, false);
+    } else if (e.key === "Enter") {
+      e.preventDefault();
+      hoverIndex = -1;
+      triggerPulse();
+    }
+  });
+
+  canvas.addEventListener("pointermove", (e) => {
+    const p = pointerPosition(e);
+    const hit = hitTestButton(p.x, p.y);
+    if (hit !== hoverIndex) hoverIndex = hit;
+    canvas.style.cursor = hit >= 0 ? "pointer" : "default";
+  });
+
+  canvas.addEventListener("pointerleave", () => {
+    hoverIndex = -1;
+    canvas.style.cursor = "default";
+  });
+
+  canvas.addEventListener("pointerdown", (e) => {
+    canvas.focus();
+    const p = pointerPosition(e);
+    const hit = hitTestButton(p.x, p.y);
+    if (hit >= 0) {
+      e.preventDefault();
+      hoverIndex = hit;
+      setSelected(hit, true);
+    }
+  });
+
+  /* --------------------------------------------------------------------------
+     Empty black background
+  -------------------------------------------------------------------------- */
+
+  function drawBackground() {
+    ctx.fillStyle = "#000";
+    ctx.fillRect(0, 0, W, H);
+  }
+
+  /* --------------------------------------------------------------------------
+     Floating extracted-style HUD frame
+  -------------------------------------------------------------------------- */
+
+  function drawHUDFrame(t) {
+    ctx.save();
+
+    frameOuterPath(ctx);
+    const outerFill = ctx.createLinearGradient(60, 66, 751, 548);
+    outerFill.addColorStop(0, "rgba(81, 102, 224, 0.88)");
+    outerFill.addColorStop(0.2, "rgba(109, 125, 242, 0.72)");
+    outerFill.addColorStop(0.54, "rgba(60, 71, 178, 0.60)");
+    outerFill.addColorStop(0.82, "rgba(126, 137, 255, 0.70)");
+    outerFill.addColorStop(1, "rgba(69, 81, 198, 0.84)");
+    ctx.fillStyle = outerFill;
+    ctx.shadowColor = "rgba(96, 108, 255, 0.95)";
+    ctx.shadowBlur = 24;
+    ctx.fill();
+
+    frameOuterPath(ctx);
+    ctx.lineWidth = 4.5;
+    ctx.strokeStyle = "rgba(97, 102, 255, 0.92)";
+    ctx.shadowColor = "rgba(104, 118, 255, 0.92)";
+    ctx.shadowBlur = 15;
+    ctx.stroke();
+
+    frameOuterPath(ctx);
+    ctx.lineWidth = 1.6;
+    ctx.strokeStyle = "rgba(199, 221, 255, 0.78)";
+    ctx.shadowBlur = 0;
+    ctx.stroke();
+
+    frameInnerPath(ctx);
+    const innerFill = ctx.createLinearGradient(82, 82, 734, 528);
+    innerFill.addColorStop(0, "rgba(43, 46, 60, 0.95)");
+    innerFill.addColorStop(0.5, "rgba(48, 51, 66, 0.93)");
+    innerFill.addColorStop(1, "rgba(36, 40, 55, 0.95)");
+    ctx.fillStyle = innerFill;
+    ctx.shadowColor = "rgba(0, 0, 0, 0.72)";
+    ctx.shadowBlur = 8;
+    ctx.fill();
+
+    frameInnerPath(ctx);
+    ctx.lineWidth = 3;
+    ctx.strokeStyle = "rgba(87, 99, 255, 0.88)";
+    ctx.shadowColor = "rgba(95, 116, 255, 0.86)";
+    ctx.shadowBlur = 12;
+    ctx.stroke();
+
+    frameInnerPath(ctx);
+    ctx.lineWidth = 1.1;
+    ctx.strokeStyle = "rgba(185, 214, 255, 0.65)";
+    ctx.shadowBlur = 0;
+    ctx.stroke();
+
+    drawFrameHighlights(t);
+    drawTopSlices(t);
+    drawTitle();
+
+    ctx.restore();
+  }
+
+  function drawFrameHighlights(t) {
+    ctx.save();
+
+    ctx.globalCompositeOperation = "lighter";
+
+    ctx.strokeStyle = "rgba(230, 240, 255, 0.18)";
+    ctx.lineWidth = 5;
+    ctx.beginPath();
+    ctx.moveTo(102, 124);
+    ctx.lineTo(372, 124);
+    ctx.lineTo(410, 75);
+    ctx.lineTo(704, 75);
+    ctx.stroke();
+
+    ctx.strokeStyle = "rgba(87, 110, 255, 0.28)";
+    ctx.lineWidth = 8;
+    ctx.beginPath();
+    ctx.moveTo(73, 490);
+    ctx.quadraticCurveTo(73, 523, 105, 523);
+    ctx.lineTo(195, 523);
+    ctx.lineTo(195, 540);
+    ctx.lineTo(607, 540);
+    ctx.lineTo(607, 523);
+    ctx.lineTo(706, 523);
+    ctx.quadraticCurveTo(738, 520, 741, 491);
+    ctx.stroke();
+
+    const sweep = 0.5 + 0.5 * Math.sin(t * 1.45);
+    ctx.strokeStyle = `rgba(135, 150, 255, ${0.10 + sweep * 0.08})`;
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(88, 145);
+    ctx.lineTo(384, 145);
+    ctx.lineTo(428, 96);
+    ctx.lineTo(698, 96);
+    ctx.stroke();
+
+    ctx.restore();
+  }
+
+  function drawTopSlices(t) {
+    ctx.save();
+
+    topSliceClipPath(ctx);
+    ctx.clip();
+
+    const pulse = 0.55 + 0.32 * Math.sin(t * 2.1);
+
+    for (let i = 0; i < 4; i++) {
+      const sx = 362 + i * 13;
+      const alpha = 0.26 + pulse * 0.18 + i * 0.025;
+
+      ctx.beginPath();
+      ctx.moveTo(sx, 114);
+      ctx.lineTo(sx + 8, 114);
+      ctx.lineTo(sx + 45, 68);
+      ctx.lineTo(sx + 35, 68);
+      ctx.closePath();
+
+      const fill = ctx.createLinearGradient(sx, 114, sx + 45, 68);
+      fill.addColorStop(0, `rgba(45, 76, 205, ${alpha})`);
+      fill.addColorStop(0.48, `rgba(118, 147, 255, ${alpha + 0.12})`);
+      fill.addColorStop(1, `rgba(42, 64, 175, ${alpha})`);
+      ctx.fillStyle = fill;
+      ctx.shadowColor = "rgba(108, 135, 255, 0.65)";
+      ctx.shadowBlur = 6;
+      ctx.fill();
+
+      ctx.lineWidth = 1;
+      ctx.strokeStyle = `rgba(200, 220, 255, ${0.22 + pulse * 0.1})`;
+      ctx.stroke();
+    }
+
+    ctx.restore();
+
+    ctx.save();
+    ctx.globalCompositeOperation = "lighter";
+    ctx.strokeStyle = "rgba(111, 128, 255, 0.72)";
+    ctx.lineWidth = 2.5;
+    ctx.shadowColor = "rgba(104, 118, 255, 0.85)";
+    ctx.shadowBlur = 8;
+    ctx.beginPath();
+    ctx.moveTo(370, 113);
+    ctx.lineTo(408, 66);
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  function drawTitle() {
+    ctx.save();
+
+    ctx.font = 'italic 900 50px "Trebuchet MS", "Arial Narrow", Arial, sans-serif';
+    ctx.textAlign = "left";
+    ctx.textBaseline = "middle";
+    ctx.lineJoin = "round";
+
+    ctx.shadowColor = "rgba(86, 102, 255, 0.90)";
+    ctx.shadowBlur = 10;
+    ctx.lineWidth = 7;
+    ctx.strokeStyle = "rgba(60, 66, 115, 0.92)";
+    ctx.strokeText("Main Menu", 104, 91);
+
+    ctx.shadowColor = "rgba(0, 0, 0, 0.85)";
+    ctx.shadowBlur = 4;
+    ctx.lineWidth = 3;
+    ctx.strokeStyle = "rgba(255, 255, 255, 0.78)";
+    ctx.strokeText("Main Menu", 104, 91);
+
+    const textFill = ctx.createLinearGradient(104, 60, 104, 124);
+    textFill.addColorStop(0, "#ffffff");
+    textFill.addColorStop(0.45, "#f4f5ff");
+    textFill.addColorStop(1, "#cfd2e6");
+    ctx.fillStyle = textFill;
+    ctx.fillText("Main Menu", 104, 91);
+
+    ctx.restore();
+  }
+
+  /* --------------------------------------------------------------------------
+     Menu buttons
+  -------------------------------------------------------------------------- */
+
+  function drawNormalButton(b, index, active) {
+    ctx.save();
+
+    buttonPath(ctx, b);
+
+    const fill = ctx.createLinearGradient(b.x, b.y, b.x + b.w + b.skew, b.y + b.h);
+    fill.addColorStop(0, "rgba(5, 9, 34, 0.98)");
+    fill.addColorStop(0.52, "rgba(9, 20, 62, 0.96)");
+    fill.addColorStop(1, "rgba(3, 7, 26, 0.98)");
+    ctx.fillStyle = fill;
+    ctx.fill();
+
+    ctx.shadowColor = "rgba(77, 220, 255, 0.50)";
+    ctx.shadowBlur = 4;
+    ctx.lineWidth = 1.6;
+    ctx.strokeStyle = "rgba(71, 216, 255, 0.62)";
+    ctx.stroke();
+
+    ctx.shadowBlur = 0;
+    ctx.lineWidth = 1;
+    ctx.strokeStyle = "rgba(205, 245, 255, 0.18)";
+    ctx.beginPath();
+    ctx.moveTo(b.x + b.skew + 5, b.y + 3);
+    ctx.lineTo(b.x + b.w + b.skew - 8, b.y + 3);
+    ctx.stroke();
+
+    if (index !== active) {
+      const cx = b.x + b.w + b.skew * 0.5 + 5;
+      const cy = b.y + b.h * 0.5;
+      const dot = ctx.createRadialGradient(cx - 2, cy - 2, 1, cx, cy, 6);
+      dot.addColorStop(0, "rgba(230, 255, 255, 0.95)");
+      dot.addColorStop(0.35, "rgba(92, 240, 255, 0.75)");
+      dot.addColorStop(1, "rgba(40, 100, 255, 0.05)");
+      ctx.beginPath();
+      ctx.fillStyle = dot;
+      ctx.shadowColor = "rgba(90, 240, 255, 0.55)";
+      ctx.shadowBlur = 6;
+      ctx.arc(cx, cy, 4.2, 0, TAU);
+      ctx.fill();
+    }
+
+    ctx.restore();
+  }
+
+  function drawSelectedHighlight(t) {
+    const active = activeVisualIndex();
+    const b = buttons[active];
+
+    ctx.save();
+
+    buttonPath(ctx, b, selectorY);
+    const fill = ctx.createLinearGradient(b.x, selectorY, b.x + b.w + b.skew, selectorY + b.h);
+    fill.addColorStop(0, "#f7b800");
+    fill.addColorStop(0.43, "#ffe030");
+    fill.addColorStop(0.72, "#ffd21c");
+    fill.addColorStop(1, "#d99100");
+    ctx.fillStyle = fill;
+    ctx.shadowColor = "rgba(255, 220, 40, 0.92)";
+    ctx.shadowBlur = 18;
+    ctx.fill();
+
+    buttonPath(ctx, b, selectorY);
+    ctx.lineWidth = 3;
+    ctx.strokeStyle = "rgba(255, 244, 132, 0.92)";
+    ctx.shadowBlur = 15;
+    ctx.stroke();
+
+    buttonPath(ctx, b, selectorY);
+    ctx.lineWidth = 1;
+    ctx.strokeStyle = "rgba(255, 255, 225, 0.72)";
+    ctx.shadowBlur = 0;
+    ctx.stroke();
+
+    ctx.save();
+    buttonPath(ctx, b, selectorY);
+    ctx.clip();
+    const sheen = ctx.createLinearGradient(0, selectorY, 0, selectorY + b.h);
+    sheen.addColorStop(0, "rgba(255, 255, 255, 0.30)");
+    sheen.addColorStop(0.38, "rgba(255, 255, 255, 0.08)");
+    sheen.addColorStop(0.4, "rgba(255, 255, 255, 0)");
+    sheen.addColorStop(1, "rgba(80, 30, 0, 0.15)");
+    ctx.fillStyle = sheen;
+    ctx.fillRect(b.x - 25, selectorY, b.w + b.skew + 60, b.h);
+    ctx.restore();
+
+    ctx.restore();
+  }
+
+  function drawButtonPulse(nowMs) {
+    const age = (nowMs - pulseStart) / 310;
+    if (age < 0 || age > 1) return;
+
+    const b = buttons[selectedIndex];
+    const cx = b.x + b.w * 0.5 + b.skew * 0.5;
+    const cy = b.y + b.h * 0.5;
+    const alpha = 1 - age;
+
+    ctx.save();
+    ctx.translate(cx, cy);
+    ctx.scale(1 + age * 0.085, 1 + age * 0.16);
+    ctx.translate(-cx, -cy);
+
+    buttonPath(ctx, b);
+    ctx.fillStyle = `rgba(255, 255, 235, ${0.18 * alpha})`;
+    ctx.shadowColor = "rgba(255, 245, 120, 0.85)";
+    ctx.shadowBlur = 26;
+    ctx.fill();
+
+    buttonPath(ctx, b);
+    ctx.lineWidth = 3 + age * 5;
+    ctx.strokeStyle = `rgba(255, 255, 220, ${0.72 * alpha})`;
+    ctx.stroke();
+
+    ctx.restore();
+  }
+
+  function drawButtonText(fill, shadow) {
+    ctx.save();
+
+    ctx.font = 'italic 800 31px Georgia, "Times New Roman", serif';
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.fillStyle = fill;
+
+    if (shadow) {
+      ctx.shadowColor = "rgba(0, 0, 0, 0.85)";
+      ctx.shadowBlur = 4;
+      ctx.shadowOffsetX = 1;
+      ctx.shadowOffsetY = 2;
+    }
+
+    for (const b of buttons) {
+      ctx.fillText(b.label, b.x + b.w * 0.5 + b.skew * 0.5, b.y + b.h * 0.52);
+    }
+
+    ctx.restore();
+  }
+
+  function drawGem(t) {
+    const active = activeVisualIndex();
+    const b = buttons[active];
+    const cx = b.x + b.w + b.skew * 0.5 + 8;
+    const cy = selectorY + b.h * 0.5;
+    const pulse = 1 + 0.075 * Math.sin(t * TAU / 1.5);
+    const rot = t * TAU / 1.5;
+
+    ctx.save();
+
+    ctx.globalCompositeOperation = "lighter";
+    ctx.beginPath();
+    ctx.fillStyle = "rgba(255, 230, 0, 0.18)";
+    ctx.shadowColor = "rgba(255, 225, 20, 0.95)";
+    ctx.shadowBlur = 20;
+    ctx.arc(cx, cy, 23 * pulse, 0, TAU);
+    ctx.fill();
+
+    ctx.restore();
+
+    ctx.save();
+    ctx.translate(cx, cy);
+    ctx.rotate(rot);
+    ctx.scale(pulse, pulse);
+
+    const gem = ctx.createRadialGradient(-7, -8, 1, 0, 0, 18);
+    gem.addColorStop(0, "#fff9b0");
+    gem.addColorStop(0.28, "#fff045");
+    gem.addColorStop(0.62, "#e3bf00");
+    gem.addColorStop(1, "#8b6500");
+
+    ctx.beginPath();
+    ctx.fillStyle = gem;
+    ctx.shadowColor = "rgba(255, 235, 40, 0.85)";
+    ctx.shadowBlur = 10;
+    ctx.arc(0, 0, 17, 0, TAU);
+    ctx.fill();
+
+    ctx.lineWidth = 2;
+    ctx.strokeStyle = "rgba(255, 255, 210, 0.85)";
+    ctx.stroke();
+
+    ctx.shadowBlur = 0;
+    ctx.lineWidth = 3.2;
+    ctx.strokeStyle = "rgba(65, 70, 40, 0.43)";
+    ctx.beginPath();
+    ctx.arc(0, 0, 8.5, -1.1, 1.05);
+    ctx.stroke();
+
+    ctx.beginPath();
+    ctx.fillStyle = "rgba(255, 255, 230, 0.78)";
+    ctx.arc(-6, -7, 3.2, 0, TAU);
+    ctx.fill();
+
+    ctx.restore();
+  }
+
+  function drawMenu(t, nowMs) {
+    const active = activeVisualIndex();
+
+    for (let i = 0; i < buttons.length; i++) {
+      drawNormalButton(buttons[i], i, active);
+    }
+
+    drawSelectedHighlight(t);
+    drawButtonPulse(nowMs);
+
+    drawButtonText("rgba(255, 235, 195, 0.96)", true);
+
+    ctx.save();
+    buttonPath(ctx, buttons[active], selectorY);
+    ctx.clip();
+    drawButtonText("rgba(18, 16, 8, 0.98)", false);
+    ctx.restore();
+
+    drawGem(t);
+  }
+
+  /* --------------------------------------------------------------------------
+     Submenu panel
+  -------------------------------------------------------------------------- */
+
+  function drawSubmenuItems(index, alpha, dx, dy) {
+    const x = 540 + dx;
+    const list = submenus[index];
+    const lineHeight = 30;
+    const startY = list.length === 3 ? 211 : 195;
+
+    ctx.save();
+    ctx.globalAlpha = alpha;
+    ctx.font = 'italic 700 17px Georgia, "Times New Roman", serif';
+    ctx.textAlign = "left";
+    ctx.textBaseline = "middle";
+    ctx.fillStyle = "rgba(204, 255, 255, 0.92)";
+    ctx.shadowColor = "rgba(75, 230, 255, 0.65)";
+    ctx.shadowBlur = 5;
+
+    for (let i = 0; i < list.length; i++) {
+      ctx.fillText(list[i], x, startY + i * lineHeight + dy);
+    }
+
+    ctx.restore();
+  }
+
+  function drawSubmenuPanel(nowMs) {
+    const x = 520;
+    const y = 153;
+    const w = 172;
+    const h = 209;
+    const skew = 18;
+
+    ctx.save();
+
+    panelPath(ctx, x, y, w, h, skew);
+    const fill = ctx.createLinearGradient(x, y, x + w, y + h);
+    fill.addColorStop(0, "rgba(9, 26, 55, 0.74)");
+    fill.addColorStop(0.6, "rgba(8, 43, 74, 0.42)");
+    fill.addColorStop(1, "rgba(16, 62, 86, 0.50)");
+    ctx.fillStyle = fill;
+    ctx.fill();
+
+    panelPath(ctx, x, y, w, h, skew);
+    ctx.shadowColor = "rgba(70, 225, 255, 0.45)";
+    ctx.shadowBlur = 8;
+    ctx.lineWidth = 1.4;
+    ctx.strokeStyle = "rgba(102, 225, 255, 0.44)";
+    ctx.stroke();
+
+    ctx.shadowBlur = 0;
+    ctx.globalCompositeOperation = "lighter";
+    ctx.strokeStyle = "rgba(170, 245, 255, 0.16)";
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(x + 25, y + 16);
+    ctx.lineTo(x + w - 13, y + 11);
+    ctx.stroke();
+
+    ctx.strokeStyle = "rgba(70, 210, 255, 0.12)";
+    for (let i = 0; i < 4; i++) {
+      ctx.beginPath();
+      ctx.moveTo(x + 26 + i * 34, y + 18);
+      ctx.lineTo(x + 11 + i * 34, y + h - 26);
+      ctx.stroke();
+    }
+
+    ctx.restore();
+
+    const raw = (nowMs - submenuStart) / 230;
+    const p = easeOutCubic(raw);
+
+    ctx.save();
+    panelPath(ctx, x + 8, y + 10, w - 13, h - 22, skew * 0.5);
+    ctx.clip();
+
+    if (submenuFrom !== selectedIndex && raw < 1) {
+      drawSubmenuItems(submenuFrom, 1 - p, -8 * p, -3 * p);
+      drawSubmenuItems(selectedIndex, p, 10 * (1 - p), 5 * (1 - p));
+    } else {
+      drawSubmenuItems(selectedIndex, 1, 0, 0);
+    }
+
+    ctx.restore();
+  }
+
+  /* --------------------------------------------------------------------------
+     Tooltip integrated into the lower border slot
+  -------------------------------------------------------------------------- */
+
+  function drawTooltip() {
+    const x = 204;
+    const y = 500;
+    const w = 394;
+    const h = 46;
+
+    ctx.save();
+
+    roundedRectPath(ctx, x, y, w, h, 7);
+    const fill = ctx.createLinearGradient(x, y, x, y + h);
+    fill.addColorStop(0, "rgba(63, 65, 76, 0.98)");
+    fill.addColorStop(0.48, "rgba(38, 40, 52, 0.98)");
+    fill.addColorStop(1, "rgba(24, 26, 38, 0.98)");
+    ctx.fillStyle = fill;
+    ctx.shadowColor = "rgba(0, 0, 0, 0.70)";
+    ctx.shadowBlur = 8;
+    ctx.fill();
+
+    roundedRectPath(ctx, x, y, w, h, 7);
+    ctx.lineWidth = 3.3;
+    ctx.strokeStyle = "rgba(88, 103, 255, 0.92)";
+    ctx.shadowColor = "rgba(100, 118, 255, 0.90)";
+    ctx.shadowBlur = 13;
+    ctx.stroke();
+
+    roundedRectPath(ctx, x + 4, y + 4, w - 8, h - 8, 5);
+    ctx.lineWidth = 1.2;
+    ctx.strokeStyle = "rgba(216, 229, 255, 0.78)";
+    ctx.shadowBlur = 0;
+    ctx.stroke();
+
+    ctx.globalCompositeOperation = "lighter";
+    ctx.strokeStyle = "rgba(230, 236, 255, 0.18)";
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(x + 16, y + 8);
+    ctx.lineTo(x + w - 16, y + 8);
+    ctx.stroke();
+
+    ctx.globalCompositeOperation = "source-over";
+    ctx.font = 'italic 800 26px Georgia, "Times New Roman", serif';
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.fillStyle = "rgba(232, 232, 220, 0.96)";
+    ctx.shadowColor = "rgba(0, 0, 0, 0.86)";
+    ctx.shadowBlur = 4;
+    ctx.fillText(tooltips[selectedIndex], x + w * 0.5, y + h * 0.54);
+
+    ctx.restore();
+  }
+
+  /* --------------------------------------------------------------------------
+     Frame loop
+  -------------------------------------------------------------------------- */
+
+  function update(dt) {
+    const targetY = buttons[activeVisualIndex()].y;
+    const k = 1 - Math.exp(-dt / 0.052);
+    selectorY += (targetY - selectorY) * k;
+  }
+
+  function render(nowMs) {
+    resizeCanvas();
+
+    const t = nowMs / 1000;
+    drawBackground();
+    drawHUDFrame(t);
+    drawMenu(t, nowMs);
+    drawSubmenuPanel(nowMs);
+    drawTooltip();
+  }
+
+  function frame(nowMs) {
+    const dt = Math.min(0.05, Math.max(0.001, (nowMs - lastTime) / 1000));
+    lastTime = nowMs;
+    update(dt);
+    render(nowMs);
+    requestAnimationFrame(frame);
+  }
+
+  window.addEventListener("resize", resizeCanvas);
+
+  if ("ResizeObserver" in window) {
+    new ResizeObserver(resizeCanvas).observe(canvas);
+  }
+
+  resizeCanvas();
+  requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>

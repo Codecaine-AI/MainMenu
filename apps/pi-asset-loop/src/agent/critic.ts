@@ -23,6 +23,9 @@ export interface CritiqueIssue {
   region: string;
   severity: IssueSeverity;
   description: string;
+  reference_geometry: string;
+  render_geometry: string;
+  affected_element_hint: string;
   fix_hint: string;
 }
 
@@ -129,6 +132,24 @@ damaged):
 - Text. Font, weight, stroke, shadow, color, position. Text must be live
   text in the render, not rasterized — if it looks rasterized, flag it.
 - Interior fill. Color, any inner gradient or texture.
+
+For every issue you report, you MUST describe the defect physically and
+spatially, not just visually. The asset coordinate system is WxH pixels,
+(0,0) at top-left. In your issue fields:
+
+- reference_geometry: describe what the reference shows using approximate
+  pixel coordinates, angles, and measurements. Example: "straight diagonal
+  edge running from approximately (184,34) to (210,11), no curve, forming
+  a ~55° angle"
+- render_geometry: describe what the render shows in the same terms.
+  Example: "curved endpoint with ~8px radius circle centered at (210,20),
+  creating a bulge that protrudes ~6px rightward from where the straight
+  edge should end"
+- affected_element_hint: name the kind of code element that likely causes
+  this — SVG path, CSS property, gradient definition, filter, etc. Be
+  specific: "the SVG path defining the tab's right-edge silhouette" or
+  "the border-radius CSS property on the top-right corner" — not just
+  "the tab."
 </regional_checks>
 
 <non_issues>
@@ -173,6 +194,9 @@ markdown fences. Shape:
       "region": "genre" | "slop" | "projection" | "top_edge" | "bottom_edge" | "left_edge" | "right_edge" | "top_left_corner" | "top_right_corner" | "bottom_left_corner" | "bottom_right_corner" | "tab_callout" | "interior_fill" | "border" | "glow" | "shadow" | "text" | "gradient" | "dimensional" | "color" | "other",
       "severity": "blocking" | "major" | "minor",
       "description": "what is wrong, named concretely",
+      "reference_geometry": "physical description of what the reference shows at this location — use approximate pixel coordinates, edge angles, radii, distances in px",
+      "render_geometry": "physical description of what the render shows at the same location — same coordinate terms so the implementer can diff them",
+      "affected_element_hint": "which code element likely needs changing — name the specific SVG path, CSS property, gradient, filter, etc.",
       "fix_hint": "one-sentence suggestion; the implementer picks the actual fix"
     }
   ]
@@ -339,6 +363,9 @@ function normalizeIssue(raw: unknown, index: number): CritiqueIssue | null {
       typeof r.region === "string" && r.region.length > 0 ? r.region : "other",
     severity,
     description: typeof r.description === "string" ? r.description : "",
+    reference_geometry: typeof r.reference_geometry === "string" ? r.reference_geometry : "",
+    render_geometry: typeof r.render_geometry === "string" ? r.render_geometry : "",
+    affected_element_hint: typeof r.affected_element_hint === "string" ? r.affected_element_hint : "",
     fix_hint: typeof r.fix_hint === "string" ? r.fix_hint : "",
   };
 }
