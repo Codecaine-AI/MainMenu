@@ -550,7 +550,7 @@
       "prerequisites": [
         1
       ],
-      "status": "pending",
+      "status": "completed",
       "testing_strategy": "Manual end-to-end: `bun run asset-loop --asset <existing asset dir>` from apps/pi-asset-loop against an asset that converges inside the 15-render budget. Expect: stdout prints 'phase: initial-gen', then per iteration 'phase: render iter N/15', 'phase: critique iter N', either 'phase: fix iter N \u2014 K issues' followed by one 'fix I<j>: <brief>' line per popped issue, or 'accepted \u2014 hit_empty' / 'accepted \u2014 cap'. accepted.json is written and matches the shape the old extension produced (asset_id, iterations, max_iterations, hit_empty_issues, residual_issues, verdict, notes, accepted_at). critique.json is overwritten each critique cycle with the latest { iteration, verdict, issues }. component.html / component.css change between iterations (sanity: diff before/after). Typecheck passes (`npm run typecheck`). Parse-failure abort: temporarily force-return { ok: false, reason: 'parse_failed', ... } from runCritique and re-run \u2014 orchestrator prints 'aborted: critic parse failure' to stderr and exits 1 without writing accepted.json. Old extension path still runs: `pi -e ./extensions/asset-loop.ts --asset <dir>` must still drive a render/critique/accept cycle (critique tool unwraps the new CritiqueOutcome shape).",
       "task_groups": [
         {

@@ -21,7 +21,7 @@ import { buildRenderWrapper } from "../src/wrapper.ts";
 import { renderWithPlaywright } from "../src/renderer.ts";
 import { buildSystemPrompt } from "../src/systemPrompt.ts";
 import { readPngSize } from "../src/pngSize.ts";
-import { runCritique, type CritiqueIssue, type CritiqueResult, type IssueSeverity } from "../src/critic.ts";
+import { runCritique, type CritiqueIssue, type CritiqueOutcome, type CritiqueResult, type IssueSeverity } from "../src/critic.ts";
 
 const MAX_ITERATIONS = 15;
 const MODEL_CANDIDATES: Array<{ provider: string; id: string }> = [
@@ -241,7 +241,7 @@ export default function assetLoop(pi: ExtensionAPI) {
         throw new Error(`Cannot resolve credentials for critic: ${auth.error}`);
       }
 
-      const result = await runCritique({
+      const outcome = await runCritique({
         model: ctx.model,
         auth: { apiKey: auth.apiKey, headers: auth.headers },
         sourcePngPath: resolved.sourcePngPath,
@@ -251,6 +251,10 @@ export default function assetLoop(pi: ExtensionAPI) {
         assetJson: assetJsonText,
         signal: ctx.signal,
       });
+      if (!outcome.ok) {
+        throw new Error(`Critic parse failure after retry: ${truncate(outcome.rawSecond, 400)}`);
+      }
+      const result = outcome.result;
 
       lastCritique = result;
       renderedSinceLastCritique = false;
@@ -334,6 +338,11 @@ export default function assetLoop(pi: ExtensionAPI) {
       };
     },
   });
+}
+
+function truncate(s: string, max: number): string {
+  if (s.length <= max) return s;
+  return `${s.slice(0, max)}…`;
 }
 
 function countBy(issues: CritiqueIssue[], severity: IssueSeverity): number {
