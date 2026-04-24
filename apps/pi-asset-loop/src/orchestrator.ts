@@ -23,6 +23,7 @@ import { runFixStep } from "./fixStep.ts";
 import { readPngSize } from "./pngSize.ts";
 import { renderWithPlaywright } from "./renderer.ts";
 import { buildSystemPrompt } from "./systemPrompt.ts";
+import { AssetLoopTUI } from "./tui.ts";
 import { UsageAggregator, formatUsageSnapshot } from "./usage.ts";
 import { buildRenderWrapper } from "./wrapper.ts";
 
@@ -69,6 +70,25 @@ export async function runAssetLoop(input: ResolveInput): Promise<void> {
   const assetJsonText = readFileSync(resolved.assetJsonPath, "utf8");
   const extractionPromptText = readFileSync(resolved.extractionPromptPath, "utf8");
 
+  const tui = new AssetLoopTUI({
+    assetId: resolved.assetId,
+    maxIterations: MAX_ITERATIONS,
+    extractedBase64: referenceBase64,
+    extractedMime: "image/png",
+  });
+  tui.start();
+  tui.setPhase("initial_gen");
+
+  const sigintHandler = () => {
+    try {
+      tui.stop();
+    } finally {
+      process.exit(130);
+    }
+  };
+  process.once("SIGINT", sigintHandler);
+
+  try {
   const authStorage = AuthStorage.create();
   const modelRegistry = ModelRegistry.create(authStorage);
 
@@ -111,6 +131,7 @@ export async function runAssetLoop(input: ResolveInput): Promise<void> {
       event.message.usage
     ) {
       usage.add(event.message.usage);
+      tui.setUsage(usage.snapshot());
     }
   });
 
@@ -135,6 +156,8 @@ export async function runAssetLoop(input: ResolveInput): Promise<void> {
   session.dispose();
 
   for (let iteration = 1; iteration <= MAX_ITERATIONS; iteration++) {
+    tui.setIteration(iteration);
+    tui.setPhase("render");
     console.log(`phase: render iter ${iteration}/${MAX_ITERATIONS}`);
     const componentHtml = readFileSync(resolved.componentHtmlPath, "utf8");
     const componentCss = readFileSync(resolved.componentCssPath, "utf8");
@@ -146,6 +169,8 @@ export async function runAssetLoop(input: ResolveInput): Promise<void> {
       referenceHeight,
     });
     const renderBase64 = readFileSync(resolved.renderPath).toString("base64");
+    tui.setRender(renderBase64, "image/png");
+    tui.setPhase("critique");
 
     console.log(`phase: critique iter ${iteration}`);
     const auth = await modelRegistry.getApiKeyAndHeaders(model);
@@ -162,12 +187,14 @@ export async function runAssetLoop(input: ResolveInput): Promise<void> {
       assetJson: assetJsonText,
     });
     for (const u of outcome.usages) usage.add(u);
+    tui.setUsage(usage.snapshot());
 
     if (!outcome.ok) {
       console.error(
         `aborted: critic parse failure — ${truncate(outcome.rawSecond, 400)}`,
       );
-      console.log(formatUsageSnapshot(usage.snapshot()));
+      console.error(formatUsageSnapshot(usage.snapshot()));
+      tui.stop();
       throw new Error("critic parse failure");
     }
 
@@ -175,6 +202,8 @@ export async function runAssetLoop(input: ResolveInput): Promise<void> {
       resolved.critiqueJsonPath,
       `${JSON.stringify({ iteration, verdict: outcome.result.verdict, issues: outcome.result.issues }, null, 2)}\n`,
     );
+
+    tui.setIssues(outcome.result.issues);
 
     if (outcome.result.issues.length === 0) {
       console.log("accepted — hit_empty");
@@ -184,7 +213,14 @@ export async function runAssetLoop(input: ResolveInput): Promise<void> {
         residualIssues: [],
         verdict: outcome.result.verdict,
       });
-      console.log(formatUsageSnapshot(usage.snapshot()));
+      tui.setPhase("done");
+      tui.showSummary([
+        "hit_empty: true",
+        `iter ${iteration}/${MAX_ITERATIONS}`,
+        formatUsageSnapshot(usage.snapshot()),
+        `accepted: ${resolved.acceptedJsonPath}`,
+      ]);
+      tui.stop();
       return;
     }
 
@@ -196,12 +232,21 @@ export async function runAssetLoop(input: ResolveInput): Promise<void> {
         residualIssues: outcome.result.issues,
         verdict: outcome.result.verdict,
       });
-      console.log(formatUsageSnapshot(usage.snapshot()));
+      tui.setPhase("done");
+      tui.showSummary([
+        "cap_reached",
+        `iter ${iteration}/${MAX_ITERATIONS}`,
+        formatUsageSnapshot(usage.snapshot()),
+        `accepted: ${resolved.acceptedJsonPath}`,
+      ]);
+      tui.stop();
       return;
     }
 
     console.log(`phase: fix iter ${iteration} — ${outcome.result.issues.length} issues`);
-    for (const issue of outcome.result.issues) {
+    for (const [issueIndex, issue] of outcome.result.issues.entries()) {
+      tui.setPhase("fix", issue);
+      tui.setCurrentIssue(issueIndex);
       console.log(`fix ${issue.id}: ${issue.severity} ${issue.region}`);
       await runFixStep({
         resolved,
@@ -217,9 +262,15 @@ export async function runAssetLoop(input: ResolveInput): Promise<void> {
         model,
         authStorage,
         modelRegistry,
-        onUsage: (u) => usage.add(u),
+        onUsage: (u) => {
+          usage.add(u);
+          tui.setUsage(usage.snapshot());
+        },
       });
     }
+  }
+  } finally {
+    process.off("SIGINT", sigintHandler);
   }
 }
 
