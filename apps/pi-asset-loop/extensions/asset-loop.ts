@@ -126,7 +126,6 @@ export default function assetLoop(pi: ExtensionAPI) {
       assetJson: assetJsonText,
       referenceWidth,
       referenceHeight,
-      maxIterations: MAX_ITERATIONS,
     });
     return { systemPrompt: prompt };
   });

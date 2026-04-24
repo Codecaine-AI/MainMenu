@@ -11,7 +11,7 @@
       "title": "End-to-end thin slice via Pi SDK",
       "goal": "Replace extension orchestration with a minimal TypeScript orchestrator that runs initial-gen (one in-memory SDK session with write tools), renders once with Playwright, critiques once, and writes critique.json. Simplify systemPrompt.ts to remove loop/tool protocol. Launch via `bun run asset-loop --asset <path>` through a new bin/asset-loop.ts entry. No TUI yet, no fix loop, no iteration cap, no accepted.json \u2014 this checkpoint only proves SDK plumbing + reused modules (args, renderer, wrapper, pngSize, critic) drive one end-to-end pass.",
       "prerequisites": [],
-      "status": "pending",
+      "status": "completed",
       "testing_strategy": "Manual end-to-end: `bun run asset-loop --asset <existing asset dir>` from apps/pi-asset-loop. Expect: component.html + component.css written by the SDK agent, render.png exists, critique.json written with valid JSON matching CritiqueResult shape (verdict + issues array). Typecheck passes (`npm run typecheck`). Process exits 0 after one critique. Old extension path (`pi -e ./extensions/asset-loop.ts`) is NOT yet removed and should still work \u2014 this CP is additive.",
       "task_groups": [
         {
