@@ -13,6 +13,7 @@ import {
   type Api,
   type Context,
   type Model,
+  type Usage,
 } from "@mariozechner/pi-ai";
 
 export type IssueSeverity = "blocking" | "major" | "minor";
@@ -32,8 +33,14 @@ export interface CritiqueResult {
 }
 
 export type CritiqueOutcome =
-  | { ok: true; result: CritiqueResult }
-  | { ok: false; reason: "parse_failed"; rawFirst: string; rawSecond: string };
+  | { ok: true; result: CritiqueResult; usages: Usage[] }
+  | {
+      ok: false;
+      reason: "parse_failed";
+      rawFirst: string;
+      rawSecond: string;
+      usages: Usage[];
+    };
 
 export interface RunCritiqueInput {
   model: Model<Api>;
@@ -230,7 +237,11 @@ export async function runCritique(
   const firstText = extractText(first.content);
   const firstParsed = tryParse(firstText);
   if (firstParsed) {
-    return { ok: true, result: { ...firstParsed, raw: firstText } };
+    return {
+      ok: true,
+      result: { ...firstParsed, raw: firstText },
+      usages: [first.usage],
+    };
   }
 
   // One retry with stricter instruction.
@@ -270,7 +281,11 @@ export async function runCritique(
   const secondText = extractText(second.content);
   const secondParsed = tryParse(secondText);
   if (secondParsed) {
-    return { ok: true, result: { ...secondParsed, raw: secondText } };
+    return {
+      ok: true,
+      result: { ...secondParsed, raw: secondText },
+      usages: [first.usage, second.usage],
+    };
   }
 
   return {
@@ -278,6 +293,7 @@ export async function runCritique(
     reason: "parse_failed",
     rawFirst: truncate(firstText, 400),
     rawSecond: truncate(secondText, 400),
+    usages: [first.usage, second.usage],
   };
 }
 
