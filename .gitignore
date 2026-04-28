@@ -11,3 +11,5 @@ dist/
 build/
 runs/
 assets/
+!apps/font-creation/generation/melee-3/inputs/assets/
+!apps/font-creation/generation/melee-3/inputs/assets/**

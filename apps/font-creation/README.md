@@ -1,6 +1,6 @@
-# Font Creation Pipeline
+# Font Creation
 
-A pipeline for turning a rendered alphabet sheet into layered SVG glyph assets for the Codecaine visual type system.
+Workspace for turning rendered alphabet sheets into layered SVG glyph assets, then tuning those generated assets in an app.
 
 The important idea is simple:
 
@@ -13,21 +13,21 @@ This avoids manually redrawing every letter and avoids tracing the flattened ima
 ## Quick start
 
 ```bash
-cd apps/font-creation
+cd apps/font-creation/pipeline
 python3 -m venv .venv
 source .venv/bin/activate
 
 pip install -r requirements.txt
 
 python3 scripts/run_pipeline.py \
-  --run-spec samples/melee/run.json \
+  --run-spec inputs/melee-3/run.json \
   --out output
 
 python3 scripts/05_render_word_svg.py \
   --text CODECAINE \
-  --paths output/runs/melee/<timestamp>/03_trace/paths/glyph_paths.json \
+  --paths output/runs/melee-3/<timestamp>/03_trace/paths/glyph_paths.json \
   --style config/style.json \
-  --out output/runs/melee/<timestamp>/05_preview/words/CODECAINE.svg \
+  --out output/runs/melee-3/<timestamp>/05_preview/words/CODECAINE.svg \
   --tracking 4
 ```
 
@@ -35,9 +35,9 @@ Open:
 
 ```text
 output/runs/latest.txt
-output/runs/melee/<timestamp>/01_segment/debug/segmentation_preview.png
-output/runs/melee/<timestamp>/04_svgs/glyphs/A.svg
-output/runs/melee/<timestamp>/05_preview/words/CODECAINE.svg
+output/runs/melee-3/<timestamp>/01_segment/debug/segmentation_preview.png
+output/runs/melee-3/<timestamp>/04_svgs/glyphs/A.svg
+output/runs/melee-3/<timestamp>/05_preview/words/CODECAINE.svg
 ```
 
 ## What the pipeline creates
@@ -46,7 +46,7 @@ output/runs/melee/<timestamp>/05_preview/words/CODECAINE.svg
 output/
   runs/
     latest.txt
-    melee/
+    melee-3/
       <timestamp>/
         run.json
         status.json
@@ -61,16 +61,53 @@ output/
 ## Core files
 
 ```text
-config/glyph-map.json
-config/style.json
+app/                         viewer/editor applications
+pipeline/                    reusable pipeline code, configs, source specs, tests
+generation/                  active generated-font workspaces used by apps
 
-scripts/01_segment_glyph_sheet.py
-scripts/02_upscale_glyphs.py
-scripts/03_trace_fill_paths.py
-scripts/04_build_layered_svgs.py
-scripts/05_render_word_svg.py
-scripts/run_pipeline.py
-scripts/common.py
+pipeline/config/glyph-map.json
+pipeline/config/style.json
+pipeline/inputs/melee-3/run.json
+
+pipeline/scripts/01_segment_glyph_sheet.py
+pipeline/scripts/02_upscale_glyphs.py
+pipeline/scripts/03_trace_fill_paths.py
+pipeline/scripts/04_build_layered_svgs.py
+pipeline/scripts/05_render_word_svg.py
+pipeline/scripts/run_pipeline.py
+pipeline/scripts/common.py
+```
+
+## MELEE 3 layer app
+
+The current MELEE 3 tuning surface is split into an app and a generation workspace:
+
+```text
+app/melee-3
+generation/melee-3
+```
+
+`generation/` is the middle workspace. It is not the reusable pipeline and it is not the app. It holds the currently selected generated font state:
+
+```text
+generation/melee-3/inputs/    copied source artifacts the app needs
+generation/melee-3/recipes/   editable recipe state
+generation/melee-3/outputs/   regenerated SVG outputs consumed by the app
+```
+
+That gives the app a stable workspace it can read from and write to without mutating the reusable pipeline inputs or timestamped pipeline runs.
+
+Run the app:
+
+```bash
+make font-melee3-install
+make font-melee3-app
+```
+
+Regenerate the recipe outputs without the app:
+
+```bash
+make font-melee3-generate
 ```
 
 ## Run workflow
@@ -78,8 +115,10 @@ scripts/common.py
 Runs are named and timestamped so experiments do not overwrite each other:
 
 ```bash
+cd apps/font-creation/pipeline
+
 python3 scripts/run_pipeline.py \
-  --run-spec samples/melee/run.json \
+  --run-spec inputs/melee-3/run.json \
   --out output
 ```
 
@@ -88,8 +127,10 @@ The runner snapshots the source image, description, glyph map, style file, and p
 Resume from a step:
 
 ```bash
+cd apps/font-creation/pipeline
+
 python3 scripts/run_pipeline.py \
-  --run-dir output/runs/melee/<timestamp> \
+  --run-dir output/runs/melee-3/<timestamp> \
   --from-step trace \
   --through-step svgs
 ```
@@ -97,8 +138,10 @@ python3 scripts/run_pipeline.py \
 Run only segmentation:
 
 ```bash
+cd apps/font-creation/pipeline
+
 python3 scripts/run_pipeline.py \
-  --run-spec samples/melee/run.json \
+  --run-spec inputs/melee-3/run.json \
   --through-step segment
 ```
 
@@ -107,8 +150,10 @@ python3 scripts/run_pipeline.py \
 The full pipeline runs Gemini upscaling by default and expects credentials from `.env` or the environment variables supported by `google-genai`.
 
 ```bash
+cd apps/font-creation/pipeline
+
 python3 scripts/run_pipeline.py \
-  --run-spec samples/melee/run.json \
+  --run-spec inputs/melee-3/run.json \
   --out output \
   --max-workers 4
 ```
@@ -116,13 +161,15 @@ python3 scripts/run_pipeline.py \
 For deterministic local debugging or CI, skip Gemini and trace the original segmented crops:
 
 ```bash
+cd apps/font-creation/pipeline
+
 python3 scripts/run_pipeline.py \
-  --run-spec samples/melee/run.json \
+  --run-spec inputs/melee-3/run.json \
   --out output \
   --no-upscale
 ```
 
-The prompt template is `prompts/upscale-glyph.md`. The pipeline replaces `{{USER_DESCRIPTION}}` with `samples/melee/description.md` unless `--prompt` or `--description` are provided.
+The prompt template is `prompts/upscale-glyph.md`. The pipeline replaces `{{USER_DESCRIPTION}}` with `inputs/melee-3/description.md` unless `--prompt` or `--description` are provided.
 
 ## What to tune first
 
@@ -191,6 +238,8 @@ The crop segmentation can be correct while the SVG still looks bad. Treat these 
 Run a quick mask tuning grid for a glyph:
 
 ```bash
+cd apps/font-creation/pipeline
+
 RUN_DIR=$(cat output/runs/latest.txt)
 
 python3 scripts/06_debug_mask_tuning.py \

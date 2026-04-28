@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Font Layer App</title>
+  </head>
+  <body>
+    <main class="lab-shell">
+      <section class="workbench" aria-label="MELEE 3 layer preview">
+        <div class="scene" id="scene">
+          <div class="stage-background" aria-hidden="true"></div>
+          <div class="stage-tilt" id="stageTilt">
+            <div class="logo-mount" id="svgMount" aria-live="polite">
+              <div class="load-state">Loading MELEE 3 asset</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <aside class="control-panel" aria-label="Layer controls">
+        <header class="panel-header">
+          <h1>Font layer app</h1>
+
+          <div class="control-group header-asset-picker">
+            <label for="assetSelect">Asset</label>
+            <select id="assetSelect">
+              <option value="/generation/outputs/generated/glyphs/at.css-layers.svg" selected>Recipe glyph @</option>
+              <option value="/generation/inputs/assets/glyphs/at.svg">Base glyph @</option>
+              <option value="/generation/outputs/generated/word/CODECAINE.css-layers.svg">CODECAINE recipe SVG</option>
+              <option value="/generation/inputs/assets/word/CODECAINE.svg">CODECAINE word</option>
+              <option value="/generation/outputs/generated/glyphs/asterisk.css-layers.svg">Recipe glyph *</option>
+              <option value="/generation/outputs/generated/glyphs/exclamation.css-layers.svg">Recipe glyph !</option>
+              <option value="/generation/outputs/generated/glyphs/period.css-layers.svg">Recipe glyph .</option>
+              <option value="/generation/inputs/assets/glyphs/A.svg">Glyph A</option>
+              <option value="/generation/outputs/generated/glyphs/C.css-layers.svg">Recipe glyph C</option>
+              <option value="/generation/inputs/assets/glyphs/C.svg">Glyph C</option>
+              <option value="/generation/inputs/assets/glyphs/O.svg">Glyph O</option>
+              <option value="/generation/inputs/assets/glyphs/D.svg">Glyph D</option>
+              <option value="/generation/inputs/assets/glyphs/E.svg">Glyph E</option>
+              <option value="/generation/inputs/assets/glyphs/I.svg">Glyph I</option>
+              <option value="/generation/inputs/assets/glyphs/N.svg">Glyph N</option>
+            </select>
+          </div>
+        </header>
+
+        <div class="editor-tabs">
+          <div class="editor-tab-list" role="tablist" aria-label="Editor sections">
+            <button type="button" class="tab-button is-active" id="layerEditorTab" role="tab" aria-selected="true" aria-controls="layerEditorPanel" data-editor-tab="layers">Layers</button>
+            <button type="button" class="tab-button" id="chromeEditorTab" role="tab" aria-selected="false" aria-controls="chromeEditorPanel" data-editor-tab="chrome">Chrome</button>
+            <button type="button" class="tab-button" id="styleEditorTab" role="tab" aria-selected="false" aria-controls="styleEditorPanel" data-editor-tab="style">Styling</button>
+            <button type="button" class="tab-button" id="actionsEditorTab" role="tab" aria-selected="false" aria-controls="actionsEditorPanel" data-editor-tab="actions">Actions</button>
+          </div>
+
+          <section class="tab-panel is-active" id="layerEditorPanel" role="tabpanel" aria-labelledby="layerEditorTab" data-editor-panel="layers">
+            <section class="layer-visualizer" aria-label="SVG layer stack">
+              <div class="layer-visualizer-header">
+                <h2>Layer Stack</h2>
+                <button type="button" id="regenerateButton" disabled>Save</button>
+              </div>
+              <p>Shown inside out. This is the layer map, not SVG paint order.</p>
+              <div class="layer-stack-map" id="layerStackMap"></div>
+            </section>
+          </section>
+
+          <section class="tab-panel" id="chromeEditorPanel" role="tabpanel" aria-labelledby="chromeEditorTab" data-editor-panel="chrome" hidden>
+            <section class="chrome-editor" aria-label="Chrome gradient controls">
+              <div class="chrome-editor-header">
+                <h2>Chrome Editor</h2>
+                <div class="chrome-actions">
+                  <button type="button" id="chromeEditButton">Edit</button>
+                  <button type="button" id="chromeSaveButton" disabled>Save</button>
+                  <button type="button" id="chromeResetButton" disabled>Reset</button>
+                </div>
+              </div>
+              <label>
+                <span>Piece</span>
+                <select id="chromeLayerSelect"></select>
+              </label>
+              <div class="chrome-gradient-preview" id="chromeGradientPreview"></div>
+              <div class="chrome-stop-list" id="chromeStopList"></div>
+            </section>
+          </section>
+
+          <section class="tab-panel" id="styleEditorPanel" role="tabpanel" aria-labelledby="styleEditorTab" data-editor-panel="style" hidden>
+            <section class="style-editor" aria-label="CSS styling controls">
+              <h2>Styling</h2>
+
+              <section class="style-section" aria-label="Global preview controls">
+                <h3>Global Preview</h3>
+                <div class="control-grid compact-grid">
+                  <label>
+                    <span>Contrast</span>
+                    <span class="style-control-pair">
+                      <input type="number" min="0.75" max="1.45" value="1" step="0.01" aria-label="Contrast value" data-style-var="contrast" />
+                    </span>
+                  </label>
+                  <label>
+                    <span>Stage</span>
+                    <input type="color" value="#858384" data-style-var="stage-color" />
+                  </label>
+                </div>
+              </section>
+            </section>
+          </section>
+
+          <section class="tab-panel" id="actionsEditorPanel" role="tabpanel" aria-labelledby="actionsEditorTab" data-editor-panel="actions" hidden>
+            <section class="actions-editor" aria-label="Render actions">
+              <h2>Actions</h2>
+              <div class="button-row">
+                <button type="button" id="resetTiltButton">Reset Tilt</button>
+                <button type="button" id="copyButton">Copy CSS</button>
+              </div>
+              <p class="app-status" id="appStatus" role="status" aria-live="polite"></p>
+            </section>
+          </section>
+        </div>
+      </aside>
+    </main>
+
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>
