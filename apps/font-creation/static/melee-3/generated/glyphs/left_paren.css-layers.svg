@@ -1,0 +1,177 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 263 1000" role="img" aria-label="(">
+  <defs>
+    <path id="glyph_0028" d="M 75.4 330 C 74.75 330 73.43 330.16 72.83 330.29 C 72.22 330.42 70.49 330.84 69.82 331.19 C 69.15 331.54 67.16 332.97 66.62 333.53 C 66.09 334.09 65.16 335.88 64.91 336.39 C 64.65 336.91 64.38 337.84 64.29 338.25 C 64.19 338.67 63.96 339.62 64 340.26 C 64.04 340.9 64.3 343.31 64.62 344.17 C 64.94 345.03 66.05 347.01 66.91 348.18 C 67.77 349.35 70.97 352.93 72.54 355 C 74.11 357.08 79.49 364.34 81.42 367.31 C 83.34 370.29 88.77 379.73 90.29 382.49 C 91.81 385.25 94.45 390.68 95.44 392.79 C 96.44 394.9 98.24 398.84 99.45 401.95 C 100.67 405.07 105.47 418.04 106.66 421.56 C 107.84 425.08 109.7 431.87 110.38 434.45 C 111.06 437.02 112.21 441.67 112.95 445.33 C 113.7 448.98 116.57 464.17 117.25 468.23 C 117.93 472.29 118.91 479.98 119.25 482.83 C 119.59 485.68 120.21 492.05 120.4 494.57 C 120.58 497.08 120.88 504.76 120.97 506.07 C 121.06 507.37 121.23 506 121.26 506.59 C 121.29 507.18 121.23 510.92 121.26 511.5 C 121.29 512.09 121.51 511.41 121.54 512.03 C 121.57 512.65 121.51 516.61 121.54 517.23 C 121.57 517.85 121.8 516.98 121.83 517.76 C 121.86 518.53 121.8 523.61 121.83 524.39 C 121.86 525.16 122.08 520.45 122.12 524.91 C 122.15 529.38 122.15 561.15 122.12 565.61 C 122.08 570.08 121.89 564.71 121.83 566.14 C 121.77 567.56 121.61 577.35 121.54 578.78 C 121.48 580.21 121.35 578.07 121.26 579.31 C 121.16 580.55 120.87 587.75 120.68 590.23 C 120.5 592.72 119.94 598.91 119.54 602.26 C 119.14 605.61 117.58 617.31 116.96 621.15 C 116.34 625 114.46 634.62 113.81 637.76 C 113.16 640.89 111.66 647.24 110.95 650.07 C 110.24 652.89 108.26 660.44 107.23 663.81 C 106.2 667.17 102.48 678.2 101.46 681.13 C 100.43 684.06 98.91 688.1 97.73 690.86 C 96.56 693.62 91.79 704.06 90.58 706.61 C 89.37 709.15 87.65 712.41 86.57 714.34 C 85.48 716.26 82.05 722.09 80.56 724.36 C 79.07 726.62 74.24 733.35 72.83 735.24 C 71.41 737.12 68.25 740.79 67.48 741.77 C 66.72 742.76 66.08 743.74 65.77 744.35 C 65.45 744.95 64.73 746.78 64.57 747.36 C 64.41 747.93 64.22 749.02 64.29 749.69 C 64.35 750.37 64.97 752.92 65.19 753.56 C 65.42 754.19 65.99 755.12 66.34 755.56 C 66.68 756 68.01 757.3 68.39 757.61 C 68.77 757.93 69.28 758.25 69.82 758.47 C 70.36 758.7 72.26 759.51 73.4 759.67 C 74.54 759.83 78.99 760.05 80.32 759.95 C 81.64 759.85 84.73 759.04 85.61 758.76 C 86.5 758.48 87.73 757.79 88.48 757.33 C 89.22 756.86 90.4 756.14 92.49 754.47 C 94.57 752.79 104.94 744.26 107.71 741.87 C 110.47 739.48 116.15 734.19 118.01 732.42 C 119.87 730.65 122.9 727.66 124.88 725.55 C 126.87 723.44 133.82 715.86 136.33 712.91 C 138.85 709.95 145.59 701.62 148.07 698.31 C 150.55 694.99 156.97 685.81 159.24 682.27 C 161.5 678.74 167.23 668.83 168.97 665.67 C 170.71 662.51 173.87 656.08 175.27 653.07 C 176.67 650.06 180.58 641.2 181.85 637.9 C 183.13 634.6 186.03 626.01 187.05 622.58 C 188.08 619.16 190.57 609.58 191.35 606.26 C 192.12 602.95 193.65 595.27 194.21 591.95 C 194.77 588.63 196.16 578.42 196.5 575.63 C 196.84 572.84 197.27 567.65 197.36 566.19 C 197.45 564.72 197.33 562.63 197.36 562.13 C 197.39 561.63 197.62 562.19 197.65 561.6 C 197.68 561.02 197.62 557.28 197.65 556.69 C 197.68 556.1 197.87 558.21 197.93 556.17 C 198 554.12 198.22 539.84 198.22 537.8 C 198.22 535.75 198 539.04 197.93 537.27 C 197.87 535.5 197.86 525.08 197.65 521.48 C 197.43 517.87 196.36 507.3 195.93 504.01 C 195.5 500.73 194.23 493.98 193.64 491.13 C 193.05 488.28 191.49 481.23 190.49 477.68 C 189.49 474.12 185.61 461.78 184.43 458.35 C 183.25 454.92 180.77 448.86 179.56 446.04 C 178.35 443.22 174.88 435.49 173.27 432.3 C 171.65 429.1 166.57 419.75 164.68 416.55 C 162.79 413.36 157.79 405.67 155.8 402.81 C 153.82 399.96 148.62 393.01 146.35 390.22 C 144.09 387.42 137.69 380.01 134.9 377 C 132.11 373.98 123.94 365.59 120.59 362.4 C 117.23 359.2 107.57 350.58 103.94 347.51 C 100.3 344.44 89.4 335.82 87.05 334.06 C 84.69 332.29 83.06 331.6 82.18 331.19 C 81.3 330.78 79.62 330.42 78.89 330.29 C 78.15 330.16 76.06 330 75.4 330 Z" fill-rule="evenodd"/>
+    <clipPath id="fill-clip" clipPathUnits="userSpaceOnUse">
+    <use href="#glyph_0028" transform="translate(0 0)"/>
+    </clipPath>
+    <linearGradient id="red-fill-gradient" x1="0" y1="0" x2="0" y2="1000" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#d21414"/>
+      <stop offset="18%" stop-color="#a60000"/>
+      <stop offset="52%" stop-color="#780000"/>
+      <stop offset="78%" stop-color="#b40000"/>
+      <stop offset="100%" stop-color="#4d0000"/>
+    </linearGradient>
+    <linearGradient id="red-gloss-gradient" x1="0" y1="0" x2="0" y2="1000" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.55"/>
+      <stop offset="34%" stop-color="#ffffff" stop-opacity="0.16"/>
+      <stop offset="68%" stop-color="#ffffff" stop-opacity="0.16"/>
+      <stop offset="100%" stop-color="#ffffff" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="silver-gradient" x1="0" y1="0" x2="0" y2="1000" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="8%" stop-color="#f8fbff"/>
+      <stop offset="18%" stop-color="#92989d"/>
+      <stop offset="28%" stop-color="#ffffff"/>
+      <stop offset="43%" stop-color="#343a3f"/>
+      <stop offset="55%" stop-color="#f6f9fc"/>
+      <stop offset="70%" stop-color="#7e858a"/>
+      <stop offset="84%" stop-color="#1e252a"/>
+      <stop offset="100%" stop-color="#ffffff"/>
+    </linearGradient>
+    <filter id="drop-shadow" x="-40%" y="-40%" width="180%" height="180%">
+      <feDropShadow dx="24" dy="30" stdDeviation="16" flood-color="#050505" flood-opacity="0.65"/>
+    </filter>
+    <filter id="rim-glow" x="-25%" y="-25%" width="150%" height="150%">
+      <feGaussianBlur stdDeviation="3" result="blur"/>
+      <feFlood flood-color="#ffffff" flood-opacity="0.34"/>
+      <feComposite in2="blur" operator="in"/>
+      <feMerge>
+        <feMergeNode/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  <style>
+      :root {
+        --melee3-shadow-layer-paint: #050505;
+        --melee3-shadow-layer-width: 112px;
+        --melee3-shadow-layer-opacity: 1;
+        --melee3-shadow-layer-dx: 0px;
+        --melee3-shadow-layer-dy: 0px;
+        --melee3-outer-depth-layer-paint: #151515;
+        --melee3-outer-depth-layer-width: 92px;
+        --melee3-outer-depth-layer-opacity: 1;
+        --melee3-outer-depth-layer-dx: 0px;
+        --melee3-outer-depth-layer-dy: 0px;
+        --melee3-rim-glow-layer-paint: #ffffff;
+        --melee3-rim-glow-layer-width: 82px;
+        --melee3-rim-glow-layer-opacity: 1;
+        --melee3-rim-glow-layer-dx: 0px;
+        --melee3-rim-glow-layer-dy: 0px;
+        --melee3-rim-dark-underlay-paint: #050505;
+        --melee3-rim-dark-underlay-width: 88px;
+        --melee3-rim-dark-underlay-opacity: 0.94;
+        --melee3-rim-dark-underlay-dx: 0px;
+        --melee3-rim-dark-underlay-dy: 0px;
+        --melee3-rim-left-plate-paint: #f8fbff;
+        --melee3-rim-left-plate-width: 104px;
+        --melee3-rim-left-plate-opacity: 0.74;
+        --melee3-rim-left-plate-dx: -9px;
+        --melee3-rim-left-plate-dy: 7px;
+        --melee3-rim-right-plate-paint: #20262c;
+        --melee3-rim-right-plate-width: 96px;
+        --melee3-rim-right-plate-opacity: 0.62;
+        --melee3-rim-right-plate-dx: 16px;
+        --melee3-rim-right-plate-dy: -11px;
+        --melee3-silver-rim-layer-paint: url(#silver-gradient);
+        --melee3-silver-rim-layer-width: 72px;
+        --melee3-silver-rim-layer-opacity: 1;
+        --melee3-silver-rim-layer-dx: 0px;
+        --melee3-silver-rim-layer-dy: 0px;
+        --melee3-fill-layer-paint: url(#red-fill-gradient);
+        --melee3-fill-layer-opacity: 1;
+        --melee3-red-gloss-layer-paint: url(#red-gloss-gradient);
+        --melee3-red-gloss-layer-opacity: 0.3;
+        --melee3-red-gloss-layer-height-ratio: 0.58;
+        --melee3-edge-highlight-layer-paint: #ffffff;
+        --melee3-edge-highlight-layer-width: 22px;
+        --melee3-edge-highlight-layer-opacity: 0.72;
+        --melee3-edge-highlight-layer-dx: 0px;
+        --melee3-edge-highlight-layer-dy: 0px;
+        --melee3-inner-highlight-layer-paint: #ffffff;
+        --melee3-inner-highlight-layer-width: 16px;
+        --melee3-inner-highlight-layer-opacity: 0.95;
+        --melee3-inner-highlight-layer-dx: 0px;
+        --melee3-inner-highlight-layer-dy: 0px;
+        --melee3-inner-shadow-layer-paint: #1c1c1c;
+        --melee3-inner-shadow-layer-width: 10px;
+        --melee3-inner-shadow-layer-opacity: 0.58;
+        --melee3-inner-shadow-layer-dx: 0px;
+        --melee3-inner-shadow-layer-dy: 0px;
+      }
+      
+      g[data-layer] { transform-box: fill-box; transform-origin: center; }
+      #shadow-layer { opacity: var(--melee3-shadow-layer-opacity, 1); transform: translate(var(--melee3-shadow-layer-dx, 0px), var(--melee3-shadow-layer-dy, 0px)); }
+      #shadow-layer use { stroke: var(--melee3-shadow-layer-paint); stroke-width: var(--melee3-shadow-layer-width); }
+      #outer-depth-layer { opacity: var(--melee3-outer-depth-layer-opacity, 1); transform: translate(var(--melee3-outer-depth-layer-dx, 0px), var(--melee3-outer-depth-layer-dy, 0px)); }
+      #outer-depth-layer use { stroke: var(--melee3-outer-depth-layer-paint); stroke-width: var(--melee3-outer-depth-layer-width); }
+      #rim-glow-layer { opacity: var(--melee3-rim-glow-layer-opacity, 1); transform: translate(var(--melee3-rim-glow-layer-dx, 0px), var(--melee3-rim-glow-layer-dy, 0px)); }
+      #rim-glow-layer use { stroke: var(--melee3-rim-glow-layer-paint); stroke-width: var(--melee3-rim-glow-layer-width); }
+      #rim-dark-underlay { opacity: var(--melee3-rim-dark-underlay-opacity, 1); transform: translate(var(--melee3-rim-dark-underlay-dx, 0px), var(--melee3-rim-dark-underlay-dy, 0px)); }
+      #rim-dark-underlay use { stroke: var(--melee3-rim-dark-underlay-paint); stroke-width: var(--melee3-rim-dark-underlay-width); }
+      #rim-left-plate { opacity: var(--melee3-rim-left-plate-opacity, 1); transform: translate(var(--melee3-rim-left-plate-dx, 0px), var(--melee3-rim-left-plate-dy, 0px)); }
+      #rim-left-plate use { stroke: var(--melee3-rim-left-plate-paint); stroke-width: var(--melee3-rim-left-plate-width); }
+      #rim-right-plate { opacity: var(--melee3-rim-right-plate-opacity, 1); transform: translate(var(--melee3-rim-right-plate-dx, 0px), var(--melee3-rim-right-plate-dy, 0px)); }
+      #rim-right-plate use { stroke: var(--melee3-rim-right-plate-paint); stroke-width: var(--melee3-rim-right-plate-width); }
+      #silver-rim-layer { opacity: var(--melee3-silver-rim-layer-opacity, 1); transform: translate(var(--melee3-silver-rim-layer-dx, 0px), var(--melee3-silver-rim-layer-dy, 0px)); }
+      #silver-rim-layer use { stroke: var(--melee3-silver-rim-layer-paint); stroke-width: var(--melee3-silver-rim-layer-width); }
+      #fill-layer { opacity: var(--melee3-fill-layer-opacity, 1); transform: translate(var(--melee3-fill-layer-dx, 0px), var(--melee3-fill-layer-dy, 0px)); }
+      #red-gloss-layer { opacity: var(--melee3-red-gloss-layer-opacity, 1); transform: translate(var(--melee3-red-gloss-layer-dx, 0px), var(--melee3-red-gloss-layer-dy, 0px)); }
+      #edge-highlight-layer { opacity: var(--melee3-edge-highlight-layer-opacity, 1); transform: translate(var(--melee3-edge-highlight-layer-dx, 0px), var(--melee3-edge-highlight-layer-dy, 0px)); }
+      #edge-highlight-layer use { stroke: var(--melee3-edge-highlight-layer-paint); stroke-width: var(--melee3-edge-highlight-layer-width); }
+      #inner-highlight-layer { opacity: var(--melee3-inner-highlight-layer-opacity, 1); transform: translate(var(--melee3-inner-highlight-layer-dx, 0px), var(--melee3-inner-highlight-layer-dy, 0px)); }
+      #inner-highlight-layer use { stroke: var(--melee3-inner-highlight-layer-paint); stroke-width: var(--melee3-inner-highlight-layer-width); }
+      #inner-shadow-layer { opacity: var(--melee3-inner-shadow-layer-opacity, 1); transform: translate(var(--melee3-inner-shadow-layer-dx, 0px), var(--melee3-inner-shadow-layer-dy, 0px)); }
+      #inner-shadow-layer use { stroke: var(--melee3-inner-shadow-layer-paint); stroke-width: var(--melee3-inner-shadow-layer-width); }
+  </style>
+
+  <rect id="background" width="263" height="1000" fill="#111827"/>
+
+  <g id="shadow-layer" data-layer="shadow-layer" filter="url(#drop-shadow)">
+    <use href="#glyph_0028" transform="translate(0 0)" fill="none" stroke-linejoin="round" stroke-linecap="round"/>
+  </g>
+
+  <g id="outer-depth-layer" data-layer="outer-depth-layer">
+    <use href="#glyph_0028" transform="translate(0 0)" fill="none" stroke-linejoin="round" stroke-linecap="round"/>
+  </g>
+
+  <g id="rim-glow-layer" data-layer="rim-glow-layer" filter="url(#rim-glow)">
+    <use href="#glyph_0028" transform="translate(0 0)" fill="none" stroke-linejoin="round" stroke-linecap="round"/>
+  </g>
+
+  <g id="rim-dark-underlay" data-layer="rim-dark-underlay">
+    <use href="#glyph_0028" transform="translate(0 0)" fill="none" stroke-linejoin="round" stroke-linecap="round"/>
+  </g>
+
+  <g id="rim-left-plate" data-layer="rim-left-plate">
+    <use href="#glyph_0028" transform="translate(0 0)" fill="none" stroke-linejoin="round" stroke-linecap="round"/>
+  </g>
+
+  <g id="rim-right-plate" data-layer="rim-right-plate">
+    <use href="#glyph_0028" transform="translate(0 0)" fill="none" stroke-linejoin="round" stroke-linecap="round"/>
+  </g>
+
+  <g id="silver-rim-layer" data-layer="silver-rim-layer">
+    <use href="#glyph_0028" transform="translate(0 0)" fill="none" stroke-linejoin="round" stroke-linecap="round"/>
+  </g>
+
+  <g id="fill-layer" data-layer="fill-layer" clip-path="url(#fill-clip)">
+    <rect width="263" height="1000" fill="url(#red-fill-gradient)"/>
+  </g>
+
+  <g id="red-gloss-layer" data-layer="red-gloss-layer" clip-path="url(#fill-clip)">
+    <rect width="263" height="580" fill="url(#red-gloss-gradient)"/>
+  </g>
+
+  <g id="edge-highlight-layer" data-layer="edge-highlight-layer">
+    <use href="#glyph_0028" transform="translate(0 0)" fill="none" stroke-linejoin="round" stroke-linecap="round"/>
+  </g>
+
+  <g id="inner-highlight-layer" data-layer="inner-highlight-layer">
+    <use href="#glyph_0028" transform="translate(0 0)" fill="none" stroke-linejoin="round" stroke-linecap="round"/>
+  </g>
+
+  <g id="inner-shadow-layer" data-layer="inner-shadow-layer">
+    <use href="#glyph_0028" transform="translate(0 0)" fill="none" stroke-linejoin="round" stroke-linecap="round"/>
+  </g>
+</svg>

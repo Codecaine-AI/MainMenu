@@ -1,0 +1,155 @@
+{
+  "text": "CODECAINE",
+  "tracking": 4,
+  "padding_x": 48,
+  "padding_y": 40,
+  "background": "#111827",
+  "css_scope": "melee3",
+  "gradients": {
+    "red_fill": [
+      { "offset": "0%", "color": "#d21414" },
+      { "offset": "18%", "color": "#a60000" },
+      { "offset": "52%", "color": "#780000" },
+      { "offset": "78%", "color": "#b40000" },
+      { "offset": "100%", "color": "#4d0000" }
+    ],
+    "red_gloss": [
+      { "offset": "0%", "color": "#ffffff", "opacity": 0.55 },
+      { "offset": "34%", "color": "#ffffff", "opacity": 0.16 },
+      { "offset": "68%", "color": "#ffffff", "opacity": 0.16 },
+      { "offset": "100%", "color": "#ffffff", "opacity": 0 }
+    ],
+    "silver": [
+      { "offset": "0%", "color": "#ffffff" },
+      { "offset": "8%", "color": "#f8fbff" },
+      { "offset": "18%", "color": "#92989d" },
+      { "offset": "28%", "color": "#ffffff" },
+      { "offset": "43%", "color": "#343a3f" },
+      { "offset": "55%", "color": "#f6f9fc" },
+      { "offset": "70%", "color": "#7e858a" },
+      { "offset": "84%", "color": "#1e252a" },
+      { "offset": "100%", "color": "#ffffff" }
+    ]
+  },
+  "filters": {
+    "drop_shadow": {
+      "dx": 24,
+      "dy": 30,
+      "std_deviation": 16,
+      "color": "#050505",
+      "opacity": 0.65
+    },
+    "rim_glow": {
+      "std_deviation": 3,
+      "color": "#ffffff",
+      "opacity": 0.34
+    }
+  },
+  "layers": [
+    {
+      "id": "shadow-layer",
+      "type": "stroke",
+      "paint": "#050505",
+      "width": 112,
+      "opacity": 1,
+      "dx": 0,
+      "dy": 0,
+      "filter": "drop_shadow"
+    },
+    {
+      "id": "outer-depth-layer",
+      "type": "stroke",
+      "paint": "#151515",
+      "width": 92,
+      "opacity": 1,
+      "dx": 0,
+      "dy": 0
+    },
+    {
+      "id": "rim-glow-layer",
+      "type": "stroke",
+      "paint": "#ffffff",
+      "width": 82,
+      "opacity": 1,
+      "dx": 0,
+      "dy": 0,
+      "filter": "rim_glow"
+    },
+    {
+      "id": "rim-dark-underlay",
+      "type": "stroke",
+      "paint": "#050505",
+      "width": 88,
+      "opacity": 0.94,
+      "dx": 0,
+      "dy": 0
+    },
+    {
+      "id": "rim-left-plate",
+      "type": "stroke",
+      "paint": "#f8fbff",
+      "width": 104,
+      "opacity": 0.74,
+      "dx": -9,
+      "dy": 7
+    },
+    {
+      "id": "rim-right-plate",
+      "type": "stroke",
+      "paint": "#20262c",
+      "width": 96,
+      "opacity": 0.62,
+      "dx": 16,
+      "dy": -11
+    },
+    {
+      "id": "silver-rim-layer",
+      "type": "stroke",
+      "paint": "url(#silver-gradient)",
+      "width": 72,
+      "opacity": 1,
+      "dx": 0,
+      "dy": 0
+    },
+    {
+      "id": "fill-layer",
+      "type": "fill",
+      "paint": "url(#red-fill-gradient)",
+      "opacity": 1
+    },
+    {
+      "id": "red-gloss-layer",
+      "type": "rect-fill",
+      "paint": "url(#red-gloss-gradient)",
+      "opacity": 0.3,
+      "height_ratio": 0.58
+    },
+    {
+      "id": "edge-highlight-layer",
+      "type": "stroke",
+      "paint": "#ffffff",
+      "width": 22,
+      "opacity": 0.72,
+      "dx": 0,
+      "dy": 0
+    },
+    {
+      "id": "inner-highlight-layer",
+      "type": "stroke",
+      "paint": "#ffffff",
+      "width": 16,
+      "opacity": 0.95,
+      "dx": 0,
+      "dy": 0
+    },
+    {
+      "id": "inner-shadow-layer",
+      "type": "stroke",
+      "paint": "#1c1c1c",
+      "width": 10,
+      "opacity": 0.58,
+      "dx": 0,
+      "dy": 0
+    }
+  ]
+}

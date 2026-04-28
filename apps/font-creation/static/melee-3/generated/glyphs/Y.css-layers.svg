@@ -1,0 +1,177 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 831 1000" role="img" aria-label="Y">
+  <defs>
+    <path id="glyph_0059" d="M 68.68 73.09 C 67.96 73.75 66.09 76 65.59 77.18 C 65.08 78.36 64.17 81.14 64 83.94 C 63.83 86.75 63.95 100.61 64 103.07 C 64.05 105.52 64.22 105.62 64.5 106.57 C 64.78 107.52 65.86 110.77 66.59 111.83 C 67.31 112.9 68.5 115.15 71.18 116.42 C 73.86 117.7 88.04 122.29 91.3 123.61 C 94.57 124.93 99.42 127.53 101.32 128.62 C 103.22 129.7 107.42 132.59 108.84 133.63 C 110.26 134.66 113 136.82 114.43 138.13 C 115.86 139.45 119.96 143.22 122.03 145.73 C 124.1 148.25 130.84 157.1 133.55 161.35 C 136.27 165.59 138.22 168.39 147.08 184.89 C 155.95 201.4 205.61 295.44 215.38 313.73 C 225.15 332.02 229.99 340 237.26 353.73 C 244.53 367.46 274.97 426.21 282.51 440.48 C 290.06 454.76 302.79 477.79 306.9 485.49 C 311 493.18 318.57 507.6 320.42 511.54 C 322.28 515.47 323.46 519.28 324.01 521.81 C 324.56 524.33 325.35 515.77 325.52 534.83 C 325.68 553.89 325.57 679.99 325.52 697.74 C 325.46 715.49 325.07 697.46 325.02 698.66 C 324.96 699.85 325.07 707.57 325.02 708.76 C 324.96 709.95 324.62 708.21 324.51 709.68 C 324.41 711.14 324.28 719.62 324.01 722.29 C 323.74 724.96 322.62 731.84 322.01 734.31 C 321.4 736.78 319.3 742.99 318.42 745.08 C 317.54 747.17 315.05 751.85 313.91 753.6 C 312.77 755.35 309.06 759.93 307.9 761.2 C 306.74 762.46 304.54 764.3 303.22 765.29 C 301.9 766.27 297.17 769.43 295.71 770.3 C 294.24 771.17 291.46 772.59 289.7 773.3 C 287.93 774.02 282.31 776.06 279.43 776.9 C 276.54 777.73 265.27 780.33 263.06 780.99 C 260.85 781.65 259.77 782.49 259.05 782.99 C 258.34 783.49 257.02 784.62 256.46 785.58 C 255.9 786.54 254.16 788.39 253.87 791.84 C 253.59 795.3 253.59 813.91 253.87 817.48 C 254.16 821.04 255.96 823.73 256.46 824.74 C 256.97 825.75 258 826.44 258.55 826.83 C 259.1 827.22 260.34 828 261.56 828.33 C 262.78 828.66 262.41 829.74 269.82 829.92 C 277.24 830.09 323.4 829.97 330.03 829.92 C 336.65 829.86 329.97 829.47 330.94 829.42 C 331.92 829.36 338.07 829.36 339.04 829.42 C 340.02 829.47 316.03 829.86 339.96 829.92 C 363.9 829.97 536.04 829.97 559.98 829.92 C 583.91 829.86 559.7 829.47 560.9 829.42 C 562.09 829.36 569.44 829.53 571 829.42 C 572.56 829.3 574.42 828.66 575.26 828.33 C 576.1 828 578.05 826.99 578.77 826.33 C 579.48 825.67 581.35 823.41 581.86 822.23 C 582.36 821.06 583.27 818.44 583.44 815.47 C 583.61 812.5 583.55 797.62 583.44 794.85 C 583.33 792.07 582.77 790.84 582.44 789.84 C 582.11 788.83 581.08 786.43 580.35 785.58 C 579.63 784.73 576.56 782.5 575.76 781.99 C 574.96 781.48 574.99 781.35 573 780.9 C 571.01 780.46 560.85 778.72 557.39 777.9 C 553.94 777.07 543.74 774.18 541.11 773.3 C 538.48 772.43 534.67 770.61 533.09 769.8 C 531.52 768.98 528.01 766.83 526.58 765.79 C 525.15 764.75 521.27 761.62 519.9 760.2 C 518.52 758.77 515.14 754.67 513.89 752.6 C 512.64 750.53 509.25 743.33 508.38 741.07 C 507.5 738.82 506.39 734.87 505.79 731.81 C 505.18 728.74 503.16 717.55 502.78 712.77 C 502.4 707.98 502.39 690.46 502.28 687.64 C 502.17 684.81 501.83 692.69 501.78 686.72 C 501.73 680.75 501.73 638.5 501.78 632.53 C 501.83 626.56 502.28 643.44 502.28 631.61 C 502.28 619.78 501.67 536.67 501.78 523.31 C 501.89 509.95 502.73 511.08 503.28 508.28 C 503.84 505.49 505.45 500.63 506.87 497.51 C 508.29 494.39 510.22 490.7 516.39 479.47 C 522.56 468.25 554.16 411.53 563.82 393.89 C 573.48 376.25 597.32 331.69 605.57 316.65 C 613.82 301.62 632.48 268.74 639.97 255.12 C 647.46 241.49 669.53 200.3 674.71 190.91 C 679.88 181.51 685.61 171.83 687.73 168.36 C 689.85 164.89 692.28 161.36 694.24 158.84 C 696.21 156.33 703.39 147.66 705.85 145.15 C 708.31 142.63 714.67 137.37 716.96 135.63 C 719.24 133.89 725.02 130.26 726.98 129.12 C 728.93 127.98 733.15 125.92 734.99 125.11 C 736.84 124.29 741.72 122.38 744.01 121.6 C 746.3 120.82 754.37 118.54 756.12 117.93 C 757.86 117.31 759.25 116.58 760.12 115.92 C 761 115.26 763.6 112.68 764.22 111.83 C 764.83 110.98 765.52 109.02 765.8 108.08 C 766.08 107.13 766.7 105.73 766.8 103.07 C 766.91 100.4 766.91 86.11 766.8 83.44 C 766.7 80.77 766.08 79.33 765.8 78.43 C 765.52 77.54 764.67 75.81 764.22 75.18 C 763.76 74.54 762.23 73.03 761.63 72.59 C 761.02 72.15 759.52 71.37 758.62 71.09 C 757.73 70.81 776.63 70.12 753.36 70 C 730.1 69.88 567.13 69.88 543.86 70 C 520.6 70.12 539.73 70.63 538.6 71.09 C 537.48 71.54 534.33 73.35 533.51 74.17 C 532.69 75 531.39 77.63 531.01 78.68 C 530.62 79.74 530.04 81.52 529.92 83.94 C 529.8 86.37 529.81 98.61 529.92 101.06 C 530.03 103.51 530.64 105.57 530.92 106.57 C 531.2 107.58 531.89 109.48 532.51 110.33 C 533.12 111.18 535.83 113.81 536.6 114.42 C 537.37 115.03 537.07 115.26 539.61 115.92 C 542.14 116.58 556.44 119.58 559.98 120.52 C 563.52 121.46 570.06 123.73 572.25 124.61 C 574.45 125.49 578.63 127.58 580.27 128.62 C 581.91 129.65 586.05 132.86 587.37 134.13 C 588.69 135.39 591.41 138.58 592.46 140.31 C 593.51 142.03 596.34 147.88 597.05 150.07 C 597.77 152.27 598.89 158.2 599.06 160.6 C 599.22 162.99 599.11 169.07 598.56 172.2 C 598 175.33 594.89 186.53 593.96 189.49 C 593.03 192.44 590.99 197.23 589.95 199.51 C 588.92 201.79 591.16 198.05 584.44 210.53 C 577.73 223 539.18 293.7 528 314.65 C 516.82 335.6 486.69 393.64 481.24 403.91 C 475.79 414.18 478.51 408.42 477.73 409.42 C 476.96 410.41 474.81 412.52 474.06 413.09 C 473.31 413.66 471.49 414.51 470.8 414.68 C 470.12 414.85 468.35 414.8 467.71 414.68 C 467.08 414.56 465.6 413.99 464.96 413.59 C 464.32 413.2 462.73 412.22 461.79 411.01 C 460.84 409.79 458.9 407.31 456.27 402.41 C 453.65 397.5 440.39 371.12 437.57 365.75 C 434.75 360.38 436.08 363.93 430.22 352.81 C 424.36 341.68 391.39 278.08 383.46 263.05 C 375.54 248.01 361.08 221.68 357.08 214.03 C 353.08 206.39 348.3 196.54 346.56 192.49 C 344.81 188.45 341.84 179.78 340.96 176.71 C 340.09 173.64 338.73 166.26 338.46 164.19 C 338.19 162.11 338.35 159.01 338.46 157.59 C 338.57 156.17 339.13 152.46 339.46 151.08 C 339.8 149.69 340.72 146.48 341.55 144.81 C 342.37 143.15 345.85 137.31 347.06 135.71 C 348.27 134.12 351.31 131.27 352.74 130.12 C 354.17 128.97 358.05 126.2 360.25 125.11 C 362.45 124.01 370.03 121.01 373.03 120.02 C 376.02 119.02 385.9 116.58 387.89 115.92 C 389.88 115.26 390.74 114.42 391.4 113.92 C 392.06 113.42 393.42 112.29 393.98 111.33 C 394.55 110.37 396.24 106.13 396.57 105.07 C 396.91 104.01 397.02 103.91 397.07 101.56 C 397.13 99.22 397.19 85.98 397.07 83.44 C 396.96 80.91 396.27 79.08 395.99 78.18 C 395.71 77.29 394.93 75.78 394.49 75.18 C 394.04 74.57 392.53 73.04 391.9 72.59 C 391.26 72.14 389.54 71.28 388.64 71 C 387.75 70.72 417.4 70.11 383.63 70 C 349.86 69.89 110.68 69.88 76.94 70 C 43.2 70.12 73.08 70.75 72.18 71.09 C 71.29 71.42 69.39 72.43 68.68 73.09 Z" fill-rule="evenodd"/>
+    <clipPath id="fill-clip" clipPathUnits="userSpaceOnUse">
+    <use href="#glyph_0059" transform="translate(0 0)"/>
+    </clipPath>
+    <linearGradient id="red-fill-gradient" x1="0" y1="0" x2="0" y2="1000" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#d21414"/>
+      <stop offset="18%" stop-color="#a60000"/>
+      <stop offset="52%" stop-color="#780000"/>
+      <stop offset="78%" stop-color="#b40000"/>
+      <stop offset="100%" stop-color="#4d0000"/>
+    </linearGradient>
+    <linearGradient id="red-gloss-gradient" x1="0" y1="0" x2="0" y2="1000" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.55"/>
+      <stop offset="34%" stop-color="#ffffff" stop-opacity="0.16"/>
+      <stop offset="68%" stop-color="#ffffff" stop-opacity="0.16"/>
+      <stop offset="100%" stop-color="#ffffff" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="silver-gradient" x1="0" y1="0" x2="0" y2="1000" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="8%" stop-color="#f8fbff"/>
+      <stop offset="18%" stop-color="#92989d"/>
+      <stop offset="28%" stop-color="#ffffff"/>
+      <stop offset="43%" stop-color="#343a3f"/>
+      <stop offset="55%" stop-color="#f6f9fc"/>
+      <stop offset="70%" stop-color="#7e858a"/>
+      <stop offset="84%" stop-color="#1e252a"/>
+      <stop offset="100%" stop-color="#ffffff"/>
+    </linearGradient>
+    <filter id="drop-shadow" x="-40%" y="-40%" width="180%" height="180%">
+      <feDropShadow dx="24" dy="30" stdDeviation="16" flood-color="#050505" flood-opacity="0.65"/>
+    </filter>
+    <filter id="rim-glow" x="-25%" y="-25%" width="150%" height="150%">
+      <feGaussianBlur stdDeviation="3" result="blur"/>
+      <feFlood flood-color="#ffffff" flood-opacity="0.34"/>
+      <feComposite in2="blur" operator="in"/>
+      <feMerge>
+        <feMergeNode/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  <style>
+      :root {
+        --melee3-shadow-layer-paint: #050505;
+        --melee3-shadow-layer-width: 112px;
+        --melee3-shadow-layer-opacity: 1;
+        --melee3-shadow-layer-dx: 0px;
+        --melee3-shadow-layer-dy: 0px;
+        --melee3-outer-depth-layer-paint: #151515;
+        --melee3-outer-depth-layer-width: 92px;
+        --melee3-outer-depth-layer-opacity: 1;
+        --melee3-outer-depth-layer-dx: 0px;
+        --melee3-outer-depth-layer-dy: 0px;
+        --melee3-rim-glow-layer-paint: #ffffff;
+        --melee3-rim-glow-layer-width: 82px;
+        --melee3-rim-glow-layer-opacity: 1;
+        --melee3-rim-glow-layer-dx: 0px;
+        --melee3-rim-glow-layer-dy: 0px;
+        --melee3-rim-dark-underlay-paint: #050505;
+        --melee3-rim-dark-underlay-width: 88px;
+        --melee3-rim-dark-underlay-opacity: 0.94;
+        --melee3-rim-dark-underlay-dx: 0px;
+        --melee3-rim-dark-underlay-dy: 0px;
+        --melee3-rim-left-plate-paint: #f8fbff;
+        --melee3-rim-left-plate-width: 104px;
+        --melee3-rim-left-plate-opacity: 0.74;
+        --melee3-rim-left-plate-dx: -9px;
+        --melee3-rim-left-plate-dy: 7px;
+        --melee3-rim-right-plate-paint: #20262c;
+        --melee3-rim-right-plate-width: 96px;
+        --melee3-rim-right-plate-opacity: 0.62;
+        --melee3-rim-right-plate-dx: 16px;
+        --melee3-rim-right-plate-dy: -11px;
+        --melee3-silver-rim-layer-paint: url(#silver-gradient);
+        --melee3-silver-rim-layer-width: 72px;
+        --melee3-silver-rim-layer-opacity: 1;
+        --melee3-silver-rim-layer-dx: 0px;
+        --melee3-silver-rim-layer-dy: 0px;
+        --melee3-fill-layer-paint: url(#red-fill-gradient);
+        --melee3-fill-layer-opacity: 1;
+        --melee3-red-gloss-layer-paint: url(#red-gloss-gradient);
+        --melee3-red-gloss-layer-opacity: 0.3;
+        --melee3-red-gloss-layer-height-ratio: 0.58;
+        --melee3-edge-highlight-layer-paint: #ffffff;
+        --melee3-edge-highlight-layer-width: 22px;
+        --melee3-edge-highlight-layer-opacity: 0.72;
+        --melee3-edge-highlight-layer-dx: 0px;
+        --melee3-edge-highlight-layer-dy: 0px;
+        --melee3-inner-highlight-layer-paint: #ffffff;
+        --melee3-inner-highlight-layer-width: 16px;
+        --melee3-inner-highlight-layer-opacity: 0.95;
+        --melee3-inner-highlight-layer-dx: 0px;
+        --melee3-inner-highlight-layer-dy: 0px;
+        --melee3-inner-shadow-layer-paint: #1c1c1c;
+        --melee3-inner-shadow-layer-width: 10px;
+        --melee3-inner-shadow-layer-opacity: 0.58;
+        --melee3-inner-shadow-layer-dx: 0px;
+        --melee3-inner-shadow-layer-dy: 0px;
+      }
+      
+      g[data-layer] { transform-box: fill-box; transform-origin: center; }
+      #shadow-layer { opacity: var(--melee3-shadow-layer-opacity, 1); transform: translate(var(--melee3-shadow-layer-dx, 0px), var(--melee3-shadow-layer-dy, 0px)); }
+      #shadow-layer use { stroke: var(--melee3-shadow-layer-paint); stroke-width: var(--melee3-shadow-layer-width); }
+      #outer-depth-layer { opacity: var(--melee3-outer-depth-layer-opacity, 1); transform: translate(var(--melee3-outer-depth-layer-dx, 0px), var(--melee3-outer-depth-layer-dy, 0px)); }
+      #outer-depth-layer use { stroke: var(--melee3-outer-depth-layer-paint); stroke-width: var(--melee3-outer-depth-layer-width); }
+      #rim-glow-layer { opacity: var(--melee3-rim-glow-layer-opacity, 1); transform: translate(var(--melee3-rim-glow-layer-dx, 0px), var(--melee3-rim-glow-layer-dy, 0px)); }
+      #rim-glow-layer use { stroke: var(--melee3-rim-glow-layer-paint); stroke-width: var(--melee3-rim-glow-layer-width); }
+      #rim-dark-underlay { opacity: var(--melee3-rim-dark-underlay-opacity, 1); transform: translate(var(--melee3-rim-dark-underlay-dx, 0px), var(--melee3-rim-dark-underlay-dy, 0px)); }
+      #rim-dark-underlay use { stroke: var(--melee3-rim-dark-underlay-paint); stroke-width: var(--melee3-rim-dark-underlay-width); }
+      #rim-left-plate { opacity: var(--melee3-rim-left-plate-opacity, 1); transform: translate(var(--melee3-rim-left-plate-dx, 0px), var(--melee3-rim-left-plate-dy, 0px)); }
+      #rim-left-plate use { stroke: var(--melee3-rim-left-plate-paint); stroke-width: var(--melee3-rim-left-plate-width); }
+      #rim-right-plate { opacity: var(--melee3-rim-right-plate-opacity, 1); transform: translate(var(--melee3-rim-right-plate-dx, 0px), var(--melee3-rim-right-plate-dy, 0px)); }
+      #rim-right-plate use { stroke: var(--melee3-rim-right-plate-paint); stroke-width: var(--melee3-rim-right-plate-width); }
+      #silver-rim-layer { opacity: var(--melee3-silver-rim-layer-opacity, 1); transform: translate(var(--melee3-silver-rim-layer-dx, 0px), var(--melee3-silver-rim-layer-dy, 0px)); }
+      #silver-rim-layer use { stroke: var(--melee3-silver-rim-layer-paint); stroke-width: var(--melee3-silver-rim-layer-width); }
+      #fill-layer { opacity: var(--melee3-fill-layer-opacity, 1); transform: translate(var(--melee3-fill-layer-dx, 0px), var(--melee3-fill-layer-dy, 0px)); }
+      #red-gloss-layer { opacity: var(--melee3-red-gloss-layer-opacity, 1); transform: translate(var(--melee3-red-gloss-layer-dx, 0px), var(--melee3-red-gloss-layer-dy, 0px)); }
+      #edge-highlight-layer { opacity: var(--melee3-edge-highlight-layer-opacity, 1); transform: translate(var(--melee3-edge-highlight-layer-dx, 0px), var(--melee3-edge-highlight-layer-dy, 0px)); }
+      #edge-highlight-layer use { stroke: var(--melee3-edge-highlight-layer-paint); stroke-width: var(--melee3-edge-highlight-layer-width); }
+      #inner-highlight-layer { opacity: var(--melee3-inner-highlight-layer-opacity, 1); transform: translate(var(--melee3-inner-highlight-layer-dx, 0px), var(--melee3-inner-highlight-layer-dy, 0px)); }
+      #inner-highlight-layer use { stroke: var(--melee3-inner-highlight-layer-paint); stroke-width: var(--melee3-inner-highlight-layer-width); }
+      #inner-shadow-layer { opacity: var(--melee3-inner-shadow-layer-opacity, 1); transform: translate(var(--melee3-inner-shadow-layer-dx, 0px), var(--melee3-inner-shadow-layer-dy, 0px)); }
+      #inner-shadow-layer use { stroke: var(--melee3-inner-shadow-layer-paint); stroke-width: var(--melee3-inner-shadow-layer-width); }
+  </style>
+
+  <rect id="background" width="831" height="1000" fill="#111827"/>
+
+  <g id="shadow-layer" data-layer="shadow-layer" filter="url(#drop-shadow)">
+    <use href="#glyph_0059" transform="translate(0 0)" fill="none" stroke-linejoin="round" stroke-linecap="round"/>
+  </g>
+
+  <g id="outer-depth-layer" data-layer="outer-depth-layer">
+    <use href="#glyph_0059" transform="translate(0 0)" fill="none" stroke-linejoin="round" stroke-linecap="round"/>
+  </g>
+
+  <g id="rim-glow-layer" data-layer="rim-glow-layer" filter="url(#rim-glow)">
+    <use href="#glyph_0059" transform="translate(0 0)" fill="none" stroke-linejoin="round" stroke-linecap="round"/>
+  </g>
+
+  <g id="rim-dark-underlay" data-layer="rim-dark-underlay">
+    <use href="#glyph_0059" transform="translate(0 0)" fill="none" stroke-linejoin="round" stroke-linecap="round"/>
+  </g>
+
+  <g id="rim-left-plate" data-layer="rim-left-plate">
+    <use href="#glyph_0059" transform="translate(0 0)" fill="none" stroke-linejoin="round" stroke-linecap="round"/>
+  </g>
+
+  <g id="rim-right-plate" data-layer="rim-right-plate">
+    <use href="#glyph_0059" transform="translate(0 0)" fill="none" stroke-linejoin="round" stroke-linecap="round"/>
+  </g>
+
+  <g id="silver-rim-layer" data-layer="silver-rim-layer">
+    <use href="#glyph_0059" transform="translate(0 0)" fill="none" stroke-linejoin="round" stroke-linecap="round"/>
+  </g>
+
+  <g id="fill-layer" data-layer="fill-layer" clip-path="url(#fill-clip)">
+    <rect width="831" height="1000" fill="url(#red-fill-gradient)"/>
+  </g>
+
+  <g id="red-gloss-layer" data-layer="red-gloss-layer" clip-path="url(#fill-clip)">
+    <rect width="831" height="580" fill="url(#red-gloss-gradient)"/>
+  </g>
+
+  <g id="edge-highlight-layer" data-layer="edge-highlight-layer">
+    <use href="#glyph_0059" transform="translate(0 0)" fill="none" stroke-linejoin="round" stroke-linecap="round"/>
+  </g>
+
+  <g id="inner-highlight-layer" data-layer="inner-highlight-layer">
+    <use href="#glyph_0059" transform="translate(0 0)" fill="none" stroke-linejoin="round" stroke-linecap="round"/>
+  </g>
+
+  <g id="inner-shadow-layer" data-layer="inner-shadow-layer">
+    <use href="#glyph_0059" transform="translate(0 0)" fill="none" stroke-linejoin="round" stroke-linecap="round"/>
+  </g>
+</svg>

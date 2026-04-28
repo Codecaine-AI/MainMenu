@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {{word_width}} {{word_height}}">
+  <defs>
+    <!-- one path per unique glyph -->
+    <!-- one combined clipPath containing positioned glyph uses -->
+  </defs>
+
+  <rect id="background" width="{{word_width}}" height="{{word_height}}" fill="{{background_color}}"/>
+
+  <g id="shadow-layer"></g>
+  <g id="silver-rim-layer"></g>
+
+  <g id="fill-layer" clip-path="url(#word-fill-clip)">
+    <!-- Replace this rect with any gradient, texture image, or CSS-driven fill. -->
+    <rect width="{{word_width}}" height="{{word_height}}" fill="{{fill_color}}"/>
+  </g>
+
+  <g id="inner-highlight-layer"></g>
+</svg>

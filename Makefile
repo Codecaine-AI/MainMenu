@@ -1,5 +1,6 @@
 SHELL := /bin/bash
 
+FRONTEND_DIR ?= apps/frontend
 PIPELINE_DIR ?= apps/asset-extraction-pipeline
 RUNS_DIR ?= runs
 IMAGE ?= assets/Super-Smash-Bros-Melee07292023-112856-24048_thumb.jpg
@@ -7,16 +8,24 @@ RUN_ID ?= first-pass
 RUN_DIR ?= $(RUNS_DIR)/$(RUN_ID)
 MAX_WORKERS ?= 4
 
-.PHONY: help pipeline-help init dry-run run catalog extract extract-dry-run validate compile clean-runs
+.PHONY: help frontend dev build preview clean install \
+       pipeline-help init dry-run run catalog extract extract-dry-run validate compile clean-runs
 
 help:
 	@printf '%s\n' 'MELEE commands'
 	@printf '%s\n' ''
-	@printf '%s\n' 'Usage:'
+	@printf '%s\n' '── Frontend (apps/frontend) ──────────────'
+	@printf '%s\n' '  make frontend   Start Vite dev server (hot reload)'
+	@printf '%s\n' '  make dev        Start Vite dev server (hot reload)'
+	@printf '%s\n' '  make build      Production build → apps/frontend/dist/'
+	@printf '%s\n' '  make preview    Serve the built dist/ locally'
+	@printf '%s\n' '  make install    Install npm dependencies'
+	@printf '%s\n' '  make clean      Delete dist/ and node_modules/'
+	@printf '%s\n' ''
+	@printf '%s\n' '── Pipeline (apps/asset-extraction-pipeline) ──'
 	@printf '%s\n' '  make dry-run IMAGE=assets/source.jpg RUN_ID=test'
 	@printf '%s\n' '  make run OPENAI_API_KEY=... ANTHROPIC_API_KEY=...'
 	@printf '%s\n' ''
-	@printf '%s\n' 'Targets:'
 	@printf '%s\n' '  pipeline-help   Show extract-assets CLI help'
 	@printf '%s\n' '  init            Create a run folder from IMAGE'
 	@printf '%s\n' '  dry-run         Create run + catalog request without model API calls'
@@ -33,6 +42,24 @@ help:
 	@printf '%s\n' '  RUN_ID=$(RUN_ID)'
 	@printf '%s\n' '  RUN_DIR=$(RUN_DIR)'
 	@printf '%s\n' '  MAX_WORKERS=$(MAX_WORKERS)'
+
+# ── Frontend ────────────────────────────────────────────────
+install:
+	cd $(FRONTEND_DIR) && npm install
+
+frontend: dev
+
+dev:
+	cd $(FRONTEND_DIR) && npm run dev
+
+build:
+	cd $(FRONTEND_DIR) && npm run build
+
+preview: build
+	cd $(FRONTEND_DIR) && npm run preview
+
+clean:
+	rm -rf $(FRONTEND_DIR)/dist $(FRONTEND_DIR)/node_modules
 
 pipeline-help:
 	@cd $(PIPELINE_DIR) && uv run extract-assets --help

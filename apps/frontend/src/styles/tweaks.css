@@ -1,0 +1,26 @@
+/* Tweaks panel */
+#tweaks-panel {
+  position: fixed; bottom: 20px; right: 20px;
+  z-index: 1000;
+  width: 320px;
+  background: rgba(10, 8, 32, 0.96);
+  border: 2px solid rgba(246, 196, 25, 0.6);
+  border-radius: 12px;
+  padding: 18px;
+  font-family: 'JetBrains Mono', monospace;
+  color: #f8e79a;
+  display: none;
+  backdrop-filter: blur(6px);
+  box-shadow: 0 10px 40px rgba(0,0,0,0.6), 0 0 30px rgba(246,196,25,0.2);
+}
+#tweaks-panel.on { display: block; }
+#tweaks-panel h3 {
+  font-family: 'Orbitron', sans-serif; font-size: 16px; letter-spacing: 0.25em;
+  color: var(--amber); margin-bottom: 14px;
+}
+#tweaks-panel .tweak { display: flex; justify-content: space-between; align-items: center; margin: 10px 0; font-size: 13px; gap: 12px; }
+#tweaks-panel select, #tweaks-panel input[type=range] {
+  background: #0a0820; color: #f8e79a; border: 1px solid rgba(246,196,25,0.4); border-radius: 4px; padding: 3px 6px;
+  font-family: inherit; font-size: 12px;
+}
+#tweaks-panel input[type=checkbox] { accent-color: var(--amber); width: 16px; height: 16px; }

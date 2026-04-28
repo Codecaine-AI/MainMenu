@@ -1,0 +1,7 @@
+[
+  { "label": "GITHUB",  "url": "github.com/codecaine",  "icon": "GH" },
+  { "label": "BLUESKY", "url": "@codecaine.bsky.social", "icon": "BS" },
+  { "label": "EMAIL",   "url": "hi@codecaine.dev",       "icon": "@" },
+  { "label": "RSS",     "url": "codecaine.dev/feed.xml", "icon": "RSS" },
+  { "label": "READING", "url": "codecaine.dev/reading",  "icon": "BK" }
+]

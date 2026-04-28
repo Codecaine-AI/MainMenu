@@ -1,0 +1,230 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>MELEE 3 Static Layer Lab</title>
+    <link rel="stylesheet" href="./lab.css" />
+  </head>
+  <body>
+    <main class="lab-shell">
+      <section class="workbench" aria-label="MELEE 3 layer preview">
+        <div class="scene" id="scene">
+          <div class="stage-tilt" id="stageTilt">
+            <div class="plate">
+              <div class="logo-mount" id="svgMount" aria-live="polite">
+                <div class="load-state">Loading MELEE 3 asset</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <aside class="control-panel" aria-label="Layer controls">
+        <header class="panel-header">
+          <p class="eyebrow">MELEE 3</p>
+          <h1>Static Layer Lab</h1>
+        </header>
+
+        <div class="control-group">
+          <label for="assetSelect">Asset</label>
+          <select id="assetSelect">
+            <option value="./generated/word/CODECAINE.css-layers.svg">CODECAINE recipe SVG</option>
+            <option value="./assets/word/CODECAINE.svg">CODECAINE word</option>
+            <option value="./generated/glyphs/C.css-layers.svg">Recipe glyph C</option>
+            <option value="./assets/glyphs/C.svg">Glyph C</option>
+            <option value="./assets/glyphs/O.svg">Glyph O</option>
+            <option value="./assets/glyphs/D.svg">Glyph D</option>
+            <option value="./assets/glyphs/E.svg">Glyph E</option>
+            <option value="./assets/glyphs/A.svg">Glyph A</option>
+            <option value="./assets/glyphs/I.svg">Glyph I</option>
+            <option value="./assets/glyphs/N.svg">Glyph N</option>
+          </select>
+        </div>
+
+        <div class="control-group">
+          <label for="presetSelect">Preset</label>
+          <select id="presetSelect">
+            <option value="classic">Classic bevel</option>
+            <option value="deep">Deep extrude</option>
+            <option value="sliced">Sliced layers</option>
+            <option value="split">Split point</option>
+            <option value="foil">Foil rim</option>
+            <option value="glass">Glass fill</option>
+          </select>
+        </div>
+
+        <div class="control-grid">
+          <label>
+            <span>Depth</span>
+            <input type="range" min="0" max="86" value="28" data-var="depth" />
+          </label>
+          <label>
+            <span>Tilt X</span>
+            <input type="range" min="-28" max="28" value="8" data-var="tilt-x" data-unit="deg" />
+          </label>
+          <label>
+            <span>Tilt Y</span>
+            <input type="range" min="-34" max="34" value="-11" data-var="tilt-y" data-unit="deg" />
+          </label>
+          <label>
+            <span>Rim Width</span>
+            <input type="range" min="0.55" max="1.65" value="1" step="0.01" data-var="rim-scale" />
+          </label>
+          <label>
+            <span>Layer Spread</span>
+            <input type="range" min="0" max="42" value="13" data-var="layer-spread" />
+          </label>
+          <label>
+            <span>Glare</span>
+            <input type="range" min="0" max="1" value="0.44" step="0.01" data-var="glare" />
+          </label>
+          <label>
+            <span>Gloss</span>
+            <input type="range" min="0" max="1" value="0.32" step="0.01" data-var="gloss" />
+          </label>
+          <label>
+            <span>Shadow</span>
+            <input type="range" min="0" max="1" value="0.8" step="0.01" data-var="shadow-power" />
+          </label>
+          <label>
+            <span>Contrast</span>
+            <input type="range" min="0.75" max="1.45" value="1.1" step="0.01" data-var="contrast" />
+          </label>
+          <label>
+            <span>Saturation</span>
+            <input type="range" min="0.6" max="1.7" value="1.08" step="0.01" data-var="saturation" />
+          </label>
+        </div>
+
+        <section class="stroke-editor" aria-label="Original layer stroke widths">
+          <h2>Original Widths</h2>
+          <div class="control-grid compact-grid">
+            <label>
+              <span>Shadow Stroke</span>
+              <input type="range" min="0" max="180" value="112" data-stroke-layer="shadow-layer" />
+            </label>
+            <label>
+              <span>Depth Stroke</span>
+              <input type="range" min="0" max="160" value="92" data-stroke-layer="outer-depth-layer" />
+            </label>
+            <label>
+              <span>Glow Stroke</span>
+              <input type="range" min="0" max="150" value="82" data-stroke-layer="rim-glow-layer" />
+            </label>
+            <label>
+              <span>Edge Shadow</span>
+              <input type="range" min="0" max="150" value="82" data-stroke-layer="edge-shadow-layer" />
+            </label>
+            <label>
+              <span>Silver Stroke</span>
+              <input type="range" min="0" max="150" value="72" data-stroke-layer="silver-rim-layer" />
+            </label>
+            <label>
+              <span>Edge Highlight</span>
+              <input type="range" min="0" max="80" value="22" data-stroke-layer="edge-highlight-layer" />
+            </label>
+            <label>
+              <span>Inner Highlight</span>
+              <input type="range" min="0" max="80" value="16" data-stroke-layer="inner-highlight-layer" />
+            </label>
+            <label>
+              <span>Inner Shadow</span>
+              <input type="range" min="0" max="80" value="10" data-stroke-layer="inner-shadow-layer" />
+            </label>
+          </div>
+        </section>
+
+        <section class="rim-builder" aria-label="Extra silver rim layers">
+          <h2>Rim Builder</h2>
+          <div class="control-grid compact-grid">
+            <label>
+              <span>Extra Rims</span>
+              <input type="range" min="0" max="10" value="3" data-var="extra-rim-count" />
+            </label>
+            <label>
+              <span>Start Width</span>
+              <input type="range" min="6" max="190" value="106" data-var="extra-rim-width" />
+            </label>
+            <label>
+              <span>Width Step</span>
+              <input type="range" min="-12" max="28" value="11" data-var="extra-rim-step" />
+            </label>
+            <label>
+              <span>Curve</span>
+              <input type="range" min="-16" max="16" value="4" step="0.1" data-var="extra-rim-curve" />
+            </label>
+            <label>
+              <span>Offset</span>
+              <input type="range" min="0" max="52" value="11" data-var="extra-rim-offset" />
+            </label>
+            <label>
+              <span>Oppose</span>
+              <input type="range" min="-1" max="1" value="0.55" step="0.01" data-var="extra-rim-oppose" />
+            </label>
+            <label>
+              <span>Angle</span>
+              <input type="range" min="-180" max="180" value="-38" data-var="extra-rim-angle" data-unit="deg" />
+            </label>
+            <label>
+              <span>Opacity</span>
+              <input type="range" min="0" max="1" value="0.72" step="0.01" data-var="extra-rim-opacity" />
+            </label>
+          </div>
+
+          <div class="color-grid">
+            <label>
+              <span>Rim Light</span>
+              <input type="color" value="#ffffff" data-var="extra-rim-light" />
+            </label>
+            <label>
+              <span>Rim Dark</span>
+              <input type="color" value="#343a40" data-var="extra-rim-dark" />
+            </label>
+          </div>
+        </section>
+
+        <div class="color-grid">
+          <label>
+            <span>Red Top</span>
+            <input type="color" value="#f03024" data-var="red-top" />
+          </label>
+          <label>
+            <span>Red Base</span>
+            <input type="color" value="#760505" data-var="red-base" />
+          </label>
+          <label>
+            <span>Steel Dark</span>
+            <input type="color" value="#22272c" data-var="steel-dark" />
+          </label>
+          <label>
+            <span>Stage</span>
+            <input type="color" value="#17191f" data-var="stage-color" />
+          </label>
+        </div>
+
+        <fieldset class="layer-toggles">
+          <legend>Layers</legend>
+          <label><input type="checkbox" checked data-layer="shadow-layer" /> Shadow</label>
+          <label><input type="checkbox" checked data-layer="outer-depth-layer" /> Depth</label>
+          <label><input type="checkbox" checked data-layer="rim-glow-layer" /> Rim glow</label>
+          <label><input type="checkbox" checked data-layer="edge-shadow-layer" /> Edge shadow</label>
+          <label><input type="checkbox" checked data-layer="extra-rim-layer" /> Extra rims</label>
+          <label><input type="checkbox" checked data-layer="silver-rim-layer" /> Silver rim</label>
+          <label><input type="checkbox" checked data-layer="fill-layer" /> Red fill</label>
+          <label><input type="checkbox" checked data-layer="red-gloss-layer" /> Red gloss</label>
+          <label><input type="checkbox" checked data-layer="edge-highlight-layer" /> Edge highlight</label>
+          <label><input type="checkbox" checked data-layer="inner-highlight-layer" /> Inner highlight</label>
+          <label><input type="checkbox" checked data-layer="inner-shadow-layer" /> Inner shadow</label>
+        </fieldset>
+
+        <div class="button-row">
+          <button type="button" id="resetButton">Reset</button>
+          <button type="button" id="copyButton">Copy CSS</button>
+        </div>
+      </aside>
+    </main>
+
+    <script src="./lab.js"></script>
+  </body>
+</html>
