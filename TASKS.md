@@ -1,320 +1,375 @@
-Yes. The next step is to stop treating chrome and shadow as independent decorative layers and make them respond to one shared height field.
+Your current renderer is close, but the wrong part is being “raised.”
 
-Right now your system is strong visually, but it is still mostly a 2D ring stack:
+In your implementation, relief height only feeds the generated lighting PNG overlays. It does not move the SVG geometry upward. The only things that create actual visible depth are:
 
-* silver-rim-layer, inner-silver-down-ramp-layer, outer-silver-down-ramp-layer paint chrome bands.
-* chrome_bevel uses SourceAlpha to fake bevel highlights.
-* red-contact-shadow-layer and red-contact-core-shadow-layer are strokes clipped into the fill.
-* chrome-extrusion-stack-layer repeats the chrome silhouette down-right to fake side depth.
+1. chrome-extrusion-stack-layer
+2. chrome-extrusion-shadow-layer
+3. projected-shadow layers
+4. the contrast of chrome_normal_shadow, chrome_normal_highlight, ambient_occlusion, and chrome_reflection
 
-That produces good metal, but not true spatial behavior. The shadows do not know what is casting them, what surface is receiving them, or how high the chrome is above that surface. That is why the occlusions can feel wrong.
+So if you only increase relief.height, height_to, or height_scale, it can still look flat because the silhouette and cast depth barely change.
 
-The correct structure is:
+The main hidden issue
 
-path shape
-  -> distance field
-  -> height map
-  -> normals
-  -> lighting overlays
-  -> receiver-clipped cast shadows
-  -> chrome/reflection paint
+In render_recipe.py, your height map is rendered at resolution_scale, but the normal gradient is computed in raster pixels:
 
-You do not need full 3D mesh rendering. You need a 2.5D lighting pass.
+dy, dx = np.gradient(height_map)
 
-The model to use
+At resolution_scale: 3, your slope gets visually diluted by roughly 3x. Your height field is in SVG units, but the gradient is measured in scaled pixels.
 
-Treat the glyph as a shallow relief object.
+Patch this first.
 
-For each pixel or SVG region, assign a height:
+Patch normal_from_height
 
-red fill / enamel basin        height 0
-inner chrome ramp              height 0 -> 12
-top chrome plateau             height 12
-outer chrome ramp              height 12 -> 2
-extruded sidewall / depth      height below/top-offset
-background                     height -8 or lower
+Replace:
 
-Your recipe already contains the right physical information:
+def normal_from_height(height_map: Any, normal_strength: float, gradient_clip: float | None = None) -> Any:
+    import numpy as np
+    dy, dx = np.gradient(height_map)
 
-"inner-silver-down-ramp-layer": {
-  "start": 1,
-  "end": 8.8
+with:
+
+def normal_from_height(
+    height_map: Any,
+    normal_strength: float,
+    gradient_clip: float | None = None,
+    sample_scale: float = 1.0,
+) -> Any:
+    import numpy as np
+    dy, dx = np.gradient(height_map)
+    # Convert raster-pixel gradient back into SVG-unit gradient.
+    # Without this, resolution_scale=2 or 3 makes steep bevels look flatter.
+    dx *= sample_scale
+    dy *= sample_scale
+
+Then update compute_lighting_maps:
+
+def compute_lighting_maps(height_map: Any, masks: dict[str, Any], recipe: dict[str, Any], sample_scale: float = 1.0) -> dict[str, Any]:
+
+And change the normal call:
+
+normal = normal_from_height(
+    normal_source,
+    float(lighting.get("normal_strength", 2.4)),
+    float(lighting.get("normal_gradient_clip", 0)) or None,
+    sample_scale,
+)
+
+Also fix the AO edge calculation in the same function. Replace:
+
+dy, dx = np.gradient(normal_source)
+edge = np.hypot(dx, dy)
+
+with:
+
+dy, dx = np.gradient(normal_source)
+dx *= sample_scale
+dy *= sample_scale
+edge = np.hypot(dx, dy)
+
+Finally, update the call in generate_lighting_overlays:
+
+maps = compute_lighting_maps(height_map, masks, recipe, scale)
+
+That one change should make your existing bevel read much steeper.
+
+⸻
+
+Then make the depth visible
+
+Your current values are too polite. The bevel exists, but the shadows and sidewall do not assert height strongly enough.
+
+In layer-recipe.json, start with this lighting block:
+
+"lighting": {
+  "enabled": true,
+  "resolution_scale": 3,
+  "curve_steps": 32,
+  "embed_images": true,
+  "mask_pad": 180,
+  "max_overlay_size": 4096,
+  "glyph_max_overlay_size": 2400,
+  "normal_height_scale": 1.25,
+  "normal_blur_sigma": 0.18,
+  "normal_gradient_clip": 18,
+  "debug": true,
+  "debug_labels": ["at", "CODECAINE"],
+  "light": {
+    "x": -0.9,
+    "y": -1.15,
+    "z": 0.85
+  },
+  "view": {
+    "x": 0,
+    "y": 0,
+    "z": 1
+  },
+  "normal_strength": 3.8,
+  "ambient": 0.28,
+  "diffuse": 0.48,
+  "specular": 1.65,
+  "specular_power": 96,
+  "chrome_shadow_opacity": 0.34,
+  "chrome_highlight_opacity": 0.74,
+  "ao_opacity": 0.46
 }
-"silver-rim-layer": {
-  "start": 8.8,
-  "thickness": 18.6
-}
-"outer-silver-down-ramp-layer": {
-  "start": 27.4,
-  "end": 38.4
-}
 
-Those are not just visual stroke bands. They can become actual relief zones:
+The important changes are:
 
-0 -> 8.8       inner bevel rising away from red
-8.8 -> 27.4    raised chrome top face
-27.4 -> 38.4   outer bevel falling away from top face
+"ambient": 0.28
 
-Once you have that, lighting becomes coherent.
+Lower ambient makes the side planes separate.
 
-What should change first
+"normal_gradient_clip": 18
 
-The biggest improvement will come from replacing the red contact shadow with a directional cast shadow.
+Your current 9 clamps the steepness. Once the ramp gets steep, raising height stops mattering because the slope is clipped.
 
-Current shadow logic:
+"chrome_shadow_opacity": 0.34
+"ao_opacity": 0.46
 
-draw dark stroke around fill
-clip it to red fill
-blur it
+The bevel needs more dark contact. “Raised” is mostly shadow discipline.
 
-Better shadow logic:
+⸻
 
-take the raised inner chrome rim
-project it along light direction
-blur by height
-clip it to the red fill receiver
-do not let it paint on chrome
+Make the chrome sidewall deeper
 
-That means shadows become asymmetric. With light from upper-left, the red basin should get more shadow on the lower-right side of the inner chrome, not equally around every contour.
+Your extrusion is the part that actually changes the silhouette. Increase it.
 
-Conceptually:
+Change this layer:
 
 {
-  "id": "inner-chrome-cast-shadow-on-red-layer",
-  "type": "projected-shadow",
-  "caster": "inner-silver-down-ramp-layer",
-  "receiver": "fill",
+  "id": "chrome-extrusion-shadow-layer",
+  "type": "chrome-extrude",
   "paint": "#020304",
-  "opacity": 0.34,
-  "shadow_dx": 4.8,
-  "shadow_dy": 6.2,
-  "blur": 3.2,
-  "blend": "multiply",
+  "opacity": 0.72,
+  "steps": 12,
+  "step_dx": 1.05,
+  "step_dy": 1.22,
+  "start_opacity": 0.2,
+  "end_opacity": 0.05,
   "visible": true
 }
 
-That one layer will feel more 3D than another ten chrome gradients.
+to:
 
-The real upgrade: height-map lighting
-
-The strongest path is to add a generated lighting pass inside render_recipe.py.
-
-Keep the vector SVG for the base shape and chrome paint, but generate one or more high-resolution lighting overlays from a height map.
-
-Pipeline:
-
-glyph path
-  -> raster mask at 2x/4x resolution
-  -> distance transform around glyph edge
-  -> height map
-  -> normal map
-  -> shadow map
-  -> highlight map
-  -> embed as SVG <image> overlays
-
-The normal calculation is simple:
-
-dy, dx = np.gradient(height_map)
-normal = np.dstack([
-    -dx * normal_strength,
-    -dy * normal_strength,
-    np.ones_like(height_map),
-])
-normal /= np.linalg.norm(normal, axis=2, keepdims=True)
-
-Then lighting:
-
-light = normalize([-0.55, -0.75, 1.25])  # upper-left, above surface
-view = normalize([0.0, 0.0, 1.0])
-diffuse = np.clip(np.sum(normal * light, axis=2), 0, 1)
-half_vector = normalize(light + view)
-specular = np.clip(np.sum(normal * half_vector, axis=2), 0, 1) ** shininess
-
-For chrome, do not rely heavily on diffuse lighting. Chrome is reflective. Use the normal pass mainly for:
-
-edge darkness
-contact occlusion
-directional highlight cuts
-specular glints
-shadow consistency
-
-Keep your existing chrome gradients as the “environment reflection.” Then add normal-derived overlays on top:
-
-chrome base gradient
-  + dark normal/occlusion multiply layer
-  + hot specular screen layer
-
-That gives you metal that still has your designed red/silver look, but now responds to form.
-
-Why SVG filters alone are not enough
-
-You already have this in chrome_bevel:
-
-<feSpecularLighting in="soft-alpha" ...>
-
-That is useful, but it is lighting the blurred alpha of each individual layer. It does not know the full surface structure.
-
-It sees this:
-
-one flat stroke alpha
-
-It does not see this:
-
-red basin lower than chrome
-inner bevel ramp rising
-top face plateau
-outer bevel falling
-sidewall extrusion
-
-So feSpecularLighting can create shiny rims, but it cannot solve the scene. It cannot produce correct receiver-aware shadows unless you feed it a meaningful height map or add explicit projected-shadow layers.
-
-Use SVG filters for local bevel accents. Use generated lighting for scene coherence.
-
-Layer order should become physical
-
-Your current visual order works because masks avoid most overlaps, but for real lighting the order should be conceptually physical:
-
-background
-global cast shadow / ground shadow
-extrusion sidewall
-red fill
-chrome shadow projected onto red fill
-red contact ambient occlusion
-inner chrome ramp
-chrome top face
-outer chrome ramp
-chrome edge lines
-specular / hot reflection overlays
-final containment strokes
-
-The important rule:
-
-receiver first
-shadow on receiver second
-caster above both
-
-That prevents the common fake-3D bug where a shadow appears to float over the object that should be casting it.
-
-The three shadow types you need
-
-1. Contact occlusion
-
-Short, dark, mostly non-directional. This lives where high chrome meets lower red.
-
-Use for the tight black line near the red/chrome boundary.
-
-small blur
-short radius
-clipped to red fill
-strongest at contact
-
-This replaces part of red-contact-core-shadow-layer.
-
-2. Directional cast shadow
-
-Longer and directional. This is what makes the chrome feel raised.
-
-caster: inner chrome rim
-receiver: red fill
-direction: down-right
-blur: based on height
-opacity: moderate
-
-This should replace most of red-contact-shadow-layer.
-
-3. Ground / outer cast shadow
-
-This is the outer form shadow on the background or lower sidewall.
-
-caster: whole chrome stack or outer chrome rim
-receiver: outside/background
-direction: down-right
-blur: larger
-opacity: lower
-
-This makes the full symbol feel like an object, not just a flat graphic.
-
-Recommended implementation path
-
-Do it in two passes.
-
-Pass 1: add projected shadows in SVG
-
-Add a new layer type in render_recipe.py:
-
-if layer_type == "projected-shadow":
-    return projected_shadow_layer_svg(layer, records, width, height, y, recipe)
-
-The generated SVG should do roughly this:
-
-<g id="inner-chrome-cast-shadow-on-red-layer"
-   clip-path="url(#fill-clip)"
-   style="mix-blend-mode:multiply">
-  <g transform="translate(4.8 6.2)" filter="url(#inner-shadow-blur)">
-    <rect width="..." height="..."
-          fill="#020304"
-          mask="url(#inner-silver-down-ramp-layer-band-mask)" />
-  </g>
-</g>
-
-This gives you real caster/receiver logic without building a full lighting engine yet.
-
-Then reduce the old symmetric red shadows:
-
-"red-contact-shadow-layer": {
-  "opacity": 0.08
-}
-"red-contact-core-shadow-layer": {
-  "opacity": 0.16
+{
+  "id": "chrome-extrusion-shadow-layer",
+  "type": "chrome-extrude",
+  "paint": "#020304",
+  "opacity": 0.9,
+  "steps": 20,
+  "step_dx": 1.25,
+  "step_dy": 1.5,
+  "start_opacity": 0.3,
+  "end_opacity": 0.08,
+  "visible": true
 }
 
-Do not remove them immediately. Let the projected shadow carry the volume, and let the old layers act only as tight ambient occlusion.
+Then change:
 
-Pass 2: add height-map lighting overlays
+{
+  "id": "chrome-extrusion-stack-layer",
+  "type": "chrome-extrude",
+  "paint": "url(#chrome-extrude-depth-gradient)",
+  "opacity": 1,
+  "steps": 10,
+  "step_dx": 0.9,
+  "step_dy": 1.05,
+  "start_opacity": 0.58,
+  "end_opacity": 0.12,
+  "filter": "extrusion_soften",
+  "visible": true
+}
 
-Add a generated lighting output:
+to:
 
-outputs/generated/lighting/at.chrome-shadow.png
-outputs/generated/lighting/at.chrome-highlight.png
-outputs/generated/lighting/at.ao.png
+{
+  "id": "chrome-extrusion-stack-layer",
+  "type": "chrome-extrude",
+  "paint": "url(#chrome-extrude-depth-gradient)",
+  "opacity": 1,
+  "steps": 18,
+  "step_dx": 1.08,
+  "step_dy": 1.32,
+  "start_opacity": 0.72,
+  "end_opacity": 0.16,
+  "filter": "extrusion_soften",
+  "visible": true
+}
 
-Then embed them into the SVG as image layers:
+That will make the chrome body visibly project down and right instead of only glowing on the surface.
 
-<g id="chrome-normal-shadow-layer"
-   mask="url(#chrome-stack-mask)"
-   style="mix-blend-mode:multiply">
-  <image href="data:image/png;base64,..."
-         width="..."
-         height="..." />
-</g>
-<g id="chrome-normal-highlight-layer"
-   mask="url(#chrome-stack-mask)"
-   style="mix-blend-mode:screen">
-  <image href="data:image/png;base64,..."
-         width="..."
-         height="..." />
-</g>
+⸻
 
-That gives you the raised 3D-model feeling without abandoning SVG.
+Strengthen the cast shadow
 
-Best result for this project
+This is the second major “pop” source.
 
-The strongest version is hybrid:
+Change:
 
-vector paths for clean glyph geometry
-recipe gradients for designed chrome/reflection
-SVG masks for layer control
-Python-generated height-map overlays for lighting, AO, shadows
+{
+  "id": "outer-chrome-cast-shadow-on-background-layer",
+  "opacity": 0.1,
+  "dx": 7.2,
+  "dy": 9.5,
+  "blur": 7.2
+}
 
-Do not jump straight to Three.js or mesh extrusion. That will give you physical depth, but you will lose a lot of the graphic control that makes this render good.
+to:
 
-The next architectural move is:
+{
+  "id": "outer-chrome-cast-shadow-on-background-layer",
+  "opacity": 0.22,
+  "dx": 12,
+  "dy": 15,
+  "blur": 10.5
+}
 
-chrome is no longer a painted band
-chrome is a raised material region
-shadows are no longer strokes
-shadows are projections from raised regions onto lower receivers
-highlights are no longer only gradients
-highlights are derived from height/normal, then stylized
+Then raise the internal red-contact shadows:
 
-That is the point where this stops looking like a mapped SVG and starts reading like a rendered object.
+{
+  "id": "inner-chrome-cast-shadow-on-red-layer",
+  "opacity": 0.28,
+  "dx": 4.6,
+  "dy": 6.2,
+  "blur": 2.8
+}
+{
+  "id": "chrome-top-cast-shadow-on-red-layer",
+  "opacity": 0.16,
+  "dx": 4.4,
+  "dy": 5.8,
+  "blur": 5.6
+}
+
+Right now the red center does not believe the chrome rim is towering over it. These shadows fix that.
+
+⸻
+
+Use the angle formula correctly
+
+For your bevel ramps, the apparent angle is controlled by this ratio:
+
+angle = atan(height_delta / ramp_width)
+
+Your current ramp widths are approximately:
+
+inner ramp: 6.8 - 1 = 5.8
+outer ramp: 38.4 - 30 = 8.4
+
+For literal slope targets:
+
+30°: height_delta ≈ width * 0.577
+60°: height_delta ≈ width * 1.732
+70°: height_delta ≈ width * 2.747
+
+So for the outer ramp:
+
+30° ≈ 4.8
+60° ≈ 14.5
+70° ≈ 23.1
+
+Your current relief deltas are already larger than that:
+
+"inner-ramp-relief": 0 -> 42
+"outer-ramp-relief": 42 -> -4
+
+So the issue is not that the mathematical height is too low. The issue is that the normal rendering, clipping, shadows, and extrusion are not making that height readable.
+
+That is why increasing height_to alone does not solve it.
+
+⸻
+
+Use this relief preset after the normal-scale patch
+
+After applying the sample_scale patch, use less absurd height but stronger contrast:
+
+"relief": {
+  "enabled": true,
+  "height_scale": 72,
+  "fill_height": 0,
+  "background_height": -20,
+  "bands": [
+    {
+      "id": "inner-ramp-relief",
+      "layer_id": "inner-silver-down-ramp-layer",
+      "role": "ramp",
+      "height_from": 0,
+      "height_to": 56,
+      "crown": 0,
+      "profile": "linear"
+    },
+    {
+      "id": "chrome-top-relief",
+      "layer_id": "silver-rim-layer",
+      "role": "raised_plateau",
+      "edge_height": 56,
+      "height": 122,
+      "shoulder_width_ratio": 0.045,
+      "crown": 0,
+      "profile": "linear"
+    },
+    {
+      "id": "outer-ramp-relief",
+      "layer_id": "outer-silver-down-ramp-layer",
+      "role": "ramp",
+      "height_from": 56,
+      "height_to": -14,
+      "crown": 0,
+      "profile": "linear"
+    }
+  ]
+}
+
+The top becomes a flatter raised plateau, while the inner and outer ramps read as steep planes.
+
+⸻
+
+Make reflections help the shape
+
+Your chrome reflection is good, but it is too restrained for a raised metal form.
+
+Change:
+
+"materials": {
+  "chrome": {
+    "reflection_enabled": true,
+    "reflection_opacity": 0.58,
+    "normal_warp_x": 0.08,
+    "normal_warp_y": 0.16,
+    "reflection_edge_guard_px": 4,
+    "reflection_edge_feather_px": 10
+  }
+}
+
+to:
+
+"materials": {
+  "chrome": {
+    "reflection_enabled": true,
+    "reflection_opacity": 0.68,
+    "normal_warp_x": 0.16,
+    "normal_warp_y": 0.3,
+    "reflection_edge_guard_px": 2,
+    "reflection_edge_feather_px": 6
+  }
+}
+
+This makes the angled side planes bend the environment harder, which sells steepness.
+
+⸻
+
+The practical tuning order
+
+Do it in this order:
+
+1. Patch the normal scale bug in render_recipe.py.
+2. Increase extrusion steps and offsets.
+3. Strengthen cast shadows.
+4. Lower ambient and increase AO/shadow overlays.
+5. Raise normal_gradient_clip.
+6. Only then adjust relief heights.
+
+The biggest visual win will come from steps 1, 2, and 3.
+
+One more important point: your lighting overlays are baked into the generated SVG as embedded PNGs. So changes to relief, normal strength, light direction, reflection warp, or resolution will not fully update live in the app. You need to hit Save/regenerate to see the actual bevel steepness.

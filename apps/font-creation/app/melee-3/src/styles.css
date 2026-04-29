@@ -219,6 +219,7 @@ h1 {
 .layer-visualizer,
 .style-editor,
 .chrome-editor,
+.lighting-editor,
 .actions-editor,
 .color-section,
 .color-grid,
@@ -232,6 +233,7 @@ h1 {
 .layer-visualizer,
 .color-section,
 .style-editor,
+.lighting-editor,
 .actions-editor {
   display: grid;
   gap: 14px;
@@ -251,6 +253,7 @@ h1 {
 .color-section h2,
 .style-editor h2,
 .chrome-editor h2,
+.lighting-editor h2,
 .actions-editor h2 {
   margin: 0;
   color: var(--ink);
@@ -409,11 +412,55 @@ h1 {
   gap: 14px;
 }
 
-.chrome-editor-header {
+.chrome-editor-header,
+.lighting-editor-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 12px;
+}
+
+.lighting-editor {
+  display: grid;
+  gap: 14px;
+}
+
+.lighting-editor-header button {
+  min-height: 32px;
+  padding: 0 16px;
+  border-color: rgba(138, 31, 27, 0.24);
+  color: #8a1f1b;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.lighting-control-list {
+  display: grid;
+  gap: 12px;
+}
+
+.lighting-control-section {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px 10px;
+  border-top: 1px solid var(--line);
+  padding-top: 12px;
+}
+
+.lighting-control-section:first-child {
+  border-top: 0;
+  padding-top: 0;
+}
+
+.lighting-control-section h3 {
+  grid-column: 1 / -1;
+  margin: 0;
+  color: var(--muted);
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
 }
 
 .chrome-actions {
@@ -524,6 +571,16 @@ h1 {
   background: #ffffff;
 }
 
+.stack-row.is-projected-shadow-row {
+  border-color: rgba(138, 31, 27, 0.22);
+  background: rgba(255, 255, 255, 0.72);
+}
+
+.stack-row.is-lighting-overlay-row {
+  border-color: rgba(37, 74, 108, 0.2);
+  background: rgba(247, 250, 252, 0.78);
+}
+
 .stack-row.is-hidden {
   opacity: 0.48;
 }
@@ -623,8 +680,13 @@ h1 {
   min-width: 0;
 }
 
+.layer-controls.is-disabled {
+  opacity: 0.48;
+  pointer-events: none;
+}
+
 .layer-slider {
-  grid-template-columns: 64px 64px;
+  grid-template-columns: minmax(104px, 1fr) 64px;
   align-items: center;
   gap: 8px;
   min-width: 0;
@@ -638,12 +700,41 @@ h1 {
 .layer-slider-header {
   display: flex;
   align-items: center;
+  justify-content: space-between;
+  gap: 6px;
 }
 
 .layer-slider-inputs {
   display: grid;
   grid-template-columns: 56px;
   align-items: center;
+}
+
+.control-mode-badge {
+  display: inline-grid;
+  min-width: 44px;
+  min-height: 18px;
+  place-items: center;
+  border: 1px solid rgba(22, 25, 29, 0.12);
+  border-radius: 999px;
+  padding: 0 6px;
+  background: rgba(255, 255, 255, 0.72);
+  color: var(--muted);
+  font-size: 9px;
+  font-weight: 900;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.control-mode-badge.is-live {
+  border-color: rgba(29, 111, 73, 0.22);
+  color: #1d6f49;
+}
+
+.control-mode-badge.is-rebuild {
+  border-color: rgba(138, 31, 27, 0.22);
+  color: #8a1f1b;
 }
 
 .layer-slider input[type="number"] {
@@ -804,6 +895,11 @@ button:active {
   .color-grid,
   .layer-toggles,
   .button-row {
+    grid-template-columns: 1fr;
+  }
+
+  .editor-tab-list,
+  .lighting-control-section {
     grid-template-columns: 1fr;
   }
 

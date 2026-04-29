@@ -47,7 +47,7 @@
         <div class="editor-tabs">
           <div class="editor-tab-list" role="tablist" aria-label="Editor sections">
             <button type="button" class="tab-button is-active" id="layerEditorTab" role="tab" aria-selected="true" aria-controls="layerEditorPanel" data-editor-tab="layers">Layers</button>
-            <button type="button" class="tab-button" id="chromeEditorTab" role="tab" aria-selected="false" aria-controls="chromeEditorPanel" data-editor-tab="chrome">Chrome</button>
+            <button type="button" class="tab-button" id="lightingEditorTab" role="tab" aria-selected="false" aria-controls="lightingEditorPanel" data-editor-tab="lighting">Lighting</button>
             <button type="button" class="tab-button" id="styleEditorTab" role="tab" aria-selected="false" aria-controls="styleEditorPanel" data-editor-tab="style">Styling</button>
             <button type="button" class="tab-button" id="actionsEditorTab" role="tab" aria-selected="false" aria-controls="actionsEditorPanel" data-editor-tab="actions">Actions</button>
           </div>
@@ -63,22 +63,13 @@
             </section>
           </section>
 
-          <section class="tab-panel" id="chromeEditorPanel" role="tabpanel" aria-labelledby="chromeEditorTab" data-editor-panel="chrome" hidden>
-            <section class="chrome-editor" aria-label="Chrome gradient controls">
-              <div class="chrome-editor-header">
-                <h2>Chrome Editor</h2>
-                <div class="chrome-actions">
-                  <button type="button" id="chromeEditButton">Edit</button>
-                  <button type="button" id="chromeSaveButton" disabled>Save</button>
-                  <button type="button" id="chromeResetButton" disabled>Reset</button>
-                </div>
+          <section class="tab-panel" id="lightingEditorPanel" role="tabpanel" aria-labelledby="lightingEditorTab" data-editor-panel="lighting" hidden>
+            <section class="lighting-editor" aria-label="Lighting controls">
+              <div class="lighting-editor-header">
+                <h2>Lighting</h2>
+                <button type="button" id="lightingSaveButton" disabled>Save</button>
               </div>
-              <label>
-                <span>Piece</span>
-                <select id="chromeLayerSelect"></select>
-              </label>
-              <div class="chrome-gradient-preview" id="chromeGradientPreview"></div>
-              <div class="chrome-stop-list" id="chromeStopList"></div>
+              <div class="lighting-control-list" id="lightingControlList"></div>
             </section>
           </section>
 

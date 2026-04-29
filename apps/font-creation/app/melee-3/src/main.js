@@ -16,6 +16,8 @@ const chromeGradientPreview = document.querySelector("#chromeGradientPreview");
 const chromeEditButton = document.querySelector("#chromeEditButton");
 const chromeSaveButton = document.querySelector("#chromeSaveButton");
 const chromeResetButton = document.querySelector("#chromeResetButton");
+const lightingControlList = document.querySelector("#lightingControlList");
+const lightingSaveButton = document.querySelector("#lightingSaveButton");
 const styleControls = Array.from(document.querySelectorAll("[data-style-var]"));
 const editorTabButtons = Array.from(document.querySelectorAll("[data-editor-tab]"));
 const editorTabPanels = Array.from(document.querySelectorAll("[data-editor-panel]"));
@@ -42,11 +44,29 @@ const layerPresentation = {
     name: "Extrusion Stack",
     role: "stepped metal sidewall depth",
   },
+  "outer-chrome-cast-shadow-on-background-layer": {
+    order: 33,
+    category: "Lighting",
+    name: "Outer Cast Shadow",
+    role: "soft projection from raised chrome onto the background",
+  },
   "fill-layer": {
     order: 10,
     category: "Interior",
     name: "Red Fill",
     role: "core color shape",
+  },
+  "red-enamel-basin-shadow-layer": {
+    order: 11,
+    category: "Interior",
+    name: "Enamel Basin",
+    role: "subtle lower enamel depth",
+  },
+  "red-enamel-gloss-layer": {
+    order: 12,
+    category: "Interior",
+    name: "Enamel Gloss",
+    role: "clearcoat sheen clipped to red fill",
   },
   "red-contact-shadow-layer": {
     order: 21,
@@ -59,6 +79,72 @@ const layerPresentation = {
     category: "Interior",
     name: "Red Core Contact Shadow",
     role: "tight inner occlusion line",
+  },
+  "inner-chrome-cast-shadow-on-red-layer": {
+    order: 23,
+    category: "Lighting",
+    name: "Inner Cast Shadow",
+    role: "directional shadow cast by raised chrome onto red fill",
+  },
+  "chrome-top-cast-shadow-on-red-layer": {
+    order: 24,
+    category: "Lighting",
+    name: "Top Cast Shadow",
+    role: "soft top-rim projection onto the red enamel",
+  },
+  "chrome-normal-shadow-layer": {
+    order: 76,
+    category: "Lighting",
+    name: "Chrome Normal Shadow",
+    role: "height-map shadow overlay on chrome",
+  },
+  "chrome-environment-reflection-layer": {
+    order: 76,
+    category: "Chrome Reflection",
+    name: "Environment Reflection",
+    role: "normal-warped mirror environment across chrome",
+  },
+  "chrome-normal-highlight-layer": {
+    order: 77,
+    category: "Lighting",
+    name: "Chrome Normal Highlight",
+    role: "height-map specular overlay on chrome",
+  },
+  "ambient-occlusion-layer": {
+    order: 78,
+    category: "Lighting",
+    name: "Ambient Occlusion",
+    role: "tight relief darkening at height transitions",
+  },
+  "final-red-chrome-cut-layer": {
+    order: 91,
+    category: "Final Edge",
+    name: "Red Chrome Cut",
+    role: "final crisp separation between enamel and chrome",
+  },
+  "final-inner-chrome-hotline-layer": {
+    order: 92,
+    category: "Final Edge",
+    name: "Inner Chrome Hotline",
+    role: "final bright cut at inner chrome transition",
+  },
+  "final-outer-chrome-hotline-layer": {
+    order: 93,
+    category: "Final Edge",
+    name: "Outer Chrome Hotline",
+    role: "final bright cut at outer chrome transition",
+  },
+  "final-outer-silhouette-cut-layer": {
+    order: 94,
+    category: "Final Edge",
+    name: "Outer Silhouette Cut",
+    role: "final dark edge containment",
+  },
+  "final-outer-silhouette-hotline-layer": {
+    order: 95,
+    category: "Final Edge",
+    name: "Outer Silhouette Hotline",
+    role: "final polished rim highlight",
   },
   "inner-highlight-layer": {
     order: 50,
@@ -143,6 +229,12 @@ const layerPresentation = {
     category: "Chrome Reflection",
     name: "Stack Hot Reflection",
     role: "subtle highlight shared by all chrome",
+  },
+  "chrome-top-cast-shadow-on-lower-bevel-layer": {
+    order: 69,
+    category: "Lighting",
+    name: "Lower Bevel Cast",
+    role: "top chrome projection onto lower bevels",
   },
   "chrome-stack-edge-hotline-layer": {
     order: 70,
@@ -249,6 +341,7 @@ function setRecipeDirty(isDirty) {
   recipeDirty = isDirty;
   regenerateButton.disabled = !recipeDirty;
   if (chromeSaveButton) chromeSaveButton.disabled = !recipeDirty;
+  if (lightingSaveButton) lightingSaveButton.disabled = !recipeDirty;
 }
 
 function recipeHasChanges() {
@@ -543,6 +636,22 @@ function formatBandValue(value) {
   return Number.isInteger(number) ? String(number) : number.toFixed(1).replace(/\.0$/, "");
 }
 
+function formatSvgNumber(value) {
+  const number = Number(value);
+
+  if (Math.abs(number - Math.round(number)) < 0.001) return String(Math.round(number));
+  return number.toFixed(2).replace(/0+$/, "").replace(/\.$/, "");
+}
+
+function controlModeBadge(mode) {
+  const badge = document.createElement("span");
+
+  badge.className = `control-mode-badge is-${mode}`;
+  badge.textContent = mode === "live" ? "Live" : "Rebuild";
+
+  return badge;
+}
+
 function bandRangeText(layer) {
   const start = Number(layer?.start ?? 0);
   const end = layer && "end" in layer ? Number(layer.end) : start + Number(layer?.thickness ?? 0);
@@ -558,6 +667,14 @@ function updateBandRange(layerId) {
   readout.textContent = bandRangeText(recipeLayer(layerId));
 }
 
+function updateProjectedShadowGeometry(svg, layer) {
+  const transformNode = svg.querySelector(`[data-projected-shadow-transform="${CSS.escape(layer.id)}"]`);
+  const blurNode = svg.querySelector(`[data-projected-shadow-blur="${CSS.escape(layer.id)}"]`);
+
+  transformNode?.setAttribute("transform", `translate(${formatSvgNumber(layer.dx ?? 0)} ${formatSvgNumber(layer.dy ?? 0)})`);
+  blurNode?.setAttribute("stdDeviation", formatSvgNumber(layer.blur ?? 0));
+}
+
 function applyRecipeLayerValue(layerId, property, value) {
   const layer = recipeLayer(layerId);
   const svg = mount.querySelector("svg");
@@ -565,6 +682,23 @@ function applyRecipeLayerValue(layerId, property, value) {
   if (!layer || !svg) return;
 
   layer[property] = Number(value);
+  if (property === "opacity" && layer.type === "lighting-overlay") {
+    const lightingOpacityBySource = {
+      chrome_shadow: "chrome_shadow_opacity",
+      chrome_highlight: "chrome_highlight_opacity",
+      ambient_occlusion: "ao_opacity",
+    };
+    const lightingKey = lightingOpacityBySource[layer.source];
+
+    if (lightingKey) {
+      if (!activeRecipe.lighting) activeRecipe.lighting = {};
+      activeRecipe.lighting[lightingKey] = layer[property];
+    } else if (layer.source === "chrome_reflection") {
+      if (!activeRecipe.materials) activeRecipe.materials = {};
+      if (!activeRecipe.materials.chrome) activeRecipe.materials.chrome = {};
+      activeRecipe.materials.chrome.reflection_opacity = layer[property];
+    }
+  }
   const cssScope = activeRecipe.css_scope ?? "melee3";
   const cssProperty = property === "start" || property === "thickness" ? "width" : property;
   const cssName = `--${cssScope}-${layerId}-${cssProperty}`;
@@ -585,6 +719,10 @@ function applyRecipeLayerValue(layerId, property, value) {
     if (rect) rect.setAttribute("height", String(svg.viewBox.baseVal.height * layer[property]));
   }
 
+  if (layer.type === "projected-shadow" && ["dx", "dy", "blur"].includes(property)) {
+    updateProjectedShadowGeometry(svg, layer);
+  }
+
   setRecipeDirty(true);
 }
 
@@ -597,6 +735,111 @@ function applyRecipeLayerPaint(layerId, paint) {
   layer.paint = paint;
   svg.style.setProperty(`--${activeRecipe.css_scope ?? "melee3"}-${layerId}-paint`, paint);
   setRecipeDirty(true);
+}
+
+function lightingPathValue(path) {
+  return path.split(".").reduce((value, key) => value?.[key], activeRecipe?.lighting);
+}
+
+function setLightingPathValue(path, value) {
+  if (!activeRecipe.lighting) activeRecipe.lighting = {};
+
+  const keys = path.split(".");
+  let target = activeRecipe.lighting;
+
+  keys.slice(0, -1).forEach((key) => {
+    if (!target[key]) target[key] = {};
+    target = target[key];
+  });
+  target[keys.at(-1)] = Number(value);
+}
+
+function syncLightingOpacityLayer(path, value) {
+  const layerByPath = {
+    chrome_shadow_opacity: "chrome-normal-shadow-layer",
+    chrome_highlight_opacity: "chrome-normal-highlight-layer",
+    ao_opacity: "ambient-occlusion-layer",
+  };
+  const layerId = layerByPath[path];
+
+  if (layerId) applyRecipeLayerValue(layerId, "opacity", value);
+}
+
+function applyRecipeLightingValue(path, value) {
+  setLightingPathValue(path, value);
+  syncLightingOpacityLayer(path, value);
+  setRecipeDirty(true);
+}
+
+function lightingSlider(path, labelText, fallback, min, max, step, updateMode = "rebuild") {
+  const label = document.createElement("label");
+  const header = document.createElement("span");
+  const name = document.createElement("span");
+  const inputs = document.createElement("span");
+  const numberInput = document.createElement("input");
+  const value = lightingPathValue(path) ?? fallback;
+  const controlValue = clamp(Number(value), Number(min), Number(max));
+
+  label.className = "lighting-slider layer-slider";
+  label.dataset.updateMode = updateMode;
+  header.className = "layer-slider-header";
+  inputs.className = "layer-slider-inputs";
+  name.textContent = labelText;
+  numberInput.type = "number";
+  numberInput.min = String(min);
+  numberInput.max = String(max);
+  numberInput.step = String(step);
+  numberInput.value = String(controlValue);
+
+  numberInput.addEventListener("input", () => {
+    if (numberInput.value === "") return;
+    const numericValue = clamp(Number(numberInput.value), Number(min), Number(max));
+
+    numberInput.value = String(numericValue);
+    applyRecipeLightingValue(path, numericValue);
+  });
+
+  header.append(name, controlModeBadge(updateMode));
+  inputs.append(numberInput);
+  label.append(header, inputs);
+
+  return label;
+}
+
+function lightingSection(title, controls) {
+  const section = document.createElement("section");
+  const heading = document.createElement("h3");
+
+  section.className = "lighting-control-section";
+  heading.textContent = title;
+  section.append(heading, ...controls);
+
+  return section;
+}
+
+function renderLightingEditor() {
+  if (!lightingControlList || !activeRecipe) return;
+
+  lightingControlList.replaceChildren(
+    lightingSection("Light", [
+      lightingSlider("light.x", "X", -0.55, -2, 2, 0.05),
+      lightingSlider("light.y", "Y", -0.75, -2, 2, 0.05),
+      lightingSlider("light.z", "Z", 1.25, 0.1, 4, 0.05),
+    ]),
+    lightingSection("Surface", [
+      lightingSlider("normal_strength", "Normal", 2.4, 0, 6, 0.1),
+      lightingSlider("ambient", "Ambient", 0.32, 0, 1, 0.01),
+      lightingSlider("diffuse", "Diffuse", 0.42, 0, 1, 0.01),
+      lightingSlider("specular", "Specular", 0.86, 0, 2, 0.01),
+      lightingSlider("specular_power", "Power", 48, 1, 128, 1),
+    ]),
+    lightingSection("Overlays", [
+      lightingSlider("chrome_shadow_opacity", "Shadow", 0.22, 0, 1, 0.01),
+      lightingSlider("chrome_highlight_opacity", "Highlight", 0.42, 0, 1, 0.01),
+      lightingSlider("ao_opacity", "AO", 0.34, 0, 1, 0.01),
+      lightingSlider("resolution_scale", "Resolution", 3, 0.5, 4, 0.25),
+    ]),
+  );
 }
 
 function chromeLayers() {
@@ -727,23 +970,35 @@ function recipeControls(layer) {
   const controls = document.createElement("span");
   controls.className = "layer-controls";
 
+  if ("opacity" in recipe) {
+    controls.append(recipeSlider(layer.id, "opacity", "Opacity", recipe.opacity ?? 1, 0, 1, 0.01, "live"));
+  }
+
   if (recipe.type === "stroke") {
     if (recipe.mask === "outside_fill") {
       controls.append(
-        recipeSlider(layer.id, "start", "Start", recipe.start ?? 0, 0, 40, 0.5),
-        recipeSlider(layer.id, "thickness", "Thickness", recipe.thickness ?? 1, 0, 40, 0.5),
+        recipeSlider(layer.id, "start", "Start", recipe.start ?? 0, 0, 40, 0.5, "live"),
+        recipeSlider(layer.id, "thickness", "Thickness", recipe.thickness ?? 1, 0, 40, 0.5, "live"),
       );
     } else {
-      controls.append(recipeSlider(layer.id, "width", "Width", recipe.width ?? 0, 0, 40, 0.5));
+      controls.append(recipeSlider(layer.id, "width", "Width", recipe.width ?? 0, 0, 40, 0.5, "live"));
     }
   } else if (recipe.type === "bevel-ramp") {
     controls.append(
-      recipeSlider(layer.id, "start", "Start", recipe.start ?? 0, 0, 40, 0.25),
-      recipeSlider(layer.id, "end", "End", recipe.end ?? 8, 0, 48, 0.25),
+      recipeSlider(layer.id, "start", "Start", recipe.start ?? 0, 0, 40, 0.25, "rebuild"),
+      recipeSlider(layer.id, "end", "End", recipe.end ?? 8, 0, 48, 0.25, "rebuild"),
     );
   } else if (recipe.type === "rect-fill") {
-    controls.append(recipeSlider(layer.id, "height_ratio", "Height", recipe.height_ratio ?? 1, 0, 1, 0.01));
+    controls.append(recipeSlider(layer.id, "height_ratio", "Height", recipe.height_ratio ?? 1, 0, 1, 0.01, "live"));
+  } else if (recipe.type === "projected-shadow") {
+    controls.append(
+      recipeSlider(layer.id, "dx", "DX", recipe.dx ?? 0, -24, 24, 0.25, "live"),
+      recipeSlider(layer.id, "dy", "DY", recipe.dy ?? 0, -24, 24, 0.25, "live"),
+      recipeSlider(layer.id, "blur", "Blur", recipe.blur ?? 1, 0, 16, 0.25, "live"),
+    );
   }
+
+  controls.classList.toggle("is-disabled", recipe.type === "lighting-overlay" && activeRecipe?.lighting?.enabled === false);
 
   return controls.childElementCount ? controls : null;
 }
@@ -766,7 +1021,7 @@ function bandRange(layerId) {
   return readout;
 }
 
-function recipeSlider(layerId, property, labelText, value, min, max, step) {
+function recipeSlider(layerId, property, labelText, value, min, max, step, updateMode = "live") {
   const label = document.createElement("label");
   const header = document.createElement("span");
   const name = document.createElement("span");
@@ -775,6 +1030,7 @@ function recipeSlider(layerId, property, labelText, value, min, max, step) {
   const controlValue = clamp(Number(value), Number(min), Number(max));
 
   label.className = "layer-slider";
+  label.dataset.updateMode = updateMode;
   header.className = "layer-slider-header";
   inputs.className = "layer-slider-inputs";
   name.textContent = labelText;
@@ -797,7 +1053,7 @@ function recipeSlider(layerId, property, labelText, value, min, max, step) {
     syncInputs(numberInput.value);
   });
 
-  header.append(name);
+  header.append(name, controlModeBadge(updateMode));
   inputs.append(numberInput);
   label.append(header, inputs);
 
@@ -847,12 +1103,15 @@ function renderLayerVisualizer() {
     const metrics = document.createElement("span");
     const swatch = document.createElement("span");
     const colorInput = document.createElement("input");
+    const recipe = recipeLayer(layer.id);
     const range = bandRange(layer.id);
     const controls = recipeControls(layer);
 
     row.type = "button";
     row.className = `stack-row${layer.visible ? "" : " is-hidden"}`;
+    if (recipe?.type) row.classList.add(`is-${recipe.type}-row`);
     row.dataset.layerId = layer.id;
+    row.dataset.layerType = recipe?.type ?? "svg";
 
     toggle.className = "stack-toggle";
     toggle.textContent = layer.visible ? "On" : "Off";
@@ -863,7 +1122,7 @@ function renderLayerVisualizer() {
     swatch.className = "visualizer-swatch";
     swatch.style.setProperty("--layer-color", layer.color);
     if (layer.gradientKey) swatch.dataset.gradientKey = layer.gradientKey;
-    if (recipeLayer(layer.id)?.stops) swatch.dataset.stopLayer = layer.id;
+    if (recipe?.stops) swatch.dataset.stopLayer = layer.id;
     colorInput.type = "color";
     colorInput.className = "visualizer-color-input";
     colorInput.value = isSolidColor(layer.paint) ? layer.paint : "#d6d9dc";
@@ -926,6 +1185,7 @@ async function loadSvg(src) {
     applyLayerVisibility();
     renderLayerVisualizer();
     renderChromeEditor();
+    renderLightingEditor();
     setRecipeDirty(false);
   } catch (error) {
     mount.innerHTML = `<div class="error-state">Run a local static server to load ${src}</div>`;
@@ -1037,6 +1297,7 @@ chromeLayerSelect?.addEventListener("change", renderChromeStops);
 chromeEditButton?.addEventListener("click", () => setChromeEditing(!chromeEditing));
 chromeSaveButton?.addEventListener("click", regenerateSvgs);
 chromeResetButton?.addEventListener("click", resetSelectedChromeGradient);
+lightingSaveButton?.addEventListener("click", regenerateSvgs);
 assetSelect.addEventListener("change", () => loadSvg(assetSelect.value));
 workbench.addEventListener("pointerdown", startTiltDrag);
 workbench.addEventListener("pointermove", updateTiltDrag);
