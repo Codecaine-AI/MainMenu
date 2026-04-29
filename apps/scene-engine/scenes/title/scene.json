@@ -14,7 +14,14 @@
       "type": "glyph-group",
       "asset": "codecaine-logo",
       "position": { "x": "center", "y": "33%" },
-      "properties": { "scale": 0.18 }
+      "properties": { "scale": 0.18 },
+      "children": [
+        { "id": "extrusion-shadow", "layer": "chrome-extrusion-shadow-layer" },
+        { "id": "fill-layer-tinted", "layer": "fill-layer", "properties": { "hue": 20, "opacity": 0.9 } },
+        { "id": "in-text-fire", "type": "media", "asset": "in-text-fire", "properties": { "fit": "cover", "blend": "screen", "opacity": 0.85 } },
+        { "id": "red-enamel-gloss", "layer": "red-enamel-gloss-layer" },
+        { "id": "chrome-environment-reflection", "layer": "chrome-environment-reflection-layer", "visible": false }
+      ]
     },
     {
       "id": "crt",
