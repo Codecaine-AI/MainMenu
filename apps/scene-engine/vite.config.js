@@ -1,12 +1,27 @@
 import { defineConfig } from 'vite';
-import { writeFile, mkdir } from 'node:fs/promises';
-import { dirname, resolve } from 'node:path';
+import { writeFile, mkdir, cp, copyFile } from 'node:fs/promises';
+import { existsSync } from 'node:fs';
+import path, { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { ensureAllSceneHtml } from './scripts/discover-scenes.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 const SCENES_DIR = resolve(__dirname, 'scenes');
 const SCENE_ID_RE = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
+
+const scenes = ensureAllSceneHtml(__dirname);
+
+function buildInput(rootDir, discoveredScenes) {
+  const input = {
+    root: path.resolve(rootDir, 'index.html'),
+    editor: path.resolve(rootDir, 'editor', 'index.html'),
+  };
+  for (const s of discoveredScenes) {
+    input[`scene_${s.id}`] = path.resolve(rootDir, 'scenes', s.id, 'index.html');
+  }
+  return input;
+}
 
 function readJsonBody(req, limit = 4 * 1024 * 1024) {
   return new Promise((resolvePromise, rejectPromise) => {
@@ -85,11 +100,33 @@ function sceneSavePlugin() {
   };
 }
 
+function copyStaticAssetsPlugin(rootDir, discoveredScenes) {
+  return {
+    name: 'copy-static-assets',
+    apply: 'build',
+    async closeBundle() {
+      const outDir = resolve(rootDir, 'dist');
+      const assetsSrc = resolve(rootDir, 'assets');
+      if (existsSync(assetsSrc)) {
+        await cp(assetsSrc, resolve(outDir, 'assets'), { recursive: true });
+      }
+      for (const s of discoveredScenes) {
+        const dest = resolve(outDir, 'scenes', s.id, 'scene.json');
+        await mkdir(dirname(dest), { recursive: true });
+        await copyFile(s.sceneJsonPath, dest);
+      }
+    },
+  };
+}
+
 export default defineConfig({
   root: '.',
   publicDir: 'public',
   build: {
     outDir: 'dist',
+    rollupOptions: {
+      input: buildInput(__dirname, scenes),
+    },
   },
-  plugins: [sceneSavePlugin()],
+  plugins: [sceneSavePlugin(), copyStaticAssetsPlugin(__dirname, scenes)],
 });

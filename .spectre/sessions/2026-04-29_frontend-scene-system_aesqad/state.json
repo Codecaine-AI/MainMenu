@@ -7,7 +7,7 @@
   "prior_sessions": [],
   "session_type": "full",
   "created_at": "2026-04-29T16:16:09+00:00",
-  "updated_at": "2026-04-29T23:56:00+00:00",
+  "updated_at": "2026-04-29T23:58:00+00:00",
   "current_phase": "build",
   "status": "active",
   "intake": {
@@ -84,11 +84,11 @@
     "started_at": "2026-04-29T17:05:00+00:00",
     "completed_at": "2026-04-29T19:55:00+00:00",
     "finalized_at": "2026-04-29T19:55:00+00:00",
-    "last_updated": "2026-04-29T23:56:00+00:00",
+    "last_updated": "2026-04-29T23:58:00+00:00",
     "data": {
       "oversight_mode": "stepped",
       "current_level": "checkpoint",
-      "current_checkpoint": 6,
+      "current_checkpoint": null,
       "current_task_group": null,
       "current_task": null
     }
@@ -102,20 +102,21 @@
       2,
       3,
       4,
-      5
+      5,
+      6
     ],
-    "current_checkpoint": 6,
+    "current_checkpoint": null,
     "current_task_group": null,
     "current_task": null,
-    "last_updated": "2026-04-29T23:56:00+00:00"
+    "last_updated": "2026-04-29T23:58:00+00:00"
   },
   "build": {
-    "status": "in_progress",
+    "status": "completed",
     "started_at": "2026-04-29T20:00:00+00:00",
-    "completed_at": null,
-    "last_updated": "2026-04-29T23:56:00+00:00",
+    "completed_at": "2026-04-29T23:58:00+00:00",
+    "last_updated": "2026-04-29T23:58:00+00:00",
     "data": {
-      "current_checkpoint": 6,
+      "current_checkpoint": null,
       "current_task_group": null,
       "current_task": null,
       "checkpoints_completed": [
@@ -123,7 +124,8 @@
         2,
         3,
         4,
-        5
+        5,
+        6
       ]
     }
   },

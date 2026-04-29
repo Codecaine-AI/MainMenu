@@ -3755,7 +3755,7 @@
       "prerequisites": [
         5
       ],
-      "status": "pending",
+      "status": "completed",
       "testing_strategy": "Manual: title scene visually matches success-criteria checklist from spec.md (every item passes). press-start blinks. Audio plays/loops. Run vite build \u2192 dist/ contains one HTML per scene with bundled assets, no broken references. Serve dist/ statically (e.g. `npx serve dist/`) and confirm the title page renders identically to dev mode. apps/frontend/ deleted from working tree; no remaining import references from other apps.",
       "task_groups": [
         {

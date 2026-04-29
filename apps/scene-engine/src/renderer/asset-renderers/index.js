@@ -1,6 +1,8 @@
 import { renderMedia } from './media.js';
 import { renderCssEffect } from './css-effect.js';
 import { renderGlyphGroup } from './glyph-group.js';
+import { renderComponent } from './component.js';
+import { renderAudio } from './audio.js';
 
 const registry = new Map();
 
@@ -17,3 +19,5 @@ export function getRenderer(type) {
 registerRenderer('media', renderMedia);
 registerRenderer('effect', renderCssEffect);
 registerRenderer('glyph-group', renderGlyphGroup);
+registerRenderer('component', renderComponent);
+registerRenderer('audio', renderAudio);

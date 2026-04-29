@@ -1,6 +1,6 @@
 SHELL := /bin/bash
 
-FRONTEND_DIR ?= apps/frontend
+FRONTEND_DIR ?= apps/scene-engine
 PIPELINE_DIR ?= apps/asset-extraction-pipeline
 FONT_MELEE3_APP_DIR ?= apps/font-creation/app/melee-3
 FONT_MELEE3_GENERATION_DIR ?= apps/font-creation/generation/melee-3
@@ -18,10 +18,10 @@ MAX_WORKERS ?= 4
 help:
 	@printf '%s\n' 'MELEE commands'
 	@printf '%s\n' ''
-	@printf '%s\n' '── Frontend (apps/frontend) ──────────────'
+	@printf '%s\n' '── Frontend (apps/scene-engine) ──────────────'
 	@printf '%s\n' '  make frontend   Start Vite dev server (hot reload)'
 	@printf '%s\n' '  make dev        Start Vite dev server (hot reload)'
-	@printf '%s\n' '  make build      Production build → apps/frontend/dist/'
+	@printf '%s\n' '  make build      Production build → apps/scene-engine/dist/'
 	@printf '%s\n' '  make preview    Serve the built dist/ locally'
 	@printf '%s\n' '  make install    Install npm dependencies'
 	@printf '%s\n' '  make clean      Delete dist/ and node_modules/'

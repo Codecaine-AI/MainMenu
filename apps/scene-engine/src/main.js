@@ -3,7 +3,8 @@ import { renderScene } from './renderer/scene-renderer.js';
 import './renderer/asset-renderers/index.js';
 
 async function boot() {
-  const res = await fetch('/scenes/title/scene.json');
+  const sceneId = window.__SCENE_ID__ ?? 'title';
+  const res = await fetch(`/scenes/${sceneId}/scene.json`);
   const scene = await res.json();
   await renderScene(scene, document.getElementById('stage'));
 }

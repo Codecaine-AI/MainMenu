@@ -47,7 +47,7 @@ function buildLayer(assetId, entry, dropPos, scene) {
         properties: {},
       };
     case 'audio':
-      return { id, type: 'audio', asset: assetId, properties: {} };
+      return { id, type: 'audio', asset: assetId, properties: { volume: 1.0, loop: true, autoplay: true } };
     default:
       return { id, type: entry.type, asset: assetId, properties: {} };
   }

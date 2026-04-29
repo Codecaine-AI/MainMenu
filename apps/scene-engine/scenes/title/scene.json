@@ -14,14 +14,27 @@
       "type": "glyph-group",
       "asset": "codecaine-logo",
       "position": { "x": "center", "y": "33%" },
-      "properties": { "scale": 0.18 },
+      "properties": { "scale": 0.18, "shimmer": true },
       "children": [
-        { "id": "extrusion-shadow", "layer": "chrome-extrusion-shadow-layer" },
-        { "id": "fill-layer-tinted", "layer": "fill-layer", "properties": { "hue": 20, "opacity": 0.9 } },
+        { "id": "extrusion-shadow", "layer": "chrome-extrusion-shadow-layer", "visible": true },
+        { "id": "fill-layer-tinted", "layer": "fill-layer", "visible": true, "properties": { "hue": 20, "opacity": 0.9 } },
         { "id": "in-text-fire", "type": "media", "asset": "in-text-fire", "properties": { "fit": "cover", "blend": "screen", "opacity": 0.85 } },
-        { "id": "red-enamel-gloss", "layer": "red-enamel-gloss-layer" },
+        { "id": "red-enamel-gloss", "layer": "red-enamel-gloss-layer", "visible": true },
         { "id": "chrome-environment-reflection", "layer": "chrome-environment-reflection-layer", "visible": false }
       ]
+    },
+    {
+      "id": "press-start",
+      "type": "component",
+      "asset": "press-start",
+      "position": { "x": "center", "y": "75%" },
+      "properties": { "text": "PRESS  START", "blink-rate": 1.1 }
+    },
+    {
+      "id": "start-cue",
+      "type": "audio",
+      "asset": "start-cue",
+      "properties": { "volume": 0.6, "loop": false, "autoplay": true }
     },
     {
       "id": "crt",

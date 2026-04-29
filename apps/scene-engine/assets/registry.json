@@ -14,5 +14,13 @@
   "in-text-fire": {
     "type": "media",
     "path": "/assets/media/test-fire-3.mp4"
+  },
+  "press-start": {
+    "type": "component",
+    "path": "/assets/components/press-start/press-start.js"
+  },
+  "start-cue": {
+    "type": "audio",
+    "path": "/assets/audio/start-cue/start-cue.js"
   }
 }

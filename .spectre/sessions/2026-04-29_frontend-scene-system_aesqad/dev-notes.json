@@ -145,6 +145,51 @@
       "category": "discovery",
       "content": "Verification limitation (same as CP1-CP4): no browser available so the visual/interactive outcome (drag CODECAINE onto canvas \u2192 layer added; type into inspector number field \u2192 canvas re-renders live; drag hierarchy row to reorder; click Save \u2192 button disables, scene.json round-trips) is not eyeballed. Verified all plumbing: vite build succeeds; dev server boots in ~90 ms; all editor modules transform with HTTP 200 (state.js, panels/inspector.js, panels/canvas-drop.js, panels/hierarchy.js, panels/asset-browser.js, panels/toolbar.js, loader.js); save endpoint returns 204 on valid PUT and writes correct JSON, 400 on invalid id (Bad_Id), 400 on invalid JSON body, 400 on non-object body ([]), 405 on GET. Move-into-self guard in moveLayer + descendant string-prefix check in hierarchy onDrop prevent the cycle case. User should run npm --prefix apps/scene-engine run dev and open /editor/?scene=title to confirm the authoring loop.",
       "created_at": "2026-04-29T23:55:00+00:00"
+    },
+    {
+      "scope": {
+        "type": "task",
+        "ref": "6.1.1"
+      },
+      "category": "deviation",
+      "content": "Plan asked for @import url('https://fonts.googleapis.com/css2?family=Orbitron') as a fallback. Instead copied apps/frontend/public/fonts/FolkPro_Family/ to apps/scene-engine/public/fonts/FolkPro_Family/ and inlined the four FolkPro @font-face rules + the --amber custom property at the top of stage.css. This keeps the title look pixel-identical to the legacy frontend without an external font CDN dependency, and still works after apps/frontend/ is deleted in task 6.3.9.",
+      "created_at": "2026-04-29T23:56:00+00:00"
+    },
+    {
+      "scope": {
+        "type": "task",
+        "ref": "6.3.6"
+      },
+      "category": "deviation",
+      "content": "Plan task description listed sub-layer names like 'Chrome Depth/Extrusion Shadow', 'Interior/Red Fill', 'Chrome/Top' but those slash-paths do not exist in the actual CODECAINE.css-layers.svg \u2014 the SVG only has kebab-case data-layer attributes (chrome-extrusion-shadow-layer, fill-layer, red-enamel-gloss-layer, etc.). Preserved the working CP3 children that reference real data-layer ids and added in-text-fire interleaved between fill-layer and red-enamel-gloss for the chrome/red sandwich. Added top-level press-start (component) at center/75%, start-cue (audio, volume 0.6, autoplay), and crt (effect) layers per the plan; total 5 top-level layers.",
+      "created_at": "2026-04-29T23:56:00+00:00"
+    },
+    {
+      "scope": {
+        "type": "task",
+        "ref": "6.3.8"
+      },
+      "category": "deviation",
+      "content": "Plan task 8 left asset bundling unspecified \u2014 with root='.' and publicDir='public', the apps/scene-engine/assets/ tree is served in dev (Vite serves project root as static) but is NOT copied to dist/ by default. Added a small inline `copyStaticAssetsPlugin` (apply: 'build') in vite.config.js that uses fs.cp to recursively copy `assets/` \u2192 `dist/assets/` and copies each discovered scene.json into `dist/scenes/<id>/scene.json` during closeBundle. Build now produces a self-contained deployable dist/: redirect index.html, per-scene HTML+JSON, editor HTML, all assets/{glyphs,media,effects,components,audio,registry.json}, and Vite-bundled JS/CSS chunks under dist/assets/. The benign INEFFECTIVE_DYNAMIC_IMPORT warning from CP3 is unchanged.",
+      "created_at": "2026-04-29T23:56:00+00:00"
+    },
+    {
+      "scope": {
+        "type": "task",
+        "ref": "6.3.9"
+      },
+      "category": "deviation",
+      "content": "Repo has no root package.json \u2014 there is no workspaces array to update. The only non-historical reference to `apps/frontend` outside .spectre/ was the Makefile's FRONTEND_DIR variable + the help text. Retargeted FRONTEND_DIR to `apps/scene-engine` so `make dev` / `make build` / `make preview` continue to work after deletion. Updated the help-text path string to `apps/scene-engine/dist/`. Other hits remain in .spectre/sessions/** (historical session logs) and .claude/commands/prime/*.md (those reference an unrelated Spectre/Pi Next.js dashboard, not this repo's apps/frontend) \u2014 left untouched. apps/frontend/ removed via rm -rf.",
+      "created_at": "2026-04-29T23:56:00+00:00"
+    },
+    {
+      "scope": {
+        "type": "checkpoint",
+        "ref": "6"
+      },
+      "category": "discovery",
+      "content": "Verification limitation (same as CP1\u2013CP5): no browser available so the visual/audio outcome (bg video + chrome CODECAINE with in-text fire interleave + blinking PRESS START + CRT scanlines + start-cue beep on first user gesture) is not eyeballed. Verified plumbing: `npm run build` succeeds in ~50ms producing dist/index.html (redirect) + dist/scenes/title/{index.html,scene.json} + dist/editor/index.html + dist/assets/{glyphs,media,effects,components,audio,registry.json} + Vite-bundled JS/CSS chunks. ensureAllSceneHtml runs at vite-config load time and auto-generated scenes/title/index.html with `window.__SCENE_ID__ = 'title'` + module script. Component renderer dynamic-imports asset modules with a moduleCache + ensureStylesheet sidecar; audio renderer mirrors the pattern minus CSS + position. apps/frontend/ removed; Makefile retargeted at apps/scene-engine. User should run `npm --prefix apps/scene-engine run dev` and open / (\u2192 /scenes/title/) to confirm the full vertical-slice fidelity, plus `npm --prefix apps/scene-engine run preview` to confirm the production build renders identically.",
+      "created_at": "2026-04-29T23:56:00+00:00"
     }
   ]
 }

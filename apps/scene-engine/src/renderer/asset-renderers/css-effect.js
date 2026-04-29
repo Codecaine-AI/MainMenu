@@ -1,13 +1,4 @@
-const loadedStylesheets = new Set();
-
-function ensureStylesheet(href) {
-  if (loadedStylesheets.has(href)) return;
-  const link = document.createElement('link');
-  link.rel = 'stylesheet';
-  link.href = href;
-  document.head.appendChild(link);
-  loadedStylesheets.add(href);
-}
+import { ensureStylesheet } from './stylesheet.js';
 
 export function renderCssEffect(layer, entry) {
   ensureStylesheet(entry.path);

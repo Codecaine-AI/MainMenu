@@ -1,8 +1,0 @@
-[
-  { "title": "Halftone Harbor",   "year": "2025", "kind": "WEB",   "tags": ["react", "canvas", "shader"],  "thumb": "// HARBOR.JS" },
-  { "title": "Midnight Protocol", "year": "2025", "kind": "TOOL",  "tags": ["rust", "cli"],                "thumb": "// PROTOCOL.RS" },
-  { "title": "Paper Arcade",      "year": "2024", "kind": "GAME",  "tags": ["unity", "c#", "design"],      "thumb": "// ARCADE.CS" },
-  { "title": "Lumen Notes",       "year": "2024", "kind": "APP",   "tags": ["swift", "ios"],               "thumb": "// LUMEN.SWIFT" },
-  { "title": "Trellis",           "year": "2023", "kind": "WEB",   "tags": ["ts", "svg", "motion"],        "thumb": "// TRELLIS.TS" },
-  { "title": "Fieldcode Zine",    "year": "2023", "kind": "PRINT", "tags": ["print", "typography"],        "thumb": "// ZINE.INDD" }
-]
