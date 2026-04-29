@@ -49,3 +49,9 @@ export function resolveAsset(id) {
 export function getRegistry() {
   return mergedRegistry;
 }
+
+export function updateEntry(id, partial) {
+  if (!mergedRegistry || !mergedRegistry[id]) return null;
+  mergedRegistry[id] = { ...mergedRegistry[id], ...partial };
+  return mergedRegistry[id];
+}

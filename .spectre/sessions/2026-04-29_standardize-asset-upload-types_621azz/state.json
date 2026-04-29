@@ -35,40 +35,43 @@
     "status": "finalized",
     "started_at": "2026-04-29T23:05:00+00:00",
     "completed_at": "2026-04-29T23:17:20+00:00",
-    "last_updated": "2026-04-29T19:00:00+00:00",
+    "last_updated": "2026-04-29T19:30:00+00:00",
     "data": {
       "oversight_mode": "stepped",
       "current_level": "checkpoint",
-      "current_checkpoint": 3,
+      "current_checkpoint": null,
       "current_task_group": null,
       "current_task": null
     }
   },
   "plan_state": {
-    "status": "in_progress",
+    "status": "completed",
     "checkpoints_total": 3,
     "checkpoints_detailed": 3,
     "checkpoints_completed": [
       1,
-      2
+      2,
+      3
     ],
-    "current_checkpoint": 3,
+    "current_checkpoint": null,
     "current_task_group": null,
     "current_task": null,
-    "last_updated": "2026-04-29T19:00:00+00:00"
+    "last_updated": "2026-04-29T19:30:00+00:00",
+    "summary": "All 3 checkpoints complete. Inspector swap dropdown live for asset-type containers; AssetBrowserPanel restricted to the 4 asset types; PATCH /api/registry/[id] persists file pointer changes."
   },
   "build": {
-    "status": "in_progress",
+    "status": "completed",
     "started_at": "2026-04-29T23:30:00+00:00",
-    "completed_at": null,
-    "last_updated": "2026-04-29T19:00:00+00:00",
+    "completed_at": "2026-04-29T19:30:00+00:00",
+    "last_updated": "2026-04-29T19:30:00+00:00",
     "data": {
-      "current_checkpoint": 3,
+      "current_checkpoint": null,
       "current_task_group": null,
       "current_task": null,
       "checkpoints_completed": [
         1,
-        2
+        2,
+        3
       ]
     }
   },
@@ -91,6 +94,12 @@
         "sha": "63f5d137744ca176b66541c9dbf08ec97a474cb2",
         "message": "checkpoint-1: Reorg public/ + dual-registry (assets vs modules)",
         "created_at": "2026-04-29T23:55:00+00:00"
+      },
+      {
+        "checkpoint_id": 2,
+        "sha": "ec65f1ecf2819eee5f85d9340b502a0aee469a2b",
+        "message": "checkpoint-2: Upload pipeline \u2014 API + standalone /upload page",
+        "created_at": "2026-04-29T19:00:00+00:00"
       }
     ]
   }

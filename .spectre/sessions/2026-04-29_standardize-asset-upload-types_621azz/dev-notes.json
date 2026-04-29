@@ -41,6 +41,22 @@
       },
       "category": "discovery",
       "content": "The new app/api/assets/[type]/ route directory was caught by the global `assets/` .gitignore rule. Extended .gitignore with `!apps/scene-engine/app/api/assets/` + `**` exceptions so the route file is tracked. (Same flavor of issue as CP1 task 1.1.1, but for the API route rather than public/.)"
+    },
+    {
+      "scope": {
+        "type": "task",
+        "ref": "3.3.4"
+      },
+      "category": "deviation",
+      "content": "Plan said to gate the AssetSwapDropdown on `(ASSET_TYPES as readonly string[]).includes(layer.type)`, but glyph assets render as layers with `layer.type === 'glyph-group'` (not 'glyph') — so that gate would have hidden the dropdown for the codecaine-logo layer, contradicting the verification step that says the glyph layer must show it. Switched the gate to read the registry entry's `type` (the actual asset type) via `containerEntry?.type` + `isAssetType()` predicate; passes that narrowed AssetType to AssetSwapDropdown. Result: any layer whose `asset` resolves to an AssetContainer gets the dropdown regardless of layer.type, which matches the spec intent (file-swap is a container concept, not a layer concept)."
+    },
+    {
+      "scope": {
+        "type": "task",
+        "ref": "3.1.1"
+      },
+      "category": "decision",
+      "content": "Plan called for an explicit `import { ASSET_TYPES }` + `const TYPE_ORDER = ASSET_TYPES`. Done as written — TYPE_ORDER becomes the readonly tuple ['audio','image','video','glyph']. `byType` is keyed by `string` so `.has(t)` still type-checks against the readonly tuple element type."
     }
   ]
 }

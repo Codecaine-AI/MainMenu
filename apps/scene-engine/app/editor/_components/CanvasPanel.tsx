@@ -68,7 +68,7 @@ export function CanvasPanel() {
       }
     })
     return () => { cancelled = true }
-  }, [scene])
+  }, [scene, registry])
 
   useLayoutEffect(() => {
     if (!stageRef.current || !scene) return

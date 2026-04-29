@@ -3,8 +3,9 @@
 import { useMemo, useCallback } from 'react'
 import { useEditorStore } from '@/store/editor-store'
 import type { Registry } from '@/types/scene'
+import { ASSET_TYPES } from '@/lib/asset-types'
 
-const TYPE_ORDER = ['audio', 'image', 'video', 'glyph', 'effect', 'component'] as const
+const TYPE_ORDER = ASSET_TYPES
 
 export function AssetBrowserPanel() {
   const registry = useEditorStore((s) => s.registry)
