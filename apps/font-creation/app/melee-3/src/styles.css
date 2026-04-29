@@ -3,8 +3,8 @@
   --tilt-x: 0deg;
   --tilt-y: 0deg;
   --stage-color: #858384;
-  --contrast: 1;
-  --saturation: 1;
+  --contrast: 1.12;
+  --saturation: 1.04;
   --panel: #f1f3f4;
   --ink: #16191d;
   --muted: #697078;
@@ -166,6 +166,7 @@ select {
   backface-visibility: hidden;
   transform: translateZ(0);
   transform-style: preserve-3d;
+  isolation: isolate;
 }
 
 .logo-svg #background {

@@ -24,29 +24,23 @@ const defaultTilt = { x: 0, y: 0 };
 const tilt = { x: 0, y: 0 };
 const tiltLimit = { x: 28, y: 34 };
 const layerVisibility = new Map();
-const defaultVisibleLayers = new Set(["fill-layer", "red-gloss-layer", "red-lip-boundary-layer"]);
+const defaultVisibleLayers = new Set(["fill-layer", "red-lip-boundary-layer"]);
 let activeRecipe = null;
 let savedRecipe = null;
 let recipeDirty = false;
 let chromeEditing = false;
 const layerPresentation = {
-  "shadow-layer": {
-    order: 120,
-    category: "Extra",
-    name: "Drop Shadow",
-    role: "optional cast shadow",
+  "chrome-extrusion-shadow-layer": {
+    order: 31,
+    category: "Chrome Depth",
+    name: "Extrusion Shadow",
+    role: "deep lower-right cast body",
   },
-  "outer-depth-layer": {
-    order: 110,
-    category: "Extra",
-    name: "Outer Depth",
-    role: "optional thick outside body",
-  },
-  "rim-glow-layer": {
-    order: 130,
-    category: "Extra",
-    name: "Rim Glow",
-    role: "optional outer light bloom",
+  "chrome-extrusion-stack-layer": {
+    order: 32,
+    category: "Chrome Depth",
+    name: "Extrusion Stack",
+    role: "stepped metal sidewall depth",
   },
   "fill-layer": {
     order: 10,
@@ -54,11 +48,17 @@ const layerPresentation = {
     name: "Red Fill",
     role: "core color shape",
   },
-  "red-gloss-layer": {
-    order: 20,
+  "red-contact-shadow-layer": {
+    order: 21,
     category: "Interior",
-    name: "Red Gloss",
-    role: "shine clipped inside red",
+    name: "Red Contact Shadow",
+    role: "soft shadow cast by raised chrome",
+  },
+  "red-contact-core-shadow-layer": {
+    order: 22,
+    category: "Interior",
+    name: "Red Core Contact Shadow",
+    role: "tight inner occlusion line",
   },
   "inner-highlight-layer": {
     order: 50,
@@ -72,17 +72,11 @@ const layerPresentation = {
     name: "Outer Silver Lip",
     role: "light lip after chrome top",
   },
-  "edge-highlight-layer": {
-    order: 40,
-    category: "Chrome",
-    name: "Inner Silver Edge",
-    role: "first light edge outside black boundary",
-  },
-  "inner-silver-up-edge-layer": {
-    order: 80,
-    category: "Chrome",
-    name: "Outer Silver Edge",
-    role: "outer light edge after lip",
+  "inner-silver-down-ramp-layer": {
+    order: 41,
+    category: "Chrome Ramps",
+    name: "Inner Silver Taper",
+    role: "slopes from top chrome down toward red",
   },
   "red-lip-boundary-layer": {
     order: 30,
@@ -95,6 +89,60 @@ const layerPresentation = {
     category: "Chrome",
     name: "Chrome Top",
     role: "main reflective silver band",
+  },
+  "inner-ramp-top-face-blend-layer": {
+    order: 66,
+    category: "Chrome Ramps",
+    name: "Inner Ramp Top Blend",
+    role: "matches inner taper into top chrome",
+  },
+  "outer-ramp-top-face-blend-layer": {
+    order: 67,
+    category: "Chrome Ramps",
+    name: "Outer Ramp Top Blend",
+    role: "matches outer taper into top chrome",
+  },
+  "chrome-stack-soft-dark-reflection-layer": {
+    order: 68,
+    category: "Chrome Reflection",
+    name: "Stack Dark Reflection",
+    role: "subtle reflection shared by all chrome",
+  },
+  "chrome-stack-soft-hot-reflection-layer": {
+    order: 69,
+    category: "Chrome Reflection",
+    name: "Stack Hot Reflection",
+    role: "subtle highlight shared by all chrome",
+  },
+  "chrome-dark-reflection-layer": {
+    order: 63,
+    category: "Chrome Reflection",
+    name: "Dark Reflection",
+    role: "dark mirror band on main chrome face",
+  },
+  "chrome-hot-reflection-layer": {
+    order: 64,
+    category: "Chrome Reflection",
+    name: "Hot Reflection",
+    role: "white mirror glints on main chrome face",
+  },
+  "outer-silver-down-ramp-layer": {
+    order: 79,
+    category: "Chrome Ramps",
+    name: "Outer Silver Taper",
+    role: "slopes from top chrome down toward outside wall",
+  },
+  "inner-ramp-low-contact-layer": {
+    order: 88,
+    category: "Chrome Ramps",
+    name: "Inner Ramp Low Contact",
+    role: "dark low edge of inner taper",
+  },
+  "outer-ramp-low-contact-layer": {
+    order: 89,
+    category: "Chrome Ramps",
+    name: "Outer Ramp Low Contact",
+    role: "dark low edge of outer taper",
   },
   "edge-shadow-layer": {
     order: 90,
@@ -558,6 +606,18 @@ function recipeControls(layer) {
     } else {
       controls.append(recipeSlider(layer.id, "width", "Width", recipe.width ?? 0, 0, 40, 0.5));
     }
+  } else if (recipe.type === "bevel-ramp") {
+    if (layer.id === "inner-silver-down-ramp-layer") {
+      controls.append(
+        recipeSlider(layer.id, "dx_start", "Dx Start", recipe.dx_start ?? 0, 0, 4, 0.05),
+        recipeSlider(layer.id, "dy_start", "Dy Start", recipe.dy_start ?? 0, 0, 4, 0.05),
+      );
+    } else if (layer.id === "outer-silver-down-ramp-layer") {
+      controls.append(
+        recipeSlider(layer.id, "dx_end", "Dx End", recipe.dx_end ?? 0, 0, 4, 0.05),
+        recipeSlider(layer.id, "dy_end", "Dy End", recipe.dy_end ?? 0, 0, 4, 0.05),
+      );
+    }
   } else if (recipe.type === "rect-fill") {
     controls.append(recipeSlider(layer.id, "height_ratio", "Height", recipe.height_ratio ?? 1, 0, 1, 0.01));
   }
@@ -632,6 +692,13 @@ function applyLayerVisibility() {
   });
 }
 
+function updateLayerVisualizerRow(row, visible) {
+  const toggle = row.querySelector(".stack-toggle");
+
+  row.classList.toggle("is-hidden", !visible);
+  if (toggle) toggle.textContent = visible ? "On" : "Off";
+}
+
 function renderLayerVisualizer() {
   if (!layerStackMap) return;
 
@@ -694,9 +761,11 @@ function renderLayerVisualizer() {
     row.append(toggle, body, swatch);
     toggle.addEventListener("click", (event) => {
       event.stopPropagation();
-      setLayerVisible(layer.id, !isLayerVisible(layer.id));
+      const visible = !isLayerVisible(layer.id);
+
+      setLayerVisible(layer.id, visible);
       applyLayerVisibility();
-      renderLayerVisualizer();
+      updateLayerVisualizerRow(row, visible);
     });
     body.addEventListener("click", (event) => {
       if (event.target.closest(".layer-controls")) event.stopPropagation();
