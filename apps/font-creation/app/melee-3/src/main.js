@@ -78,6 +78,24 @@ const layerPresentation = {
     name: "Inner Silver Taper",
     role: "slopes from top chrome down toward red",
   },
+  "inner-ramp-red-contact-blackline-layer": {
+    order: 42,
+    category: "Chrome Ramps",
+    name: "Inner Red Contact",
+    role: "dark contour where taper meets red",
+  },
+  "inner-ramp-mid-hotline-layer": {
+    order: 43,
+    category: "Chrome Ramps",
+    name: "Inner Mid Hotline",
+    role: "bright contour through the inner taper",
+  },
+  "inner-ramp-top-hotline-layer": {
+    order: 44,
+    category: "Chrome Ramps",
+    name: "Inner Top Hotline",
+    role: "hot contour into the chrome top face",
+  },
   "red-lip-boundary-layer": {
     order: 30,
     category: "Separator",
@@ -89,6 +107,18 @@ const layerPresentation = {
     category: "Chrome",
     name: "Chrome Top",
     role: "main reflective silver band",
+  },
+  "chrome-top-edge-hotline-layer": {
+    order: 61,
+    category: "Chrome Reflection",
+    name: "Top Edge Hotline",
+    role: "hard white edge reflection on the top chrome",
+  },
+  "chrome-top-edge-shadowline-layer": {
+    order: 62,
+    category: "Chrome Reflection",
+    name: "Top Edge Shadowline",
+    role: "dark containment edge on the top chrome",
   },
   "inner-ramp-top-face-blend-layer": {
     order: 66,
@@ -114,6 +144,42 @@ const layerPresentation = {
     name: "Stack Hot Reflection",
     role: "subtle highlight shared by all chrome",
   },
+  "chrome-stack-edge-hotline-layer": {
+    order: 70,
+    category: "Chrome Reflection",
+    name: "Stack Edge Hotline",
+    role: "shared white edge reflection across all chrome",
+  },
+  "chrome-stack-edge-shadowline-layer": {
+    order: 71,
+    category: "Chrome Reflection",
+    name: "Stack Edge Shadowline",
+    role: "shared dark edge reflection across all chrome",
+  },
+  "inner-ramp-hot-reflection-layer": {
+    order: 72,
+    category: "Chrome Reflection",
+    name: "Inner Ramp Hot Reflection",
+    role: "white mirror cuts on the inner taper",
+  },
+  "inner-ramp-dark-reflection-layer": {
+    order: 73,
+    category: "Chrome Reflection",
+    name: "Inner Ramp Dark Reflection",
+    role: "dark mirror cuts on the inner taper",
+  },
+  "outer-ramp-hot-reflection-layer": {
+    order: 74,
+    category: "Chrome Reflection",
+    name: "Outer Ramp Hot Reflection",
+    role: "white mirror cuts on the outer taper",
+  },
+  "outer-ramp-dark-reflection-layer": {
+    order: 75,
+    category: "Chrome Reflection",
+    name: "Outer Ramp Dark Reflection",
+    role: "dark mirror cuts on the outer taper",
+  },
   "chrome-dark-reflection-layer": {
     order: 63,
     category: "Chrome Reflection",
@@ -131,6 +197,18 @@ const layerPresentation = {
     category: "Chrome Ramps",
     name: "Outer Silver Taper",
     role: "slopes from top chrome down toward outside wall",
+  },
+  "outer-ramp-top-hotline-layer": {
+    order: 80,
+    category: "Chrome Ramps",
+    name: "Outer Top Hotline",
+    role: "hot contour leaving the chrome top face",
+  },
+  "outer-ramp-falloff-shadow-layer": {
+    order: 81,
+    category: "Chrome Ramps",
+    name: "Outer Falloff Shadow",
+    role: "dark contour before the extrusion falloff",
   },
   "inner-ramp-low-contact-layer": {
     order: 88,
@@ -184,8 +262,8 @@ function setChromeEditing(isEditing) {
   renderChromeStops();
 }
 
-function selectedChromeGradientKey() {
-  return gradientKeyFromPaint(recipeLayer(chromeLayerSelect?.value)?.paint);
+function selectedChromeStopSource() {
+  return chromeStopSource(recipeLayer(chromeLayerSelect?.value), activeRecipe);
 }
 
 async function loadRecipe() {
@@ -275,14 +353,55 @@ function gradientKeyFromPaint(paint) {
   return gradientKeyFromId(gradientIdFromPaint(paint));
 }
 
+function stopsGradientCss(stops) {
+  if (!stops?.length) return null;
+
+  const stopsText = stops.map((stop) => `${stop.color} ${stop.offset}`).join(", ");
+
+  return `linear-gradient(180deg, ${stopsText})`;
+}
+
 function gradientCss(gradientKey) {
-  const gradient = activeRecipe?.gradients?.[gradientKey];
+  return stopsGradientCss(activeRecipe?.gradients?.[gradientKey]);
+}
 
-  if (!gradient) return null;
+function chromeStopSource(layer, recipe = activeRecipe) {
+  if (!layer || !recipe) return null;
 
-  const stops = gradient.map((stop) => `${stop.color} ${stop.offset}`).join(", ");
+  const gradientKey = gradientKeyFromPaint(layer.paint);
+  if (gradientKey && recipe.gradients?.[gradientKey]) {
+    return {
+      type: "gradient",
+      key: gradientKey,
+      layerId: layer.id,
+      stops: recipe.gradients[gradientKey],
+    };
+  }
 
-  return `linear-gradient(180deg, ${stops})`;
+  if (Array.isArray(layer.stops)) {
+    return {
+      type: "layer",
+      key: layer.id,
+      layerId: layer.id,
+      stops: layer.stops,
+    };
+  }
+
+  return null;
+}
+
+function savedChromeStopSource(source) {
+  if (!source || !savedRecipe) return null;
+
+  if (source.type === "gradient") {
+    const stops = savedRecipe.gradients?.[source.key];
+
+    return stops ? { ...source, stops } : null;
+  }
+
+  const layer = savedRecipe.layers?.find((entry) => entry.id === source.layerId);
+
+  return Array.isArray(layer?.stops) ? { ...source, stops: layer.stops } : null;
 }
 
 function gradientPaint(svg, paint) {
@@ -426,7 +545,7 @@ function formatBandValue(value) {
 
 function bandRangeText(layer) {
   const start = Number(layer?.start ?? 0);
-  const end = start + Number(layer?.thickness ?? 0);
+  const end = layer && "end" in layer ? Number(layer.end) : start + Number(layer?.thickness ?? 0);
 
   return `${formatBandValue(start)} -> ${formatBandValue(end)}`;
 }
@@ -457,6 +576,10 @@ function applyRecipeLayerValue(layerId, property, value) {
     updateBandRange(layerId);
   }
 
+  if (property === "end") {
+    updateBandRange(layerId);
+  }
+
   if (property === "height_ratio") {
     const rect = svg.querySelector(`#${CSS.escape(layerId)} rect`);
     if (rect) rect.setAttribute("height", String(svg.viewBox.baseVal.height * layer[property]));
@@ -479,9 +602,9 @@ function applyRecipeLayerPaint(layerId, paint) {
 function chromeLayers() {
   return activeRecipe?.layers?.filter((layer) => {
     const presentation = layerPresentation[layer.id];
-    const gradientKey = gradientKeyFromPaint(layer.paint);
+    const source = chromeStopSource(layer);
 
-    return presentation?.category === "Chrome" && gradientKey && activeRecipe.gradients?.[gradientKey];
+    return presentation?.category?.startsWith("Chrome") && source;
   }) ?? [];
 }
 
@@ -507,16 +630,16 @@ function renderChromeStops() {
   if (!chromeLayerSelect || !chromeStopList || !chromeGradientPreview || !activeRecipe) return;
 
   const layer = recipeLayer(chromeLayerSelect.value);
-  const gradientKey = gradientKeyFromPaint(layer?.paint);
-  const gradient = activeRecipe.gradients?.[gradientKey] ?? [];
-  const savedGradient = savedRecipe?.gradients?.[gradientKey];
+  const source = chromeStopSource(layer);
+  const savedSource = savedChromeStopSource(source);
+  const stops = source?.stops ?? [];
 
   chromeStopList.replaceChildren();
-  chromeGradientPreview.style.background = gradientCss(gradientKey) ?? "#d6d9dc";
+  chromeGradientPreview.style.background = stopsGradientCss(stops) ?? "#d6d9dc";
   if (chromeLayerSelect) chromeLayerSelect.disabled = !chromeEditing;
-  if (chromeResetButton) chromeResetButton.disabled = !chromeEditing || !savedGradient;
+  if (chromeResetButton) chromeResetButton.disabled = !chromeEditing || !savedSource;
 
-  gradient.forEach((stop, index) => {
+  stops.forEach((stop, index) => {
     const row = document.createElement("label");
     const name = document.createElement("span");
     const controls = document.createElement("span");
@@ -538,12 +661,12 @@ function renderChromeStops() {
 
     color.addEventListener("input", () => {
       stop.color = color.value;
-      syncChromeGradient(gradientKey);
+      syncChromeStops(source);
     });
     offset.addEventListener("input", () => {
       if (offset.value === "") return;
       stop.offset = `${clamp(Number(offset.value), 0, 100)}%`;
-      syncChromeGradient(gradientKey);
+      syncChromeStops(source);
     });
 
     controls.append(color, offset);
@@ -553,37 +676,44 @@ function renderChromeStops() {
 }
 
 function resetSelectedChromeGradient() {
-  const gradientKey = selectedChromeGradientKey();
-  const savedGradient = savedRecipe?.gradients?.[gradientKey];
+  const source = selectedChromeStopSource();
+  const savedSource = savedChromeStopSource(source);
 
-  if (!gradientKey || !savedGradient || !activeRecipe?.gradients) return;
+  if (!source || !savedSource) return;
 
-  activeRecipe.gradients[gradientKey] = structuredClone(savedGradient);
-  syncChromeGradient(gradientKey, { markDirty: false });
+  if (source.type === "gradient") {
+    activeRecipe.gradients[source.key] = structuredClone(savedSource.stops);
+  } else {
+    const layer = recipeLayer(source.layerId);
+    if (layer) layer.stops = structuredClone(savedSource.stops);
+  }
+
+  syncChromeStops(selectedChromeStopSource(), { markDirty: false });
   renderChromeStops();
   setRecipeDirty(recipeHasChanges());
 }
 
-function syncChromeGradient(gradientKey, { markDirty = true } = {}) {
+function syncChromeStops(source, { markDirty = true } = {}) {
   const svg = mount.querySelector("svg");
-  const gradient = activeRecipe?.gradients?.[gradientKey];
-  const gradientId = `${gradientKey.replace(/_/g, "-")}-gradient`;
+  const stops = source?.stops;
 
-  if (!gradient) return;
+  if (!source || !stops) return;
+
+  const gradientId = source.type === "gradient" ? `${source.key.replace(/_/g, "-")}-gradient` : `${source.layerId}-gradient`;
 
   if (svg) {
     const gradientElement = svg.querySelector(`#${CSS.escape(gradientId)}`);
-    const stops = Array.from(gradientElement?.querySelectorAll("stop") ?? []);
+    const svgStops = Array.from(gradientElement?.querySelectorAll("stop") ?? []);
 
-    gradient.forEach((stop, index) => {
-      stops[index]?.setAttribute("stop-color", stop.color);
-      stops[index]?.setAttribute("offset", stop.offset);
+    stops.forEach((stop, index) => {
+      svgStops[index]?.setAttribute("stop-color", stop.color);
+      svgStops[index]?.setAttribute("offset", stop.offset);
     });
   }
 
-  const background = gradientCss(gradientKey) ?? "#d6d9dc";
+  const background = stopsGradientCss(stops) ?? "#d6d9dc";
   chromeGradientPreview.style.background = background;
-  layerStackMap?.querySelectorAll(`[data-gradient-key="${gradientKey}"]`).forEach((swatch) => {
+  layerStackMap?.querySelectorAll(`[data-gradient-key="${source.key}"], [data-stop-layer="${source.layerId}"]`).forEach((swatch) => {
     swatch.style.setProperty("--layer-color", background);
   });
   if (markDirty) setRecipeDirty(true);
@@ -607,17 +737,10 @@ function recipeControls(layer) {
       controls.append(recipeSlider(layer.id, "width", "Width", recipe.width ?? 0, 0, 40, 0.5));
     }
   } else if (recipe.type === "bevel-ramp") {
-    if (layer.id === "inner-silver-down-ramp-layer") {
-      controls.append(
-        recipeSlider(layer.id, "dx_start", "Dx Start", recipe.dx_start ?? 0, 0, 4, 0.05),
-        recipeSlider(layer.id, "dy_start", "Dy Start", recipe.dy_start ?? 0, 0, 4, 0.05),
-      );
-    } else if (layer.id === "outer-silver-down-ramp-layer") {
-      controls.append(
-        recipeSlider(layer.id, "dx_end", "Dx End", recipe.dx_end ?? 0, 0, 4, 0.05),
-        recipeSlider(layer.id, "dy_end", "Dy End", recipe.dy_end ?? 0, 0, 4, 0.05),
-      );
-    }
+    controls.append(
+      recipeSlider(layer.id, "start", "Start", recipe.start ?? 0, 0, 40, 0.25),
+      recipeSlider(layer.id, "end", "End", recipe.end ?? 8, 0, 48, 0.25),
+    );
   } else if (recipe.type === "rect-fill") {
     controls.append(recipeSlider(layer.id, "height_ratio", "Height", recipe.height_ratio ?? 1, 0, 1, 0.01));
   }
@@ -628,7 +751,7 @@ function recipeControls(layer) {
 function bandRange(layerId) {
   const layer = recipeLayer(layerId);
 
-  if (!layer || layer.mask !== "outside_fill" || !("start" in layer || "thickness" in layer)) return null;
+  if (!layer || (layer.type !== "bevel-ramp" && layer.mask !== "outside_fill") || !("start" in layer || "thickness" in layer || "end" in layer)) return null;
 
   const readout = document.createElement("span");
   const label = document.createElement("span");
@@ -740,6 +863,7 @@ function renderLayerVisualizer() {
     swatch.className = "visualizer-swatch";
     swatch.style.setProperty("--layer-color", layer.color);
     if (layer.gradientKey) swatch.dataset.gradientKey = layer.gradientKey;
+    if (recipeLayer(layer.id)?.stops) swatch.dataset.stopLayer = layer.id;
     colorInput.type = "color";
     colorInput.className = "visualizer-color-input";
     colorInput.value = isSolidColor(layer.paint) ? layer.paint : "#d6d9dc";

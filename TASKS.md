@@ -1,461 +1,320 @@
-The current system can get the look. The issue is not the SVG base. The issue is that only silver-rim-layer is being treated like chrome. The taper layers are still being treated like matte beveled fills.
+Yes. The next step is to stop treating chrome and shadow as independent decorative layers and make them respond to one shared height field.
 
-The target finish needs four distinct surfaces:
+Right now your system is strong visually, but it is still mostly a 2D ring stack:
 
-1. Red enamel fill: deep red, slightly glossy, mostly flat.
-2. Inner silver taper: a sloped chrome bevel between red and top chrome.
-3. Chrome top face: mirror-metal band with hard white/black reflection cuts.
-4. Outer silver taper / sidewall: another sloped chrome bevel dropping into the extrusion shadow.
+* silver-rim-layer, inner-silver-down-ramp-layer, outer-silver-down-ramp-layer paint chrome bands.
+* chrome_bevel uses SourceAlpha to fake bevel highlights.
+* red-contact-shadow-layer and red-contact-core-shadow-layer are strokes clipped into the fill.
+* chrome-extrusion-stack-layer repeats the chrome silhouette down-right to fake side depth.
 
-Right now your recipe has the geometry for this, but not enough material separation.
+That produces good metal, but not true spatial behavior. The shadows do not know what is casting them, what surface is receiving them, or how high the chrome is above that surface. That is why the occlusions can feel wrong.
 
-What is happening now
+The correct structure is:
 
-In layer-recipe.json, this is your core chrome stack:
+path shape
+  -> distance field
+  -> height map
+  -> normals
+  -> lighting overlays
+  -> receiver-clipped cast shadows
+  -> chrome/reflection paint
 
-"chrome_stack": {
-  "layer_ids": [
-    "inner-silver-down-ramp-layer",
-    "silver-rim-layer",
-    "outer-silver-down-ramp-layer"
-  ]
-}
+You do not need full 3D mesh rendering. You need a 2.5D lighting pass.
 
-That is the right structure.
+The model to use
 
-But the actual visual treatment is uneven:
+Treat the glyph as a shallow relief object.
 
-{
-  "id": "inner-silver-down-ramp-layer",
-  "type": "bevel-ramp",
-  ...
-}
+For each pixel or SVG region, assign a height:
 
-and
+red fill / enamel basin        height 0
+inner chrome ramp              height 0 -> 12
+top chrome plateau             height 12
+outer chrome ramp              height 12 -> 2
+extruded sidewall / depth      height below/top-offset
+background                     height -8 or lower
 
-{
-  "id": "outer-silver-down-ramp-layer",
-  "type": "bevel-ramp",
-  ...
-}
+Your recipe already contains the right physical information:
 
-are rendered by bevel_ramp_layer_svg() as a masked rectangle filled with a simple gradient. They are not really getting the same chrome reflection behavior as the main rim.
-
-Meanwhile:
-
-{
-  "id": "silver-rim-layer",
-  "type": "stroke",
-  "paint": "url(#chrome-top-gradient)",
-  "filter": "chrome_bevel"
-}
-
-does get the chrome gradient, the bevel filter, and the stronger reflection overlays.
-
-So the top face is “semi-chrome,” while the tapers are “gray ramps.” That mismatch is exactly what your examples do not have. In the examples, every silver surface shares the same reflective metal language, even when the surface angle changes.
-
-First change: make chrome darker and brighter, not just lighter
-
-Chrome does not read as shiny because it is bright. It reads as shiny because it has violent contrast: white cuts next to near-black cuts.
-
-Your chrome_top gradient is close, but still too satin. Push it harder.
-
-Change the chrome top logic toward this kind of stop rhythm:
-
-"chrome_top": [
-  { "offset": "0%", "color": "#f6fbff" },
-  { "offset": "4%", "color": "#ffffff" },
-  { "offset": "7%", "color": "#9ca7af" },
-  { "offset": "12%", "color": "#222a31" },
-  { "offset": "17%", "color": "#050607" },
-  { "offset": "21%", "color": "#ffffff" },
-  { "offset": "27%", "color": "#f7fbff" },
-  { "offset": "31%", "color": "#818b93" },
-  { "offset": "42%", "color": "#252d34" },
-  { "offset": "49%", "color": "#040506" },
-  { "offset": "54%", "color": "#ffffff" },
-  { "offset": "61%", "color": "#e4edf2" },
-  { "offset": "68%", "color": "#7a858e" },
-  { "offset": "78%", "color": "#11171c" },
-  { "offset": "84%", "color": "#050607" },
-  { "offset": "88%", "color": "#ffffff" },
-  { "offset": "93%", "color": "#eef5f9" },
-  { "offset": "100%", "color": "#68727a" }
-]
-
-The important move is this: do not reduce black. Add more black. Add more white. Chrome needs both.
-
-Then raise the reflection overlays:
-
-{
-  "id": "chrome-dark-reflection-layer",
-  "opacity": 0.46
-},
-{
-  "id": "chrome-hot-reflection-layer",
-  "opacity": 0.82
-},
-{
-  "id": "chrome-stack-soft-dark-reflection-layer",
-  "opacity": 0.22
-},
-{
-  "id": "chrome-stack-soft-hot-reflection-layer",
-  "opacity": 0.34
-}
-
-Your current stack reflection opacities are too low:
-
-"chrome-stack-soft-dark-reflection-layer": 0.1
-"chrome-stack-soft-hot-reflection-layer": 0.14
-
-Those are barely affecting the tapers. Raise them. The examples have obvious white highlights and dark mirror bands across the metal.
-
-Second change: make the taper gradients chrome, not gray
-
-Your inner ramp currently moves like this:
-
-"#162027" -> "#34444d" -> "#74818a" -> "#b7c1c8" -> "#dce4e8" -> "#edf3f6"
-
-That is a smooth gray slope. It will never look like polished metal.
-
-Use a broken chrome ramp instead:
-
-{
-  "id": "inner-silver-down-ramp-layer",
-  "type": "bevel-ramp",
+"inner-silver-down-ramp-layer": {
   "start": 1,
-  "end": 7.2,
-  "opacity": 1,
-  "gradient_vector": {
-    "x1": 0.82,
-    "y1": 0.9,
-    "x2": 0.18,
-    "y2": 0.1
-  },
-  "stops": [
-    { "offset": "0%", "color": "#050607", "opacity": 1 },
-    { "offset": "13%", "color": "#182127", "opacity": 1 },
-    { "offset": "25%", "color": "#5f6b74", "opacity": 1 },
-    { "offset": "36%", "color": "#ffffff", "opacity": 1 },
-    { "offset": "43%", "color": "#dce6eb", "opacity": 1 },
-    { "offset": "54%", "color": "#66737c", "opacity": 1 },
-    { "offset": "65%", "color": "#10161b", "opacity": 1 },
-    { "offset": "76%", "color": "#f8fbff", "opacity": 1 },
-    { "offset": "88%", "color": "#a8b3bb", "opacity": 1 },
-    { "offset": "100%", "color": "#f2f7fa", "opacity": 1 }
-  ],
-  "visible": true
+  "end": 8.8
+}
+"silver-rim-layer": {
+  "start": 8.8,
+  "thickness": 18.6
+}
+"outer-silver-down-ramp-layer": {
+  "start": 27.4,
+  "end": 38.4
 }
 
-For the outer ramp, reverse the feeling: bright upper lip, dark lower/right falloff.
+Those are not just visual stroke bands. They can become actual relief zones:
+
+0 -> 8.8       inner bevel rising away from red
+8.8 -> 27.4    raised chrome top face
+27.4 -> 38.4   outer bevel falling away from top face
+
+Once you have that, lighting becomes coherent.
+
+What should change first
+
+The biggest improvement will come from replacing the red contact shadow with a directional cast shadow.
+
+Current shadow logic:
+
+draw dark stroke around fill
+clip it to red fill
+blur it
+
+Better shadow logic:
+
+take the raised inner chrome rim
+project it along light direction
+blur by height
+clip it to the red fill receiver
+do not let it paint on chrome
+
+That means shadows become asymmetric. With light from upper-left, the red basin should get more shadow on the lower-right side of the inner chrome, not equally around every contour.
+
+Conceptually:
 
 {
-  "id": "outer-silver-down-ramp-layer",
-  "type": "bevel-ramp",
-  "start": 29.6,
-  "end": 38.2,
-  "opacity": 1,
-  "gradient_vector": {
-    "x1": 0.16,
-    "y1": 0.06,
-    "x2": 0.9,
-    "y2": 0.94
-  },
-  "stops": [
-    { "offset": "0%", "color": "#ffffff", "opacity": 1 },
-    { "offset": "8%", "color": "#edf4f8", "opacity": 1 },
-    { "offset": "18%", "color": "#9da8b0", "opacity": 1 },
-    { "offset": "31%", "color": "#2b343b", "opacity": 1 },
-    { "offset": "43%", "color": "#050607", "opacity": 1 },
-    { "offset": "54%", "color": "#151c22", "opacity": 1 },
-    { "offset": "65%", "color": "#ffffff", "opacity": 1 },
-    { "offset": "73%", "color": "#d8e2e8", "opacity": 1 },
-    { "offset": "85%", "color": "#68737c", "opacity": 1 },
-    { "offset": "100%", "color": "#071015", "opacity": 1 }
-  ],
-  "visible": true
-}
-
-This makes the tapers use the same visual vocabulary as the chrome top: black cuts, white cuts, cold blue-gray steel between them.
-
-Third change: use the unused chrome edge gradients
-
-You already defined these:
-
-"chrome_edge_hotline"
-"chrome_edge_shadowline"
-
-But they are not being used as layers.
-
-Use them. They are exactly the kind of detail the references have: a hot white metal edge and a dark containment edge.
-
-Add top-face overlays after silver-rim-layer:
-
-{
-  "id": "chrome-top-edge-hotline-layer",
-  "type": "rect-fill",
-  "paint": "url(#chrome-edge-hotline-gradient)",
-  "opacity": 0.42,
-  "height_ratio": 1,
-  "mask_ref": "silver-rim-layer",
-  "blend": "screen",
-  "visible": true
-},
-{
-  "id": "chrome-top-edge-shadowline-layer",
-  "type": "rect-fill",
-  "paint": "url(#chrome-edge-shadowline-gradient)",
-  "opacity": 0.26,
-  "height_ratio": 1,
-  "mask_ref": "silver-rim-layer",
-  "blend": "multiply",
-  "visible": true
-}
-
-Then use the same idea on the full chrome stack:
-
-{
-  "id": "chrome-stack-edge-hotline-layer",
-  "type": "rect-fill",
-  "paint": "url(#chrome-edge-hotline-gradient)",
-  "opacity": 0.18,
-  "height_ratio": 1,
-  "mask": "chrome_stack",
-  "blend": "screen",
-  "visible": true
-},
-{
-  "id": "chrome-stack-edge-shadowline-layer",
-  "type": "rect-fill",
-  "paint": "url(#chrome-edge-shadowline-gradient)",
-  "opacity": 0.16,
-  "height_ratio": 1,
-  "mask": "chrome_stack",
-  "blend": "multiply",
-  "visible": true
-}
-
-This will make the top, inner taper, and outer taper feel like one continuous metal object instead of three unrelated gray bands.
-
-Fourth change: expose bevel-ramp masks globally
-
-Right now mask_ref works well for normal stroke layers like silver-rim-layer, because band_masks_svg() creates masks for stroke layers with mask: "outside_fill".
-
-But inner-silver-down-ramp-layer and outer-silver-down-ramp-layer are bevel-ramp layers. Their masks are created locally inside bevel_ramp_layer_svg(), not globally as *-band-mask.
-
-That limits how easily you can target them with reflection layers.
-
-In render_recipe.py, add a shared helper:
-
-def layer_band_bounds(layer: dict[str, Any]) -> tuple[float, float] | None:
-    if layer.get("type") == "bevel-ramp" and "start" in layer:
-        start = float(layer["start"])
-        end = float(layer.get("end", start + float(layer.get("thickness", 0))))
-        return start, end
-    if layer.get("mask") == "outside_fill" and ("start" in layer or "thickness" in layer):
-        start = float(layer.get("start", 0))
-        end = start + float(layer.get("thickness", 0))
-        return start, end
-    return None
-
-Then update band_masks_svg() so it also creates masks for bevel-ramp layers:
-
-def band_masks_svg(recipe, records, width, height, y):
-    scope = recipe.get("css_scope", "melee3")
-    masks = []
-    for layer in recipe["layers"]:
-        bounds = layer_band_bounds(layer)
-        if not bounds:
-            continue
-        start, end = bounds
-        layer_id = layer["id"]
-        escaped_layer_id = escape(layer_id)
-        if layer.get("type") == "stroke":
-            outer_width = f"var({css_var(scope, layer_id, 'width')})"
-            inner_width = f"var({css_var(scope, layer_id, 'inner-width')})"
-        else:
-            outer_width = fmt(2 * end)
-            inner_width = fmt(2 * start)
-        outer_attrs = (
-            f' fill="none" stroke="white" stroke-width="{outer_width}"'
-            f' stroke-linejoin="round" stroke-linecap="round"'
-        )
-        inner_attrs = (
-            f' fill="black" stroke="black" stroke-width="{inner_width}"'
-            f' stroke-linejoin="round" stroke-linecap="round"'
-        )
-        masks.append(
-            f'''    <mask id="{escaped_layer_id}-band-mask" maskUnits="userSpaceOnUse" x="0" y="0" width="{fmt(width)}" height="{fmt(height)}">
-      <rect width="{fmt(width)}" height="{fmt(height)}" fill="black"/>
-{use_nodes(records, y, outer_attrs)}
-{use_nodes(records, y, inner_attrs)}
-    </mask>'''
-        )
-    return "\n".join(masks)
-
-Now you can add reflection layers directly to the inner and outer tapers:
-
-{
-  "id": "inner-ramp-hot-reflection-layer",
-  "type": "rect-fill",
-  "paint": "url(#chrome-hot-reflection-gradient)",
-  "opacity": 0.32,
-  "height_ratio": 1,
-  "mask_ref": "inner-silver-down-ramp-layer",
-  "blend": "screen",
-  "visible": true
-},
-{
-  "id": "inner-ramp-dark-reflection-layer",
-  "type": "rect-fill",
-  "paint": "url(#chrome-dark-reflection-gradient)",
-  "opacity": 0.22,
-  "height_ratio": 1,
-  "mask_ref": "inner-silver-down-ramp-layer",
-  "blend": "multiply",
-  "visible": true
-},
-{
-  "id": "outer-ramp-hot-reflection-layer",
-  "type": "rect-fill",
-  "paint": "url(#chrome-hot-reflection-gradient)",
-  "opacity": 0.28,
-  "height_ratio": 1,
-  "mask_ref": "outer-silver-down-ramp-layer",
-  "blend": "screen",
-  "visible": true
-},
-{
-  "id": "outer-ramp-dark-reflection-layer",
-  "type": "rect-fill",
-  "paint": "url(#chrome-dark-reflection-gradient)",
-  "opacity": 0.26,
-  "height_ratio": 1,
-  "mask_ref": "outer-silver-down-ramp-layer",
-  "blend": "multiply",
-  "visible": true
-}
-
-That is the main material fix.
-
-Fifth change: make taper highlights contour-based
-
-The strongest version is not a single diagonal gradient clipped to the taper. The strongest version is a distance-from-red contour bevel.
-
-Your current bevel-ramp is scene-gradient based. It says: “fill the whole ramp with a diagonal gradient.”
-
-A better bevel says: “at distance 1 from the red fill, use dark contact shadow; at distance 3, use mid steel; at distance 5, use white highlight; at distance 7, blend into top chrome.”
-
-That follows the actual glyph contour. It will look much more 3D on curves like @, O, C, and Q.
-
-You can fake this immediately with thin stroke bands:
-
-{
-  "id": "inner-ramp-red-contact-blackline-layer",
-  "type": "stroke",
+  "id": "inner-chrome-cast-shadow-on-red-layer",
+  "type": "projected-shadow",
+  "caster": "inner-silver-down-ramp-layer",
+  "receiver": "fill",
   "paint": "#020304",
-  "start": 1,
-  "thickness": 0.75,
-  "opacity": 0.58,
-  "dx": 0.25,
-  "dy": 0.45,
-  "mask": "outside_fill",
-  "visible": true
-},
-{
-  "id": "inner-ramp-mid-hotline-layer",
-  "type": "stroke",
-  "paint": "url(#chrome-edge-hotline-gradient)",
-  "start": 4.8,
-  "thickness": 0.9,
-  "opacity": 0.62,
-  "dx": 0,
-  "dy": 0,
-  "mask": "outside_fill",
-  "visible": true
-},
-{
-  "id": "inner-ramp-top-hotline-layer",
-  "type": "stroke",
-  "paint": "#ffffff",
-  "start": 6.75,
-  "thickness": 0.65,
-  "opacity": 0.72,
-  "dx": -0.25,
-  "dy": -0.35,
-  "mask": "outside_fill",
+  "opacity": 0.34,
+  "shadow_dx": 4.8,
+  "shadow_dy": 6.2,
+  "blur": 3.2,
+  "blend": "multiply",
   "visible": true
 }
 
-And for the outer taper:
+That one layer will feel more 3D than another ten chrome gradients.
 
-{
-  "id": "outer-ramp-top-hotline-layer",
-  "type": "stroke",
-  "paint": "#ffffff",
-  "start": 29.35,
-  "thickness": 0.75,
-  "opacity": 0.68,
-  "dx": -0.25,
-  "dy": -0.35,
-  "mask": "outside_fill",
-  "visible": true
-},
-{
-  "id": "outer-ramp-falloff-shadow-layer",
-  "type": "stroke",
-  "paint": "#020304",
-  "start": 36.8,
-  "thickness": 1.1,
-  "opacity": 0.5,
-  "dx": 0.4,
-  "dy": 0.55,
-  "mask": "outside_fill",
-  "visible": true
+The real upgrade: height-map lighting
+
+The strongest path is to add a generated lighting pass inside render_recipe.py.
+
+Keep the vector SVG for the base shape and chrome paint, but generate one or more high-resolution lighting overlays from a height map.
+
+Pipeline:
+
+glyph path
+  -> raster mask at 2x/4x resolution
+  -> distance transform around glyph edge
+  -> height map
+  -> normal map
+  -> shadow map
+  -> highlight map
+  -> embed as SVG <image> overlays
+
+The normal calculation is simple:
+
+dy, dx = np.gradient(height_map)
+normal = np.dstack([
+    -dx * normal_strength,
+    -dy * normal_strength,
+    np.ones_like(height_map),
+])
+normal /= np.linalg.norm(normal, axis=2, keepdims=True)
+
+Then lighting:
+
+light = normalize([-0.55, -0.75, 1.25])  # upper-left, above surface
+view = normalize([0.0, 0.0, 1.0])
+diffuse = np.clip(np.sum(normal * light, axis=2), 0, 1)
+half_vector = normalize(light + view)
+specular = np.clip(np.sum(normal * half_vector, axis=2), 0, 1) ** shininess
+
+For chrome, do not rely heavily on diffuse lighting. Chrome is reflective. Use the normal pass mainly for:
+
+edge darkness
+contact occlusion
+directional highlight cuts
+specular glints
+shadow consistency
+
+Keep your existing chrome gradients as the “environment reflection.” Then add normal-derived overlays on top:
+
+chrome base gradient
+  + dark normal/occlusion multiply layer
+  + hot specular screen layer
+
+That gives you metal that still has your designed red/silver look, but now responds to form.
+
+Why SVG filters alone are not enough
+
+You already have this in chrome_bevel:
+
+<feSpecularLighting in="soft-alpha" ...>
+
+That is useful, but it is lighting the blurred alpha of each individual layer. It does not know the full surface structure.
+
+It sees this:
+
+one flat stroke alpha
+
+It does not see this:
+
+red basin lower than chrome
+inner bevel ramp rising
+top face plateau
+outer bevel falling
+sidewall extrusion
+
+So feSpecularLighting can create shiny rims, but it cannot solve the scene. It cannot produce correct receiver-aware shadows unless you feed it a meaningful height map or add explicit projected-shadow layers.
+
+Use SVG filters for local bevel accents. Use generated lighting for scene coherence.
+
+Layer order should become physical
+
+Your current visual order works because masks avoid most overlaps, but for real lighting the order should be conceptually physical:
+
+background
+global cast shadow / ground shadow
+extrusion sidewall
+red fill
+chrome shadow projected onto red fill
+red contact ambient occlusion
+inner chrome ramp
+chrome top face
+outer chrome ramp
+chrome edge lines
+specular / hot reflection overlays
+final containment strokes
+
+The important rule:
+
+receiver first
+shadow on receiver second
+caster above both
+
+That prevents the common fake-3D bug where a shadow appears to float over the object that should be casting it.
+
+The three shadow types you need
+
+1. Contact occlusion
+
+Short, dark, mostly non-directional. This lives where high chrome meets lower red.
+
+Use for the tight black line near the red/chrome boundary.
+
+small blur
+short radius
+clipped to red fill
+strongest at contact
+
+This replaces part of red-contact-core-shadow-layer.
+
+2. Directional cast shadow
+
+Longer and directional. This is what makes the chrome feel raised.
+
+caster: inner chrome rim
+receiver: red fill
+direction: down-right
+blur: based on height
+opacity: moderate
+
+This should replace most of red-contact-shadow-layer.
+
+3. Ground / outer cast shadow
+
+This is the outer form shadow on the background or lower sidewall.
+
+caster: whole chrome stack or outer chrome rim
+receiver: outside/background
+direction: down-right
+blur: larger
+opacity: lower
+
+This makes the full symbol feel like an object, not just a flat graphic.
+
+Recommended implementation path
+
+Do it in two passes.
+
+Pass 1: add projected shadows in SVG
+
+Add a new layer type in render_recipe.py:
+
+if layer_type == "projected-shadow":
+    return projected_shadow_layer_svg(layer, records, width, height, y, recipe)
+
+The generated SVG should do roughly this:
+
+<g id="inner-chrome-cast-shadow-on-red-layer"
+   clip-path="url(#fill-clip)"
+   style="mix-blend-mode:multiply">
+  <g transform="translate(4.8 6.2)" filter="url(#inner-shadow-blur)">
+    <rect width="..." height="..."
+          fill="#020304"
+          mask="url(#inner-silver-down-ramp-layer-band-mask)" />
+  </g>
+</g>
+
+This gives you real caster/receiver logic without building a full lighting engine yet.
+
+Then reduce the old symmetric red shadows:
+
+"red-contact-shadow-layer": {
+  "opacity": 0.08
+}
+"red-contact-core-shadow-layer": {
+  "opacity": 0.16
 }
 
-These thin contour strokes will do more for perceived 3D than another smooth gradient.
+Do not remove them immediately. Let the projected shadow carry the volume, and let the old layers act only as tight ambient occlusion.
 
-Important app issue
+Pass 2: add height-map lighting overlays
 
-In main.js, your bevel-ramp controls currently expose this:
+Add a generated lighting output:
 
-recipeSlider(layer.id, "dx_start", "Dx Start", ...)
-recipeSlider(layer.id, "dy_start", "Dy Start", ...)
+outputs/generated/lighting/at.chrome-shadow.png
+outputs/generated/lighting/at.chrome-highlight.png
+outputs/generated/lighting/at.ao.png
 
-and:
+Then embed them into the SVG as image layers:
 
-recipeSlider(layer.id, "dx_end", "Dx End", ...)
-recipeSlider(layer.id, "dy_end", "Dy End", ...)
+<g id="chrome-normal-shadow-layer"
+   mask="url(#chrome-stack-mask)"
+   style="mix-blend-mode:multiply">
+  <image href="data:image/png;base64,..."
+         width="..."
+         height="..." />
+</g>
+<g id="chrome-normal-highlight-layer"
+   mask="url(#chrome-stack-mask)"
+   style="mix-blend-mode:screen">
+  <image href="data:image/png;base64,..."
+         width="..."
+         height="..." />
+</g>
 
-But render_recipe.py does not use dx_start, dy_start, dx_end, or dy_end inside bevel_ramp_layer_svg().
+That gives you the raised 3D-model feeling without abandoning SVG.
 
-So those controls are not changing the render meaningfully.
+Best result for this project
 
-For taper tuning, expose these instead:
+The strongest version is hybrid:
 
-recipeSlider(layer.id, "start", "Start", recipe.start ?? 0, 0, 40, 0.25)
-recipeSlider(layer.id, "end", "End", recipe.end ?? 8, 0, 48, 0.25)
+vector paths for clean glyph geometry
+recipe gradients for designed chrome/reflection
+SVG masks for layer control
+Python-generated height-map overlays for lighting, AO, shadows
 
-Or better: expose the taper stops in the Chrome editor. Right now chromeLayers() only includes layers whose paint points to a global gradient:
+Do not jump straight to Three.js or mesh extrusion. That will give you physical depth, but you will lose a lot of the graphic control that makes this render good.
 
-const gradientKey = gradientKeyFromPaint(layer.paint);
+The next architectural move is:
 
-But your taper layers use inline stops, not paint.
+chrome is no longer a painted band
+chrome is a raised material region
+shadows are no longer strokes
+shadows are projections from raised regions onto lower receivers
+highlights are no longer only gradients
+highlights are derived from height/normal, then stylized
 
-That means the UI is not really set up to tune the taper material yet.
-
-Tuning order
-
-Use this order:
-
-1. Make chrome_top harsher: more white, more black, less middle gray.
-2. Raise chrome-hot-reflection-layer and chrome-dark-reflection-layer opacity.
-3. Raise the chrome stack reflection layers so the tapers receive the same material language.
-4. Replace smooth gray taper stops with chrome-like broken stops.
-5. Add contour hotline/shadowline strokes at the taper boundaries.
-6. Expose bevel-ramp masks globally so mask_ref can target inner and outer taper layers.
-7. Only after that, tune extrusion depth and red gloss.
-
-The key principle: do not try to make the taper shiny by making it lighter. Make it shiny by giving it the same black/white reflection cuts as the main chrome face.
+That is the point where this stops looking like a mapped SVG and starts reading like a rendered object.
