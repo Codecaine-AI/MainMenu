@@ -135,6 +135,12 @@
         "sha": "1c9fa7f018029a1b9810ecaf2071e7221279b7fc",
         "message": "checkpoint-1: Stand up scene-engine tracer bullet",
         "created_at": "2026-04-29T20:35:00+00:00"
+      },
+      {
+        "checkpoint_id": 2,
+        "sha": "ce8d5155cc95016b6e78473b2742fba36d9064eb",
+        "message": "checkpoint-2: Asset registry + glyph-group renderer + CODECAINE logo",
+        "created_at": "2026-04-29T21:35:00+00:00"
       }
     ]
   }
