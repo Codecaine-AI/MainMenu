@@ -6,6 +6,17 @@
 <title>CODECAINE Scene Engine — Editor</title>
 </head>
 <body>
+<header class="editor-toolbar">
+  <div class="editor-toolbar-left">
+    <strong class="editor-toolbar-brand">Scene Engine</strong>
+    <span class="editor-toolbar-title" data-toolbar-title></span>
+    <span class="editor-toolbar-dirty-dot" data-toolbar-dirty title="No changes"></span>
+  </div>
+  <div class="editor-toolbar-right">
+    <button type="button" class="editor-toolbar-btn" data-toolbar-reload>Reload</button>
+    <button type="button" class="editor-toolbar-btn is-primary" data-toolbar-save disabled>Save</button>
+  </div>
+</header>
 <div class="editor-shell">
   <section id="panel-hierarchy" class="panel"></section>
   <section id="panel-canvas" class="panel">

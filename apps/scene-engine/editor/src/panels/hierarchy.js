@@ -1,6 +1,46 @@
-import { subscribe, getState, setSelectedPath } from '../state.js';
+import { subscribe, getState, setSelectedPath, moveLayer } from '../state.js';
+import { resolveLayer } from '../path.js';
 
 const collapsed = new Set();
+
+function siblingPath(path, offset) {
+  const parts = path.split('.children.');
+  const last = Number(parts[parts.length - 1]) + offset;
+  parts[parts.length - 1] = String(last);
+  return parts.join('.children.');
+}
+
+function intoPath(path, childCount) {
+  return `${path}.children.${childCount}`;
+}
+
+function clearAllDropIndicators(panel) {
+  panel.querySelectorAll('.drop-indicator-before, .drop-indicator-after, .drop-indicator-into')
+    .forEach(r => r.classList.remove('drop-indicator-before', 'drop-indicator-after', 'drop-indicator-into'));
+}
+
+function computeRegion(e, row, isGroup) {
+  const rect = row.getBoundingClientRect();
+  const y = e.clientY - rect.top;
+  const third = rect.height / 3;
+  if (isGroup) {
+    if (y < third) return 'before';
+    if (y > rect.height - third) return 'after';
+    return 'into';
+  }
+  return y < rect.height / 2 ? 'before' : 'after';
+}
+
+function regionToToPath(targetPath, region, scene) {
+  if (region === 'before') return targetPath;
+  if (region === 'after') return siblingPath(targetPath, 1);
+  if (region === 'into') {
+    const layer = resolveLayer(scene, targetPath);
+    const count = layer?.children?.length ?? 0;
+    return intoPath(targetPath, count);
+  }
+  return null;
+}
 
 function renderTree(layers, basePath = '') {
   const ul = document.createElement('ul');
@@ -11,6 +51,8 @@ function renderTree(layers, basePath = '') {
     const li = document.createElement('li');
     li.className = 'hierarchy-row';
     li.dataset.path = path;
+    li.dataset.layerType = layer.type ?? 'sub-layer';
+    li.draggable = true;
     const hasChildren = layer.children?.length > 0;
     if (hasChildren) {
       const chev = document.createElement('button');
@@ -65,9 +107,61 @@ function onClick(e) {
   }
 }
 
+function onDragStart(e) {
+  const row = e.target.closest('.hierarchy-row');
+  if (!row) return;
+  e.dataTransfer.effectAllowed = 'move';
+  e.dataTransfer.setData('application/x-layer-path', row.dataset.path);
+  e.dataTransfer.setData('text/plain', row.dataset.path);
+}
+
+function onDragOver(e) {
+  if (!e.dataTransfer.types.includes('application/x-layer-path')) return;
+  const row = e.target.closest('.hierarchy-row');
+  const panel = document.getElementById('panel-hierarchy');
+  clearAllDropIndicators(panel);
+  if (!row) return;
+  e.preventDefault();
+  e.dataTransfer.dropEffect = 'move';
+  const isGroup = row.dataset.layerType === 'glyph-group';
+  const region = computeRegion(e, row, isGroup);
+  row.classList.add(`drop-indicator-${region}`);
+}
+
+function onDragLeave(e) {
+  const panel = document.getElementById('panel-hierarchy');
+  if (!panel.contains(e.relatedTarget)) clearAllDropIndicators(panel);
+}
+
+function onDrop(e) {
+  const panel = document.getElementById('panel-hierarchy');
+  if (!e.dataTransfer.types.includes('application/x-layer-path')) {
+    clearAllDropIndicators(panel);
+    return;
+  }
+  const fromPath = e.dataTransfer.getData('application/x-layer-path');
+  const row = e.target.closest('.hierarchy-row');
+  clearAllDropIndicators(panel);
+  if (!fromPath || !row) return;
+  e.preventDefault();
+  const isGroup = row.dataset.layerType === 'glyph-group';
+  const region = computeRegion(e, row, isGroup);
+  const targetPath = row.dataset.path;
+  if (region === 'into' && (targetPath === fromPath || targetPath.startsWith(fromPath + '.children.'))) return;
+  const toPath = regionToToPath(targetPath, region, getState().scene);
+  if (!toPath) return;
+  if (toPath === fromPath) return;
+  if (toPath.startsWith(fromPath + '.children.')) return;
+  moveLayer(fromPath, toPath);
+}
+
 export function initHierarchyPanel() {
   const panel = document.getElementById('panel-hierarchy');
   panel.addEventListener('click', onClick);
+  panel.addEventListener('dragstart', onDragStart);
+  panel.addEventListener('dragover', onDragOver);
+  panel.addEventListener('dragleave', onDragLeave);
+  panel.addEventListener('drop', onDrop);
   subscribe('scene-changed', renderPanel);
   subscribe('selection-changed', updateActiveRow);
 }

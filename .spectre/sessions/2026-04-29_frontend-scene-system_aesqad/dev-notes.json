@@ -109,6 +109,42 @@
       "category": "discovery",
       "content": "Verification limitation (same as CP1\u2013CP3): no browser available so the visual outcome (4-panel layout, scene rendered in canvas, hierarchy tree with chevron toggle, inspector populated on click, asset browser grouped by type) is not eyeballed. Verified all plumbing: vite build succeeds; dev server boots in ~80 ms; /editor/ + /editor/src/main.js + /scenes/title/scene.json all 200. Expected interactive behaviour: click codecaine-logo chevron \u2192 5 sub-rows collapse/expand; click a row \u2192 inspector renders read-only properties + (for resolvable layers) yellow outline appears on canvas. User should run `npm --prefix apps/scene-engine run dev` and open /editor/?scene=title to confirm.",
       "created_at": "2026-04-29T23:30:00+00:00"
+    },
+    {
+      "scope": {
+        "type": "task",
+        "ref": "5.1.2"
+      },
+      "category": "decision",
+      "content": "Inspector subscribes to scene-changed for live re-render so canvas reflects edits, but every keystroke on a debounced number input triggers a scene-changed event \u2014 a naive replaceChildren would steal focus mid-edit. Added an early-return guard  in renderInspector. When user is actively editing, the inspector skips re-rendering; selection-changed and external scene-changed (reload, drag-drop) still trigger a fresh render because focus has left the inspector. Canvas re-renders on scene-changed independently.",
+      "created_at": "2026-04-29T23:55:00+00:00"
+    },
+    {
+      "scope": {
+        "type": "task",
+        "ref": "5.3.5"
+      },
+      "category": "discovery",
+      "content": "Save endpoint round-trip normalizes scene.json formatting: original title/scene.json was hand-formatted with collapsed {} objects on single lines, while JSON.stringify(body, null, 2) always expands every object. This is intentional per the spec (\"stable 2-space pretty-print so diffs stay clean across editor and agent surfaces\") \u2014 once both editor and agent save through the endpoint, future diffs will be clean. Restored the original title/scene.json after smoke-testing so the CP5 commit doesn't bundle the one-time normalization with the feature changes; first real save will normalize it.",
+      "created_at": "2026-04-29T23:55:00+00:00"
+    },
+    {
+      "scope": {
+        "type": "task",
+        "ref": "5.3.6"
+      },
+      "category": "decision",
+      "content": "Header bar lives outside .editor-shell as a sibling under <body>. Switched <body> to a 36px+1fr CSS grid and reduced .editor-shell height to calc(100vh - 36px). Keeps the existing four-panel grid intact and gives the toolbar a fixed height without competing with the canvas/inspector layout.",
+      "created_at": "2026-04-29T23:55:00+00:00"
+    },
+    {
+      "scope": {
+        "type": "checkpoint",
+        "ref": "5"
+      },
+      "category": "discovery",
+      "content": "Verification limitation (same as CP1-CP4): no browser available so the visual/interactive outcome (drag CODECAINE onto canvas \u2192 layer added; type into inspector number field \u2192 canvas re-renders live; drag hierarchy row to reorder; click Save \u2192 button disables, scene.json round-trips) is not eyeballed. Verified all plumbing: vite build succeeds; dev server boots in ~90 ms; all editor modules transform with HTTP 200 (state.js, panels/inspector.js, panels/canvas-drop.js, panels/hierarchy.js, panels/asset-browser.js, panels/toolbar.js, loader.js); save endpoint returns 204 on valid PUT and writes correct JSON, 400 on invalid id (Bad_Id), 400 on invalid JSON body, 400 on non-object body ([]), 405 on GET. Move-into-self guard in moveLayer + descendant string-prefix check in hierarchy onDrop prevent the cycle case. User should run npm --prefix apps/scene-engine run dev and open /editor/?scene=title to confirm the authoring loop.",
+      "created_at": "2026-04-29T23:55:00+00:00"
     }
   ]
 }

@@ -2834,7 +2834,7 @@
       "prerequisites": [
         4
       ],
-      "status": "pending",
+      "status": "completed",
       "testing_strategy": "Manual: editor full authoring loop \u2014 drag the CODECAINE asset onto an empty scene, edit its position via inspector, reorder layers in hierarchy, save, reload page, confirm scene persists exactly. Edit scene.json on disk in another window, reload editor, confirm it reflects the external edit (proves agent-editability). Confirm save endpoint round-trips JSON without loss of properties or formatting differences that would break diffs.",
       "task_groups": [
         {

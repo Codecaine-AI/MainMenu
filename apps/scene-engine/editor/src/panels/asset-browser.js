@@ -21,6 +21,12 @@ function renderGroup(type, entries) {
     const li = document.createElement('li');
     li.className = 'asset-row';
     li.dataset.assetId = id;
+    li.draggable = true;
+    li.addEventListener('dragstart', (e) => {
+      e.dataTransfer.effectAllowed = 'copy';
+      e.dataTransfer.setData('application/x-asset-id', id);
+      e.dataTransfer.setData('text/plain', id);
+    });
     const idSpan = document.createElement('span');
     idSpan.className = 'asset-id';
     idSpan.textContent = id;
