@@ -172,6 +172,12 @@
         "sha": "ad66d76bc8d6dabea03e5af1f2c2ee8ecb666b5d",
         "message": "checkpoint-5: Editor authoring \u2014 drag, edit, reorder, save",
         "created_at": "2026-04-29T23:55:00+00:00"
+      },
+      {
+        "checkpoint_id": 6,
+        "sha": "39b444945081a277ede99236dec6f4ec17c02975",
+        "message": "checkpoint-6: Component + audio assets, full title scene, multi-page build, retire apps/frontend/",
+        "created_at": "2026-04-29T23:58:00+00:00"
       }
     ]
   }
