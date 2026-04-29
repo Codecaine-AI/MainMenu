@@ -1,0 +1,19 @@
+{
+  "id": "title",
+  "name": "Title Screen",
+  "stage": { "width": 1440, "height": 1080 },
+  "layers": [
+    {
+      "id": "bg-video",
+      "type": "media",
+      "asset": "/media/test-fire-2.mp4",
+      "properties": { "fit": "cover", "blend": "normal", "opacity": 1.0 }
+    },
+    {
+      "id": "crt",
+      "type": "effect",
+      "asset": "/src/effects/crt-overlay.css",
+      "properties": { "opacity": 1.0 }
+    }
+  ]
+}

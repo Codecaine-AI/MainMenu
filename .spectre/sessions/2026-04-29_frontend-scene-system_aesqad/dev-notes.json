@@ -1,0 +1,18 @@
+{
+  "$schema": "Dev notes — deviations, discoveries, decisions, blockers, resolutions captured during build",
+  "session_id": "2026-04-29_frontend-scene-system_aesqad",
+  "notes": [
+    {
+      "scope": { "type": "task", "ref": "1.2.3" },
+      "category": "discovery",
+      "content": "Vite content-negotiates CSS files at /src/**/*.css: requests with Accept: text/css (what <link rel=stylesheet> sends) get raw CSS, while JS-module requests get an HMR-wrapped JS shim. The css-effect renderer's ensureStylesheet() <link> approach therefore works correctly in dev without any extra config. This negotiation should also apply to /assets/effects/*.css after CP2's relocation since assets/ also lives under the project root.",
+      "created_at": "2026-04-29T20:30:00+00:00"
+    },
+    {
+      "scope": { "type": "checkpoint", "ref": "1" },
+      "category": "discovery",
+      "content": "Verification limitation: the checkpoint's testing_strategy is a manual visual browser test (bg video looping + CRT overlay). I verified all the underlying plumbing — npm install clean, dev server boots cleanly in ~400ms with no errors, all routes return 200 with correct content-types (HTML, JSON, video/mp4, text/css, JS modules), and `vite build` succeeds producing valid dist output. The actual rendered pixels were not visually confirmed because no browser is available in this environment. User should run `npm --prefix apps/scene-engine run dev` and open the shown URL to confirm the visual.",
+      "created_at": "2026-04-29T20:30:00+00:00"
+    }
+  ]
+}

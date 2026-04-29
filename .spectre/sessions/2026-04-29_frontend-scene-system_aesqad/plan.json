@@ -13,7 +13,7 @@
       "title": "Renderer Foundation + Title Skeleton (tracer bullet)",
       "goal": "Stand up a new apps/scene-engine/ Vite app that loads a hardcoded scenes/title/scene.json (one media bg layer + one effect overlay layer) and renders it onto a 1440x1080 stage in the browser. End-to-end pipe with two layer types only — no registry, no editor, no glyph-group yet.",
       "prerequisites": [],
-      "status": "pending",
+      "status": "completed",
       "testing_strategy": "Manual: run dev server, open browser at /, see test-fire-2.mp4 looping fullscreen with CRT scanlines/vignette overlay on top. Confirm stage dimensions render at 1440x1080 (with appropriate scaling/letterboxing). scene.json edits to opacity/blend on either layer reflect after reload. Visual smoke test only — no automated tests this checkpoint.",
       "task_groups": [
         {
