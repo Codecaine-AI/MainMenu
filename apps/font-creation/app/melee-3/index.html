@@ -25,21 +25,13 @@
           <div class="control-group header-asset-picker">
             <label for="assetSelect">Asset</label>
             <select id="assetSelect">
-              <option value="/generation/outputs/generated/glyphs/at.css-layers.svg" selected>Recipe glyph @</option>
-              <option value="/generation/inputs/assets/glyphs/at.svg">Base glyph @</option>
-              <option value="/generation/outputs/generated/word/CODECAINE.css-layers.svg">CODECAINE recipe SVG</option>
-              <option value="/generation/inputs/assets/word/CODECAINE.svg">CODECAINE word</option>
-              <option value="/generation/outputs/generated/glyphs/asterisk.css-layers.svg">Recipe glyph *</option>
-              <option value="/generation/outputs/generated/glyphs/exclamation.css-layers.svg">Recipe glyph !</option>
-              <option value="/generation/outputs/generated/glyphs/period.css-layers.svg">Recipe glyph .</option>
-              <option value="/generation/inputs/assets/glyphs/A.svg">Glyph A</option>
-              <option value="/generation/outputs/generated/glyphs/C.css-layers.svg">Recipe glyph C</option>
-              <option value="/generation/inputs/assets/glyphs/C.svg">Glyph C</option>
-              <option value="/generation/inputs/assets/glyphs/O.svg">Glyph O</option>
-              <option value="/generation/inputs/assets/glyphs/D.svg">Glyph D</option>
-              <option value="/generation/inputs/assets/glyphs/E.svg">Glyph E</option>
-              <option value="/generation/inputs/assets/glyphs/I.svg">Glyph I</option>
-              <option value="/generation/inputs/assets/glyphs/N.svg">Glyph N</option>
+              <option value="/generation/outputs/generated/word/CODECAINE.css-layers.svg">CODECAINE</option>
+              <option value="/generation/outputs/generated/glyphs/at.css-layers.svg" selected>@</option>
+              <option value="/generation/outputs/generated/glyphs/A.css-layers.svg">A</option>
+              <option value="/generation/outputs/generated/glyphs/R.css-layers.svg">R</option>
+              <option value="/generation/outputs/generated/glyphs/F.css-layers.svg">F</option>
+              <option value="/generation/outputs/generated/glyphs/K.css-layers.svg">K</option>
+              <option value="/generation/outputs/generated/glyphs/asterisk.css-layers.svg">*</option>
             </select>
           </div>
         </header>
@@ -47,6 +39,7 @@
         <div class="editor-tabs">
           <div class="editor-tab-list" role="tablist" aria-label="Editor sections">
             <button type="button" class="tab-button is-active" id="layerEditorTab" role="tab" aria-selected="true" aria-controls="layerEditorPanel" data-editor-tab="layers">Layers</button>
+            <button type="button" class="tab-button" id="mediaEditorTab" role="tab" aria-selected="false" aria-controls="mediaEditorPanel" data-editor-tab="media">Media</button>
             <button type="button" class="tab-button" id="lightingEditorTab" role="tab" aria-selected="false" aria-controls="lightingEditorPanel" data-editor-tab="lighting">Lighting</button>
             <button type="button" class="tab-button" id="styleEditorTab" role="tab" aria-selected="false" aria-controls="styleEditorPanel" data-editor-tab="style">Styling</button>
             <button type="button" class="tab-button" id="actionsEditorTab" role="tab" aria-selected="false" aria-controls="actionsEditorPanel" data-editor-tab="actions">Actions</button>
@@ -60,6 +53,16 @@
               </div>
               <p>Shown inside out. This is the layer map, not SVG paint order.</p>
               <div class="layer-stack-map" id="layerStackMap"></div>
+            </section>
+          </section>
+
+          <section class="tab-panel" id="mediaEditorPanel" role="tabpanel" aria-labelledby="mediaEditorTab" data-editor-panel="media" hidden>
+            <section class="media-editor" aria-label="Video media controls">
+              <div class="media-editor-header">
+                <h2>Video Media</h2>
+                <button type="button" id="mediaSaveButton" disabled>Save</button>
+              </div>
+              <div class="media-control-list" id="mediaControlList"></div>
             </section>
           </section>
 
@@ -92,6 +95,20 @@
                   </label>
                 </div>
               </section>
+
+              <section class="style-section" aria-label="Tilt response controls">
+                <h3>Tilt Response</h3>
+                <div class="control-grid compact-grid">
+                  <label class="tilt-toggle-label">
+                    <span>Enabled</span>
+                    <input type="checkbox" id="tiltResponseToggle" checked />
+                  </label>
+                  <label>
+                    <span>Intensity</span>
+                    <input type="range" min="0" max="2" step="0.1" value="1" id="tiltResponseIntensity" aria-label="Tilt response intensity" />
+                  </label>
+                </div>
+              </section>
             </section>
           </section>
 
@@ -99,8 +116,20 @@
             <section class="actions-editor" aria-label="Render actions">
               <h2>Actions</h2>
               <div class="button-row">
+                <button type="button" id="fullRegenerateButton">Full Regenerate (all glyphs)</button>
                 <button type="button" id="resetTiltButton">Reset Tilt</button>
                 <button type="button" id="copyButton">Copy CSS</button>
+              </div>
+              <div class="button-row" style="margin-top: 0.5rem">
+                <button type="button" id="bakeButton">Bake SVG</button>
+                <label style="display:inline-flex; align-items:center; gap:0.25rem; font-size:0.8rem">
+                  <span>Scale</span>
+                  <select id="bakeScale">
+                    <option value="1">1x</option>
+                    <option value="2" selected>2x</option>
+                    <option value="3">3x</option>
+                  </select>
+                </label>
               </div>
               <p class="app-status" id="appStatus" role="status" aria-live="polite"></p>
             </section>
