@@ -1,0 +1,131 @@
+{
+  "$schema": "Session state manifest v3 - vertical phase slices, programmatic updates only",
+  "session_id": "2026-04-29_frontend-scene-system_aesqad",
+  "session_uuid": "{{SESSION_UUID}}",
+  "topic": "frontend-scene-system",
+  "description": "Migrate the demo suite from hand-wired pages into a scene composition system where each page (title screen, main menu, etc.) is a scene composed of typed asset layers (fonts, backgrounds, effects, media).",
+  "prior_sessions": [],
+  "session_type": "full",
+  "created_at": "2026-04-29T16:16:09+00:00",
+  "updated_at": "2026-04-29T17:00:00+00:00",
+  "current_phase": "plan",
+  "status": "active",
+  "intake": {
+    "status": "completed",
+    "started_at": "2026-04-29T16:16:09+00:00",
+    "completed_at": "2026-04-29T16:16:09+00:00",
+    "last_updated": "2026-04-29T16:16:09+00:00",
+    "data": {
+      "topic_summary": "Migrate hand-wired Vite pages into a scene composition system where scenes correspond to pages (title, menu, etc.) and are built from typed reusable asset layers."
+    }
+  },
+  "link_priors": {
+    "status": "completed",
+    "started_at": "2026-04-29T16:16:09+00:00",
+    "completed_at": "2026-04-29T16:16:09+00:00",
+    "last_updated": "2026-04-29T16:16:09+00:00",
+    "data": {
+      "prior_sessions": []
+    }
+  },
+  "spec": {
+    "status": "finalized",
+    "started_at": "2026-04-29T16:16:09+00:00",
+    "completed_at": "2026-04-29T17:00:00+00:00",
+    "last_updated": "2026-04-29T17:00:00+00:00",
+    "data": {
+      "open_questions": [
+      ],
+      "key_decisions": [
+        {
+          "title": "Scene = Page (Unity Scene model)",
+          "rationale": "Each scene is one full stage, 1:1 with a web page. Assets are placed into scenes. System targets landing pages / static websites, not interactive applications.",
+          "date": "2026-04-29"
+        },
+        {
+          "title": "Dual-surface authoring (visual editor + agent API)",
+          "rationale": "Human authors via visual canvas editor with drag-and-drop and property panels. AI agent edits programmatically via API on the same scene data. Generalizes the pattern already proven in the melee-3 font app.",
+          "date": "2026-04-29"
+        },
+        {
+          "title": "Collapsible group layer model (tree hierarchy)",
+          "rationale": "Scene layers form a tree, not a flat stack. Complex assets like the CodeCaine logo are groups that expand to reveal sub-layers with configurable properties. Sub-layers can reference other assets (e.g. video). Other scene assets can interleave between a group's sub-layers. Like Photoshop layer groups or Unity Hierarchy.",
+          "date": "2026-04-29"
+        },
+        {
+          "title": "Full replacement of apps/frontend/",
+          "rationale": "Scene system replaces the existing frontend entirely. All pages rebuilt as scenes. Everything unified into one application.",
+          "date": "2026-04-29"
+        },
+        {
+          "title": "Option A — content separate, assets reusable",
+          "rationale": "Assets live in registry as reusable building blocks. Content lives with components. Scenes are lean composition manifests referencing assets by ID. Avoids duplication, keeps editor focused on visual composition.",
+          "date": "2026-04-29"
+        },
+        {
+          "title": "Scene data format confirmed (scene.json)",
+          "rationale": "JSON with id, name, stage dimensions, and layers array. Layer types: media, effect, glyph-group, component. Groups use children array for sub-layers with interleaving support. Z-order is array position (last on top). Both editor and agent operate on this format.",
+          "date": "2026-04-29"
+        },
+        {
+          "title": "Font pipeline stays separate, editor app absorbed",
+          "rationale": "Python pipeline is an asset factory — stays in apps/font-creation/. The melee-3 Vite editor app's layer editing capabilities get folded into the scene editor as the glyph-group property inspector. One editor, not two.",
+          "date": "2026-04-29"
+        },
+        {
+          "title": "Five asset types on day one",
+          "rationale": "All five needed for the title scene vertical slice: glyph-group, media, effect, component, audio.",
+          "date": "2026-04-29"
+        }
+      ]
+    }
+  },
+  "plan": {
+    "status": "finalized",
+    "started_at": "2026-04-29T17:05:00+00:00",
+    "completed_at": "2026-04-29T19:55:00+00:00",
+    "finalized_at": "2026-04-29T19:55:00+00:00",
+    "last_updated": "2026-04-29T19:55:00+00:00",
+    "data": {
+      "oversight_mode": "stepped",
+      "current_level": "checkpoint",
+      "current_checkpoint": 6,
+      "current_task_group": null,
+      "current_task": null
+    }
+  },
+  "plan_state": {
+    "status": "finalized",
+    "checkpoints_total": 6,
+    "checkpoints_detailed": 6,
+    "checkpoints_completed": [],
+    "last_updated": "2026-04-29T19:55:00+00:00"
+  },
+  "build": {
+    "status": "pending",
+    "started_at": null,
+    "completed_at": null,
+    "last_updated": null,
+    "data": {
+      "current_checkpoint": null,
+      "current_task_group": null,
+      "current_task": null,
+      "checkpoints_completed": []
+    }
+  },
+  "docs": {
+    "status": "pending",
+    "started_at": null,
+    "completed_at": null,
+    "last_updated": null,
+    "data": {
+      "updates": []
+    }
+  },
+  "git": {
+    "branch": "main",
+    "worktree": null,
+    "base_branch": null,
+    "commits": []
+  }
+}
