@@ -15,3 +15,7 @@ assets/
 !apps/font-creation/generation/melee-3/inputs/assets/**
 !apps/scene-engine/assets/
 !apps/scene-engine/assets/**
+!apps/scene-engine/public/assets/
+!apps/scene-engine/public/assets/**
+!apps/scene-engine/public/modules/
+!apps/scene-engine/public/modules/**

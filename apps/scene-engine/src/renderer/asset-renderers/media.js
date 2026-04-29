@@ -1,6 +1,6 @@
 export function renderMedia(layer, entry) {
   const video = document.createElement('video');
-  video.src = entry.path;
+  video.src = entry.file;
   video.autoplay = true;
   video.muted = true;
   video.loop = true;

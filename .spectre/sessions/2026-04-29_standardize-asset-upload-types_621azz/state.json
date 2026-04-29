@@ -1,0 +1,84 @@
+{
+  "$schema": "Session state manifest v3 - vertical phase slices, programmatic updates only",
+  "session_id": "2026-04-29_standardize-asset-upload-types_621azz",
+  "session_uuid": "{{SESSION_UUID}}",
+  "topic": "Standardize asset upload types",
+  "description": "Distinguish external file 'assets' (audio, images, glyphs, video) from non-asset things like effects/components, and add an upload UI that places files into the right folder by type.",
+  "prior_sessions": [],
+  "session_type": "full",
+  "created_at": "2026-04-29T22:27:11+00:00",
+  "updated_at": "2026-04-29T23:17:20+00:00",
+  "current_phase": "build",
+  "status": "active",
+  "intake": {
+    "status": "completed",
+    "started_at": "2026-04-29T22:27:11+00:00",
+    "completed_at": "2026-04-29T22:27:30+00:00",
+    "last_updated": "2026-04-29T22:27:30+00:00",
+    "data": {}
+  },
+  "link_priors": {
+    "status": "completed",
+    "started_at": "2026-04-29T22:27:30+00:00",
+    "completed_at": "2026-04-29T22:27:35+00:00",
+    "last_updated": "2026-04-29T22:27:35+00:00",
+    "data": {}
+  },
+  "spec": {
+    "status": "finalized",
+    "started_at": "2026-04-29T22:27:35+00:00",
+    "completed_at": "2026-04-29T22:55:00+00:00",
+    "last_updated": "2026-04-29T22:55:00+00:00",
+    "data": {}
+  },
+  "plan": {
+    "status": "finalized",
+    "started_at": "2026-04-29T23:05:00+00:00",
+    "completed_at": "2026-04-29T23:17:20+00:00",
+    "last_updated": "2026-04-29T23:17:20+00:00",
+    "data": {
+      "oversight_mode": "stepped",
+      "current_level": "checkpoint",
+      "current_checkpoint": 2,
+      "current_task_group": null,
+      "current_task": null
+    }
+  },
+  "plan_state": {
+    "status": "in_progress",
+    "checkpoints_total": 3,
+    "checkpoints_detailed": 3,
+    "checkpoints_completed": [1],
+    "current_checkpoint": 2,
+    "current_task_group": null,
+    "current_task": null,
+    "last_updated": "2026-04-29T23:55:00+00:00"
+  },
+  "build": {
+    "status": "in_progress",
+    "started_at": "2026-04-29T23:30:00+00:00",
+    "completed_at": null,
+    "last_updated": "2026-04-29T23:55:00+00:00",
+    "data": {
+      "current_checkpoint": 2,
+      "current_task_group": null,
+      "current_task": null,
+      "checkpoints_completed": [1]
+    }
+  },
+  "docs": {
+    "status": "pending",
+    "started_at": null,
+    "completed_at": null,
+    "last_updated": null,
+    "data": {
+      "updates": []
+    }
+  },
+  "git": {
+    "branch": "main",
+    "worktree": null,
+    "base_branch": null,
+    "commits": []
+  }
+}

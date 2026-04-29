@@ -1,0 +1,18 @@
+{
+  "bg-video": {
+    "type": "video",
+    "file": "/assets/video/test-fire-2.mp4"
+  },
+  "in-text-fire": {
+    "type": "video",
+    "file": "/assets/video/test-fire-3.mp4"
+  },
+  "codecaine-logo": {
+    "type": "glyph",
+    "file": "/assets/glyph/CODECAINE.css-layers.svg"
+  },
+  "start-cue": {
+    "type": "audio",
+    "file": "/assets/audio/start-cue/start-cue.js"
+  }
+}

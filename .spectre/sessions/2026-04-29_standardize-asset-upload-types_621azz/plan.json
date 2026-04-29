@@ -1,0 +1,2027 @@
+{
+  "$schema": "Plan schema for session checkpoint-based planning (v2)",
+  "session_id": "2026-04-29_standardize-asset-upload-types_621azz",
+  "spec_reference": "./spec.md",
+  "created_at": "2026-04-29T23:05:00+00:00",
+  "updated_at": "2026-04-29T23:17:20+00:00",
+  "status": "complete",
+  "checkpoints": [
+    {
+      "id": 1,
+      "title": "Reorg + dual-registry foundation",
+      "goal": "Restructure public/ into assets (4 types: audio/image/video/glyph) + modules (effects/components), split registry.json into two manifests with the new container shape ({ type, file }), update the loader/types/renderers to consume both, and verify the existing title scene renders identically.",
+      "prerequisites": [],
+      "status": "completed",
+      "testing_strategy": {
+        "summary": "Manual visual regression of the title scene + editor smoke test. No unit tests added in this checkpoint.",
+        "checks": [
+          "From repo root: `cd apps/scene-engine && npm run dev` (server on http://localhost:3000).",
+          "Visit http://localhost:3000/scenes/title \u2014 confirm: codecaine-logo glyph renders with all SVG sub-layers; in-text-fire video plays inside the glyph clip; press-start component renders; start-cue audio plays once on load; crt-overlay effect overlays the stage. (bg-video has visible:false in scene.json \u2014 expected to NOT render.)",
+          "DevTools console \u2014 no errors from `[asset-registry]` or any renderer; no 404s for /assets/* or /modules/* paths.",
+          "Visit http://localhost:3000/editor?scene=title \u2014 confirm: asset browser lists all six entries (bg-video, codecaine-logo, in-text-fire, start-cue, crt-overlay, press-start); hierarchy tree populates; clicking save produces no diff (scene.json unchanged).",
+          "Run `npm run build` from apps/scene-engine/ \u2014 must succeed with no TypeScript errors."
+        ]
+      },
+      "task_groups": [
+        {
+          "id": 1,
+          "title": "Restructure public/ filesystem and split registries",
+          "objective": "Move directories into the new asset/module split and write the two new registry manifests (assets uses the container shape `{ type, file }`; modules keeps `{ type, path }`).",
+          "status": "pending",
+          "tasks": [
+            {
+              "id": "1.1.1",
+              "title": "Relocate effects/ and components/ to public/modules/",
+              "description": "Move the two non-asset code-module directories out of public/assets/ into a new top-level public/modules/ tree. These directories contain CSS effect sheets and JS components that are authored, not uploaded \u2014 per the spec they no longer belong in `assets/`. Use `git mv` so history is preserved. After this task: public/assets/ no longer contains effects/ or components/; public/modules/ contains both.",
+              "status": "pending",
+              "context": {
+                "read_before": [
+                  {
+                    "file": "apps/scene-engine/public/assets/effects/crt-overlay.css",
+                    "lines": "1-1",
+                    "purpose": "Confirm file exists at source path before move"
+                  },
+                  {
+                    "file": "apps/scene-engine/public/assets/components/press-start/press-start.js",
+                    "lines": "1-1",
+                    "purpose": "Confirm component file exists at source path before move"
+                  },
+                  {
+                    "file": ".spectre/sessions/2026-04-29_standardize-asset-upload-types_621azz/spec.md",
+                    "lines": "144-183",
+                    "purpose": "Target file structure section showing post-reorg layout"
+                  }
+                ],
+                "related_files": [
+                  "apps/scene-engine/public/assets/components/press-start/press-start-data.json",
+                  "apps/scene-engine/public/assets/components/press-start/press-start.css"
+                ]
+              },
+              "depends_on": [],
+              "file_context": {
+                "beginning": {
+                  "files": [
+                    {
+                      "path": "apps/scene-engine/public/assets/effects/crt-overlay.css",
+                      "status": "exists",
+                      "description": "CSS effect sheet \u2014 currently under assets/effects/"
+                    },
+                    {
+                      "path": "apps/scene-engine/public/assets/components/press-start/press-start.js",
+                      "status": "exists",
+                      "description": "JS component module"
+                    },
+                    {
+                      "path": "apps/scene-engine/public/assets/components/press-start/press-start.css",
+                      "status": "exists",
+                      "description": "Component stylesheet"
+                    },
+                    {
+                      "path": "apps/scene-engine/public/assets/components/press-start/press-start-data.json",
+                      "status": "exists",
+                      "description": "Component data"
+                    }
+                  ],
+                  "tree": null
+                },
+                "ending": {
+                  "files": [
+                    {
+                      "path": "apps/scene-engine/public/modules/effects/crt-overlay.css",
+                      "status": "moved",
+                      "description": "Moved from assets/effects/"
+                    },
+                    {
+                      "path": "apps/scene-engine/public/modules/components/press-start/press-start.js",
+                      "status": "moved",
+                      "description": "Moved from assets/components/"
+                    },
+                    {
+                      "path": "apps/scene-engine/public/modules/components/press-start/press-start.css",
+                      "status": "moved",
+                      "description": "Moved with component dir"
+                    },
+                    {
+                      "path": "apps/scene-engine/public/modules/components/press-start/press-start-data.json",
+                      "status": "moved",
+                      "description": "Moved with component dir"
+                    },
+                    {
+                      "path": "apps/scene-engine/public/assets/effects",
+                      "status": "deleted",
+                      "description": "Source directory removed"
+                    },
+                    {
+                      "path": "apps/scene-engine/public/assets/components",
+                      "status": "deleted",
+                      "description": "Source directory removed"
+                    }
+                  ],
+                  "tree": null
+                }
+              },
+              "actions": [
+                {
+                  "id": "1.1.1.1",
+                  "command": "CREATE DIRECTORY apps/scene-engine/public/modules/",
+                  "file": "apps/scene-engine/public/modules/",
+                  "status": "pending"
+                },
+                {
+                  "id": "1.1.1.2",
+                  "command": "MOVE apps/scene-engine/public/assets/effects/ TO apps/scene-engine/public/modules/effects/ (use `git mv`)",
+                  "file": "apps/scene-engine/public/modules/effects/",
+                  "status": "pending"
+                },
+                {
+                  "id": "1.1.1.3",
+                  "command": "MOVE apps/scene-engine/public/assets/components/ TO apps/scene-engine/public/modules/components/ (use `git mv`)",
+                  "file": "apps/scene-engine/public/modules/components/",
+                  "status": "pending"
+                },
+                {
+                  "id": "1.1.1.4",
+                  "command": "VERIFY apps/scene-engine/public/assets/effects/ no longer exists AND apps/scene-engine/public/assets/components/ no longer exists",
+                  "file": "apps/scene-engine/public/assets/",
+                  "status": "pending"
+                }
+              ]
+            },
+            {
+              "id": "1.1.2",
+              "title": "Reshape assets/ subdirectories to canonical 4 types",
+              "description": "Inside public/assets/, normalize the asset-type directories so the only subdirectories are exactly `audio/`, `image/`, `video/`, `glyph/` (singular, matches the spec's canonical asset types). Specifically: split `media/` into `image/` + `video/` (the two existing files there are .mp4 \u2192 both go to video/); rename `glyphs/` (plural) \u2192 `glyph/` (singular); leave `audio/` as-is; create an empty `image/` folder with a `.gitkeep` so it's tracked. Use `git mv` for all relocations.",
+              "status": "pending",
+              "context": {
+                "read_before": [
+                  {
+                    "file": ".spectre/sessions/2026-04-29_standardize-asset-upload-types_621azz/spec.md",
+                    "lines": "37-46",
+                    "purpose": "Canonical asset types decision: audio, image, video, glyph (4 types, image and video split)"
+                  }
+                ],
+                "related_files": [
+                  "apps/scene-engine/public/assets/media/test-fire-2.mp4",
+                  "apps/scene-engine/public/assets/media/test-fire-3.mp4",
+                  "apps/scene-engine/public/assets/glyphs/CODECAINE.css-layers.svg",
+                  "apps/scene-engine/public/assets/audio/start-cue/start-cue.js"
+                ]
+              },
+              "depends_on": [],
+              "file_context": {
+                "beginning": {
+                  "files": [
+                    {
+                      "path": "apps/scene-engine/public/assets/media/test-fire-2.mp4",
+                      "status": "exists",
+                      "description": "Background fire video"
+                    },
+                    {
+                      "path": "apps/scene-engine/public/assets/media/test-fire-3.mp4",
+                      "status": "exists",
+                      "description": "In-text fire video"
+                    },
+                    {
+                      "path": "apps/scene-engine/public/assets/glyphs/CODECAINE.css-layers.svg",
+                      "status": "exists",
+                      "description": "Codecaine logo SVG"
+                    },
+                    {
+                      "path": "apps/scene-engine/public/assets/audio/start-cue/start-cue.js",
+                      "status": "exists",
+                      "description": "Audio JS wrapper (kept as-is for legacy)"
+                    }
+                  ],
+                  "tree": null
+                },
+                "ending": {
+                  "files": [
+                    {
+                      "path": "apps/scene-engine/public/assets/video/test-fire-2.mp4",
+                      "status": "moved",
+                      "description": "Moved from media/"
+                    },
+                    {
+                      "path": "apps/scene-engine/public/assets/video/test-fire-3.mp4",
+                      "status": "moved",
+                      "description": "Moved from media/"
+                    },
+                    {
+                      "path": "apps/scene-engine/public/assets/glyph/CODECAINE.css-layers.svg",
+                      "status": "moved",
+                      "description": "Moved from glyphs/ (plural\u2192singular)"
+                    },
+                    {
+                      "path": "apps/scene-engine/public/assets/image/.gitkeep",
+                      "status": "new",
+                      "description": "Empty placeholder so the empty image/ folder is tracked"
+                    },
+                    {
+                      "path": "apps/scene-engine/public/assets/media",
+                      "status": "deleted",
+                      "description": "Empty directory removed after split"
+                    },
+                    {
+                      "path": "apps/scene-engine/public/assets/glyphs",
+                      "status": "deleted",
+                      "description": "Plural directory removed after rename"
+                    }
+                  ],
+                  "tree": null
+                }
+              },
+              "actions": [
+                {
+                  "id": "1.1.2.1",
+                  "command": "CREATE DIRECTORY apps/scene-engine/public/assets/video/",
+                  "file": "apps/scene-engine/public/assets/video/",
+                  "status": "pending"
+                },
+                {
+                  "id": "1.1.2.2",
+                  "command": "MOVE apps/scene-engine/public/assets/media/test-fire-2.mp4 TO apps/scene-engine/public/assets/video/test-fire-2.mp4 (use `git mv`)",
+                  "file": "apps/scene-engine/public/assets/video/test-fire-2.mp4",
+                  "status": "pending"
+                },
+                {
+                  "id": "1.1.2.3",
+                  "command": "MOVE apps/scene-engine/public/assets/media/test-fire-3.mp4 TO apps/scene-engine/public/assets/video/test-fire-3.mp4 (use `git mv`)",
+                  "file": "apps/scene-engine/public/assets/video/test-fire-3.mp4",
+                  "status": "pending"
+                },
+                {
+                  "id": "1.1.2.4",
+                  "command": "DELETE apps/scene-engine/public/assets/media/ (now empty)",
+                  "file": "apps/scene-engine/public/assets/media/",
+                  "status": "pending"
+                },
+                {
+                  "id": "1.1.2.5",
+                  "command": "RENAME apps/scene-engine/public/assets/glyphs/ TO apps/scene-engine/public/assets/glyph/ (use `git mv`)",
+                  "file": "apps/scene-engine/public/assets/glyph/",
+                  "status": "pending"
+                },
+                {
+                  "id": "1.1.2.6",
+                  "command": "CREATE FILE apps/scene-engine/public/assets/image/.gitkeep (empty file so empty directory is tracked)",
+                  "file": "apps/scene-engine/public/assets/image/.gitkeep",
+                  "status": "pending"
+                },
+                {
+                  "id": "1.1.2.7",
+                  "command": "VERIFY apps/scene-engine/public/assets/ contains exactly: audio/, image/, video/, glyph/, registry.json (no media/, no glyphs/)",
+                  "file": "apps/scene-engine/public/assets/",
+                  "status": "pending"
+                }
+              ]
+            },
+            {
+              "id": "1.1.3",
+              "title": "Rewrite public/assets/registry.json as container manifest (asset types only)",
+              "description": "Replace the existing registry.json with the asset-only container manifest. The new shape is `{ <id>: { type, file } }` where `type \u2208 {audio, image, video, glyph}` and `file` is the absolute public path to the file (e.g. `/assets/video/test-fire-2.mp4`). Drop the old `effect` and `component` entries \u2014 those move to the modules registry in the next task. The 4 surviving entries are: bg-video (video), in-text-fire (video), codecaine-logo (glyph), start-cue (audio). Note: the old `media` type is split \u2014 both videos become `video`. Note: the audio entry still points at the existing JS wrapper (`/assets/audio/start-cue/start-cue.js`) \u2014 plain audio file support is a CP2 concern.",
+              "status": "pending",
+              "context": {
+                "read_before": [
+                  {
+                    "file": "apps/scene-engine/public/assets/registry.json",
+                    "lines": "1-26",
+                    "purpose": "Current 6-entry registry shape `{ type, path }` \u2014 need to translate the 4 asset entries into the new `{ type, file }` shape and drop the 2 module entries"
+                  },
+                  {
+                    "file": ".spectre/sessions/2026-04-29_standardize-asset-upload-types_621azz/spec.md",
+                    "lines": "85-97",
+                    "purpose": "Container model \u2014 registry entries are containers; file pointer is swappable"
+                  }
+                ],
+                "related_files": []
+              },
+              "depends_on": [
+                "1.1.2"
+              ],
+              "file_context": {
+                "beginning": {
+                  "files": [
+                    {
+                      "path": "apps/scene-engine/public/assets/registry.json",
+                      "status": "exists",
+                      "description": "Current 6-entry registry mixing assets and modules; uses `path` field; references old paths under media/ and glyphs/"
+                    }
+                  ],
+                  "tree": null
+                },
+                "ending": {
+                  "files": [
+                    {
+                      "path": "apps/scene-engine/public/assets/registry.json",
+                      "status": "modified",
+                      "description": "4 container entries (bg-video:video, in-text-fire:video, codecaine-logo:glyph, start-cue:audio); shape `{ type, file }`; paths point at new directories"
+                    }
+                  ],
+                  "tree": null
+                }
+              },
+              "actions": [
+                {
+                  "id": "1.1.3.1",
+                  "command": "REPLACE entire contents of apps/scene-engine/public/assets/registry.json WITH JSON object containing 4 entries: bg-video={type:'video',file:'/assets/video/test-fire-2.mp4'}, in-text-fire={type:'video',file:'/assets/video/test-fire-3.mp4'}, codecaine-logo={type:'glyph',file:'/assets/glyph/CODECAINE.css-layers.svg'}, start-cue={type:'audio',file:'/assets/audio/start-cue/start-cue.js'}",
+                  "file": "apps/scene-engine/public/assets/registry.json",
+                  "status": "pending"
+                },
+                {
+                  "id": "1.1.3.2",
+                  "command": "VERIFY apps/scene-engine/public/assets/registry.json parses as JSON AND every entry has both `type` and `file` keys (no `path` key) AND every `type` is one of {audio,image,video,glyph}",
+                  "file": "apps/scene-engine/public/assets/registry.json",
+                  "status": "pending"
+                }
+              ]
+            },
+            {
+              "id": "1.1.4",
+              "title": "Create public/modules/registry.json for effects and components",
+              "description": "Author the new modules registry that owns the relocated effects and components. Shape stays `{ <id>: { type, path } }` \u2014 modules are not containers (file is not swappable, the code IS the module). `type` is `effect` or `component`. The 2 entries are: crt-overlay (effect \u2192 /modules/effects/crt-overlay.css) and press-start (component \u2192 /modules/components/press-start/press-start.js).",
+              "status": "pending",
+              "context": {
+                "read_before": [
+                  {
+                    "file": "apps/scene-engine/public/assets/registry.json",
+                    "lines": "1-26",
+                    "purpose": "Reference the original `path` values for crt-overlay and press-start so the new module paths line up correctly"
+                  },
+                  {
+                    "file": ".spectre/sessions/2026-04-29_standardize-asset-upload-types_621azz/spec.md",
+                    "lines": "108-115",
+                    "purpose": "Decision: split registries; module registry has effects + components"
+                  }
+                ],
+                "related_files": [
+                  "apps/scene-engine/public/modules/effects/crt-overlay.css",
+                  "apps/scene-engine/public/modules/components/press-start/press-start.js"
+                ]
+              },
+              "depends_on": [
+                "1.1.1"
+              ],
+              "file_context": {
+                "beginning": {
+                  "files": [
+                    {
+                      "path": "apps/scene-engine/public/modules/",
+                      "status": "exists",
+                      "description": "New top-level dir created in task 1.1.1; contains effects/ and components/ but no registry.json yet"
+                    }
+                  ],
+                  "tree": null
+                },
+                "ending": {
+                  "files": [
+                    {
+                      "path": "apps/scene-engine/public/modules/registry.json",
+                      "status": "new",
+                      "description": "Module manifest with 2 entries (crt-overlay:effect, press-start:component); shape `{ type, path }`"
+                    }
+                  ],
+                  "tree": null
+                }
+              },
+              "actions": [
+                {
+                  "id": "1.1.4.1",
+                  "command": "CREATE FILE apps/scene-engine/public/modules/registry.json WITH JSON object containing 2 entries: crt-overlay={type:'effect',path:'/modules/effects/crt-overlay.css'}, press-start={type:'component',path:'/modules/components/press-start/press-start.js'}",
+                  "file": "apps/scene-engine/public/modules/registry.json",
+                  "status": "pending"
+                },
+                {
+                  "id": "1.1.4.2",
+                  "command": "VERIFY apps/scene-engine/public/modules/registry.json parses as JSON AND every `type` is one of {effect,component} AND every entry has a `path` key",
+                  "file": "apps/scene-engine/public/modules/registry.json",
+                  "status": "pending"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": 2,
+          "title": "Update types and asset-registry loader for dual-registry, container shape",
+          "objective": "Codify the new asset/module distinction in the TypeScript type system and teach the runtime registry loader to fetch both manifests in parallel and merge them into a single id-keyed map.",
+          "status": "pending",
+          "tasks": [
+            {
+              "id": "1.2.1",
+              "title": "Update src/types/scene.ts with AssetContainer and ModuleEntry types",
+              "description": "Replace the single `RegistryEntry` interface with two distinct types reflecting the new model: `AssetContainer` (`{ type: AssetType; file: string }`) for asset registry entries, and `ModuleEntry` (`{ type: ModuleType; path: string }`) for module registry entries. Add the canonical type unions: `AssetType = 'audio' | 'image' | 'video' | 'glyph'` and `ModuleType = 'effect' | 'component'`. Keep `Registry` as a discriminated record but make it represent the merged runtime map: `Record<string, AssetContainer | ModuleEntry>`. Consumers can narrow on the `type` field. The existing `RegistryEntry` interface should be removed (or aliased to the union for back-compat \u2014 prefer remove and update callsites in tasks 1.3.x).",
+              "status": "pending",
+              "context": {
+                "read_before": [
+                  {
+                    "file": "apps/scene-engine/src/types/scene.ts",
+                    "lines": "1-43",
+                    "purpose": "Current type definitions \u2014 RegistryEntry has { type, path }; needs to be replaced with the two-shape union"
+                  }
+                ],
+                "related_files": [
+                  "apps/scene-engine/src/store/editor-store.ts",
+                  "apps/scene-engine/app/editor/_components/AssetBrowserPanel.tsx",
+                  "apps/scene-engine/src/hooks/useSceneLoader.ts"
+                ]
+              },
+              "depends_on": [],
+              "file_context": {
+                "beginning": {
+                  "files": [
+                    {
+                      "path": "apps/scene-engine/src/types/scene.ts",
+                      "status": "exists",
+                      "description": "Has single RegistryEntry interface { type:string, path:string } and Registry = Record<string,RegistryEntry>"
+                    }
+                  ],
+                  "tree": null
+                },
+                "ending": {
+                  "files": [
+                    {
+                      "path": "apps/scene-engine/src/types/scene.ts",
+                      "status": "modified",
+                      "description": "Adds AssetType, ModuleType, AssetContainer, ModuleEntry; Registry is the merged union record; old RegistryEntry removed"
+                    }
+                  ],
+                  "tree": null
+                }
+              },
+              "actions": [
+                {
+                  "id": "1.2.1.1",
+                  "command": "ADD TYPE AssetType = 'audio' | 'image' | 'video' | 'glyph'",
+                  "file": "apps/scene-engine/src/types/scene.ts",
+                  "status": "pending"
+                },
+                {
+                  "id": "1.2.1.2",
+                  "command": "ADD TYPE ModuleType = 'effect' | 'component'",
+                  "file": "apps/scene-engine/src/types/scene.ts",
+                  "status": "pending"
+                },
+                {
+                  "id": "1.2.1.3",
+                  "command": "ADD INTERFACE AssetContainer { type: AssetType; file: string }",
+                  "file": "apps/scene-engine/src/types/scene.ts",
+                  "status": "pending"
+                },
+                {
+                  "id": "1.2.1.4",
+                  "command": "ADD INTERFACE ModuleEntry { type: ModuleType; path: string }",
+                  "file": "apps/scene-engine/src/types/scene.ts",
+                  "status": "pending"
+                },
+                {
+                  "id": "1.2.1.5",
+                  "command": "REPLACE TYPE Registry WITH Record<string, AssetContainer | ModuleEntry>",
+                  "file": "apps/scene-engine/src/types/scene.ts",
+                  "status": "pending"
+                },
+                {
+                  "id": "1.2.1.6",
+                  "command": "REMOVE INTERFACE RegistryEntry",
+                  "file": "apps/scene-engine/src/types/scene.ts",
+                  "status": "pending"
+                }
+              ]
+            },
+            {
+              "id": "1.2.2",
+              "title": "Refactor asset-registry.js to load both manifests and expose a merged map",
+              "description": "Rework the runtime loader so a single call fetches both `/assets/registry.json` AND `/modules/registry.json` in parallel and merges them into one id-keyed map. The merged map carries each entry as-is (asset entries keep their `file` field, module entries keep their `path` field \u2014 the renderer dispatches on `type` and reads whichever field is present). Update the public surface: `loadRegistry()` (no args, or accepts `{assetsUrl, modulesUrl}`) returns the merged map; `resolveAsset(id)` keeps its name and continues returning whatever entry matches by id (asset or module \u2014 the renderer does the right thing with it); `getRegistry()` returns the merged map. On fetch error for either manifest, log and continue with whatever loaded \u2014 don't fail closed. Keep id collisions impossible at the data level (assets and modules have disjoint id namespaces by spec); if a collision occurs, last-write-wins with a console.warn.",
+              "status": "pending",
+              "context": {
+                "read_before": [
+                  {
+                    "file": "apps/scene-engine/src/renderer/asset-registry.js",
+                    "lines": "1-40",
+                    "purpose": "Current single-URL loader with cache-by-url; needs to become a dual-fetcher with a merged result"
+                  },
+                  {
+                    "file": "apps/scene-engine/src/renderer/scene-renderer.js",
+                    "lines": "1-23",
+                    "purpose": "Caller \u2014 invokes `loadRegistry()` and `resolveAsset(layer.asset)`; signature must remain compatible"
+                  },
+                  {
+                    "file": "apps/scene-engine/src/hooks/useSceneLoader.ts",
+                    "lines": "63-95",
+                    "purpose": "Caller \u2014 invokes `loadRegistry('/assets/registry.json')` and `getRegistry()`; signature must remain compatible"
+                  }
+                ],
+                "related_files": []
+              },
+              "depends_on": [
+                "1.1.3",
+                "1.1.4",
+                "1.2.1"
+              ],
+              "file_context": {
+                "beginning": {
+                  "files": [
+                    {
+                      "path": "apps/scene-engine/src/renderer/asset-registry.js",
+                      "status": "exists",
+                      "description": "Single-URL loader with cache-by-url; resolveAsset reads from currentUrl cache"
+                    }
+                  ],
+                  "tree": null
+                },
+                "ending": {
+                  "files": [
+                    {
+                      "path": "apps/scene-engine/src/renderer/asset-registry.js",
+                      "status": "modified",
+                      "description": "loadRegistry fetches /assets/registry.json AND /modules/registry.json in parallel, merges into a single map; resolveAsset/getRegistry read from the merged map; per-fetch error tolerance"
+                    }
+                  ],
+                  "tree": null
+                }
+              },
+              "actions": [
+                {
+                  "id": "1.2.2.1",
+                  "command": "REFACTOR loadRegistry FROM single-URL fetch INTO parallel-fetch of /assets/registry.json AND /modules/registry.json (use Promise.all over fetch+json, each wrapped to swallow errors with console.error and return {})",
+                  "file": "apps/scene-engine/src/renderer/asset-registry.js",
+                  "status": "pending"
+                },
+                {
+                  "id": "1.2.2.2",
+                  "command": "REPLACE the per-URL Map cache WITH a single merged object cached as `mergedRegistry` (module-scope let)",
+                  "file": "apps/scene-engine/src/renderer/asset-registry.js",
+                  "status": "pending"
+                },
+                {
+                  "id": "1.2.2.3",
+                  "command": "ADD merge logic: spread assets first then modules into one object; on duplicate id console.warn '[asset-registry] id collision: <id> \u2014 module overrides asset'",
+                  "file": "apps/scene-engine/src/renderer/asset-registry.js",
+                  "status": "pending"
+                },
+                {
+                  "id": "1.2.2.4",
+                  "command": "UPDATE FUNCTION resolveAsset(id) TO read from mergedRegistry instead of the per-URL Map",
+                  "file": "apps/scene-engine/src/renderer/asset-registry.js",
+                  "status": "pending"
+                },
+                {
+                  "id": "1.2.2.5",
+                  "command": "UPDATE FUNCTION getRegistry() TO return mergedRegistry (or null if loadRegistry has not been called yet)",
+                  "file": "apps/scene-engine/src/renderer/asset-registry.js",
+                  "status": "pending"
+                },
+                {
+                  "id": "1.2.2.6",
+                  "command": "VERIFY signature: loadRegistry() callable with no args; calling loadRegistry() a second time is a no-op (returns cached mergedRegistry)",
+                  "file": "apps/scene-engine/src/renderer/asset-registry.js",
+                  "status": "pending"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": 3,
+          "title": "Update renderers, hooks, and editor consumers for the new entry shape",
+          "objective": "Teach every callsite that reads a registry entry to use `entry.file` for asset-type entries (audio, image, video, glyph) and keep using `entry.path` for module-type entries (effect, component) \u2014 so the title scene continues to render with the new container manifest.",
+          "status": "pending",
+          "tasks": [
+            {
+              "id": "1.3.1",
+              "title": "Update asset-type renderers (media, glyph-group, audio) to read entry.file",
+              "description": "The asset registry now uses `file` instead of `path` for its entries. The renderers that handle asset-type layers \u2014 `media.js` (video element), `glyph-group.js` (SVG fetch + foreign children), and `audio.js` (JS module loader) \u2014 must read `entry.file` instead of `entry.path`. The two module renderers (`css-effect.js`, `component.js`) keep reading `entry.path` since the module registry retains that field name. The `media.js` renderer is currently named for the old `media` type but the new asset types are `image`+`video` \u2014 for CP1 the simplest path is: keep `media.js` as the renderer impl, and have `index.js` register it under the new type names (`video`, `image`) instead of `media`. (Image rendering using a <video> element is wrong long-term, but no image assets exist yet \u2014 handle properly when an image is uploaded in CP2.)",
+              "status": "pending",
+              "context": {
+                "read_before": [
+                  {
+                    "file": "apps/scene-engine/src/renderer/asset-renderers/media.js",
+                    "lines": "1-15",
+                    "purpose": "Reads entry.path on line 3 \u2014 change to entry.file"
+                  },
+                  {
+                    "file": "apps/scene-engine/src/renderer/asset-renderers/glyph-group.js",
+                    "lines": "131-175",
+                    "purpose": "renderGlyphGroup reads entry.path on line 132 (fetchSvgText); mountForeignChild also relies on entry from resolveAsset \u2014 but the foreign child is itself an asset, so its entry will have entry.file"
+                  },
+                  {
+                    "file": "apps/scene-engine/src/renderer/asset-renderers/audio.js",
+                    "lines": "1-35",
+                    "purpose": "Reads entry.path inside loadModule call on line 24"
+                  },
+                  {
+                    "file": "apps/scene-engine/src/renderer/asset-renderers/index.js",
+                    "lines": "1-23",
+                    "purpose": "registerRenderer mapping \u2014 currently registers 'media' (singular old type); needs registrations under new asset type names"
+                  },
+                  {
+                    "file": "apps/scene-engine/scenes/title/scene.json",
+                    "lines": "9-19",
+                    "purpose": "Reference how layers reference asset types \u2014 bg-video uses type:'media' today; will need to be updated to type:'video' OR the renderer dispatch must alias 'media'\u2192video. Decision: update scene.json layer types in task 1.3.4 to match new asset types."
+                  }
+                ],
+                "related_files": [
+                  "apps/scene-engine/src/renderer/asset-renderers/css-effect.js",
+                  "apps/scene-engine/src/renderer/asset-renderers/component.js"
+                ]
+              },
+              "depends_on": [
+                "1.2.2"
+              ],
+              "file_context": {
+                "beginning": {
+                  "files": [
+                    {
+                      "path": "apps/scene-engine/src/renderer/asset-renderers/media.js",
+                      "status": "exists",
+                      "description": "Reads entry.path"
+                    },
+                    {
+                      "path": "apps/scene-engine/src/renderer/asset-renderers/glyph-group.js",
+                      "status": "exists",
+                      "description": "fetchSvgText(entry.path) on line 132"
+                    },
+                    {
+                      "path": "apps/scene-engine/src/renderer/asset-renderers/audio.js",
+                      "status": "exists",
+                      "description": "loadModule(entry.path) on line 24"
+                    },
+                    {
+                      "path": "apps/scene-engine/src/renderer/asset-renderers/index.js",
+                      "status": "exists",
+                      "description": "Registers 'media','effect','glyph-group','component','audio'"
+                    }
+                  ],
+                  "tree": null
+                },
+                "ending": {
+                  "files": [
+                    {
+                      "path": "apps/scene-engine/src/renderer/asset-renderers/media.js",
+                      "status": "modified",
+                      "description": "Reads entry.file"
+                    },
+                    {
+                      "path": "apps/scene-engine/src/renderer/asset-renderers/glyph-group.js",
+                      "status": "modified",
+                      "description": "fetchSvgText(entry.file)"
+                    },
+                    {
+                      "path": "apps/scene-engine/src/renderer/asset-renderers/audio.js",
+                      "status": "modified",
+                      "description": "loadModule(entry.file)"
+                    },
+                    {
+                      "path": "apps/scene-engine/src/renderer/asset-renderers/index.js",
+                      "status": "modified",
+                      "description": "Registers media renderer under 'video' AND 'image' (replacing old 'media') alongside unchanged 'glyph-group','component','audio','effect'"
+                    }
+                  ],
+                  "tree": null
+                }
+              },
+              "actions": [
+                {
+                  "id": "1.3.1.1",
+                  "command": "REPLACE entry.path WITH entry.file in apps/scene-engine/src/renderer/asset-renderers/media.js (renderMedia, line ~3 \u2014 `video.src = entry.file`)",
+                  "file": "apps/scene-engine/src/renderer/asset-renderers/media.js",
+                  "status": "pending"
+                },
+                {
+                  "id": "1.3.1.2",
+                  "command": "REPLACE entry.path WITH entry.file in apps/scene-engine/src/renderer/asset-renderers/glyph-group.js renderGlyphGroup (line ~132: `fetchSvgText(entry.file)`)",
+                  "file": "apps/scene-engine/src/renderer/asset-renderers/glyph-group.js",
+                  "status": "pending"
+                },
+                {
+                  "id": "1.3.1.3",
+                  "command": "REPLACE entry.path WITH entry.file in apps/scene-engine/src/renderer/asset-renderers/audio.js renderAudio (line ~24: `loadModule(entry.file)`)",
+                  "file": "apps/scene-engine/src/renderer/asset-renderers/audio.js",
+                  "status": "pending"
+                },
+                {
+                  "id": "1.3.1.4",
+                  "command": "UPDATE apps/scene-engine/src/renderer/asset-renderers/index.js: REMOVE registerRenderer('media', renderMedia); ADD registerRenderer('video', renderMedia) AND registerRenderer('image', renderMedia)",
+                  "file": "apps/scene-engine/src/renderer/asset-renderers/index.js",
+                  "status": "pending"
+                },
+                {
+                  "id": "1.3.1.5",
+                  "command": "VERIFY css-effect.js and component.js still read entry.path (no change \u2014 modules keep `path`)",
+                  "file": "apps/scene-engine/src/renderer/asset-renderers/",
+                  "status": "pending"
+                }
+              ]
+            },
+            {
+              "id": "1.3.2",
+              "title": "Update useSceneLoader hook to load merged registry and read entry.file",
+              "description": "Two changes in `useSceneLoader.ts`: (1) call `loadRegistry()` with no argument since the loader now fetches both manifests itself; (2) inside `expandGlyphGroupChildren`, the resolveAsset result is used to read the SVG path \u2014 switch from `entry.path` to `entry.file` since the codecaine-logo entry is an asset (glyph) and uses `file`. The TS shape returned from resolveAsset should be typed as `AssetContainer | ModuleEntry | undefined` from the new types; the call here only handles glyph-group entries (which are AssetContainer), so a narrowing read of `.file` is correct. Update the inline TS type on the resolveAsset parameter accordingly.",
+              "status": "pending",
+              "context": {
+                "read_before": [
+                  {
+                    "file": "apps/scene-engine/src/hooks/useSceneLoader.ts",
+                    "lines": "1-99",
+                    "purpose": "Full hook \u2014 line 73 calls loadRegistry with explicit URL; line 19 reads entry.path inside expandGlyphGroupChildren; line 8 has the inline resolveAsset signature `(id: string) => { path: string } | undefined`"
+                  },
+                  {
+                    "file": "apps/scene-engine/src/types/scene.ts",
+                    "lines": "1-50",
+                    "purpose": "Reference for new AssetContainer/ModuleEntry types added in task 1.2.1"
+                  }
+                ],
+                "related_files": [
+                  "apps/scene-engine/src/store/editor-store.ts"
+                ]
+              },
+              "depends_on": [
+                "1.2.1",
+                "1.2.2"
+              ],
+              "file_context": {
+                "beginning": {
+                  "files": [
+                    {
+                      "path": "apps/scene-engine/src/hooks/useSceneLoader.ts",
+                      "status": "exists",
+                      "description": "Calls loadRegistry('/assets/registry.json'); reads entry.path; inline type uses { path: string }"
+                    }
+                  ],
+                  "tree": null
+                },
+                "ending": {
+                  "files": [
+                    {
+                      "path": "apps/scene-engine/src/hooks/useSceneLoader.ts",
+                      "status": "modified",
+                      "description": "Calls loadRegistry() with no arg; reads entry.file for glyph asset; inline type uses { file: string } or imports AssetContainer"
+                    }
+                  ],
+                  "tree": null
+                }
+              },
+              "actions": [
+                {
+                  "id": "1.3.2.1",
+                  "command": "REPLACE call `loadRegistry('/assets/registry.json')` WITH `loadRegistry()` (line ~73)",
+                  "file": "apps/scene-engine/src/hooks/useSceneLoader.ts",
+                  "status": "pending"
+                },
+                {
+                  "id": "1.3.2.2",
+                  "command": "REPLACE entry.path WITH entry.file inside expandGlyphGroupChildren (line ~19: `await discoverGlyphLayers(entry.file)`)",
+                  "file": "apps/scene-engine/src/hooks/useSceneLoader.ts",
+                  "status": "pending"
+                },
+                {
+                  "id": "1.3.2.3",
+                  "command": "UPDATE inline TS signature of resolveAsset parameter (line ~8) FROM `(id: string) => { path: string } | undefined` TO `(id: string) => { file: string } | undefined` (narrow shape sufficient for this hook's usage)",
+                  "file": "apps/scene-engine/src/hooks/useSceneLoader.ts",
+                  "status": "pending"
+                }
+              ]
+            },
+            {
+              "id": "1.3.3",
+              "title": "Update title scene.json layer types from 'media' to 'video'",
+              "description": "The title scene currently has two layers with `type: 'media'` (bg-video at the top level, in-text-fire as a foreign child of codecaine-logo). The renderer registration in task 1.3.1 replaced `media` with `video` and `image`, so these layer types must be updated to `video` to match. The asset entries already point at video files in the new registry, so this is just a string swap. No other layer types change (`glyph-group`, `component`, `audio`, `effect` are unchanged).",
+              "status": "pending",
+              "context": {
+                "read_before": [
+                  {
+                    "file": "apps/scene-engine/scenes/title/scene.json",
+                    "lines": "9-19",
+                    "purpose": "bg-video layer with type:'media'"
+                  },
+                  {
+                    "file": "apps/scene-engine/scenes/title/scene.json",
+                    "lines": "200-220",
+                    "purpose": "in-text-fire foreign child with type:'media' (inside codecaine-logo children array)"
+                  }
+                ],
+                "related_files": []
+              },
+              "depends_on": [
+                "1.3.1"
+              ],
+              "file_context": {
+                "beginning": {
+                  "files": [
+                    {
+                      "path": "apps/scene-engine/scenes/title/scene.json",
+                      "status": "exists",
+                      "description": "Two layers with type:'media' \u2014 bg-video and in-text-fire"
+                    }
+                  ],
+                  "tree": null
+                },
+                "ending": {
+                  "files": [
+                    {
+                      "path": "apps/scene-engine/scenes/title/scene.json",
+                      "status": "modified",
+                      "description": "Both 'media' layer types replaced with 'video'"
+                    }
+                  ],
+                  "tree": null
+                }
+              },
+              "actions": [
+                {
+                  "id": "1.3.3.1",
+                  "command": "REPLACE all occurrences of `\"type\": \"media\"` WITH `\"type\": \"video\"` in apps/scene-engine/scenes/title/scene.json (2 occurrences expected: bg-video layer and in-text-fire foreign child)",
+                  "file": "apps/scene-engine/scenes/title/scene.json",
+                  "status": "pending"
+                },
+                {
+                  "id": "1.3.3.2",
+                  "command": "VERIFY no remaining occurrences of `\"type\": \"media\"` in apps/scene-engine/scenes/title/scene.json",
+                  "file": "apps/scene-engine/scenes/title/scene.json",
+                  "status": "pending"
+                }
+              ]
+            },
+            {
+              "id": "1.3.4",
+              "title": "Update AssetBrowserPanel TYPE_ORDER to reflect new types",
+              "description": "AssetBrowserPanel currently orders type groups using `TYPE_ORDER = ['media', 'effect', 'glyph-group', 'component', 'audio']`. After CP1 the merged registry yields types from the new union: `audio`, `image`, `video`, `glyph` (assets) plus `effect`, `component` (modules). Update TYPE_ORDER to include all six in a sensible order. Also update the `entries.path` reference (line ~17, ~53) \u2014 the field is `path` for modules and `file` for assets, so use `entry.file ?? entry.path` when building the displayed path string. The display is informational; the dragged payload (assetId) is unchanged. (Filtering modules out of the panel happens in CP3, not here \u2014 keep all 6 visible for CP1.)",
+              "status": "pending",
+              "context": {
+                "read_before": [
+                  {
+                    "file": "apps/scene-engine/app/editor/_components/AssetBrowserPanel.tsx",
+                    "lines": "1-64",
+                    "purpose": "Reads entry.path on lines 17 and 53; TYPE_ORDER on line 7 lists old type names"
+                  },
+                  {
+                    "file": "apps/scene-engine/src/types/scene.ts",
+                    "lines": "1-50",
+                    "purpose": "Use updated Registry/AssetContainer/ModuleEntry types"
+                  }
+                ],
+                "related_files": [
+                  "apps/scene-engine/src/store/editor-store.ts"
+                ]
+              },
+              "depends_on": [
+                "1.2.1"
+              ],
+              "file_context": {
+                "beginning": {
+                  "files": [
+                    {
+                      "path": "apps/scene-engine/app/editor/_components/AssetBrowserPanel.tsx",
+                      "status": "exists",
+                      "description": "TYPE_ORDER lists old types; reads entry.path"
+                    }
+                  ],
+                  "tree": null
+                },
+                "ending": {
+                  "files": [
+                    {
+                      "path": "apps/scene-engine/app/editor/_components/AssetBrowserPanel.tsx",
+                      "status": "modified",
+                      "description": "TYPE_ORDER updated to ['audio','image','video','glyph','effect','component']; path display uses entry.file ?? entry.path"
+                    }
+                  ],
+                  "tree": null
+                }
+              },
+              "actions": [
+                {
+                  "id": "1.3.4.1",
+                  "command": "REPLACE TYPE_ORDER constant WITH ['audio','image','video','glyph','effect','component'] as const (line ~7)",
+                  "file": "apps/scene-engine/app/editor/_components/AssetBrowserPanel.tsx",
+                  "status": "pending"
+                },
+                {
+                  "id": "1.3.4.2",
+                  "command": "UPDATE the byType.get(t)!.push call (line ~17) TO push { id, path: ('file' in entry ? entry.file : entry.path) } so the displayed path string works for both shapes",
+                  "file": "apps/scene-engine/app/editor/_components/AssetBrowserPanel.tsx",
+                  "status": "pending"
+                },
+                {
+                  "id": "1.3.4.3",
+                  "command": "VERIFY AssetBrowserPanel compiles under strict TS (no implicit any on entry, narrowing on `'file' in entry` works against the new Registry union)",
+                  "file": "apps/scene-engine/app/editor/_components/AssetBrowserPanel.tsx",
+                  "status": "pending"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "title": "Upload pipeline \u2014 API + standalone /upload page",
+      "goal": "End-to-end upload flow: GET /api/assets/[type] lists files in a type folder; POST /api/upload accepts a file + selected type, validates mime/extension, writes to public/assets/{type}/, slugifies filename to ID, appends a container to assets/registry.json. Standalone /upload page at /upload \u2014 file picker, mime-pre-filled type select, validation, submit. After upload the new container is visible in the asset browser and renders if added to a scene.",
+      "prerequisites": [
+        1
+      ],
+      "status": "pending",
+      "testing_strategy": {
+        "summary": "Manual end-to-end test of the upload flow + verifying the new asset is loadable. No unit tests in this checkpoint.",
+        "checks": [
+          "From repo root: `cd apps/scene-engine && npm run dev` (server on http://localhost:3000).",
+          "Visit http://localhost:3000/upload \u2014 page renders: file picker, type <select> with 4 options (audio/image/video/glyph), submit button, status/error region.",
+          "Pick a small .mp4 file \u2014 type select auto-suggests `video`; click submit; response is 200; success message shows the new asset ID; apps/scene-engine/public/assets/registry.json now has a new entry of shape `{ type: 'video', file: '/assets/video/<slug>.mp4' }`; the file exists on disk at apps/scene-engine/public/assets/video/<slug>.mp4.",
+          "Pick a .png file but force type select to `audio` \u2014 submit returns HTTP 400 with a mime/extension mismatch message; no file is written; registry.json is unchanged.",
+          "Pick a .png file with type `image` \u2014 file is written under public/assets/image/; registry gains a new entry; image/.gitkeep stays untouched.",
+          "Re-upload a file whose slugified id matches an existing entry \u2014 file overwrites on disk; registry entry's `file` is updated; no duplicate id is created.",
+          "Visit http://localhost:3000/api/assets/video \u2014 returns 200 JSON `{ files: [{ name, file }, ...] }` covering every file under public/assets/video/ (excluding dot-files like .gitkeep).",
+          "Visit http://localhost:3000/api/assets/effect \u2014 returns HTTP 400 (effect is a module type, not an asset type).",
+          "Visit http://localhost:3000/api/assets/foo \u2014 returns HTTP 400 (unknown type).",
+          "Visit http://localhost:3000/editor?scene=title \u2014 the asset browser still renders all containers, including any newly uploaded ones; the existing title scene continues to render correctly.",
+          "Run `npm run build` from apps/scene-engine/ \u2014 must succeed with no TypeScript errors."
+        ]
+      },
+      "task_groups": [
+        {
+          "id": 1,
+          "title": "Shared asset-type validation utilities",
+          "objective": "Centralize the canonical asset-type rules (mime/extension allowlists, mime\u2192type pre-fill, slugify) in one TypeScript module that both the API routes and the upload page import.",
+          "status": "pending",
+          "tasks": [
+            {
+              "id": "2.1.1",
+              "title": "Create src/lib/asset-types.ts with rules, slugify, and validators",
+              "description": "Author a new shared module that owns every asset-type fact this checkpoint needs: the 4 canonical types, their extension/mime allowlists, a mime\u2192type lookup, a filename\u2192{slug,ext} helper, and a single validateUpload(...) validator. The upload API and the upload page both import from here so they cannot disagree about what's allowed. Slug rules: strip extension, lowercase, replace runs of non-[a-z0-9]+ with '-', trim leading/trailing '-'. Mime allowlist (per spec decision): audio = audio/mpeg, audio/wav, audio/ogg + ext .mp3/.wav/.ogg; image = image/png, image/jpeg, image/webp, image/gif + ext .png/.jpg/.jpeg/.webp/.gif; video = video/mp4, video/webm + ext .mp4/.webm; glyph = image/svg+xml + ext .svg. Validator returns { ok: true } | { ok: false, error: string } so callers can branch without try/catch.",
+              "status": "pending",
+              "context": {
+                "read_before": [
+                  {
+                    "file": "apps/scene-engine/src/types/scene.ts",
+                    "lines": "1-50",
+                    "purpose": "Pull the AssetType union added in CP1 task 1.2.1 \u2014 'audio' | 'image' | 'video' | 'glyph'. This module re-exports the same type alias so callers have one import site."
+                  },
+                  {
+                    "file": ".spectre/sessions/2026-04-29_standardize-asset-upload-types_621azz/spec.md",
+                    "lines": "37-46",
+                    "purpose": "Canonical asset types decision and upload validation policy (mime/ext check, overwrite on duplicate)."
+                  },
+                  {
+                    "file": ".spectre/sessions/2026-04-29_standardize-asset-upload-types_621azz/spec.md",
+                    "lines": "108-115",
+                    "purpose": "Upload flow \u2014 file first, type second, slug-from-filename, mime pre-fill."
+                  }
+                ],
+                "related_files": [
+                  "apps/scene-engine/app/api/upload/route.ts",
+                  "apps/scene-engine/app/api/assets/[type]/route.ts",
+                  "apps/scene-engine/app/upload/page.tsx"
+                ]
+              },
+              "depends_on": [],
+              "file_context": {
+                "beginning": {
+                  "files": [
+                    {
+                      "path": "apps/scene-engine/src/lib/asset-types.ts",
+                      "status": "missing",
+                      "description": "Does not exist yet"
+                    },
+                    {
+                      "path": "apps/scene-engine/src/types/scene.ts",
+                      "status": "exists",
+                      "description": "After CP1 task 1.2.1 \u2014 exports AssetType union"
+                    }
+                  ],
+                  "tree": null
+                },
+                "ending": {
+                  "files": [
+                    {
+                      "path": "apps/scene-engine/src/lib/asset-types.ts",
+                      "status": "new",
+                      "description": "Exports ASSET_TYPES (readonly tuple), ASSET_TYPE_RULES (per-type {extensions, mimes}), AssetType (re-exported), isAssetType, getTypeFromMime, slugifyFilename, validateUpload"
+                    }
+                  ],
+                  "tree": null
+                }
+              },
+              "actions": [
+                {
+                  "id": "2.1.1.1",
+                  "command": "CREATE FILE apps/scene-engine/src/lib/asset-types.ts",
+                  "file": "apps/scene-engine/src/lib/asset-types.ts",
+                  "status": "pending"
+                },
+                {
+                  "id": "2.1.1.2",
+                  "command": "ADD `export type { AssetType } from '@/types/scene'` re-export so callers have a single import site",
+                  "file": "apps/scene-engine/src/lib/asset-types.ts",
+                  "status": "pending"
+                },
+                {
+                  "id": "2.1.1.3",
+                  "command": "ADD CONSTANT `export const ASSET_TYPES = ['audio','image','video','glyph'] as const`",
+                  "file": "apps/scene-engine/src/lib/asset-types.ts",
+                  "status": "pending"
+                },
+                {
+                  "id": "2.1.1.4",
+                  "command": "ADD CONSTANT `export const ASSET_TYPE_RULES: Record<AssetType, { extensions: string[]; mimes: string[] }>` with: audio={extensions:['mp3','wav','ogg'], mimes:['audio/mpeg','audio/wav','audio/ogg']}; image={extensions:['png','jpg','jpeg','webp','gif'], mimes:['image/png','image/jpeg','image/webp','image/gif']}; video={extensions:['mp4','webm'], mimes:['video/mp4','video/webm']}; glyph={extensions:['svg'], mimes:['image/svg+xml']}",
+                  "file": "apps/scene-engine/src/lib/asset-types.ts",
+                  "status": "pending"
+                },
+                {
+                  "id": "2.1.1.5",
+                  "command": "ADD FUNCTION `export function isAssetType(value: string): value is AssetType` \u2014 returns (ASSET_TYPES as readonly string[]).includes(value)",
+                  "file": "apps/scene-engine/src/lib/asset-types.ts",
+                  "status": "pending"
+                },
+                {
+                  "id": "2.1.1.6",
+                  "command": "ADD FUNCTION `export function getTypeFromMime(mime: string): AssetType | null` \u2014 lowercase the mime, scan ASSET_TYPE_RULES, return the first AssetType whose mimes include it, else null",
+                  "file": "apps/scene-engine/src/lib/asset-types.ts",
+                  "status": "pending"
+                },
+                {
+                  "id": "2.1.1.7",
+                  "command": "ADD FUNCTION `export function slugifyFilename(filename: string): { slug: string; ext: string }` \u2014 split on the last '.', lowercase ext (no dot, '' if none); slugify the basename: lowercase, replace /[^a-z0-9]+/g with '-', trim leading/trailing '-'; if slug is '' throw new Error('Filename slugified to empty string')",
+                  "file": "apps/scene-engine/src/lib/asset-types.ts",
+                  "status": "pending"
+                },
+                {
+                  "id": "2.1.1.8",
+                  "command": "ADD FUNCTION `export function validateUpload(input: { type: string; mime: string; filename: string }): { ok: true } | { ok: false; error: string }` \u2014 checks: isAssetType(type) (else 'Invalid asset type: <x>'); ext (lowercased, no dot, parsed from filename) is in ASSET_TYPE_RULES[type].extensions (else 'Extension .<ext> not allowed for type <type>'); mime (lowercased) is in ASSET_TYPE_RULES[type].mimes (else 'Mime <mime> not allowed for type <type>')",
+                  "file": "apps/scene-engine/src/lib/asset-types.ts",
+                  "status": "pending"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": 2,
+          "title": "API endpoints \u2014 upload + per-type listing",
+          "objective": "Server-side handlers: POST /api/upload (validate, write file, update assets/registry.json) and GET /api/assets/[type] (list files in a type folder). Both reuse the validation utilities from group 1.",
+          "status": "pending",
+          "tasks": [
+            {
+              "id": "2.2.1",
+              "title": "Create app/api/upload/route.ts (POST handler for asset upload)",
+              "description": "Implement POST /api/upload as a Next.js Route Handler. Body is multipart/form-data with two fields: `file` (the binary asset) and `type` (one of the 4 AssetType strings). Flow: parse formData; pull file (instanceof File) and type (string); run validateUpload({type, mime: file.type, filename: file.name}); slugify filename to {slug, ext}; ensure public/assets/{type}/ exists (mkdir recursive); write the file's bytes to apps/scene-engine/public/assets/{type}/{slug}.{ext} (overwrite-allowed); read public/assets/registry.json, set/overwrite registry[slug] = { type, file: '/assets/{type}/{slug}.{ext}' }, write back with 2-space JSON indent + trailing newline (match scene-save style); respond 200 JSON `{ id, type, file }`. Errors: missing/invalid file \u2192 400 'No file uploaded'; missing type \u2192 400 'Missing type'; validateUpload failure \u2192 400 with the validator error; any unexpected exception \u2192 500 with the exception message. Use process.cwd() to resolve paths (Next.js dev runs from apps/scene-engine/).",
+              "status": "pending",
+              "context": {
+                "read_before": [
+                  {
+                    "file": "apps/scene-engine/app/api/scenes/[id]/route.ts",
+                    "lines": "1-54",
+                    "purpose": "Reference style for Next.js 15 Route Handlers in this repo: NextResponse, fs/promises writeFile + mkdir, existsSync guards, process.cwd() resolution, error response shape `{error}`"
+                  },
+                  {
+                    "file": "apps/scene-engine/src/lib/asset-types.ts",
+                    "lines": "1-100",
+                    "purpose": "Validators and constants created in task 2.1.1 \u2014 isAssetType, validateUpload, slugifyFilename, ASSET_TYPE_RULES"
+                  },
+                  {
+                    "file": "apps/scene-engine/public/assets/registry.json",
+                    "lines": "1-30",
+                    "purpose": "Registry shape post-CP1: `{ <id>: { type, file } }` \u2014 handler appends/overwrites by id"
+                  }
+                ],
+                "related_files": [
+                  "apps/scene-engine/src/types/scene.ts",
+                  "apps/scene-engine/app/upload/page.tsx"
+                ]
+              },
+              "depends_on": [
+                "2.1.1"
+              ],
+              "file_context": {
+                "beginning": {
+                  "files": [
+                    {
+                      "path": "apps/scene-engine/app/api/upload/",
+                      "status": "missing",
+                      "description": "Directory does not exist"
+                    },
+                    {
+                      "path": "apps/scene-engine/public/assets/registry.json",
+                      "status": "exists",
+                      "description": "Asset container manifest from CP1; shape `{<id>: {type, file}}`"
+                    }
+                  ],
+                  "tree": null
+                },
+                "ending": {
+                  "files": [
+                    {
+                      "path": "apps/scene-engine/app/api/upload/route.ts",
+                      "status": "new",
+                      "description": "POST handler validating + writing asset file + updating registry.json"
+                    }
+                  ],
+                  "tree": null
+                }
+              },
+              "actions": [
+                {
+                  "id": "2.2.1.1",
+                  "command": "CREATE FILE apps/scene-engine/app/api/upload/route.ts",
+                  "file": "apps/scene-engine/app/api/upload/route.ts",
+                  "status": "pending"
+                },
+                {
+                  "id": "2.2.1.2",
+                  "command": "ADD imports: `NextResponse` from 'next/server'; `writeFile`, `readFile`, `mkdir` from 'fs/promises'; `existsSync` from 'fs'; `path` from 'path'; `isAssetType`, `validateUpload`, `slugifyFilename` from '@/lib/asset-types'; type `AssetContainer` from '@/types/scene'",
+                  "file": "apps/scene-engine/app/api/upload/route.ts",
+                  "status": "pending"
+                },
+                {
+                  "id": "2.2.1.3",
+                  "command": "ADD CONSTANT `const REGISTRY_PATH = path.join(process.cwd(), 'public', 'assets', 'registry.json')`",
+                  "file": "apps/scene-engine/app/api/upload/route.ts",
+                  "status": "pending"
+                },
+                {
+                  "id": "2.2.1.4",
+                  "command": "ADD FUNCTION `export async function POST(req: Request)` \u2014 wrap the entire body in try/catch",
+                  "file": "apps/scene-engine/app/api/upload/route.ts",
+                  "status": "pending"
+                },
+                {
+                  "id": "2.2.1.5",
+                  "command": "ADD form parsing inside POST: `const form = await req.formData()`; `const file = form.get('file')`; if (!(file instanceof File)) return NextResponse.json({error:'No file uploaded'}, {status:400}); `const typeRaw = form.get('type')`; if (typeof typeRaw !== 'string' || typeRaw === '') return NextResponse.json({error:'Missing type'}, {status:400})",
+                  "file": "apps/scene-engine/app/api/upload/route.ts",
+                  "status": "pending"
+                },
+                {
+                  "id": "2.2.1.6",
+                  "command": "ADD validation inside POST: `const result = validateUpload({ type: typeRaw, mime: file.type, filename: file.name })`; if (!result.ok) return NextResponse.json({error: result.error}, {status:400}); narrow `if (!isAssetType(typeRaw)) return NextResponse.json({error:'Invalid asset type'}, {status:400})` (also tightens TS; AssetType is now usable as `const type: AssetType = typeRaw`)",
+                  "file": "apps/scene-engine/app/api/upload/route.ts",
+                  "status": "pending"
+                },
+                {
+                  "id": "2.2.1.7",
+                  "command": "ADD slug+write inside POST: `const { slug, ext } = slugifyFilename(file.name)`; `const dir = path.join(process.cwd(), 'public', 'assets', type)`; `if (!existsSync(dir)) await mkdir(dir, { recursive: true })`; `const filename = ext ? `${slug}.${ext}` : slug`; `const diskPath = path.join(dir, filename)`; `await writeFile(diskPath, Buffer.from(await file.arrayBuffer()))`",
+                  "file": "apps/scene-engine/app/api/upload/route.ts",
+                  "status": "pending"
+                },
+                {
+                  "id": "2.2.1.8",
+                  "command": "ADD registry update inside POST: read REGISTRY_PATH (utf-8); `const registry = JSON.parse(text) as Record<string, AssetContainer>`; `registry[slug] = { type, file: `/assets/${type}/${filename}` }`; `await writeFile(REGISTRY_PATH, JSON.stringify(registry, null, 2) + '\\n', 'utf-8')`",
+                  "file": "apps/scene-engine/app/api/upload/route.ts",
+                  "status": "pending"
+                },
+                {
+                  "id": "2.2.1.9",
+                  "command": "ADD success response inside POST: `return NextResponse.json({ id: slug, type, file: registry[slug].file })`",
+                  "file": "apps/scene-engine/app/api/upload/route.ts",
+                  "status": "pending"
+                },
+                {
+                  "id": "2.2.1.10",
+                  "command": "ADD catch block: `return NextResponse.json({ error: err instanceof Error ? err.message : 'Upload failed' }, { status: 500 })`",
+                  "file": "apps/scene-engine/app/api/upload/route.ts",
+                  "status": "pending"
+                }
+              ]
+            },
+            {
+              "id": "2.2.2",
+              "title": "Create app/api/assets/[type]/route.ts (GET handler listing files in a type folder)",
+              "description": "Implement GET /api/assets/[type] as a Next.js 15 dynamic Route Handler. Validate the {type} param via isAssetType \u2014 if not, return 400 `{error: 'Invalid asset type'}`. Read public/assets/{type}/ via fs/promises.readdir(withFileTypes:true); filter to entries that are files, drop dot-files (incl. .gitkeep). Return 200 JSON `{ files: [{ name, file }, ...] }` where `file = '/assets/{type}/{name}'`. Used by the inspector swap dropdown in CP3 and useful for verifying the upload pipeline in CP2 testing. Next.js 15 dynamic route handlers receive `params: Promise<{ type: string }>` \u2014 await it.",
+              "status": "pending",
+              "context": {
+                "read_before": [
+                  {
+                    "file": "apps/scene-engine/app/api/scenes/[id]/route.ts",
+                    "lines": "12-30",
+                    "purpose": "Reference Next.js 15 dynamic route signature `{ params }: { params: Promise<{ id: string }> }` and the `await params` pattern"
+                  },
+                  {
+                    "file": "apps/scene-engine/src/lib/asset-types.ts",
+                    "lines": "1-50",
+                    "purpose": "isAssetType narrowing function from task 2.1.1"
+                  }
+                ],
+                "related_files": [
+                  "apps/scene-engine/public/assets/audio/",
+                  "apps/scene-engine/public/assets/image/",
+                  "apps/scene-engine/public/assets/video/",
+                  "apps/scene-engine/public/assets/glyph/"
+                ]
+              },
+              "depends_on": [
+                "2.1.1"
+              ],
+              "file_context": {
+                "beginning": {
+                  "files": [
+                    {
+                      "path": "apps/scene-engine/app/api/assets/",
+                      "status": "missing",
+                      "description": "Directory does not exist"
+                    }
+                  ],
+                  "tree": null
+                },
+                "ending": {
+                  "files": [
+                    {
+                      "path": "apps/scene-engine/app/api/assets/[type]/route.ts",
+                      "status": "new",
+                      "description": "GET handler listing files in public/assets/{type}/ as {name, file}"
+                    }
+                  ],
+                  "tree": null
+                }
+              },
+              "actions": [
+                {
+                  "id": "2.2.2.1",
+                  "command": "CREATE FILE apps/scene-engine/app/api/assets/[type]/route.ts",
+                  "file": "apps/scene-engine/app/api/assets/[type]/route.ts",
+                  "status": "pending"
+                },
+                {
+                  "id": "2.2.2.2",
+                  "command": "ADD imports: `NextResponse` from 'next/server'; `readdir` from 'fs/promises'; `existsSync` from 'fs'; `path` from 'path'; `isAssetType` from '@/lib/asset-types'",
+                  "file": "apps/scene-engine/app/api/assets/[type]/route.ts",
+                  "status": "pending"
+                },
+                {
+                  "id": "2.2.2.3",
+                  "command": "ADD FUNCTION `export async function GET(_req: Request, { params }: { params: Promise<{ type: string }> })`",
+                  "file": "apps/scene-engine/app/api/assets/[type]/route.ts",
+                  "status": "pending"
+                },
+                {
+                  "id": "2.2.2.4",
+                  "command": "ADD inside GET: `const { type } = await params`; if (!isAssetType(type)) return NextResponse.json({ error: 'Invalid asset type' }, { status: 400 })",
+                  "file": "apps/scene-engine/app/api/assets/[type]/route.ts",
+                  "status": "pending"
+                },
+                {
+                  "id": "2.2.2.5",
+                  "command": "ADD inside GET: `const dir = path.join(process.cwd(), 'public', 'assets', type)`; if (!existsSync(dir)) return NextResponse.json({ files: [] })",
+                  "file": "apps/scene-engine/app/api/assets/[type]/route.ts",
+                  "status": "pending"
+                },
+                {
+                  "id": "2.2.2.6",
+                  "command": "ADD inside GET: `const entries = await readdir(dir, { withFileTypes: true })`; build `files = entries.filter(e => e.isFile() && !e.name.startsWith('.')).map(e => ({ name: e.name, file: `/assets/${type}/${e.name}` }))`; return `NextResponse.json({ files })`",
+                  "file": "apps/scene-engine/app/api/assets/[type]/route.ts",
+                  "status": "pending"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": 3,
+          "title": "Standalone /upload page + dashboard link",
+          "objective": "Client-side upload UX: a /upload page with file picker, mime-pre-filled type select, submit, and error/success feedback; plus an entry-point link from the dashboard.",
+          "status": "pending",
+          "tasks": [
+            {
+              "id": "2.3.1",
+              "title": "Create app/upload/page.tsx \u2014 file picker + type select + submit",
+              "description": "Standalone client-side upload page at /upload. Uses 'use client' and React hooks. Layout (top-down): page heading 'Upload Asset' + a 'back to dashboard' link; a single panel containing: <input type=file> (no multiple), <select> for type with the 4 options, status region, submit button. State machine: status \u2208 {idle, submitting, success, error} + message string. On file change: read file.type, call getTypeFromMime; if non-null, setType(suggested); reset status to 'idle'. Type select can still be changed manually after auto-fill. On submit: build FormData, append file + type, fetch POST /api/upload; on response.ok set status='success' + message=`Uploaded ${json.id} \u2192 ${json.file}`; on !ok set status='error' + message=json.error ?? 'Upload failed'. Disable submit when no file or no type or status==='submitting'. Style to match the dashboard look (bg-[#111] / panels bg-[#1a1a1a] / borders #2a2a2a / text-gray-300). Keep it small \u2014 this is dev-tooling UX.",
+              "status": "pending",
+              "context": {
+                "read_before": [
+                  {
+                    "file": "apps/scene-engine/app/page.tsx",
+                    "lines": "1-48",
+                    "purpose": "Dashboard styling tokens (bg-[#111], panels, gray text classes) \u2014 match these so /upload feels native"
+                  },
+                  {
+                    "file": "apps/scene-engine/src/lib/asset-types.ts",
+                    "lines": "1-100",
+                    "purpose": "ASSET_TYPES, getTypeFromMime \u2014 for the select options + auto-fill on file change"
+                  },
+                  {
+                    "file": "apps/scene-engine/src/types/scene.ts",
+                    "lines": "1-50",
+                    "purpose": "AssetType union for typing the local state"
+                  }
+                ],
+                "related_files": [
+                  "apps/scene-engine/app/api/upload/route.ts"
+                ]
+              },
+              "depends_on": [
+                "2.1.1",
+                "2.2.1"
+              ],
+              "file_context": {
+                "beginning": {
+                  "files": [
+                    {
+                      "path": "apps/scene-engine/app/upload/",
+                      "status": "missing",
+                      "description": "Directory does not exist"
+                    }
+                  ],
+                  "tree": null
+                },
+                "ending": {
+                  "files": [
+                    {
+                      "path": "apps/scene-engine/app/upload/page.tsx",
+                      "status": "new",
+                      "description": "Client-side upload page with file picker, type select w/ mime pre-fill, status region, submit"
+                    }
+                  ],
+                  "tree": null
+                }
+              },
+              "actions": [
+                {
+                  "id": "2.3.1.1",
+                  "command": "CREATE FILE apps/scene-engine/app/upload/page.tsx",
+                  "file": "apps/scene-engine/app/upload/page.tsx",
+                  "status": "pending"
+                },
+                {
+                  "id": "2.3.1.2",
+                  "command": "ADD `'use client'` directive AT TOP OF FILE",
+                  "file": "apps/scene-engine/app/upload/page.tsx",
+                  "status": "pending"
+                },
+                {
+                  "id": "2.3.1.3",
+                  "command": "ADD imports: `useState` from 'react'; `Link` from 'next/link'; `ASSET_TYPES`, `getTypeFromMime` from '@/lib/asset-types'; type `AssetType` from '@/types/scene'",
+                  "file": "apps/scene-engine/app/upload/page.tsx",
+                  "status": "pending"
+                },
+                {
+                  "id": "2.3.1.4",
+                  "command": "ADD FUNCTION `export default function UploadPage()` \u2014 component body below",
+                  "file": "apps/scene-engine/app/upload/page.tsx",
+                  "status": "pending"
+                },
+                {
+                  "id": "2.3.1.5",
+                  "command": "ADD STATE inside UploadPage: `const [file, setFile] = useState<File | null>(null)`; `const [type, setType] = useState<AssetType | ''>('')`; `const [status, setStatus] = useState<'idle'|'submitting'|'success'|'error'>('idle')`; `const [message, setMessage] = useState('')`",
+                  "file": "apps/scene-engine/app/upload/page.tsx",
+                  "status": "pending"
+                },
+                {
+                  "id": "2.3.1.6",
+                  "command": "ADD HANDLER `function onFileChange(e: React.ChangeEvent<HTMLInputElement>)` \u2014 `const f = e.target.files?.[0] ?? null`; setFile(f); setStatus('idle'); setMessage(''); if (f) { const suggested = getTypeFromMime(f.type); if (suggested) setType(suggested) }",
+                  "file": "apps/scene-engine/app/upload/page.tsx",
+                  "status": "pending"
+                },
+                {
+                  "id": "2.3.1.7",
+                  "command": "ADD HANDLER `async function onSubmit(e: React.FormEvent)` \u2014 preventDefault; if (!file || !type) return; setStatus('submitting'); setMessage(''); `const form = new FormData(); form.append('file', file); form.append('type', type)`; `const res = await fetch('/api/upload', { method: 'POST', body: form })`; `const json = await res.json().catch(() => ({}))`; if (res.ok) { setStatus('success'); setMessage(`Uploaded ${json.id} \u2192 ${json.file}`) } else { setStatus('error'); setMessage(json.error ?? 'Upload failed') }",
+                  "file": "apps/scene-engine/app/upload/page.tsx",
+                  "status": "pending"
+                },
+                {
+                  "id": "2.3.1.8",
+                  "command": "ADD JSX RETURN: outer `<div className=\"min-h-screen bg-[#111] p-8 text-gray-300\">` containing (a) heading row with `<h1 className=\"text-lg font-semibold text-gray-300 tracking-wide\">Upload Asset</h1>` and `<Link href=\"/\" className=\"text-xs text-gray-500 hover:text-gray-300 no-underline\">\u2190 back to dashboard</Link>`; (b) `<form onSubmit={onSubmit} className=\"max-w-xl mt-6 bg-[#1a1a1a] border border-[#2a2a2a] rounded p-4 flex flex-col gap-3\">` with a labeled file input (`<input type=\"file\" onChange={onFileChange} />`), a labeled `<select value={type} onChange={e => setType(e.target.value as AssetType)}>` whose first option is `<option value=\"\" disabled>Select type\u2026</option>` followed by `ASSET_TYPES.map(t => <option key={t} value={t}>{t}</option>)`, a status region rendering `message` colored `text-red-400` on status==='error' / `text-emerald-400` on status==='success' / `text-gray-500` otherwise, and a submit button `<button type=\"submit\" disabled={!file || !type || status==='submitting'}>{status==='submitting' ? 'Uploading\u2026' : 'Upload'}</button>` styled with the same chip classes used elsewhere (`text-xs px-2.5 py-1 rounded-sm bg-[#173247] border border-[#2a6da3] text-[#cfe6ff] hover:bg-[#1d3d54] disabled:opacity-50 disabled:cursor-not-allowed`)",
+                  "file": "apps/scene-engine/app/upload/page.tsx",
+                  "status": "pending"
+                }
+              ]
+            },
+            {
+              "id": "2.3.2",
+              "title": "Add Upload entry-point link to the dashboard",
+              "description": "Surface the new /upload page from the dashboard so users can find it. Add a single Link styled like the existing 'Edit' button (blue chrome chip), placed in the top-right of the heading row. Minimal change to app/page.tsx \u2014 keep the existing scene grid intact. Confirm `import Link from 'next/link'` is already present (it is, used by the per-scene Edit/Preview links).",
+              "status": "pending",
+              "context": {
+                "read_before": [
+                  {
+                    "file": "apps/scene-engine/app/page.tsx",
+                    "lines": "1-48",
+                    "purpose": "Current dashboard structure \u2014 heading row + scene grid; pick the existing styling tokens to match"
+                  }
+                ],
+                "related_files": [
+                  "apps/scene-engine/app/upload/page.tsx"
+                ]
+              },
+              "depends_on": [
+                "2.3.1"
+              ],
+              "file_context": {
+                "beginning": {
+                  "files": [
+                    {
+                      "path": "apps/scene-engine/app/page.tsx",
+                      "status": "exists",
+                      "description": "Dashboard with heading + scene grid; no link to /upload"
+                    }
+                  ],
+                  "tree": null
+                },
+                "ending": {
+                  "files": [
+                    {
+                      "path": "apps/scene-engine/app/page.tsx",
+                      "status": "modified",
+                      "description": "Heading row contains an 'Upload Asset' Link to /upload"
+                    }
+                  ],
+                  "tree": null
+                }
+              },
+              "actions": [
+                {
+                  "id": "2.3.2.1",
+                  "command": "VERIFY `import Link from 'next/link'` exists at the top of apps/scene-engine/app/page.tsx (no change needed \u2014 already imported)",
+                  "file": "apps/scene-engine/app/page.tsx",
+                  "status": "pending"
+                },
+                {
+                  "id": "2.3.2.2",
+                  "command": "WRAP the existing `<h1>` (line 9) in a flex row that also holds a sibling `<Link href=\"/upload\">Upload Asset</Link>` styled with `text-xs px-2.5 py-1 rounded-sm bg-[#173247] border border-[#2a6da3] text-[#cfe6ff] hover:bg-[#1d3d54] no-underline` \u2014 replace `<h1 \u2026>Scene Engine</h1>` with `<div className=\"flex items-center justify-between mb-6 max-w-xl\"><h1 className=\"text-lg font-semibold text-gray-300 tracking-wide\">Scene Engine</h1><Link href=\"/upload\" className=\"text-xs px-2.5 py-1 rounded-sm bg-[#173247] border border-[#2a6da3] text-[#cfe6ff] hover:bg-[#1d3d54] no-underline\">Upload Asset</Link></div>` (and remove the original `mb-6` from the h1)",
+                  "file": "apps/scene-engine/app/page.tsx",
+                  "status": "pending"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "title": "Inspector swap dropdown + asset browser cleanup",
+      "goal": "Inspector shows a file-swap dropdown for asset-type layers (lists files in matching type folder via the /api/assets/[type] endpoint); selecting a file updates the container's `file` pointer in assets/registry.json and re-renders. AssetBrowserPanel filters to asset-type entries only (no modules). Title scene editor flow proves swap works end-to-end.",
+      "prerequisites": [
+        1,
+        2
+      ],
+      "status": "pending",
+      "testing_strategy": {
+        "summary": "Manual editor walkthrough of the file-swap flow + asset browser scoping. No unit tests in this checkpoint.",
+        "checks": [
+          "From repo root: `cd apps/scene-engine && npm run dev` (server on http://localhost:3000).",
+          "Pre-step: ensure there are >=2 video files on disk under apps/scene-engine/public/assets/video/ (test-fire-2.mp4 and test-fire-3.mp4 from CP1 satisfy this; if not, upload one extra .mp4 via /upload from CP2).",
+          "Visit http://localhost:3000/editor?scene=title \u2014 confirm the AssetBrowser panel only shows asset-type sections (audio, image, video, glyph). The 'effect' and 'component' sections must NOT appear (crt-overlay and press-start are no longer surfaced in the panel).",
+          "Click the 'bg-video' layer in the hierarchy \u2014 Inspector now shows a 'file' row with a <select> dropdown listing every file under public/assets/video/ (e.g. test-fire-2.mp4 + test-fire-3.mp4); the currently-selected option matches the container's current file (test-fire-2.mp4).",
+          "Change the dropdown to test-fire-3.mp4 \u2014 within ~1s the canvas re-renders the bg-video layer with the new video; apps/scene-engine/public/assets/registry.json on disk has bg-video.file updated to '/assets/video/test-fire-3.mp4'; no scene.json mutation occurred (scene.json is unchanged on disk; editor dirty indicator stays clean).",
+          "Refresh the editor page \u2014 the bg-video container still points at test-fire-3.mp4 (the registry change persisted).",
+          "Swap bg-video back to test-fire-2.mp4 to leave the demo unchanged for downstream sessions.",
+          "Click the 'codecaine-logo' glyph layer \u2014 Inspector shows the file-swap dropdown for the glyph type (lists files under public/assets/glyph/, currently just CODECAINE.css-layers.svg).",
+          "Click the 'crt-overlay' or 'press-start' layer (still in the hierarchy because the scene references them) \u2014 Inspector does NOT show a file-swap dropdown (effect/component layers are not asset containers; only the existing LayerForm fields render).",
+          "DevTools network tab \u2014 selecting a file in the dropdown fires exactly one PATCH to /api/registry/<id> returning 200; no other network noise.",
+          "DevTools console \u2014 no errors from the swap flow.",
+          "Run `npm run build` from apps/scene-engine/ \u2014 must succeed with no TypeScript errors."
+        ]
+      },
+      "task_groups": [
+        {
+          "id": 1,
+          "title": "Asset browser scoping \u2014 drop module types",
+          "objective": "Restrict AssetBrowserPanel to the 4 asset types so authors cannot drag effects/components from a panel labeled 'Assets'.",
+          "status": "pending",
+          "tasks": [
+            {
+              "id": "3.1.1",
+              "title": "Restrict AssetBrowserPanel to asset types only",
+              "description": "After CP1 task 1.3.4 the panel's TYPE_ORDER was widened to ['audio','image','video','glyph','effect','component'] so the merged registry could be displayed during the reorg. Per spec success criteria \u2014 'Asset browser in the editor only shows asset-type entries (not modules)' \u2014 narrow TYPE_ORDER back down to the 4 asset types, dropping 'effect' and 'component'. The merged registry still contains module entries (the CanvasPanel drop handler still resolves them by id from the merged map, and the hierarchy still references them) \u2014 this change is purely about which sections render in the side panel. Keep the type-narrowing read of `entry.file ?? entry.path` so the displayed path string is correct for the asset-type entries that remain.",
+              "status": "pending",
+              "context": {
+                "read_before": [
+                  {
+                    "file": "apps/scene-engine/app/editor/_components/AssetBrowserPanel.tsx",
+                    "lines": "1-64",
+                    "purpose": "TYPE_ORDER constant on line 7 \u2014 currently ['audio','image','video','glyph','effect','component'] from CP1 task 1.3.4"
+                  },
+                  {
+                    "file": "apps/scene-engine/src/lib/asset-types.ts",
+                    "lines": "1-30",
+                    "purpose": "ASSET_TYPES tuple (created in CP2 task 2.1.1) \u2014 the canonical set; reuse it instead of re-listing literals"
+                  },
+                  {
+                    "file": ".spectre/sessions/2026-04-29_standardize-asset-upload-types_621azz/spec.md",
+                    "lines": "65-65",
+                    "purpose": "Success criterion: 'Asset browser in the editor only shows asset-type entries (not modules)'"
+                  }
+                ],
+                "related_files": []
+              },
+              "depends_on": [],
+              "file_context": {
+                "beginning": {
+                  "files": [
+                    {
+                      "path": "apps/scene-engine/app/editor/_components/AssetBrowserPanel.tsx",
+                      "status": "exists",
+                      "description": "TYPE_ORDER includes effect+component (CP1 widened it for the reorg phase)"
+                    }
+                  ],
+                  "tree": null
+                },
+                "ending": {
+                  "files": [
+                    {
+                      "path": "apps/scene-engine/app/editor/_components/AssetBrowserPanel.tsx",
+                      "status": "modified",
+                      "description": "TYPE_ORDER imported from / aligned with ASSET_TYPES (the 4 asset types only); effect+component sections no longer render"
+                    }
+                  ],
+                  "tree": null
+                }
+              },
+              "actions": [
+                {
+                  "id": "3.1.1.1",
+                  "command": "ADD import `import { ASSET_TYPES } from '@/lib/asset-types'` at the top of apps/scene-engine/app/editor/_components/AssetBrowserPanel.tsx (alongside the existing imports)",
+                  "file": "apps/scene-engine/app/editor/_components/AssetBrowserPanel.tsx",
+                  "status": "pending"
+                },
+                {
+                  "id": "3.1.1.2",
+                  "command": "REPLACE the TYPE_ORDER constant (line ~7) WITH `const TYPE_ORDER = ASSET_TYPES` (drops 'effect' and 'component'; reuses the canonical tuple). The downstream `.filter((t) => byType.has(t))` already gracefully omits any types absent from the registry.",
+                  "file": "apps/scene-engine/app/editor/_components/AssetBrowserPanel.tsx",
+                  "status": "pending"
+                },
+                {
+                  "id": "3.1.1.3",
+                  "command": "VERIFY TYPE_ORDER no longer references 'effect' or 'component' literals; AssetBrowserPanel still compiles under strict TS (ASSET_TYPES is a readonly tuple of AssetType \u2014 TYPE_ORDER's downstream usages already accept readonly string[] semantics)",
+                  "file": "apps/scene-engine/app/editor/_components/AssetBrowserPanel.tsx",
+                  "status": "pending"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": 2,
+          "title": "Container file-swap API",
+          "objective": "PATCH endpoint that updates a container's `file` pointer in public/assets/registry.json, with validation that the new path is under the matching type folder.",
+          "status": "pending",
+          "tasks": [
+            {
+              "id": "3.2.1",
+              "title": "Create app/api/registry/[id]/route.ts (PATCH handler updating a container's file pointer)",
+              "description": "Implement PATCH /api/registry/[id] as a Next.js 15 dynamic Route Handler. Body is JSON `{ file: string }`. Flow: await `params` and pull `id`; read public/assets/registry.json, parse as `Record<string, AssetContainer>`; if !registry[id] return 404 `{error:'Unknown container id: <id>'}`; pull body, validate it's a JSON object with a string `file` field that starts with `/assets/{type}/` matching the container's existing type (else 400 `{error:'File path must be under /assets/<type>/'}`); set registry[id].file = body.file; write back with 2-space indent + trailing newline (match the upload route style); respond 200 JSON `{ id, type, file }`. This endpoint is asset-only \u2014 it explicitly guards against editing entries in modules/registry.json (which it never reads). Use process.cwd() to resolve REGISTRY_PATH (Next.js dev runs from apps/scene-engine/).",
+              "status": "pending",
+              "context": {
+                "read_before": [
+                  {
+                    "file": "apps/scene-engine/app/api/upload/route.ts",
+                    "lines": "1-60",
+                    "purpose": "Reference style for asset-registry mutation: REGISTRY_PATH constant via process.cwd(), readFile/JSON.parse/JSON.stringify(reg, null, 2) + '\\n', NextResponse error+success shape"
+                  },
+                  {
+                    "file": "apps/scene-engine/app/api/scenes/[id]/route.ts",
+                    "lines": "1-54",
+                    "purpose": "Reference Next.js 15 dynamic param signature `{ params }: { params: Promise<{ id: string }> }` and the `await params` pattern"
+                  },
+                  {
+                    "file": "apps/scene-engine/src/types/scene.ts",
+                    "lines": "1-50",
+                    "purpose": "AssetContainer type added in CP1 task 1.2.1 \u2014 used to type the parsed registry"
+                  }
+                ],
+                "related_files": [
+                  "apps/scene-engine/public/assets/registry.json",
+                  "apps/scene-engine/src/lib/asset-types.ts"
+                ]
+              },
+              "depends_on": [],
+              "file_context": {
+                "beginning": {
+                  "files": [
+                    {
+                      "path": "apps/scene-engine/app/api/registry/",
+                      "status": "missing",
+                      "description": "Directory does not exist"
+                    },
+                    {
+                      "path": "apps/scene-engine/public/assets/registry.json",
+                      "status": "exists",
+                      "description": "Asset container manifest; shape `{<id>: {type, file}}`"
+                    }
+                  ],
+                  "tree": null
+                },
+                "ending": {
+                  "files": [
+                    {
+                      "path": "apps/scene-engine/app/api/registry/[id]/route.ts",
+                      "status": "new",
+                      "description": "PATCH handler updating registry[id].file with type-folder validation"
+                    }
+                  ],
+                  "tree": null
+                }
+              },
+              "actions": [
+                {
+                  "id": "3.2.1.1",
+                  "command": "CREATE FILE apps/scene-engine/app/api/registry/[id]/route.ts",
+                  "file": "apps/scene-engine/app/api/registry/[id]/route.ts",
+                  "status": "pending"
+                },
+                {
+                  "id": "3.2.1.2",
+                  "command": "ADD imports: `NextResponse` from 'next/server'; `readFile`, `writeFile` from 'fs/promises'; `path` from 'path'; type `AssetContainer` from '@/types/scene'",
+                  "file": "apps/scene-engine/app/api/registry/[id]/route.ts",
+                  "status": "pending"
+                },
+                {
+                  "id": "3.2.1.3",
+                  "command": "ADD CONSTANT `const REGISTRY_PATH = path.join(process.cwd(), 'public', 'assets', 'registry.json')`",
+                  "file": "apps/scene-engine/app/api/registry/[id]/route.ts",
+                  "status": "pending"
+                },
+                {
+                  "id": "3.2.1.4",
+                  "command": "ADD FUNCTION `export async function PATCH(req: Request, { params }: { params: Promise<{ id: string }> })` \u2014 wrap entire body in try/catch",
+                  "file": "apps/scene-engine/app/api/registry/[id]/route.ts",
+                  "status": "pending"
+                },
+                {
+                  "id": "3.2.1.5",
+                  "command": "ADD inside PATCH: `const { id } = await params`; `let body: unknown`; try { body = await req.json() } catch { return NextResponse.json({error:'Invalid JSON'},{status:400}) }; if (!body || typeof body !== 'object' || Array.isArray(body)) return NextResponse.json({error:'Body must be a JSON object'},{status:400}); `const file = (body as Record<string, unknown>).file`; if (typeof file !== 'string' || file === '') return NextResponse.json({error:'Body must include a string `file` field'},{status:400})",
+                  "file": "apps/scene-engine/app/api/registry/[id]/route.ts",
+                  "status": "pending"
+                },
+                {
+                  "id": "3.2.1.6",
+                  "command": "ADD inside PATCH: `const text = await readFile(REGISTRY_PATH, 'utf-8')`; `const registry = JSON.parse(text) as Record<string, AssetContainer>`; `const entry = registry[id]`; if (!entry) return NextResponse.json({error:`Unknown container id: ${id}`},{status:404})",
+                  "file": "apps/scene-engine/app/api/registry/[id]/route.ts",
+                  "status": "pending"
+                },
+                {
+                  "id": "3.2.1.7",
+                  "command": "ADD inside PATCH: validate file path matches the container's type \u2014 `const expectedPrefix = `/assets/${entry.type}/``; if (!file.startsWith(expectedPrefix)) return NextResponse.json({error:`File path must be under ${expectedPrefix}`},{status:400})",
+                  "file": "apps/scene-engine/app/api/registry/[id]/route.ts",
+                  "status": "pending"
+                },
+                {
+                  "id": "3.2.1.8",
+                  "command": "ADD inside PATCH: `registry[id] = { ...entry, file }`; `await writeFile(REGISTRY_PATH, JSON.stringify(registry, null, 2) + '\\n', 'utf-8')`; `return NextResponse.json({ id, type: entry.type, file })`",
+                  "file": "apps/scene-engine/app/api/registry/[id]/route.ts",
+                  "status": "pending"
+                },
+                {
+                  "id": "3.2.1.9",
+                  "command": "ADD catch block: `return NextResponse.json({ error: err instanceof Error ? err.message : 'Registry update failed' }, { status: 500 })`",
+                  "file": "apps/scene-engine/app/api/registry/[id]/route.ts",
+                  "status": "pending"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": 3,
+          "title": "Inspector swap dropdown + canvas re-render wiring",
+          "objective": "Add the in-memory plumbing (asset-registry helper + zustand mutation + canvas re-render dep), then surface a file-swap <select> in the inspector for asset-type layers.",
+          "status": "pending",
+          "tasks": [
+            {
+              "id": "3.3.1",
+              "title": "Add updateEntry helper to asset-registry.js + canvas re-render on registry change",
+              "description": "Two coordinated changes so that mutating the registry in memory triggers a stage re-render: (1) Add `export function updateEntry(id, partial)` to `src/renderer/asset-registry.js` \u2014 merges `partial` into the cached merged registry's entry for `id` (does nothing if id is missing or loadRegistry hasn't run), then returns the updated entry. The renderer reads `entry.file` at render time via resolveAsset, so once the cache is updated the next render will use the new file. (2) Update `CanvasPanel.tsx` so the renderScene useEffect (currently keyed on `[scene]`, line 72) also depends on `registry`. This causes the imperative renderer to re-mount when the swap mutation publishes a new registry reference, picking up the updated container.file. No change to scene-renderer.js itself \u2014 the existing renderScene clears+rebuilds the stage on every call (already idempotent).",
+              "status": "pending",
+              "context": {
+                "read_before": [
+                  {
+                    "file": "apps/scene-engine/src/renderer/asset-registry.js",
+                    "lines": "1-40",
+                    "purpose": "After CP1 task 1.2.2 this module exposes loadRegistry/resolveAsset/getRegistry over a single mergedRegistry object \u2014 add updateEntry alongside"
+                  },
+                  {
+                    "file": "apps/scene-engine/app/editor/_components/CanvasPanel.tsx",
+                    "lines": "63-72",
+                    "purpose": "renderScene useEffect \u2014 currently `}, [scene])` on line 72; needs to become `[scene, registry]` so registry mutations re-render"
+                  }
+                ],
+                "related_files": [
+                  "apps/scene-engine/src/renderer/scene-renderer.js"
+                ]
+              },
+              "depends_on": [],
+              "file_context": {
+                "beginning": {
+                  "files": [
+                    {
+                      "path": "apps/scene-engine/src/renderer/asset-registry.js",
+                      "status": "exists",
+                      "description": "After CP1 task 1.2.2 \u2014 exports loadRegistry, resolveAsset, getRegistry over mergedRegistry; no in-place mutation API"
+                    },
+                    {
+                      "path": "apps/scene-engine/app/editor/_components/CanvasPanel.tsx",
+                      "status": "exists",
+                      "description": "renderScene useEffect deps are [scene] only"
+                    }
+                  ],
+                  "tree": null
+                },
+                "ending": {
+                  "files": [
+                    {
+                      "path": "apps/scene-engine/src/renderer/asset-registry.js",
+                      "status": "modified",
+                      "description": "Adds updateEntry(id, partial) \u2014 merges partial into mergedRegistry[id]"
+                    },
+                    {
+                      "path": "apps/scene-engine/app/editor/_components/CanvasPanel.tsx",
+                      "status": "modified",
+                      "description": "renderScene useEffect deps become [scene, registry]"
+                    }
+                  ],
+                  "tree": null
+                }
+              },
+              "actions": [
+                {
+                  "id": "3.3.1.1",
+                  "command": "ADD FUNCTION `export function updateEntry(id, partial)` to apps/scene-engine/src/renderer/asset-registry.js \u2014 body: if (!mergedRegistry || !mergedRegistry[id]) return null; mergedRegistry[id] = { ...mergedRegistry[id], ...partial }; return mergedRegistry[id]",
+                  "file": "apps/scene-engine/src/renderer/asset-registry.js",
+                  "status": "pending"
+                },
+                {
+                  "id": "3.3.1.2",
+                  "command": "UPDATE apps/scene-engine/app/editor/_components/CanvasPanel.tsx \u2014 REPLACE the renderScene useEffect dependency array (line ~72) FROM `}, [scene])` TO `}, [scene, registry])` so registry mutations re-trigger renderScene",
+                  "file": "apps/scene-engine/app/editor/_components/CanvasPanel.tsx",
+                  "status": "pending"
+                },
+                {
+                  "id": "3.3.1.3",
+                  "command": "VERIFY apps/scene-engine/src/renderer/asset-registry.js \u2014 updateEntry mutates the same mergedRegistry object that getRegistry/resolveAsset read from (so subsequent renderScene calls see the new file)",
+                  "file": "apps/scene-engine/src/renderer/asset-registry.js",
+                  "status": "pending"
+                }
+              ]
+            },
+            {
+              "id": "3.3.2",
+              "title": "Add updateContainerFile mutation to editor-store",
+              "description": "Add a new action `updateContainerFile(id: string, file: string)` to the zustand store. It takes the container id and the new file path, calls `updateEntry(id, { file })` from src/renderer/asset-registry to mutate the in-memory cache (dynamic import inside the action to keep the renderer module browser-only and avoid SSR coupling), then calls `setRegistry({ ...currentRegistry, [id]: { ...currentRegistry[id], file } })` to publish a new registry reference (this is what triggers the CanvasPanel re-render added in 3.3.1 and any registry-dependent inspector reads). Does NOT mark the scene dirty \u2014 the swap mutates registry.json on the server-side via the API, not scene.json. If the id is missing from the current registry, the action is a no-op. Add the action signature to the EditorStore interface.",
+              "status": "pending",
+              "context": {
+                "read_before": [
+                  {
+                    "file": "apps/scene-engine/src/store/editor-store.ts",
+                    "lines": "1-155",
+                    "purpose": "Existing store \u2014 interface, create() body, mutation patterns (e.g. mutateLayerAt sets dirty); add new action without coupling it to dirty state"
+                  },
+                  {
+                    "file": "apps/scene-engine/src/renderer/asset-registry.js",
+                    "lines": "1-50",
+                    "purpose": "Reference the updateEntry signature added in task 3.3.1"
+                  }
+                ],
+                "related_files": [
+                  "apps/scene-engine/src/types/scene.ts"
+                ]
+              },
+              "depends_on": [
+                "3.3.1"
+              ],
+              "file_context": {
+                "beginning": {
+                  "files": [
+                    {
+                      "path": "apps/scene-engine/src/store/editor-store.ts",
+                      "status": "exists",
+                      "description": "EditorStore interface + create() body \u2014 no container-mutation action"
+                    }
+                  ],
+                  "tree": null
+                },
+                "ending": {
+                  "files": [
+                    {
+                      "path": "apps/scene-engine/src/store/editor-store.ts",
+                      "status": "modified",
+                      "description": "Adds updateContainerFile(id, file) action \u2014 mutates asset-registry cache + publishes new registry ref; scene/dirty untouched"
+                    }
+                  ],
+                  "tree": null
+                }
+              },
+              "actions": [
+                {
+                  "id": "3.3.2.1",
+                  "command": "ADD `updateContainerFile: (id: string, file: string) => void` TO the EditorStore interface in apps/scene-engine/src/store/editor-store.ts (alongside the existing action signatures, before the closing brace of the interface)",
+                  "file": "apps/scene-engine/src/store/editor-store.ts",
+                  "status": "pending"
+                },
+                {
+                  "id": "3.3.2.2",
+                  "command": "ADD action implementation inside the `create<EditorStore>((set, get) => ({ ... }))` body in apps/scene-engine/src/store/editor-store.ts: `updateContainerFile: async (id, file) => { const { registry } = get(); if (!registry || !registry[id]) return; const { updateEntry } = await import('@/renderer/asset-registry'); updateEntry(id, { file }); set({ registry: { ...registry, [id]: { ...registry[id], file } } as Registry }) }`",
+                  "file": "apps/scene-engine/src/store/editor-store.ts",
+                  "status": "pending"
+                },
+                {
+                  "id": "3.3.2.3",
+                  "command": "UPDATE the EditorStore interface signature for updateContainerFile to match the async implementation: `updateContainerFile: (id: string, file: string) => Promise<void>`",
+                  "file": "apps/scene-engine/src/store/editor-store.ts",
+                  "status": "pending"
+                },
+                {
+                  "id": "3.3.2.4",
+                  "command": "VERIFY no `dirty` mutation in updateContainerFile (registry mutations persist directly to disk via the API; scene.json is untouched)",
+                  "file": "apps/scene-engine/src/store/editor-store.ts",
+                  "status": "pending"
+                }
+              ]
+            },
+            {
+              "id": "3.3.3",
+              "title": "Create AssetSwapDropdown component",
+              "description": "New client component at `app/editor/_components/AssetSwapDropdown.tsx`. Props: `assetId: string` (the container id), `assetType: AssetType` (one of audio/image/video/glyph), `currentFile: string` (the registry's current file pointer for this container). Behavior: on mount (and when assetType changes), fetch GET `/api/assets/{assetType}` (the endpoint built in CP2 task 2.2.2) \u2014 list of `{name, file}`. Cache in component state. Render a labeled <select> whose value is `currentFile`; options are the fetched files (display `name`, value `file`). On change: call `await fetch('/api/registry/' + assetId, { method: 'PATCH', headers: { 'Content-Type':'application/json' }, body: JSON.stringify({ file: newFile }) })`; on res.ok call `useEditorStore.getState().updateContainerFile(assetId, newFile)`; on !ok set a small inline error string ('Swap failed'). Loading state: while files are being fetched, render the <select> disabled with a single 'Loading\u2026' option. Style classes match the existing inspector inputs (bg-[#0e0e0e] border border-[#2a2a2a] text-gray-300 text-xs font-mono px-1 py-0.5 rounded-sm).",
+              "status": "pending",
+              "context": {
+                "read_before": [
+                  {
+                    "file": "apps/scene-engine/app/editor/_components/LayerForm.tsx",
+                    "lines": "33-78",
+                    "purpose": "Existing inspector input style classes (bg-[#0e0e0e] border border-[#2a2a2a] etc.) \u2014 match these so the dropdown looks native"
+                  },
+                  {
+                    "file": "apps/scene-engine/app/editor/_components/inputs/BlendSelect.tsx",
+                    "lines": "1-80",
+                    "purpose": "Reference existing labeled <select> styling/onChange patterns in this codebase"
+                  },
+                  {
+                    "file": "apps/scene-engine/src/store/editor-store.ts",
+                    "lines": "1-30",
+                    "purpose": "Reference useEditorStore import path and the updateContainerFile action signature added in task 3.3.2"
+                  },
+                  {
+                    "file": "apps/scene-engine/src/lib/asset-types.ts",
+                    "lines": "1-30",
+                    "purpose": "AssetType union for the prop type"
+                  }
+                ],
+                "related_files": [
+                  "apps/scene-engine/app/api/assets/[type]/route.ts",
+                  "apps/scene-engine/app/api/registry/[id]/route.ts"
+                ]
+              },
+              "depends_on": [
+                "3.3.2"
+              ],
+              "file_context": {
+                "beginning": {
+                  "files": [
+                    {
+                      "path": "apps/scene-engine/app/editor/_components/AssetSwapDropdown.tsx",
+                      "status": "missing",
+                      "description": "Does not exist"
+                    }
+                  ],
+                  "tree": null
+                },
+                "ending": {
+                  "files": [
+                    {
+                      "path": "apps/scene-engine/app/editor/_components/AssetSwapDropdown.tsx",
+                      "status": "new",
+                      "description": "Client component \u2014 fetches /api/assets/[type], renders labeled <select>, PATCHes /api/registry/[id] on change, calls updateContainerFile"
+                    }
+                  ],
+                  "tree": null
+                }
+              },
+              "actions": [
+                {
+                  "id": "3.3.3.1",
+                  "command": "CREATE FILE apps/scene-engine/app/editor/_components/AssetSwapDropdown.tsx",
+                  "file": "apps/scene-engine/app/editor/_components/AssetSwapDropdown.tsx",
+                  "status": "pending"
+                },
+                {
+                  "id": "3.3.3.2",
+                  "command": "ADD `'use client'` directive AT TOP OF FILE",
+                  "file": "apps/scene-engine/app/editor/_components/AssetSwapDropdown.tsx",
+                  "status": "pending"
+                },
+                {
+                  "id": "3.3.3.3",
+                  "command": "ADD imports: `useEffect, useState` from 'react'; `useEditorStore` from '@/store/editor-store'; type `AssetType` from '@/types/scene'",
+                  "file": "apps/scene-engine/app/editor/_components/AssetSwapDropdown.tsx",
+                  "status": "pending"
+                },
+                {
+                  "id": "3.3.3.4",
+                  "command": "ADD INTERFACE `interface Props { assetId: string; assetType: AssetType; currentFile: string }` and INTERFACE `interface FileEntry { name: string; file: string }`",
+                  "file": "apps/scene-engine/app/editor/_components/AssetSwapDropdown.tsx",
+                  "status": "pending"
+                },
+                {
+                  "id": "3.3.3.5",
+                  "command": "ADD FUNCTION `export function AssetSwapDropdown({ assetId, assetType, currentFile }: Props)` \u2014 component body below",
+                  "file": "apps/scene-engine/app/editor/_components/AssetSwapDropdown.tsx",
+                  "status": "pending"
+                },
+                {
+                  "id": "3.3.3.6",
+                  "command": "ADD STATE inside AssetSwapDropdown: `const [files, setFiles] = useState<FileEntry[] | null>(null)`; `const [error, setError] = useState<string | null>(null)`; `const updateContainerFile = useEditorStore((s) => s.updateContainerFile)`",
+                  "file": "apps/scene-engine/app/editor/_components/AssetSwapDropdown.tsx",
+                  "status": "pending"
+                },
+                {
+                  "id": "3.3.3.7",
+                  "command": "ADD useEffect that fetches files when assetType changes: `useEffect(() => { let cancelled = false; setFiles(null); setError(null); fetch('/api/assets/' + assetType).then(r => r.json()).then(j => { if (!cancelled) setFiles(Array.isArray(j.files) ? j.files : []) }).catch(() => { if (!cancelled) setFiles([]) }); return () => { cancelled = true } }, [assetType])`",
+                  "file": "apps/scene-engine/app/editor/_components/AssetSwapDropdown.tsx",
+                  "status": "pending"
+                },
+                {
+                  "id": "3.3.3.8",
+                  "command": "ADD HANDLER `async function onChange(e: React.ChangeEvent<HTMLSelectElement>)` \u2014 `const newFile = e.target.value`; if (newFile === currentFile) return; setError(null); `const res = await fetch('/api/registry/' + assetId, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ file: newFile }) })`; if (!res.ok) { const j = await res.json().catch(() => ({})); setError(j.error ?? 'Swap failed'); return }; `await updateContainerFile(assetId, newFile)`",
+                  "file": "apps/scene-engine/app/editor/_components/AssetSwapDropdown.tsx",
+                  "status": "pending"
+                },
+                {
+                  "id": "3.3.3.9",
+                  "command": "ADD JSX RETURN: a fragment containing (a) a `<dt className=\"text-gray-500 whitespace-nowrap\">file</dt>`; (b) a `<dd className=\"m-0 text-gray-300 break-all\">` wrapping a `<select value={currentFile} onChange={onChange} disabled={files === null} className=\"w-full bg-[#0e0e0e] border border-[#2a2a2a] text-gray-300 text-xs font-mono px-1 py-0.5 rounded-sm\">` whose options are: if files === null \u2192 `<option value={currentFile}>Loading\u2026</option>`; else if currentFile not in files \u2192 render currentFile as the first selected option (so the select reflects state) followed by mapped options; otherwise render `files.map(f => <option key={f.file} value={f.file}>{f.name}</option>)`. Below the select, when error is non-null render `<span className=\"text-red-400 text-[10px] block mt-1\">{error}</span>`.",
+                  "file": "apps/scene-engine/app/editor/_components/AssetSwapDropdown.tsx",
+                  "status": "pending"
+                }
+              ]
+            },
+            {
+              "id": "3.3.4",
+              "title": "Integrate AssetSwapDropdown into LayerForm for asset-type layers",
+              "description": "In `LayerForm.tsx`, when the layer's `type` is one of the 4 asset types AND the layer has an `asset` id that resolves to a container with a `file`, render the AssetSwapDropdown above the existing properties grid (below the id/type/asset/visible rows so the rest of the form is unaffected). Read `currentFile` by looking the asset id up in the editor store's registry; narrow with `'file' in entry` so the AssetContainer branch of the union compiles. If the layer's type is not an asset type (e.g. 'effect', 'component', 'glyph-group') or the registry has no entry yet, render nothing extra \u2014 the existing form is unchanged. Use ASSET_TYPES from src/lib/asset-types to drive the type check (`(ASSET_TYPES as readonly string[]).includes(layer.type)`).",
+              "status": "pending",
+              "context": {
+                "read_before": [
+                  {
+                    "file": "apps/scene-engine/app/editor/_components/LayerForm.tsx",
+                    "lines": "1-133",
+                    "purpose": "Existing form \u2014 find the spot below the id/type/asset/visible rows (around line 47) to slot the dropdown row in without disturbing the property loop"
+                  },
+                  {
+                    "file": "apps/scene-engine/src/lib/asset-types.ts",
+                    "lines": "1-30",
+                    "purpose": "ASSET_TYPES tuple \u2014 the runtime list of asset types to gate the dropdown on"
+                  },
+                  {
+                    "file": "apps/scene-engine/src/types/scene.ts",
+                    "lines": "1-50",
+                    "purpose": "AssetContainer + Registry union types from CP1 task 1.2.1 \u2014 needed for the narrowing read"
+                  }
+                ],
+                "related_files": [
+                  "apps/scene-engine/src/store/editor-store.ts",
+                  "apps/scene-engine/app/editor/_components/AssetSwapDropdown.tsx"
+                ]
+              },
+              "depends_on": [
+                "3.3.3"
+              ],
+              "file_context": {
+                "beginning": {
+                  "files": [
+                    {
+                      "path": "apps/scene-engine/app/editor/_components/LayerForm.tsx",
+                      "status": "exists",
+                      "description": "Renders id/type/asset/visible rows then the properties loop; no asset-swap UI"
+                    }
+                  ],
+                  "tree": null
+                },
+                "ending": {
+                  "files": [
+                    {
+                      "path": "apps/scene-engine/app/editor/_components/LayerForm.tsx",
+                      "status": "modified",
+                      "description": "Adds AssetSwapDropdown for layers whose type is an asset type and whose registry container has a file pointer"
+                    }
+                  ],
+                  "tree": null
+                }
+              },
+              "actions": [
+                {
+                  "id": "3.3.4.1",
+                  "command": "ADD imports to apps/scene-engine/app/editor/_components/LayerForm.tsx: `ASSET_TYPES` from '@/lib/asset-types'; `AssetSwapDropdown` from './AssetSwapDropdown'; type `Registry` from '@/types/scene'",
+                  "file": "apps/scene-engine/app/editor/_components/LayerForm.tsx",
+                  "status": "pending"
+                },
+                {
+                  "id": "3.3.4.2",
+                  "command": "ADD inside the LayerForm function body, before the JSX return: `const registry = useEditorStore((s) => s.registry) as Registry | null`; `const assetId = layer.asset as string | undefined`; `const layerType = layer.type as string | undefined`; `const isAssetTypeLayer = !!layerType && (ASSET_TYPES as readonly string[]).includes(layerType)`; `const containerEntry = assetId && registry ? registry[assetId] : undefined`; `const currentFile = containerEntry && 'file' in containerEntry ? containerEntry.file : null`",
+                  "file": "apps/scene-engine/app/editor/_components/LayerForm.tsx",
+                  "status": "pending"
+                },
+                {
+                  "id": "3.3.4.3",
+                  "command": "INSERT into the JSX <dl> in LayerForm, AFTER the existing `visible` Field block (around line 47, before the position.x block), the conditional: `{isAssetTypeLayer && assetId && currentFile ? <AssetSwapDropdown assetId={assetId} assetType={layerType as AssetType} currentFile={currentFile} /> : null}`. Add the `import type { AssetType } from '@/types/scene'` (or merge with the existing scene.ts type imports) so the cast compiles.",
+                  "file": "apps/scene-engine/app/editor/_components/LayerForm.tsx",
+                  "status": "pending"
+                },
+                {
+                  "id": "3.3.4.4",
+                  "command": "VERIFY LayerForm compiles under strict TS \u2014 registry-narrowing read uses `'file' in containerEntry` (standard discriminant on the AssetContainer | ModuleEntry union); AssetSwapDropdown receives only narrowed string + AssetType props",
+                  "file": "apps/scene-engine/app/editor/_components/LayerForm.tsx",
+                  "status": "pending"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

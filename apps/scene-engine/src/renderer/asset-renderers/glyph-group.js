@@ -1,6 +1,14 @@
 import { applyPosition, applyScale } from '../positioning.js';
 import { resolveAsset } from '../asset-registry.js';
 
+const svgTextCache = new Map();
+function fetchSvgText(path) {
+  if (!svgTextCache.has(path)) {
+    svgTextCache.set(path, fetch(path).then(r => r.text()));
+  }
+  return svgTextCache.get(path);
+}
+
 function parseViewBox(svg) {
   const vbAttr = svg.getAttribute('viewBox');
   if (vbAttr) {
@@ -45,9 +53,48 @@ async function mountForeignChild(svg, child, vb, anchor) {
   const props = child.properties || {};
   if (typeof props.opacity === 'number') fo.style.opacity = String(props.opacity);
   if (typeof props.blend === 'string') fo.style.mixBlendMode = props.blend;
+  if (typeof props.clip === 'string') fo.setAttribute('clip-path', `url(#${props.clip})`);
 
   const xhtmlWrap = document.createElementNS('http://www.w3.org/1999/xhtml', 'div');
-  xhtmlWrap.setAttribute('style', 'width:100%;height:100%;position:relative');
+  const posX = props.position_x ?? 0;
+  const posY = props.position_y ?? 0;
+  const scale = props.scale ?? 1;
+  const rotation = props.rotation ?? 0;
+  const transforms = [];
+  if (posX !== 0 || posY !== 0) transforms.push(`translate(${posX}%, ${posY}%)`);
+  if (scale !== 1) transforms.push(`scale(${scale})`);
+  if (rotation !== 0) transforms.push(`rotate(${rotation}deg)`);
+  const transformStr = transforms.length ? `transform:${transforms.join(' ')};transform-origin:center center;` : '';
+  xhtmlWrap.setAttribute('style', `width:100%;height:100%;position:relative;overflow:hidden;${transformStr}`);
+
+  if (typeof props.hue === 'number' && props.hue !== 0) {
+    el.style.filter = `hue-rotate(${props.hue}deg)`;
+  }
+  if (typeof props.speed === 'number' && props.speed !== 1 && el.tagName === 'VIDEO') {
+    el.defaultPlaybackRate = props.speed;
+    el.playbackRate = props.speed;
+  }
+
+  const repeatX = Math.max(1, Math.round(props.repeat_x ?? 1));
+  const repeatY = Math.max(1, Math.round(props.repeat_y ?? 1));
+  const totalTiles = repeatX * repeatY;
+
+  if (totalTiles > 1) {
+    xhtmlWrap.style.display = 'grid';
+    xhtmlWrap.style.gridTemplateColumns = `repeat(${repeatX}, 1fr)`;
+    xhtmlWrap.style.gridTemplateRows = `repeat(${repeatY}, 1fr)`;
+    for (let i = 1; i < totalTiles; i++) {
+      const clone = el.cloneNode(true);
+      if (clone.tagName === 'VIDEO') {
+        clone.autoplay = true;
+        clone.muted = true;
+        clone.loop = true;
+        clone.play().catch(() => {});
+      }
+      xhtmlWrap.appendChild(clone);
+    }
+  }
+
   xhtmlWrap.appendChild(el);
   fo.appendChild(xhtmlWrap);
 
@@ -56,11 +103,38 @@ async function mountForeignChild(svg, child, vb, anchor) {
   return fo;
 }
 
-export async function renderGlyphGroup(layer, entry) {
-  const res = await fetch(entry.path);
-  const text = await res.text();
+function applyCssVars(svg, layer) {
+  const scope = 'melee3';
+  for (const child of (layer.children ?? [])) {
+    if (!child.layer) continue;
+    const props = child.properties ?? {};
+    if (typeof props.opacity === 'number') {
+      svg.style.setProperty(`--${scope}-${child.layer}-opacity`, String(props.opacity));
+    }
+    if (typeof props.paint === 'string') {
+      svg.style.setProperty(`--${scope}-${child.layer}-paint`, props.paint);
+    }
+  }
+}
+
+export async function discoverGlyphLayers(path) {
+  const text = await fetchSvgText(path);
   const doc = new DOMParser().parseFromString(text, 'image/svg+xml');
   const svg = doc.documentElement;
+  const layers = [];
+  for (const el of svg.querySelectorAll('[data-layer]')) {
+    layers.push(el.getAttribute('data-layer'));
+  }
+  return layers;
+}
+
+export async function renderGlyphGroup(layer, entry) {
+  const text = await fetchSvgText(entry.file);
+  const doc = new DOMParser().parseFromString(text, 'image/svg+xml');
+  const svg = doc.documentElement;
+
+  const bgRect = svg.querySelector('rect#background');
+  if (bgRect) bgRect.style.display = 'none';
   const wrapper = document.createElement('div');
   wrapper.className = 'glyph-group-layer';
   wrapper.dataset.layerId = layer.id;
@@ -73,6 +147,8 @@ export async function renderGlyphGroup(layer, entry) {
   svg.style.height = '100%';
   svg.style.display = 'block';
   wrapper.appendChild(svg);
+
+  applyCssVars(svg, layer);
 
   let lastNamedAnchor = null;
   for (const child of (layer.children ?? [])) {

@@ -16,7 +16,8 @@ export function getRenderer(type) {
   return fn;
 }
 
-registerRenderer('media', renderMedia);
+registerRenderer('video', renderMedia);
+registerRenderer('image', renderMedia);
 registerRenderer('effect', renderCssEffect);
 registerRenderer('glyph-group', renderGlyphGroup);
 registerRenderer('component', renderComponent);

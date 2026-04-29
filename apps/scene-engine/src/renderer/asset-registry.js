@@ -1,32 +1,44 @@
-const cache = new Map();
-let currentUrl = null;
+let mergedRegistry = null;
+let loadPromise = null;
 
-export async function loadRegistry(url = '/assets/registry.json') {
-  if (cache.has(url)) {
-    currentUrl = url;
-    return cache.get(url);
-  }
+async function fetchManifest(url) {
   try {
     const res = await fetch(url);
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    const parsed = await res.json();
-    cache.set(url, parsed);
-    currentUrl = url;
-    return parsed;
+    return await res.json();
   } catch (err) {
     console.error(`[asset-registry] failed to load ${url}`, err);
-    cache.set(url, {});
-    currentUrl = url;
     return {};
   }
 }
 
+export async function loadRegistry() {
+  if (mergedRegistry) return mergedRegistry;
+  if (loadPromise) return loadPromise;
+  loadPromise = (async () => {
+    const [assets, modules] = await Promise.all([
+      fetchManifest('/assets/registry.json'),
+      fetchManifest('/modules/registry.json'),
+    ]);
+    const merged = { ...assets };
+    for (const [id, entry] of Object.entries(modules)) {
+      if (id in merged) {
+        console.warn(`[asset-registry] id collision: ${id} — module overrides asset`);
+      }
+      merged[id] = entry;
+    }
+    mergedRegistry = merged;
+    return mergedRegistry;
+  })();
+  return loadPromise;
+}
+
 export function resolveAsset(id) {
-  if (!currentUrl) {
+  if (!mergedRegistry) {
     console.warn('[asset-registry] resolveAsset called before loadRegistry');
     return null;
   }
-  const entry = cache.get(currentUrl)?.[id];
+  const entry = mergedRegistry[id];
   if (!entry) {
     console.warn(`[asset-registry] Unknown asset id: ${id}`);
     return null;
@@ -35,5 +47,5 @@ export function resolveAsset(id) {
 }
 
 export function getRegistry() {
-  return cache.get(currentUrl) || null;
+  return mergedRegistry;
 }

@@ -1,0 +1,10 @@
+{
+  "crt-overlay": {
+    "type": "effect",
+    "path": "/modules/effects/crt-overlay.css"
+  },
+  "press-start": {
+    "type": "component",
+    "path": "/modules/components/press-start/press-start.js"
+  }
+}

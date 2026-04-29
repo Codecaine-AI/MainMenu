@@ -1,0 +1,11 @@
+.press-start {
+  font-family: 'FolkPro', 'Orbitron', sans-serif;
+  font-weight: 700;
+  font-size: 56px;
+  letter-spacing: 0.25em;
+  color: var(--amber, #f6c419);
+  text-shadow: 0 0 20px rgba(246, 196, 25, 0.7), 0 3px 0 #3a2200;
+  animation: press-start-blink var(--blink-duration, 1.1s) steps(2, end) infinite;
+}
+
+@keyframes press-start-blink { 50% { opacity: 0.15; } }

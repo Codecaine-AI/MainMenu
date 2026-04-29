@@ -1,0 +1,26 @@
+{
+  "$schema": "DevNotes — deviations, discoveries, decisions captured during build",
+  "session_id": "2026-04-29_standardize-asset-upload-types_621azz",
+  "notes": [
+    {
+      "scope": { "type": "task", "ref": "1.1.1" },
+      "category": "deviation",
+      "content": "Plan called for `git mv` to relocate effects/ and components/ into public/modules/, but apps/scene-engine/public/assets/** is gitignored (the .gitignore rule `assets/` matches with no exception for the new public path). Used plain `mv` instead — no git history to preserve since the files were never tracked. Also extended .gitignore with exceptions for `apps/scene-engine/public/assets/**` and `apps/scene-engine/public/modules/**` so the new structure is tracked going forward."
+    },
+    {
+      "scope": { "type": "task", "ref": "1.1.2" },
+      "category": "deviation",
+      "content": "Plan said `media/` contained two .mp4 files (test-fire-2, test-fire-3) — actual contents had a third (test-fire.mp4) not referenced by registry. Moved all three to video/ for consistency. Extra file is now a candidate for the inspector swap dropdown in CP3."
+    },
+    {
+      "scope": { "type": "task", "ref": "1.3.1" },
+      "category": "discovery",
+      "content": "CanvasPanel.tsx (drop handler buildLayer) also imported the removed RegistryEntry type and dispatched on entry.type === 'media' / 'glyph-group'. Updated buildLayer to switch on the new asset/module union types: 'video'/'image' both build a media-style layer, 'glyph' builds a glyph-group layer (asset-type vs layer-type distinction), 'audio'/'effect'/'component' unchanged. Removed default branch since the union is now exhaustive."
+    },
+    {
+      "scope": { "type": "task", "ref": "1.3.2" },
+      "category": "discovery",
+      "content": "app/scenes/[id]/page.tsx (scene preview) also called loadRegistry('/assets/registry.json') — wasn't listed in the plan but had to be updated to the no-arg signature so TS compile succeeds."
+    }
+  ]
+}
