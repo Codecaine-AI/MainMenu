@@ -156,6 +156,12 @@
         "sha": "8c1e94f9b810ebff073fa4909e22cb0e1e9e274e",
         "message": "checkpoint-3: Group children \u2014 sub-layer overrides + foreign-asset interleaving",
         "created_at": "2026-04-29T22:30:00+00:00"
+      },
+      {
+        "checkpoint_id": 4,
+        "sha": "eb9163710182130f99155d0954f33f0e39d214a6",
+        "message": "checkpoint-4: Visual editor \u2014 read-only 4-panel view",
+        "created_at": "2026-04-29T23:30:00+00:00"
       }
     ]
   }
