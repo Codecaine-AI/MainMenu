@@ -6,13 +6,20 @@
     {
       "id": "bg-video",
       "type": "media",
-      "asset": "/media/test-fire-2.mp4",
+      "asset": "bg-video",
       "properties": { "fit": "cover", "blend": "normal", "opacity": 1.0 }
+    },
+    {
+      "id": "codecaine-logo",
+      "type": "glyph-group",
+      "asset": "codecaine-logo",
+      "position": { "x": "center", "y": "33%" },
+      "properties": { "scale": 0.18 }
     },
     {
       "id": "crt",
       "type": "effect",
-      "asset": "/src/effects/crt-overlay.css",
+      "asset": "crt-overlay",
       "properties": { "opacity": 1.0 }
     }
   ]

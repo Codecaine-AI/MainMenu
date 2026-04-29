@@ -13,6 +13,30 @@
       "category": "discovery",
       "content": "Verification limitation: the checkpoint's testing_strategy is a manual visual browser test (bg video looping + CRT overlay). I verified all the underlying plumbing — npm install clean, dev server boots cleanly in ~400ms with no errors, all routes return 200 with correct content-types (HTML, JSON, video/mp4, text/css, JS modules), and `vite build` succeeds producing valid dist output. The actual rendered pixels were not visually confirmed because no browser is available in this environment. User should run `npm --prefix apps/scene-engine run dev` and open the shown URL to confirm the visual.",
       "created_at": "2026-04-29T20:30:00+00:00"
+    },
+    {
+      "scope": { "type": "task", "ref": "2.2.4" },
+      "category": "deviation",
+      "content": "scene-renderer.js previously set `el.style.inset = '0'` unconditionally so layers fill the stage. With glyph-group's positional layout (left/top/transform from applyPosition), inset:0 would override left/top. Adjusted scene-renderer to only set inset:'0' when layer.position is absent. Position-bearing layers retain the offsets set by their renderer; full-stage layers (media, effect) keep inset:0 as before.",
+      "created_at": "2026-04-29T21:30:00+00:00"
+    },
+    {
+      "scope": { "type": "task", "ref": "2.3.5" },
+      "category": "discovery",
+      "content": "CODECAINE.css-layers.svg from font-creation outputs is ~1.7 MB (not the ~32 KB the plan estimated). The SVG is one big mass of cubic-Bezier <path d=...> data per layer; this affects fetch latency on first scene load but is fine for a hardcoded title scene. Future optimization: could compress with SVGO, or pre-flatten to a binary asset, but that's a CP6+ concern, not CP2's job.",
+      "created_at": "2026-04-29T21:30:00+00:00"
+    },
+    {
+      "scope": { "type": "checkpoint", "ref": "2" },
+      "category": "discovery",
+      "content": "Verification limitation (same as CP1): no browser available in this environment so the visual outcome (bg video + chrome CODECAINE centered top-third + CRT overlay) is not eyeballed. Verified all plumbing: `vite build` produces valid dist; dev server returns 200 with correct content-types for /assets/registry.json (application/json), /scenes/title/scene.json (application/json), /assets/media/test-fire-2.mp4 (video/mp4, 16.2 MB), /assets/effects/crt-overlay.css (text/css), /assets/glyphs/CODECAINE.css-layers.svg (image/svg+xml, 1.78 MB). User should run `npm --prefix apps/scene-engine run dev` to confirm the visual.",
+      "created_at": "2026-04-29T21:30:00+00:00"
+    },
+    {
+      "scope": { "type": "checkpoint", "ref": "2" },
+      "category": "deviation",
+      "content": "Repo .gitignore had a blanket `assets/` rule (with an existing exception for the font-creation pipeline inputs) that would have silently dropped the new apps/scene-engine/assets/ tree from version control. Added matching `!apps/scene-engine/assets/` and `!apps/scene-engine/assets/**` exceptions so registry.json, the media/ and effects/ trees, and the CODECAINE SVG track properly. Pre-existing .css-files and .mp4 went through via `git mv` because they were already tracked.",
+      "created_at": "2026-04-29T21:30:00+00:00"
     }
   ]
 }

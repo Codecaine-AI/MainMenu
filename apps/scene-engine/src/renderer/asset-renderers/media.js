@@ -1,6 +1,6 @@
-export function renderMedia(layer) {
+export function renderMedia(layer, entry) {
   const video = document.createElement('video');
-  video.src = layer.asset;
+  video.src = entry.path;
   video.autoplay = true;
   video.muted = true;
   video.loop = true;

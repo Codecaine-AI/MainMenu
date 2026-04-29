@@ -85,11 +85,11 @@
     "started_at": "2026-04-29T17:05:00+00:00",
     "completed_at": "2026-04-29T19:55:00+00:00",
     "finalized_at": "2026-04-29T19:55:00+00:00",
-    "last_updated": "2026-04-29T19:55:00+00:00",
+    "last_updated": "2026-04-29T21:30:00+00:00",
     "data": {
       "oversight_mode": "stepped",
       "current_level": "checkpoint",
-      "current_checkpoint": 2,
+      "current_checkpoint": 3,
       "current_task_group": null,
       "current_task": null
     }
@@ -98,22 +98,22 @@
     "status": "finalized",
     "checkpoints_total": 6,
     "checkpoints_detailed": 6,
-    "checkpoints_completed": [1],
-    "current_checkpoint": 2,
+    "checkpoints_completed": [1, 2],
+    "current_checkpoint": 3,
     "current_task_group": null,
     "current_task": null,
-    "last_updated": "2026-04-29T20:30:00+00:00"
+    "last_updated": "2026-04-29T21:30:00+00:00"
   },
   "build": {
     "status": "in_progress",
     "started_at": "2026-04-29T20:00:00+00:00",
     "completed_at": null,
-    "last_updated": "2026-04-29T20:30:00+00:00",
+    "last_updated": "2026-04-29T21:30:00+00:00",
     "data": {
-      "current_checkpoint": 2,
+      "current_checkpoint": 3,
       "current_task_group": null,
       "current_task": null,
-      "checkpoints_completed": [1]
+      "checkpoints_completed": [1, 2]
     }
   },
   "docs": {

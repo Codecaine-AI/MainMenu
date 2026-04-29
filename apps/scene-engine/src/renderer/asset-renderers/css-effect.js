@@ -9,8 +9,8 @@ function ensureStylesheet(href) {
   loadedStylesheets.add(href);
 }
 
-export function renderCssEffect(layer) {
-  ensureStylesheet(layer.asset);
+export function renderCssEffect(layer, entry) {
+  ensureStylesheet(entry.path);
   const root = document.createElement('div');
   root.className = 'crt';
   const scan = document.createElement('div');

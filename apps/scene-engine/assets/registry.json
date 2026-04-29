@@ -1,0 +1,14 @@
+{
+  "bg-video": {
+    "type": "media",
+    "path": "/assets/media/test-fire-2.mp4"
+  },
+  "crt-overlay": {
+    "type": "effect",
+    "path": "/assets/effects/crt-overlay.css"
+  },
+  "codecaine-logo": {
+    "type": "glyph-group",
+    "path": "/assets/glyphs/CODECAINE.css-layers.svg"
+  }
+}

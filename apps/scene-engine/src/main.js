@@ -5,7 +5,7 @@ import './renderer/asset-renderers/index.js';
 async function boot() {
   const res = await fetch('/scenes/title/scene.json');
   const scene = await res.json();
-  renderScene(scene, document.getElementById('stage'));
+  await renderScene(scene, document.getElementById('stage'));
 }
 
 if (document.readyState === 'loading') {

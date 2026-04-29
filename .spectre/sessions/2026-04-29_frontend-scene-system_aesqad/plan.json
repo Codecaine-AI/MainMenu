@@ -233,7 +233,7 @@
       "title": "Asset Registry + Glyph-Group + CODECAINE Logo",
       "goal": "Move assets out of inline file paths and behind a registry. assets/registry.json catalogues all reusable assets by id+type+path. Renderer resolves layer.asset references through the registry. New glyph-group renderer mounts the layered CODECAINE.css-layers.svg with all sub-layers visible. Title scene becomes: bg-video → CODECAINE logo (centered, top-third) → CRT overlay.",
       "prerequisites": [1],
-      "status": "pending",
+      "status": "completed",
       "testing_strategy": "Manual: title scene now shows bg + chrome CODECAINE logo + CRT, all stacked in correct z-order. Programmatically: edit scene.json to change which media asset is referenced by id (e.g. test-fire-3.mp4), reload, confirm switch. Confirm registry resolution fails gracefully on unknown id with a clear console warning.",
       "task_groups": [
         {
