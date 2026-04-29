@@ -13,6 +13,7 @@ export async function renderScene(scene, root) {
       continue;
     }
     const el = await getRenderer(layer.type)(layer, entry);
+    el.dataset.layerId = layer.id;
     el.style.position = 'absolute';
     if (!layer.position) el.style.inset = '0';
     root.appendChild(el);

@@ -1719,7 +1719,7 @@
       "prerequisites": [
         3
       ],
-      "status": "pending",
+      "status": "completed",
       "testing_strategy": "Manual: open /editor?scene=title, see all 4 panels. Hierarchy tree matches scene.json layer order, glyph-groups collapse/expand. Selecting a sub-layer of CODECAINE shows its properties (visible, hue, blend) in inspector. Asset browser lists every registry entry grouped by type. No edits possible yet \u2014 read-only is the explicit floor.",
       "task_groups": [
         {

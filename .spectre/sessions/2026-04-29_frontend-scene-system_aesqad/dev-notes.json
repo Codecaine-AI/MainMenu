@@ -82,6 +82,33 @@
       "category": "discovery",
       "content": "Verification limitation (same as CP1, CP2): no browser available so the visual outcome (fire visibly bleeding through CODECAINE letterforms with chrome on top, hue-shifted red fill, missing chrome-environment-reflection pass) is not eyeballed. Verified all plumbing: vite build succeeds (only the expected dynamic-import warning); dev server boots in ~85 ms with no errors; all routes return 200 with correct content-types \u2014 /scenes/title/scene.json (application/json, 1139 B with new children array), /assets/registry.json (application/json, 379 B with in-text-fire entry), /assets/media/test-fire-3.mp4 (video/mp4, 14.07 MB), /assets/glyphs/CODECAINE.css-layers.svg (image/svg+xml, 1.78 MB). User should run `npm --prefix apps/scene-engine run dev` to confirm the visual.",
       "created_at": "2026-04-29T22:30:00+00:00"
+    },
+    {
+      "scope": {
+        "type": "task",
+        "ref": "4.2.4"
+      },
+      "category": "deviation",
+      "content": "Hierarchy row label spec said `${layer.id} [${layer.type}]`, but named-sub-layer children only carry { id, layer, properties? } \u2014 no type. That would render rows like `extrusion-shadow [undefined]`. Added `?? 'sub-layer'` fallback so the five CODECAINE sub-rows label as `[sub-layer]` (named-layer overrides) or their actual type for foreign-asset children (e.g. `in-text-fire [media]`). Top-level layers always have type so they render unchanged.",
+      "created_at": "2026-04-29T23:30:00+00:00"
+    },
+    {
+      "scope": {
+        "type": "checkpoint",
+        "ref": "4"
+      },
+      "category": "discovery",
+      "content": "Build only emits the runtime entry (single dist/index.html). The editor is dev-only this checkpoint \u2014 multi-page Vite build (rollupOptions.input mapping editor + scene-per-page entries) is CP6's explicit concern. Confirmed dev mode: GET /editor/ returns the editor HTML, GET /editor/src/main.js returns Vite-transformed module, GET /scenes/title/scene.json + /assets/registry.json both 200. No vite.config.js change required for CP4.",
+      "created_at": "2026-04-29T23:30:00+00:00"
+    },
+    {
+      "scope": {
+        "type": "checkpoint",
+        "ref": "4"
+      },
+      "category": "discovery",
+      "content": "Verification limitation (same as CP1\u2013CP3): no browser available so the visual outcome (4-panel layout, scene rendered in canvas, hierarchy tree with chevron toggle, inspector populated on click, asset browser grouped by type) is not eyeballed. Verified all plumbing: vite build succeeds; dev server boots in ~80 ms; /editor/ + /editor/src/main.js + /scenes/title/scene.json all 200. Expected interactive behaviour: click codecaine-logo chevron \u2192 5 sub-rows collapse/expand; click a row \u2192 inspector renders read-only properties + (for resolvable layers) yellow outline appears on canvas. User should run `npm --prefix apps/scene-engine run dev` and open /editor/?scene=title to confirm.",
+      "created_at": "2026-04-29T23:30:00+00:00"
     }
   ]
 }

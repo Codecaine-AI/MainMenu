@@ -1,0 +1,189 @@
+html, body {
+  margin: 0;
+  height: 100vh;
+  overflow: hidden;
+  background: #111;
+  color: #ddd;
+  font-family: ui-sans-serif, system-ui, -apple-system, sans-serif;
+  color-scheme: dark;
+}
+
+.editor-shell {
+  display: grid;
+  height: 100vh;
+  grid-template-columns: 280px 1fr 320px;
+  grid-template-rows: 1fr 220px;
+  grid-template-areas:
+    'hierarchy canvas inspector'
+    'asset asset asset';
+  gap: 1px;
+  background: #222;
+}
+
+#panel-hierarchy {
+  grid-area: hierarchy;
+  background: #1a1a1a;
+  overflow: auto;
+  padding: 8px;
+}
+
+#panel-canvas {
+  grid-area: canvas;
+  background: #000;
+  position: relative;
+  overflow: hidden;
+  display: grid;
+  place-items: center;
+}
+
+#panel-inspector {
+  grid-area: inspector;
+  background: #1a1a1a;
+  overflow: auto;
+  padding: 8px;
+}
+
+#panel-asset-browser {
+  grid-area: asset;
+  background: #161616;
+  overflow: auto;
+  padding: 8px;
+}
+
+.editor-stage {
+  width: 1440px;
+  height: 1080px;
+  position: relative;
+  transform-origin: center center;
+  background: #000;
+}
+
+.hierarchy-tree {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  font: 12px/1.4 ui-monospace, SFMono-Regular, monospace;
+}
+.hierarchy-tree ul {
+  list-style: none;
+  padding-left: 14px;
+  margin: 0;
+}
+.hierarchy-row {
+  padding: 2px 4px;
+  cursor: default;
+  user-select: none;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.hierarchy-row:hover {
+  background: #222;
+}
+.chev {
+  background: none;
+  border: 0;
+  color: #aaa;
+  font: inherit;
+  cursor: pointer;
+  padding: 0;
+  width: 14px;
+  text-align: center;
+  flex: 0 0 auto;
+}
+.label {
+  color: #ddd;
+  flex: 1 1 auto;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.hierarchy-row.is-selected {
+  background: #1d3247;
+  outline: 1px solid #2a6da3;
+}
+.is-canvas-selected {
+  outline: 2px solid #ffd84d !important;
+  outline-offset: 2px;
+  box-shadow: 0 0 0 4px rgba(255, 216, 77, 0.18);
+}
+
+.inspector-heading {
+  margin: 0 0 8px;
+  font: 600 12px ui-sans-serif, system-ui, -apple-system, sans-serif;
+  color: #aaa;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.inspector-list {
+  margin: 0;
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: 4px 12px;
+  font: 12px ui-monospace, SFMono-Regular, monospace;
+}
+.inspector-list dt {
+  color: #888;
+  white-space: nowrap;
+}
+.inspector-list dd {
+  margin: 0;
+  color: #ddd;
+  word-break: break-all;
+}
+.inspector-empty {
+  color: #666;
+  font: italic 12px ui-sans-serif, system-ui, sans-serif;
+  padding: 8px 4px;
+  margin: 0;
+}
+
+.asset-browser-heading {
+  margin: 0 0 8px;
+  font: 600 12px ui-sans-serif, system-ui, -apple-system, sans-serif;
+  color: #aaa;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.asset-browser-content {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+  flex-wrap: wrap;
+}
+.asset-group {
+  min-width: 200px;
+  flex: 0 0 auto;
+}
+.asset-group-title {
+  margin: 0 0 6px;
+  font: 600 11px ui-sans-serif, system-ui, sans-serif;
+  color: #bbb;
+  text-transform: capitalize;
+}
+.asset-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  font: 11px ui-monospace, SFMono-Regular, monospace;
+}
+.asset-row {
+  padding: 2px 4px;
+  display: flex;
+  gap: 8px;
+  cursor: default;
+  user-select: none;
+}
+.asset-row:hover {
+  background: #222;
+}
+.asset-id {
+  color: #ddd;
+  flex: 0 0 auto;
+}
+.asset-path {
+  color: #666;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
