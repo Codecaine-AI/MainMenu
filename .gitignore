@@ -19,3 +19,5 @@ assets/
 !apps/scene-engine/public/assets/**
 !apps/scene-engine/public/modules/
 !apps/scene-engine/public/modules/**
+!apps/scene-engine/app/api/assets/
+!apps/scene-engine/app/api/assets/**

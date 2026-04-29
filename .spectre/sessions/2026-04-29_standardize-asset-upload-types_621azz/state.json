@@ -7,7 +7,7 @@
   "prior_sessions": [],
   "session_type": "full",
   "created_at": "2026-04-29T22:27:11+00:00",
-  "updated_at": "2026-04-29T23:17:20+00:00",
+  "updated_at": "2026-04-29T19:00:00+00:00",
   "current_phase": "build",
   "status": "active",
   "intake": {
@@ -35,11 +35,11 @@
     "status": "finalized",
     "started_at": "2026-04-29T23:05:00+00:00",
     "completed_at": "2026-04-29T23:17:20+00:00",
-    "last_updated": "2026-04-29T23:17:20+00:00",
+    "last_updated": "2026-04-29T19:00:00+00:00",
     "data": {
       "oversight_mode": "stepped",
       "current_level": "checkpoint",
-      "current_checkpoint": 2,
+      "current_checkpoint": 3,
       "current_task_group": null,
       "current_task": null
     }
@@ -48,22 +48,28 @@
     "status": "in_progress",
     "checkpoints_total": 3,
     "checkpoints_detailed": 3,
-    "checkpoints_completed": [1],
-    "current_checkpoint": 2,
+    "checkpoints_completed": [
+      1,
+      2
+    ],
+    "current_checkpoint": 3,
     "current_task_group": null,
     "current_task": null,
-    "last_updated": "2026-04-29T23:55:00+00:00"
+    "last_updated": "2026-04-29T19:00:00+00:00"
   },
   "build": {
     "status": "in_progress",
     "started_at": "2026-04-29T23:30:00+00:00",
     "completed_at": null,
-    "last_updated": "2026-04-29T23:55:00+00:00",
+    "last_updated": "2026-04-29T19:00:00+00:00",
     "data": {
-      "current_checkpoint": 2,
+      "current_checkpoint": 3,
       "current_task_group": null,
       "current_task": null,
-      "checkpoints_completed": [1]
+      "checkpoints_completed": [
+        1,
+        2
+      ]
     }
   },
   "docs": {
@@ -79,6 +85,13 @@
     "branch": "main",
     "worktree": null,
     "base_branch": null,
-    "commits": []
+    "commits": [
+      {
+        "checkpoint_id": 1,
+        "sha": "63f5d137744ca176b66541c9dbf08ec97a474cb2",
+        "message": "checkpoint-1: Reorg public/ + dual-registry (assets vs modules)",
+        "created_at": "2026-04-29T23:55:00+00:00"
+      }
+    ]
   }
 }

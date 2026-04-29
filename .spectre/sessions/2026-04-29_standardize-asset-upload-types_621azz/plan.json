@@ -3,7 +3,7 @@
   "session_id": "2026-04-29_standardize-asset-upload-types_621azz",
   "spec_reference": "./spec.md",
   "created_at": "2026-04-29T23:05:00+00:00",
-  "updated_at": "2026-04-29T23:17:20+00:00",
+  "updated_at": "2026-04-29T19:00:00+00:00",
   "status": "complete",
   "checkpoints": [
     {
@@ -920,7 +920,7 @@
       "prerequisites": [
         1
       ],
-      "status": "pending",
+      "status": "completed",
       "testing_strategy": {
         "summary": "Manual end-to-end test of the upload flow + verifying the new asset is loadable. No unit tests in this checkpoint.",
         "checks": [
@@ -942,13 +942,13 @@
           "id": 1,
           "title": "Shared asset-type validation utilities",
           "objective": "Centralize the canonical asset-type rules (mime/extension allowlists, mime\u2192type pre-fill, slugify) in one TypeScript module that both the API routes and the upload page import.",
-          "status": "pending",
+          "status": "completed",
           "tasks": [
             {
               "id": "2.1.1",
               "title": "Create src/lib/asset-types.ts with rules, slugify, and validators",
               "description": "Author a new shared module that owns every asset-type fact this checkpoint needs: the 4 canonical types, their extension/mime allowlists, a mime\u2192type lookup, a filename\u2192{slug,ext} helper, and a single validateUpload(...) validator. The upload API and the upload page both import from here so they cannot disagree about what's allowed. Slug rules: strip extension, lowercase, replace runs of non-[a-z0-9]+ with '-', trim leading/trailing '-'. Mime allowlist (per spec decision): audio = audio/mpeg, audio/wav, audio/ogg + ext .mp3/.wav/.ogg; image = image/png, image/jpeg, image/webp, image/gif + ext .png/.jpg/.jpeg/.webp/.gif; video = video/mp4, video/webm + ext .mp4/.webm; glyph = image/svg+xml + ext .svg. Validator returns { ok: true } | { ok: false, error: string } so callers can branch without try/catch.",
-              "status": "pending",
+              "status": "completed",
               "context": {
                 "read_before": [
                   {
@@ -1006,49 +1006,49 @@
                   "id": "2.1.1.1",
                   "command": "CREATE FILE apps/scene-engine/src/lib/asset-types.ts",
                   "file": "apps/scene-engine/src/lib/asset-types.ts",
-                  "status": "pending"
+                  "status": "completed"
                 },
                 {
                   "id": "2.1.1.2",
                   "command": "ADD `export type { AssetType } from '@/types/scene'` re-export so callers have a single import site",
                   "file": "apps/scene-engine/src/lib/asset-types.ts",
-                  "status": "pending"
+                  "status": "completed"
                 },
                 {
                   "id": "2.1.1.3",
                   "command": "ADD CONSTANT `export const ASSET_TYPES = ['audio','image','video','glyph'] as const`",
                   "file": "apps/scene-engine/src/lib/asset-types.ts",
-                  "status": "pending"
+                  "status": "completed"
                 },
                 {
                   "id": "2.1.1.4",
                   "command": "ADD CONSTANT `export const ASSET_TYPE_RULES: Record<AssetType, { extensions: string[]; mimes: string[] }>` with: audio={extensions:['mp3','wav','ogg'], mimes:['audio/mpeg','audio/wav','audio/ogg']}; image={extensions:['png','jpg','jpeg','webp','gif'], mimes:['image/png','image/jpeg','image/webp','image/gif']}; video={extensions:['mp4','webm'], mimes:['video/mp4','video/webm']}; glyph={extensions:['svg'], mimes:['image/svg+xml']}",
                   "file": "apps/scene-engine/src/lib/asset-types.ts",
-                  "status": "pending"
+                  "status": "completed"
                 },
                 {
                   "id": "2.1.1.5",
                   "command": "ADD FUNCTION `export function isAssetType(value: string): value is AssetType` \u2014 returns (ASSET_TYPES as readonly string[]).includes(value)",
                   "file": "apps/scene-engine/src/lib/asset-types.ts",
-                  "status": "pending"
+                  "status": "completed"
                 },
                 {
                   "id": "2.1.1.6",
                   "command": "ADD FUNCTION `export function getTypeFromMime(mime: string): AssetType | null` \u2014 lowercase the mime, scan ASSET_TYPE_RULES, return the first AssetType whose mimes include it, else null",
                   "file": "apps/scene-engine/src/lib/asset-types.ts",
-                  "status": "pending"
+                  "status": "completed"
                 },
                 {
                   "id": "2.1.1.7",
                   "command": "ADD FUNCTION `export function slugifyFilename(filename: string): { slug: string; ext: string }` \u2014 split on the last '.', lowercase ext (no dot, '' if none); slugify the basename: lowercase, replace /[^a-z0-9]+/g with '-', trim leading/trailing '-'; if slug is '' throw new Error('Filename slugified to empty string')",
                   "file": "apps/scene-engine/src/lib/asset-types.ts",
-                  "status": "pending"
+                  "status": "completed"
                 },
                 {
                   "id": "2.1.1.8",
                   "command": "ADD FUNCTION `export function validateUpload(input: { type: string; mime: string; filename: string }): { ok: true } | { ok: false; error: string }` \u2014 checks: isAssetType(type) (else 'Invalid asset type: <x>'); ext (lowercased, no dot, parsed from filename) is in ASSET_TYPE_RULES[type].extensions (else 'Extension .<ext> not allowed for type <type>'); mime (lowercased) is in ASSET_TYPE_RULES[type].mimes (else 'Mime <mime> not allowed for type <type>')",
                   "file": "apps/scene-engine/src/lib/asset-types.ts",
-                  "status": "pending"
+                  "status": "completed"
                 }
               ]
             }
@@ -1058,13 +1058,13 @@
           "id": 2,
           "title": "API endpoints \u2014 upload + per-type listing",
           "objective": "Server-side handlers: POST /api/upload (validate, write file, update assets/registry.json) and GET /api/assets/[type] (list files in a type folder). Both reuse the validation utilities from group 1.",
-          "status": "pending",
+          "status": "completed",
           "tasks": [
             {
               "id": "2.2.1",
               "title": "Create app/api/upload/route.ts (POST handler for asset upload)",
               "description": "Implement POST /api/upload as a Next.js Route Handler. Body is multipart/form-data with two fields: `file` (the binary asset) and `type` (one of the 4 AssetType strings). Flow: parse formData; pull file (instanceof File) and type (string); run validateUpload({type, mime: file.type, filename: file.name}); slugify filename to {slug, ext}; ensure public/assets/{type}/ exists (mkdir recursive); write the file's bytes to apps/scene-engine/public/assets/{type}/{slug}.{ext} (overwrite-allowed); read public/assets/registry.json, set/overwrite registry[slug] = { type, file: '/assets/{type}/{slug}.{ext}' }, write back with 2-space JSON indent + trailing newline (match scene-save style); respond 200 JSON `{ id, type, file }`. Errors: missing/invalid file \u2192 400 'No file uploaded'; missing type \u2192 400 'Missing type'; validateUpload failure \u2192 400 with the validator error; any unexpected exception \u2192 500 with the exception message. Use process.cwd() to resolve paths (Next.js dev runs from apps/scene-engine/).",
-              "status": "pending",
+              "status": "completed",
               "context": {
                 "read_before": [
                   {
@@ -1123,61 +1123,61 @@
                   "id": "2.2.1.1",
                   "command": "CREATE FILE apps/scene-engine/app/api/upload/route.ts",
                   "file": "apps/scene-engine/app/api/upload/route.ts",
-                  "status": "pending"
+                  "status": "completed"
                 },
                 {
                   "id": "2.2.1.2",
                   "command": "ADD imports: `NextResponse` from 'next/server'; `writeFile`, `readFile`, `mkdir` from 'fs/promises'; `existsSync` from 'fs'; `path` from 'path'; `isAssetType`, `validateUpload`, `slugifyFilename` from '@/lib/asset-types'; type `AssetContainer` from '@/types/scene'",
                   "file": "apps/scene-engine/app/api/upload/route.ts",
-                  "status": "pending"
+                  "status": "completed"
                 },
                 {
                   "id": "2.2.1.3",
                   "command": "ADD CONSTANT `const REGISTRY_PATH = path.join(process.cwd(), 'public', 'assets', 'registry.json')`",
                   "file": "apps/scene-engine/app/api/upload/route.ts",
-                  "status": "pending"
+                  "status": "completed"
                 },
                 {
                   "id": "2.2.1.4",
                   "command": "ADD FUNCTION `export async function POST(req: Request)` \u2014 wrap the entire body in try/catch",
                   "file": "apps/scene-engine/app/api/upload/route.ts",
-                  "status": "pending"
+                  "status": "completed"
                 },
                 {
                   "id": "2.2.1.5",
                   "command": "ADD form parsing inside POST: `const form = await req.formData()`; `const file = form.get('file')`; if (!(file instanceof File)) return NextResponse.json({error:'No file uploaded'}, {status:400}); `const typeRaw = form.get('type')`; if (typeof typeRaw !== 'string' || typeRaw === '') return NextResponse.json({error:'Missing type'}, {status:400})",
                   "file": "apps/scene-engine/app/api/upload/route.ts",
-                  "status": "pending"
+                  "status": "completed"
                 },
                 {
                   "id": "2.2.1.6",
                   "command": "ADD validation inside POST: `const result = validateUpload({ type: typeRaw, mime: file.type, filename: file.name })`; if (!result.ok) return NextResponse.json({error: result.error}, {status:400}); narrow `if (!isAssetType(typeRaw)) return NextResponse.json({error:'Invalid asset type'}, {status:400})` (also tightens TS; AssetType is now usable as `const type: AssetType = typeRaw`)",
                   "file": "apps/scene-engine/app/api/upload/route.ts",
-                  "status": "pending"
+                  "status": "completed"
                 },
                 {
                   "id": "2.2.1.7",
                   "command": "ADD slug+write inside POST: `const { slug, ext } = slugifyFilename(file.name)`; `const dir = path.join(process.cwd(), 'public', 'assets', type)`; `if (!existsSync(dir)) await mkdir(dir, { recursive: true })`; `const filename = ext ? `${slug}.${ext}` : slug`; `const diskPath = path.join(dir, filename)`; `await writeFile(diskPath, Buffer.from(await file.arrayBuffer()))`",
                   "file": "apps/scene-engine/app/api/upload/route.ts",
-                  "status": "pending"
+                  "status": "completed"
                 },
                 {
                   "id": "2.2.1.8",
                   "command": "ADD registry update inside POST: read REGISTRY_PATH (utf-8); `const registry = JSON.parse(text) as Record<string, AssetContainer>`; `registry[slug] = { type, file: `/assets/${type}/${filename}` }`; `await writeFile(REGISTRY_PATH, JSON.stringify(registry, null, 2) + '\\n', 'utf-8')`",
                   "file": "apps/scene-engine/app/api/upload/route.ts",
-                  "status": "pending"
+                  "status": "completed"
                 },
                 {
                   "id": "2.2.1.9",
                   "command": "ADD success response inside POST: `return NextResponse.json({ id: slug, type, file: registry[slug].file })`",
                   "file": "apps/scene-engine/app/api/upload/route.ts",
-                  "status": "pending"
+                  "status": "completed"
                 },
                 {
                   "id": "2.2.1.10",
                   "command": "ADD catch block: `return NextResponse.json({ error: err instanceof Error ? err.message : 'Upload failed' }, { status: 500 })`",
                   "file": "apps/scene-engine/app/api/upload/route.ts",
-                  "status": "pending"
+                  "status": "completed"
                 }
               ]
             },
@@ -1185,7 +1185,7 @@
               "id": "2.2.2",
               "title": "Create app/api/assets/[type]/route.ts (GET handler listing files in a type folder)",
               "description": "Implement GET /api/assets/[type] as a Next.js 15 dynamic Route Handler. Validate the {type} param via isAssetType \u2014 if not, return 400 `{error: 'Invalid asset type'}`. Read public/assets/{type}/ via fs/promises.readdir(withFileTypes:true); filter to entries that are files, drop dot-files (incl. .gitkeep). Return 200 JSON `{ files: [{ name, file }, ...] }` where `file = '/assets/{type}/{name}'`. Used by the inspector swap dropdown in CP3 and useful for verifying the upload pipeline in CP2 testing. Next.js 15 dynamic route handlers receive `params: Promise<{ type: string }>` \u2014 await it.",
-              "status": "pending",
+              "status": "completed",
               "context": {
                 "read_before": [
                   {
@@ -1236,37 +1236,37 @@
                   "id": "2.2.2.1",
                   "command": "CREATE FILE apps/scene-engine/app/api/assets/[type]/route.ts",
                   "file": "apps/scene-engine/app/api/assets/[type]/route.ts",
-                  "status": "pending"
+                  "status": "completed"
                 },
                 {
                   "id": "2.2.2.2",
                   "command": "ADD imports: `NextResponse` from 'next/server'; `readdir` from 'fs/promises'; `existsSync` from 'fs'; `path` from 'path'; `isAssetType` from '@/lib/asset-types'",
                   "file": "apps/scene-engine/app/api/assets/[type]/route.ts",
-                  "status": "pending"
+                  "status": "completed"
                 },
                 {
                   "id": "2.2.2.3",
                   "command": "ADD FUNCTION `export async function GET(_req: Request, { params }: { params: Promise<{ type: string }> })`",
                   "file": "apps/scene-engine/app/api/assets/[type]/route.ts",
-                  "status": "pending"
+                  "status": "completed"
                 },
                 {
                   "id": "2.2.2.4",
                   "command": "ADD inside GET: `const { type } = await params`; if (!isAssetType(type)) return NextResponse.json({ error: 'Invalid asset type' }, { status: 400 })",
                   "file": "apps/scene-engine/app/api/assets/[type]/route.ts",
-                  "status": "pending"
+                  "status": "completed"
                 },
                 {
                   "id": "2.2.2.5",
                   "command": "ADD inside GET: `const dir = path.join(process.cwd(), 'public', 'assets', type)`; if (!existsSync(dir)) return NextResponse.json({ files: [] })",
                   "file": "apps/scene-engine/app/api/assets/[type]/route.ts",
-                  "status": "pending"
+                  "status": "completed"
                 },
                 {
                   "id": "2.2.2.6",
                   "command": "ADD inside GET: `const entries = await readdir(dir, { withFileTypes: true })`; build `files = entries.filter(e => e.isFile() && !e.name.startsWith('.')).map(e => ({ name: e.name, file: `/assets/${type}/${e.name}` }))`; return `NextResponse.json({ files })`",
                   "file": "apps/scene-engine/app/api/assets/[type]/route.ts",
-                  "status": "pending"
+                  "status": "completed"
                 }
               ]
             }
@@ -1276,13 +1276,13 @@
           "id": 3,
           "title": "Standalone /upload page + dashboard link",
           "objective": "Client-side upload UX: a /upload page with file picker, mime-pre-filled type select, submit, and error/success feedback; plus an entry-point link from the dashboard.",
-          "status": "pending",
+          "status": "completed",
           "tasks": [
             {
               "id": "2.3.1",
               "title": "Create app/upload/page.tsx \u2014 file picker + type select + submit",
               "description": "Standalone client-side upload page at /upload. Uses 'use client' and React hooks. Layout (top-down): page heading 'Upload Asset' + a 'back to dashboard' link; a single panel containing: <input type=file> (no multiple), <select> for type with the 4 options, status region, submit button. State machine: status \u2208 {idle, submitting, success, error} + message string. On file change: read file.type, call getTypeFromMime; if non-null, setType(suggested); reset status to 'idle'. Type select can still be changed manually after auto-fill. On submit: build FormData, append file + type, fetch POST /api/upload; on response.ok set status='success' + message=`Uploaded ${json.id} \u2192 ${json.file}`; on !ok set status='error' + message=json.error ?? 'Upload failed'. Disable submit when no file or no type or status==='submitting'. Style to match the dashboard look (bg-[#111] / panels bg-[#1a1a1a] / borders #2a2a2a / text-gray-300). Keep it small \u2014 this is dev-tooling UX.",
-              "status": "pending",
+              "status": "completed",
               "context": {
                 "read_before": [
                   {
@@ -1336,49 +1336,49 @@
                   "id": "2.3.1.1",
                   "command": "CREATE FILE apps/scene-engine/app/upload/page.tsx",
                   "file": "apps/scene-engine/app/upload/page.tsx",
-                  "status": "pending"
+                  "status": "completed"
                 },
                 {
                   "id": "2.3.1.2",
                   "command": "ADD `'use client'` directive AT TOP OF FILE",
                   "file": "apps/scene-engine/app/upload/page.tsx",
-                  "status": "pending"
+                  "status": "completed"
                 },
                 {
                   "id": "2.3.1.3",
                   "command": "ADD imports: `useState` from 'react'; `Link` from 'next/link'; `ASSET_TYPES`, `getTypeFromMime` from '@/lib/asset-types'; type `AssetType` from '@/types/scene'",
                   "file": "apps/scene-engine/app/upload/page.tsx",
-                  "status": "pending"
+                  "status": "completed"
                 },
                 {
                   "id": "2.3.1.4",
                   "command": "ADD FUNCTION `export default function UploadPage()` \u2014 component body below",
                   "file": "apps/scene-engine/app/upload/page.tsx",
-                  "status": "pending"
+                  "status": "completed"
                 },
                 {
                   "id": "2.3.1.5",
                   "command": "ADD STATE inside UploadPage: `const [file, setFile] = useState<File | null>(null)`; `const [type, setType] = useState<AssetType | ''>('')`; `const [status, setStatus] = useState<'idle'|'submitting'|'success'|'error'>('idle')`; `const [message, setMessage] = useState('')`",
                   "file": "apps/scene-engine/app/upload/page.tsx",
-                  "status": "pending"
+                  "status": "completed"
                 },
                 {
                   "id": "2.3.1.6",
                   "command": "ADD HANDLER `function onFileChange(e: React.ChangeEvent<HTMLInputElement>)` \u2014 `const f = e.target.files?.[0] ?? null`; setFile(f); setStatus('idle'); setMessage(''); if (f) { const suggested = getTypeFromMime(f.type); if (suggested) setType(suggested) }",
                   "file": "apps/scene-engine/app/upload/page.tsx",
-                  "status": "pending"
+                  "status": "completed"
                 },
                 {
                   "id": "2.3.1.7",
                   "command": "ADD HANDLER `async function onSubmit(e: React.FormEvent)` \u2014 preventDefault; if (!file || !type) return; setStatus('submitting'); setMessage(''); `const form = new FormData(); form.append('file', file); form.append('type', type)`; `const res = await fetch('/api/upload', { method: 'POST', body: form })`; `const json = await res.json().catch(() => ({}))`; if (res.ok) { setStatus('success'); setMessage(`Uploaded ${json.id} \u2192 ${json.file}`) } else { setStatus('error'); setMessage(json.error ?? 'Upload failed') }",
                   "file": "apps/scene-engine/app/upload/page.tsx",
-                  "status": "pending"
+                  "status": "completed"
                 },
                 {
                   "id": "2.3.1.8",
                   "command": "ADD JSX RETURN: outer `<div className=\"min-h-screen bg-[#111] p-8 text-gray-300\">` containing (a) heading row with `<h1 className=\"text-lg font-semibold text-gray-300 tracking-wide\">Upload Asset</h1>` and `<Link href=\"/\" className=\"text-xs text-gray-500 hover:text-gray-300 no-underline\">\u2190 back to dashboard</Link>`; (b) `<form onSubmit={onSubmit} className=\"max-w-xl mt-6 bg-[#1a1a1a] border border-[#2a2a2a] rounded p-4 flex flex-col gap-3\">` with a labeled file input (`<input type=\"file\" onChange={onFileChange} />`), a labeled `<select value={type} onChange={e => setType(e.target.value as AssetType)}>` whose first option is `<option value=\"\" disabled>Select type\u2026</option>` followed by `ASSET_TYPES.map(t => <option key={t} value={t}>{t}</option>)`, a status region rendering `message` colored `text-red-400` on status==='error' / `text-emerald-400` on status==='success' / `text-gray-500` otherwise, and a submit button `<button type=\"submit\" disabled={!file || !type || status==='submitting'}>{status==='submitting' ? 'Uploading\u2026' : 'Upload'}</button>` styled with the same chip classes used elsewhere (`text-xs px-2.5 py-1 rounded-sm bg-[#173247] border border-[#2a6da3] text-[#cfe6ff] hover:bg-[#1d3d54] disabled:opacity-50 disabled:cursor-not-allowed`)",
                   "file": "apps/scene-engine/app/upload/page.tsx",
-                  "status": "pending"
+                  "status": "completed"
                 }
               ]
             },
@@ -1386,7 +1386,7 @@
               "id": "2.3.2",
               "title": "Add Upload entry-point link to the dashboard",
               "description": "Surface the new /upload page from the dashboard so users can find it. Add a single Link styled like the existing 'Edit' button (blue chrome chip), placed in the top-right of the heading row. Minimal change to app/page.tsx \u2014 keep the existing scene grid intact. Confirm `import Link from 'next/link'` is already present (it is, used by the per-scene Edit/Preview links).",
-              "status": "pending",
+              "status": "completed",
               "context": {
                 "read_before": [
                   {
@@ -1429,13 +1429,13 @@
                   "id": "2.3.2.1",
                   "command": "VERIFY `import Link from 'next/link'` exists at the top of apps/scene-engine/app/page.tsx (no change needed \u2014 already imported)",
                   "file": "apps/scene-engine/app/page.tsx",
-                  "status": "pending"
+                  "status": "completed"
                 },
                 {
                   "id": "2.3.2.2",
                   "command": "WRAP the existing `<h1>` (line 9) in a flex row that also holds a sibling `<Link href=\"/upload\">Upload Asset</Link>` styled with `text-xs px-2.5 py-1 rounded-sm bg-[#173247] border border-[#2a6da3] text-[#cfe6ff] hover:bg-[#1d3d54] no-underline` \u2014 replace `<h1 \u2026>Scene Engine</h1>` with `<div className=\"flex items-center justify-between mb-6 max-w-xl\"><h1 className=\"text-lg font-semibold text-gray-300 tracking-wide\">Scene Engine</h1><Link href=\"/upload\" className=\"text-xs px-2.5 py-1 rounded-sm bg-[#173247] border border-[#2a6da3] text-[#cfe6ff] hover:bg-[#1d3d54] no-underline\">Upload Asset</Link></div>` (and remove the original `mb-6` from the h1)",
                   "file": "apps/scene-engine/app/page.tsx",
-                  "status": "pending"
+                  "status": "completed"
                 }
               ]
             }
