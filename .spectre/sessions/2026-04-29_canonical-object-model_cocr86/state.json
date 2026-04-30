@@ -140,6 +140,12 @@
         "sha": "dd9005c5dc4ede075e01e31c87d5f4120e1db219",
         "message": "checkpoint-3: Inspector \u2014 always-present sections + events",
         "created_at": "2026-04-30T03:27:01.407071+00:00"
+      },
+      {
+        "checkpoint_id": 4,
+        "sha": "78eb1a8f0f56bd6ca371fd8bf922a63f4961f050",
+        "message": "checkpoint-4: Manifest convention for components and effects",
+        "created_at": "2026-04-30T03:32:00+00:00"
       }
     ]
   }
