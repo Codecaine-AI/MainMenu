@@ -3,35 +3,102 @@ export interface StageDef {
   height: number
 }
 
-export interface LayerPosition {
-  x: string | number
-  y: string | number
+export type Anchor =
+  | 'top-left'
+  | 'top'
+  | 'top-right'
+  | 'left'
+  | 'center'
+  | 'right'
+  | 'bottom-left'
+  | 'bottom'
+  | 'bottom-right'
+
+export interface TransformExplicit {
+  x: number
+  y: number
+  width: number | 'auto'
+  height: number | 'auto'
+  rotation?: number
+  scale?: number
+  anchor?: Anchor
+  mode?: undefined
 }
 
-export interface LayerChild {
+export interface TransformFill {
+  mode: 'fill'
+  rotation?: number
+  scale?: number
+}
+
+export type Transform = TransformExplicit | TransformFill
+
+export type BlendMode =
+  | 'normal'
+  | 'multiply'
+  | 'screen'
+  | 'overlay'
+  | 'darken'
+  | 'lighten'
+  | 'color-dodge'
+  | 'color-burn'
+  | 'hard-light'
+  | 'soft-light'
+  | 'difference'
+  | 'exclusion'
+  | 'hue'
+  | 'saturation'
+  | 'color'
+  | 'luminosity'
+
+export type FitMode = 'cover' | 'contain' | 'fill' | 'none' | 'scale-down'
+
+export interface Appearance {
+  opacity?: number
+  blend?: BlendMode
+  hue?: number
+  saturation?: number
+  fit?: FitMode
+}
+
+export type EventTrigger = 'click' | 'hover' | 'load'
+export type EventAction = 'navigate' | 'play-audio' | 'autoplay'
+
+export interface EventBinding {
+  trigger: EventTrigger
+  action: EventAction
+  target?: string
+}
+
+export type SceneObjectType =
+  | 'video'
+  | 'image'
+  | 'audio'
+  | 'glyph-group'
+  | 'text'
+  | 'effect'
+  | 'component'
+  | 'group'
+
+export interface SceneObject {
   id: string
-  layer?: string
-  type?: string
+  name?: string
+  type: SceneObjectType
   asset?: string
   visible?: boolean
+  transform: Transform
+  appearance?: Appearance
   properties?: Record<string, unknown>
-}
-
-export interface LayerDef {
-  id: string
-  type: string
-  asset: string
-  visible?: boolean
-  position?: LayerPosition
-  properties?: Record<string, unknown>
-  children?: LayerChild[]
+  events?: EventBinding[]
+  children?: SceneObject[]
 }
 
 export interface SceneJson {
   id: string
   name: string
   stage: StageDef
-  layers: LayerDef[]
+  appearance?: Appearance
+  objects: SceneObject[]
 }
 
 export type AssetType = 'audio' | 'image' | 'video' | 'glyph'

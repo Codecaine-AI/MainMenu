@@ -5,28 +5,31 @@
     "width": 1440,
     "height": 1080
   },
-  "layers": [
+  "objects": [
     {
       "id": "bg-video",
       "type": "video",
       "asset": "bg-video",
-      "properties": {
-        "fit": "cover",
+      "visible": false,
+      "transform": { "mode": "fill" },
+      "appearance": {
+        "fit": "fill",
         "blend": "normal",
-        "opacity": 1
-      },
-      "visible": false
+        "opacity": 0.75
+      }
     },
     {
       "id": "codecaine-logo",
       "type": "glyph-group",
       "asset": "codecaine-logo",
-      "position": {
-        "x": "center",
-        "y": "20%"
+      "transform": {
+        "x": 50,
+        "y": 20,
+        "width": 18,
+        "height": "auto",
+        "anchor": "center"
       },
       "properties": {
-        "scale": 0.18,
         "shimmer": true
       },
       "children": [
@@ -292,32 +295,43 @@
       "id": "press-start",
       "type": "component",
       "asset": "press-start",
-      "position": {
-        "x": "center",
-        "y": "75%"
+      "transform": {
+        "x": 50,
+        "y": 75,
+        "width": 30,
+        "height": "auto",
+        "anchor": "center"
       },
       "properties": {
-        "text": "PRESS  START",
+        "text": "PRESS  START",
         "blink-rate": 1.1
-      }
+      },
+      "events": [
+        { "trigger": "click", "action": "navigate", "target": "menu" },
+        { "trigger": "click", "action": "play-audio", "target": "start-cue" }
+      ]
     },
     {
       "id": "start-cue",
       "type": "audio",
       "asset": "start-cue",
+      "visible": false,
+      "transform": { "mode": "fill" },
       "properties": {
         "volume": 0.6,
-        "loop": false,
-        "autoplay": true
-      }
+        "loop": false
+      },
+      "events": [
+        { "trigger": "load", "action": "autoplay" }
+      ]
     },
     {
       "id": "crt",
       "type": "effect",
       "asset": "crt-overlay",
-      "properties": {
-        "opacity": 1
-      }
+      "visible": false,
+      "transform": { "mode": "fill" },
+      "appearance": { "opacity": 1 }
     }
   ]
 }

@@ -8,10 +8,10 @@ async function expandGlyphGroupChildren(
   resolveAsset: (id: string) => { file: string } | undefined,
   discoverGlyphLayers: (path: string) => Promise<(string | null)[]>,
 ) {
-  const layers = scene.layers as Record<string, unknown>[]
-  if (!layers) return
+  const objects = scene.objects as Record<string, unknown>[]
+  if (!objects) return
 
-  for (const layer of layers) {
+  for (const layer of objects) {
     if (layer.type !== 'glyph-group') continue
     const entry = resolveAsset(layer.asset as string)
     if (!entry) continue

@@ -29,7 +29,7 @@ export default function DashboardPage() {
               <div>
                 <p className="text-gray-300 text-sm font-medium">{scene.name}</p>
                 <p className="text-gray-600 text-xs font-mono mt-0.5">
-                  {scene.id} &middot; {scene.layerCount} layer{scene.layerCount !== 1 ? 's' : ''}
+                  {scene.id} &middot; {scene.objectCount} object{scene.objectCount !== 1 ? 's' : ''}
                 </p>
               </div>
               <div className="flex gap-2">

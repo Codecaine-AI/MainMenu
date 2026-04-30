@@ -30,9 +30,9 @@ function navigateToParentContainer(
 ): { container: unknown[] | null; index: number } {
   const parts = parsePath(path)
   if (parts.length === 1) {
-    return { container: scene.layers, index: parts[0] }
+    return { container: scene.objects, index: parts[0] }
   }
-  let layer: Record<string, unknown> = scene.layers[parts[0]] as unknown as Record<string, unknown>
+  let layer: Record<string, unknown> = scene.objects[parts[0]] as unknown as Record<string, unknown>
   if (!layer) return { container: null, index: -1 }
   for (let i = 1; i < parts.length - 1; i++) {
     if (!layer.children) {
@@ -54,9 +54,9 @@ function navigateToContainer(
   parentPath: string,
   opts: { create?: boolean } = {},
 ): unknown[] | null {
-  if (parentPath === '' || parentPath == null) return scene.layers
+  if (parentPath === '' || parentPath == null) return scene.objects
   const parts = parsePath(parentPath)
-  let layer: Record<string, unknown> = scene.layers[parts[0]] as unknown as Record<string, unknown>
+  let layer: Record<string, unknown> = scene.objects[parts[0]] as unknown as Record<string, unknown>
   if (!layer) return null
   for (let i = 1; i < parts.length; i++) {
     if (!layer.children) {

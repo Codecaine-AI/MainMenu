@@ -10,13 +10,13 @@ const STAGE_H = 1080
 
 function collectIds(scene: SceneJson): Set<string> {
   const set = new Set<string>()
-  const walk = (layers: Record<string, unknown>[]) => {
-    for (const l of layers) {
+  const walk = (objects: Record<string, unknown>[]) => {
+    for (const l of objects) {
       if (l.id) set.add(l.id as string)
       if (l.children) walk(l.children as Record<string, unknown>[])
     }
   }
-  walk(scene.layers as unknown as Record<string, unknown>[])
+  walk(scene.objects as unknown as Record<string, unknown>[])
   return set
 }
 
@@ -127,7 +127,7 @@ export function CanvasPanel() {
       const x = Math.max(0, Math.min(STAGE_W, Math.round((e.clientX - rect.left) / scaleX)))
       const y = Math.max(0, Math.min(STAGE_H, Math.round((e.clientY - rect.top) / scaleY)))
       const newLayer = buildLayer(assetId, entry, { x, y }, scene as SceneJson)
-      addLayerAt('', scene.layers?.length ?? 0, newLayer)
+      addLayerAt('', scene.objects?.length ?? 0, newLayer)
     },
     [scene, registry, addLayerAt],
   )
