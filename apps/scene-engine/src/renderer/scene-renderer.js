@@ -1,30 +1,38 @@
 import { getRenderer } from './asset-renderers/index.js';
 import { loadRegistry, resolveAsset } from './asset-registry.js';
-import { applyPosition, applyScale } from './positioning.js';
+import { applyTransform, applyAppearance } from './positioning.js';
 
-function updateLayerStyles(el, layer, entry) {
-  const props = layer.properties || {};
+function isMediaType(type) {
+  return type === 'video' || type === 'image' || type === 'media';
+}
 
-  if (layer.visible === false) {
+function findMediaEl(el) {
+  if (!el) return null;
+  if (el.tagName === 'VIDEO' || el.tagName === 'IMG') return el;
+  return el.querySelector('video, img');
+}
+
+function applyObjectStyles(el, obj, entry) {
+  if (obj.visible === false) {
     el.style.display = 'none';
     return;
   }
   el.style.display = '';
 
-  el.style.position = 'absolute';
-  if (!layer.position) el.style.inset = '0';
+  applyTransform(el, obj.transform);
 
-  if (layer.type === 'media' || layer.type === 'video' || layer.type === 'image') {
-    el.style.objectFit = props.fit ?? 'cover';
-    el.style.mixBlendMode = props.blend ?? 'normal';
-    el.style.opacity = props.opacity ?? 1;
-    if (el.src && entry.file && !el.src.endsWith(entry.file)) {
-      el.src = entry.file;
-    }
+  const isMedia = isMediaType(obj.type);
+  const mediaEl = isMedia ? findMediaEl(el) : null;
+  applyAppearance(el, obj.appearance, { isMedia, mediaEl });
+
+  if (isMedia && mediaEl && entry?.file && mediaEl.src && !mediaEl.src.endsWith(entry.file)) {
+    mediaEl.src = entry.file;
   }
 
-  if (layer.type === 'glyph-group') {
-    updateGlyphGroup(el, layer);
+  if (obj.type === 'glyph-group') {
+    updateGlyphGroup(el, obj);
+  } else if (Array.isArray(obj.children) && obj.children.length > 0) {
+    el.style.position = el.style.position || 'absolute';
   }
 }
 
@@ -56,11 +64,6 @@ function updateGlyphGroup(wrapper, layer) {
       if (fo) updateForeignChild(fo, child);
     }
   }
-
-  wrapper.style.transform = '';
-  applyPosition(wrapper, layer.position, { width: 1440, height: 1080 });
-  applyScale(wrapper, layer.properties?.scale);
-  wrapper.style.transformOrigin = 'center center';
 }
 
 function updateForeignChild(fo, child) {
@@ -98,66 +101,89 @@ function updateForeignChild(fo, child) {
   }
 }
 
+async function mountObject(parent, obj) {
+  const entry = resolveAsset(obj.asset);
+  if (!entry) {
+    console.warn(`[scene-renderer] Skipping object ${obj.id}: unknown asset ${obj.asset}`);
+    return null;
+  }
+  if (obj.visible === false) return null;
+
+  const wrapper = await getRenderer(obj.type)(obj, entry);
+  wrapper.dataset.layerId = obj.id;
+  parent.appendChild(wrapper);
+  applyObjectStyles(wrapper, obj, entry);
+
+  if (obj.type !== 'glyph-group' && Array.isArray(obj.children) && obj.children.length > 0) {
+    wrapper.style.position = wrapper.style.position || 'absolute';
+    for (const child of obj.children) {
+      await mountObject(wrapper, child);
+    }
+    reorderChildren(wrapper, obj.children);
+  }
+
+  return wrapper;
+}
+
+async function updateChildren(parentEl, childArray) {
+  const existing = new Map();
+  for (const el of parentEl.children) {
+    const id = el.dataset?.layerId;
+    if (id) existing.set(id, el);
+  }
+  const wantedIds = new Set(childArray.map(c => c.id));
+
+  for (const [id, el] of existing) {
+    if (!wantedIds.has(id)) {
+      el.remove();
+      existing.delete(id);
+    }
+  }
+
+  for (const child of childArray) {
+    const el = existing.get(child.id);
+    const entry = resolveAsset(child.asset);
+    if (!entry) continue;
+    if (el) {
+      applyObjectStyles(el, child, entry);
+      if (child.type !== 'glyph-group' && Array.isArray(child.children) && child.children.length > 0) {
+        await updateChildren(el, child.children);
+      }
+    } else {
+      await mountObject(parentEl, child);
+    }
+  }
+
+  reorderChildren(parentEl, childArray);
+}
+
 export async function renderScene(scene, root) {
   await loadRegistry();
 
-  const existing = new Map();
+  root.style.width = scene.stage.width + 'px';
+  root.style.height = scene.stage.height + 'px';
+
+  const existingTopLevel = new Map();
   for (const child of root.children) {
     const id = child.dataset?.layerId;
-    if (id) existing.set(id, child);
+    if (id) existingTopLevel.set(id, child);
   }
 
-  if (existing.size > 0) {
-    const wantedIds = new Set(scene.objects.map(l => l.id));
-
-    for (const [id, el] of existing) {
-      if (!wantedIds.has(id)) {
-        el.remove();
-        existing.delete(id);
-      }
-    }
-
-    for (const layer of scene.objects) {
-      const el = existing.get(layer.id);
-      const entry = resolveAsset(layer.asset);
-      if (!entry) continue;
-      if (el) {
-        updateLayerStyles(el, layer, entry);
-      } else {
-        const newEl = await getRenderer(layer.type)(layer, entry);
-        newEl.dataset.layerId = layer.id;
-        newEl.style.position = 'absolute';
-        if (!layer.position) newEl.style.inset = '0';
-        root.appendChild(newEl);
-      }
-    }
-
-    reorderChildren(root, scene.objects);
+  if (existingTopLevel.size > 0) {
+    await updateChildren(root, scene.objects);
     return;
   }
 
   root.innerHTML = '';
-  root.style.width = scene.stage.width + 'px';
-  root.style.height = scene.stage.height + 'px';
-  for (const layer of scene.objects) {
-    const entry = resolveAsset(layer.asset);
-    if (!entry) {
-      console.warn(`[scene-renderer] Skipping layer ${layer.id}: unknown asset ${layer.asset}`);
-      continue;
-    }
-    if (layer.visible === false) continue;
-    const el = await getRenderer(layer.type)(layer, entry);
-    el.dataset.layerId = layer.id;
-    el.style.position = 'absolute';
-    if (!layer.position) el.style.inset = '0';
-    root.appendChild(el);
+  for (const obj of scene.objects) {
+    await mountObject(root, obj);
   }
+  reorderChildren(root, scene.objects);
 }
 
-function reorderChildren(root, layers) {
-  const order = layers.map(l => l.id);
-  const children = [...root.children];
-  const byId = new Map(children.map(c => [c.dataset?.layerId, c]));
+function reorderChildren(parentEl, childArray) {
+  const order = childArray.map(c => c.id);
+  const children = [...parentEl.children];
   let needsReorder = false;
   for (let i = 0; i < order.length; i++) {
     if (children[i]?.dataset?.layerId !== order[i]) {
@@ -165,10 +191,10 @@ function reorderChildren(root, layers) {
       break;
     }
   }
-  if (needsReorder) {
-    for (const id of order) {
-      const el = byId.get(id);
-      if (el) root.appendChild(el);
-    }
+  if (!needsReorder) return;
+  const byId = new Map(children.map(c => [c.dataset?.layerId, c]));
+  for (const id of order) {
+    const el = byId.get(id);
+    if (el) parentEl.appendChild(el);
   }
 }

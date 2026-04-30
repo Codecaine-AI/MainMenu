@@ -9,41 +9,22 @@ function deriveCssPath(jsPath) {
 
 function loadModule(path) {
   if (moduleCache.has(path)) return moduleCache.get(path);
-  const promise = import(/* @vite-ignore */ path).catch((err) => {
-    moduleCache.delete(path);
-    throw err;
-  });
+  const promise = fetch(path)
+    .then((res) => {
+      if (!res.ok) throw new Error(`Failed to fetch ${path}: ${res.status}`);
+      return res.text();
+    })
+    .then((code) => {
+      const blob = new Blob([code], { type: 'application/javascript' });
+      const url = URL.createObjectURL(blob);
+      return import(/* webpackIgnore: true */ url);
+    })
+    .catch((err) => {
+      moduleCache.delete(path);
+      throw err;
+    });
   moduleCache.set(path, promise);
   return promise;
-}
-
-function applyPosition(el, position) {
-  if (!position) return;
-  el.style.position = 'absolute';
-  let tx = '';
-  const x = position.x;
-  const y = position.y;
-  if (typeof x === 'number') {
-    el.style.left = x + 'px';
-  } else if (typeof x === 'string') {
-    if (x === 'center') {
-      el.style.left = '50%';
-      tx += ' translateX(-50%)';
-    } else {
-      el.style.left = x;
-    }
-  }
-  if (typeof y === 'number') {
-    el.style.top = y + 'px';
-  } else if (typeof y === 'string') {
-    if (y === 'center') {
-      el.style.top = '50%';
-      tx += ' translateY(-50%)';
-    } else {
-      el.style.top = y;
-    }
-  }
-  if (tx) el.style.transform = (el.style.transform || '') + tx;
 }
 
 export async function renderComponent(layer, entry) {
@@ -57,6 +38,5 @@ export async function renderComponent(layer, entry) {
     return placeholder;
   }
   const el = await mod.default({ properties: layer.properties || {}, layerId: layer.id });
-  applyPosition(el, layer.position);
   return el;
 }

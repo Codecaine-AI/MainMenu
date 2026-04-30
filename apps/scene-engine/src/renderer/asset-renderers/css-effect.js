@@ -13,6 +13,5 @@ export function renderCssEffect(layer, entry) {
   root.appendChild(scan);
   root.appendChild(rgb);
   root.appendChild(vign);
-  root.style.opacity = layer.properties?.opacity ?? 1;
   return root;
 }

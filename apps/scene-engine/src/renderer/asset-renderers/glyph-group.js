@@ -1,4 +1,3 @@
-import { applyPosition, applyScale } from '../positioning.js';
 import { resolveAsset } from '../asset-registry.js';
 
 const svgTextCache = new Map();
@@ -165,10 +164,6 @@ export async function renderGlyphGroup(layer, entry) {
       if (fo) lastNamedAnchor = fo;
     }
   }
-
-  applyPosition(wrapper, layer.position, { width: 1440, height: 1080 });
-  applyScale(wrapper, layer.properties?.scale);
-  wrapper.style.transformOrigin = 'center center';
 
   return wrapper;
 }
