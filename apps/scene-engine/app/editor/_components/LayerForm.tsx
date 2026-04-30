@@ -10,6 +10,7 @@ import { FitSelect } from './inputs/FitSelect'
 import { AnchorSelect } from './inputs/AnchorSelect'
 import { AssetSwapDropdown } from './AssetSwapDropdown'
 import { EventsSection } from './inputs/EventsSection'
+import { ManifestPropertyField } from './inputs/ManifestPropertyField'
 import { InspectorHeader, InspectorSection, FieldRow, AxisField, ReadonlyValue } from './inputs/InspectorSection'
 import type { Registry, Transform, Appearance, EventBinding } from '@/types/scene'
 
@@ -42,6 +43,8 @@ export function LayerForm({ layer, path }: Props) {
   const assetType = containerType && isAssetType(containerType) ? containerType : null
   const currentFile =
     containerEntry && 'file' in containerEntry ? containerEntry.file : null
+  const manifest =
+    (containerEntry && 'manifest' in containerEntry ? containerEntry.manifest : undefined) ?? null
 
   function toggleFill(nextFill: boolean) {
     if (nextFill) {
@@ -230,53 +233,69 @@ export function LayerForm({ layer, path }: Props) {
         )}
       </InspectorSection>
 
-      {Object.keys(props).length > 0 && (
+      {manifest && Object.keys(manifest.properties).length > 0 ? (
         <InspectorSection title="Properties">
-          {Object.entries(props).map(([k, v]) => {
-            const dotted = `properties.${k}`
-            if (NUMERIC_PROPERTY_STEPS[k] && typeof v === 'number') {
-              return (
-                <FieldRow key={k} label={k}>
-                  <RangedInput value={v} {...NUMERIC_PROPERTY_STEPS[k]} onChange={(val) => commit(dotted, val)} />
-                </FieldRow>
-              )
-            }
-            if (typeof v === 'number') {
+          {Object.entries(manifest.properties).map(([name, schema]) => (
+            <FieldRow key={name} label={name}>
+              <ManifestPropertyField
+                name={name}
+                schema={schema}
+                value={props[name]}
+                onChange={(v) => commit(`properties.${name}`, v)}
+              />
+            </FieldRow>
+          ))}
+        </InspectorSection>
+      ) : (
+        !manifest &&
+        Object.keys(props).length > 0 && (
+          <InspectorSection title="Properties">
+            {Object.entries(props).map(([k, v]) => {
+              const dotted = `properties.${k}`
+              if (NUMERIC_PROPERTY_STEPS[k] && typeof v === 'number') {
+                return (
+                  <FieldRow key={k} label={k}>
+                    <RangedInput value={v} {...NUMERIC_PROPERTY_STEPS[k]} onChange={(val) => commit(dotted, val)} />
+                  </FieldRow>
+                )
+              }
+              if (typeof v === 'number') {
+                return (
+                  <FieldRow key={k} label={k}>
+                    <input
+                      type="number"
+                      step="any"
+                      defaultValue={v}
+                      onChange={(e) => {
+                        const n = Number(e.target.value)
+                        if (Number.isFinite(n)) commit(dotted, n)
+                      }}
+                      className="w-full bg-[#222] border border-[#333] text-gray-300 text-[11px] font-mono px-1 py-[3px] rounded-sm focus:border-[#4a8fc2] focus:outline-none"
+                    />
+                  </FieldRow>
+                )
+              }
+              if (typeof v === 'boolean') {
+                return (
+                  <FieldRow key={k} label={k}>
+                    <input type="checkbox" defaultChecked={v} onChange={(e) => commit(dotted, e.target.checked)} className="accent-[#4a8fc2]" />
+                  </FieldRow>
+                )
+              }
               return (
                 <FieldRow key={k} label={k}>
                   <input
-                    type="number"
-                    step="any"
-                    defaultValue={v}
-                    onChange={(e) => {
-                      const n = Number(e.target.value)
-                      if (Number.isFinite(n)) commit(dotted, n)
-                    }}
+                    type="text"
+                    defaultValue={String(v)}
+                    onBlur={(e) => commit(dotted, e.target.value)}
+                    onKeyDown={(e) => { if (e.key === 'Enter') (e.target as HTMLInputElement).blur() }}
                     className="w-full bg-[#222] border border-[#333] text-gray-300 text-[11px] font-mono px-1 py-[3px] rounded-sm focus:border-[#4a8fc2] focus:outline-none"
                   />
                 </FieldRow>
               )
-            }
-            if (typeof v === 'boolean') {
-              return (
-                <FieldRow key={k} label={k}>
-                  <input type="checkbox" defaultChecked={v} onChange={(e) => commit(dotted, e.target.checked)} className="accent-[#4a8fc2]" />
-                </FieldRow>
-              )
-            }
-            return (
-              <FieldRow key={k} label={k}>
-                <input
-                  type="text"
-                  defaultValue={String(v)}
-                  onBlur={(e) => commit(dotted, e.target.value)}
-                  onKeyDown={(e) => { if (e.key === 'Enter') (e.target as HTMLInputElement).blur() }}
-                  className="w-full bg-[#222] border border-[#333] text-gray-300 text-[11px] font-mono px-1 py-[3px] rounded-sm focus:border-[#4a8fc2] focus:outline-none"
-                />
-              </FieldRow>
-            )
-          })}
-        </InspectorSection>
+            })}
+          </InspectorSection>
+        )
       )}
 
       <EventsSection

@@ -21,6 +21,21 @@
       "scope": { "type": "checkpoint", "ref": "3" },
       "category": "discovery",
       "content": "ClipSelect import remained on MediaChildForm (legacy foreign-media child still uses properties.clip until CP5). LayerForm dropped it entirely — canonical Appearance has no clip field."
+    },
+    {
+      "scope": { "type": "checkpoint", "ref": "4" },
+      "category": "decision",
+      "content": "Reused the same Tailwind classes already used by RangedInput's number input and BlendSelect (bg-[#222], rounded-sm, focus:border-[#4a8fc2]) for the string input and enum select inside ManifestPropertyField, instead of the ad-hoc classes shown in the plan. Keeps the inspector visually consistent."
+    },
+    {
+      "scope": { "type": "checkpoint", "ref": "4" },
+      "category": "decision",
+      "content": "Manifest narrowing on containerEntry uses `'manifest' in containerEntry` rather than a type guard helper. AssetContainer has no manifest field, so `'manifest' in entry` cleanly narrows to ModuleEntry without an extra import."
+    },
+    {
+      "scope": { "type": "checkpoint", "ref": "4" },
+      "category": "decision",
+      "content": "Grab-bag fallback in LayerForm renders ONLY when no manifest is attached — when a manifest exists, it is authoritative even if it has zero properties (the section then renders nothing). Per plan: legacy data without manifest still surfaces, but a module with a manifest controls the inspector exactly."
     }
   ]
 }

@@ -109,9 +109,51 @@ export interface AssetContainer {
   file: string
 }
 
+export interface ManifestNumberProperty {
+  type: 'number'
+  default?: number
+  min?: number
+  max?: number
+  step?: number
+  description?: string
+}
+
+export interface ManifestStringProperty {
+  type: 'string'
+  default?: string
+  description?: string
+}
+
+export interface ManifestBooleanProperty {
+  type: 'boolean'
+  default?: boolean
+  description?: string
+}
+
+export interface ManifestEnumProperty {
+  type: 'enum'
+  default?: string
+  options: string[]
+  description?: string
+}
+
+export type ManifestProperty =
+  | ManifestNumberProperty
+  | ManifestStringProperty
+  | ManifestBooleanProperty
+  | ManifestEnumProperty
+
+export interface Manifest {
+  name: string
+  type: ModuleType
+  sizing?: 'fill' | 'explicit'
+  properties: Record<string, ManifestProperty>
+}
+
 export interface ModuleEntry {
   type: ModuleType
   path: string
+  manifest?: Manifest
 }
 
 export type Registry = Record<string, AssetContainer | ModuleEntry>

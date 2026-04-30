@@ -59,11 +59,11 @@
     "status": "finalized",
     "started_at": "2026-04-30T01:50:00+00:00",
     "completed_at": null,
-    "last_updated": "2026-04-30T03:26:22.439320+00:00",
+    "last_updated": "2026-04-30T03:30:00+00:00",
     "data": {
       "oversight_mode": "stepped",
       "current_level": "checkpoint",
-      "current_checkpoint": 4,
+      "current_checkpoint": 5,
       "current_task_group": null,
       "current_task": null
     },
@@ -73,35 +73,40 @@
     "status": "finalized",
     "checkpoints_total": 6,
     "checkpoints_detailed": 6,
-    "current_checkpoint": 4,
+    "current_checkpoint": 5,
     "checkpoints_completed": [
       1,
       2,
-      3
+      3,
+      4
     ],
-    "last_updated": "2026-04-30T03:26:22.439320+00:00"
+    "last_updated": "2026-04-30T03:30:00+00:00",
+    "summary": "CP4 completed: manifest convention authored, registry loader fetches manifests, inspector Properties section is manifest-driven."
   },
   "build": {
     "status": "in_progress",
     "started_at": "2026-04-30T03:16:04.993802+00:00",
     "completed_at": null,
-    "last_updated": "2026-04-30T03:26:22.439320+00:00",
+    "last_updated": "2026-04-30T03:30:00+00:00",
     "data": {
-      "current_checkpoint": 3,
+      "current_checkpoint": 5,
       "current_task_group": null,
       "current_task": null,
       "checkpoints_completed": [
         1,
-        2
+        2,
+        3,
+        4
       ]
     },
-    "current_checkpoint": 4,
+    "current_checkpoint": 5,
     "current_task_group": null,
     "current_task": null,
     "checkpoints_completed": [
       1,
       2,
-      3
+      3,
+      4
     ]
   },
   "docs": {
