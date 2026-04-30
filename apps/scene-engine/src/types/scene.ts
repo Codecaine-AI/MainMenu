@@ -61,6 +61,17 @@ export interface Appearance {
   fit?: FitMode
 }
 
+export type SlotType = 'video-fill'
+
+export interface VideoFillSlot {
+  id: string
+  type: 'video-fill'
+  asset: string
+  appearance?: Appearance
+}
+
+export type Slot = VideoFillSlot
+
 export type EventTrigger = 'click' | 'hover' | 'load'
 export type EventAction = 'navigate' | 'play-audio' | 'autoplay'
 
@@ -89,6 +100,7 @@ export interface SceneObject {
   transform: Transform
   appearance?: Appearance
   properties?: Record<string, unknown>
+  slots?: Slot[]
   events?: EventBinding[]
   children?: SceneObject[]
 }

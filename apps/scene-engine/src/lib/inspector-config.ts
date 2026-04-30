@@ -34,11 +34,5 @@ export const NUMERIC_PROPERTY_STEPS: Record<string, { step: number; min: number;
   height: { step: 0.5, min: 0, max: 200 },
 }
 
-export const SUB_LAYER_ADDABLE = [
-  { key: 'opacity', label: 'opacity', defaultValue: 1 },
-  { key: 'blend', label: 'blend', defaultValue: 'normal' },
-  { key: 'hue', label: 'hue', defaultValue: 0 },
-] as const
-
 export const EVENT_TRIGGERS = ['click', 'hover', 'load'] as const
 export const EVENT_ACTIONS = ['navigate', 'play-audio', 'autoplay'] as const

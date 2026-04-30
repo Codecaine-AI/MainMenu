@@ -3,8 +3,6 @@
 import { useEditorStore } from '@/store/editor-store'
 import { resolveObject } from '@/lib/path'
 import type { SceneJson } from '@/types/scene'
-import { SubLayerForm } from './SubLayerForm'
-import { MediaChildForm } from './MediaChildForm'
 import { LayerForm } from './LayerForm'
 
 export function InspectorPanel() {
@@ -20,10 +18,6 @@ export function InspectorPanel() {
     const layer = resolveObject(scene as SceneJson, selectedPath)
     if (!layer) {
       content = <p className="text-gray-600 text-[11px] italic px-1 py-2">Selected path no longer resolves.</p>
-    } else if (layer.layer) {
-      content = <SubLayerForm key={selectedPath} layer={layer} path={selectedPath} />
-    } else if (!layer.transform && layer.type === 'media') {
-      content = <MediaChildForm key={selectedPath} layer={layer} path={selectedPath} />
     } else {
       content = <LayerForm key={selectedPath} layer={layer} path={selectedPath} />
     }

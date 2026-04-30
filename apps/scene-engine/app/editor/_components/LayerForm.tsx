@@ -11,8 +11,9 @@ import { AnchorSelect } from './inputs/AnchorSelect'
 import { AssetSwapDropdown } from './AssetSwapDropdown'
 import { EventsSection } from './inputs/EventsSection'
 import { ManifestPropertyField } from './inputs/ManifestPropertyField'
+import { SlotsSection } from './SlotsSection'
 import { InspectorHeader, InspectorSection, FieldRow, AxisField, ReadonlyValue } from './inputs/InspectorSection'
-import type { Registry, Transform, Appearance, EventBinding } from '@/types/scene'
+import type { Registry, Transform, Appearance, EventBinding, Slot } from '@/types/scene'
 
 interface Props {
   layer: Record<string, unknown>
@@ -296,6 +297,10 @@ export function LayerForm({ layer, path }: Props) {
             })}
           </InspectorSection>
         )
+      )}
+
+      {layerType === 'glyph-group' && Array.isArray(layer.slots) && (layer.slots as Slot[]).length > 0 && (
+        <SlotsSection slots={layer.slots as Slot[]} path={path} />
       )}
 
       <EventsSection

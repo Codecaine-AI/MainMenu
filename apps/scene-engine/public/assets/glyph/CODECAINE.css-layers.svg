@@ -2419,7 +2419,7 @@
     <use href="#glyph_0045" transform="translate(6115 40)" fill="none" stroke-linejoin="round" stroke-linecap="round"/>
   </g>
 
-  <g id="fill-layer" data-layer="fill-layer" clip-path="url(#fill-clip)">
+  <g id="fill-layer" data-layer="fill-layer" data-slot="in-text-fire" data-slot-type="video-fill" clip-path="url(#fill-clip)">
     <rect width="6923" height="1080" fill="url(#red-fill-gradient)"/>
     <foreignObject x="0" y="0" width="6923" height="1080">
       <div xmlns="http://www.w3.org/1999/xhtml" class="melee-fill-media-shell" style="width:100%; height:100%; overflow:hidden; transform:translate(0.0%, -20.0%) scale(1.0) rotate(0.0deg); transform-origin:center center">
