@@ -1,0 +1,26 @@
+{
+  "$schema": "Session DevNotes - deviations, discoveries, decisions captured during build",
+  "session_id": "2026-04-29_canonical-object-model_cocr86",
+  "notes": [
+    {
+      "scope": { "type": "checkpoint", "ref": "3" },
+      "category": "decision",
+      "content": "Wired EventsSection into LayerForm as part of the LayerForm rewrite (TG3.1.2) rather than as a separate follow-up step (TG3.2.3). Same end state — EventsSection mounted at the bottom of every canonical SceneObject form with onChange committing the full array via 'events' key (deepMerge replaces arrays wholesale)."
+    },
+    {
+      "scope": { "type": "checkpoint", "ref": "3" },
+      "category": "decision",
+      "content": "Toggling Fill ON commits the full transform patch with explicit-mode fields set to undefined ({mode:'fill', x:undefined, y:undefined, width:undefined, height:undefined, anchor:undefined}). deepMerge sets these properties to undefined on the existing transform; JSON.stringify drops them at save time. Toggling Fill OFF restores defaults (x=0, y=0, width='auto', height='auto', anchor='top-left') while preserving the prior rotation/scale."
+    },
+    {
+      "scope": { "type": "checkpoint", "ref": "3" },
+      "category": "decision",
+      "content": "InspectorPanel dispatch uses data-shape rather than path heuristics: layer.layer → SubLayerForm; (!layer.transform && layer.type==='media') → MediaChildForm; else → LayerForm. This correctly routes canonical SceneObjects with nested children (added by CP2 recursive rendering) to LayerForm, not to the legacy MediaChildForm."
+    },
+    {
+      "scope": { "type": "checkpoint", "ref": "3" },
+      "category": "discovery",
+      "content": "ClipSelect import remained on MediaChildForm (legacy foreign-media child still uses properties.clip until CP5). LayerForm dropped it entirely — canonical Appearance has no clip field."
+    }
+  ]
+}

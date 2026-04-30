@@ -1,6 +1,6 @@
 import type { SceneJson } from '@/types/scene'
 
-export function resolveLayer(
+export function resolveObject(
   scene: SceneJson,
   path: string,
 ): Record<string, unknown> | null {
@@ -16,7 +16,7 @@ export function resolveLayer(
   return current
 }
 
-export function resolveLayerEl(
+export function resolveObjectEl(
   scene: SceneJson,
   path: string,
   stage: HTMLElement,

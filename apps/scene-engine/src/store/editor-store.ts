@@ -12,10 +12,10 @@ export interface EditorStore {
   setSelectedPath: (path: string | null) => void
   markDirty: () => void
   markClean: () => void
-  mutateLayerAt: (path: string, patch: Record<string, unknown>) => void
-  addLayerAt: (parentPath: string, index: number, layer: Record<string, unknown>) => void
-  removeLayerAt: (path: string) => Record<string, unknown> | null
-  moveLayer: (fromPath: string, toPath: string) => void
+  mutateObjectAt: (path: string, patch: Record<string, unknown>) => void
+  addObjectAt: (parentPath: string, index: number, layer: Record<string, unknown>) => void
+  removeObjectAt: (path: string) => Record<string, unknown> | null
+  moveObject: (fromPath: string, toPath: string) => void
   updateContainerFile: (id: string, file: string) => Promise<void>
 }
 
@@ -101,7 +101,7 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
   markDirty: () => set({ dirty: true }),
   markClean: () => set({ dirty: false }),
 
-  mutateLayerAt: (path, patch) => {
+  mutateObjectAt: (path, patch) => {
     const { scene } = get()
     if (!scene) return
     const next = structuredClone(scene)
@@ -111,7 +111,7 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
     set({ scene: next, dirty: true })
   },
 
-  addLayerAt: (parentPath, index, layer) => {
+  addObjectAt: (parentPath, index, layer) => {
     const { scene } = get()
     if (!scene) return
     const next = structuredClone(scene)
@@ -122,7 +122,7 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
     set({ scene: next, dirty: true })
   },
 
-  removeLayerAt: (path) => {
+  removeObjectAt: (path) => {
     const { scene } = get()
     if (!scene) return null
     const next = structuredClone(scene)
@@ -133,7 +133,7 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
     return removed as Record<string, unknown>
   },
 
-  moveLayer: (fromPath, toPath) => {
+  moveObject: (fromPath, toPath) => {
     const { scene } = get()
     if (!scene || !fromPath || !toPath) return
     if (fromPath === toPath) return

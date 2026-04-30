@@ -2,7 +2,7 @@
 
 import { useEffect, useLayoutEffect, useRef, useCallback, useState } from 'react'
 import { useEditorStore } from '@/store/editor-store'
-import { resolveLayerEl } from '@/lib/path'
+import { resolveObjectEl } from '@/lib/path'
 import type { SceneJson, Registry, AssetContainer, ModuleEntry } from '@/types/scene'
 
 const STAGE_W = 1440
@@ -54,7 +54,7 @@ export function CanvasPanel() {
   const scene = useEditorStore((s) => s.scene)
   const selectedPath = useEditorStore((s) => s.selectedPath)
   const registry = useEditorStore((s) => s.registry)
-  const addLayerAt = useEditorStore((s) => s.addLayerAt)
+  const addObjectAt = useEditorStore((s) => s.addObjectAt)
   const stageRef = useRef<HTMLDivElement>(null)
   const panelRef = useRef<HTMLDivElement>(null)
   const [isDropTarget, setIsDropTarget] = useState(false)
@@ -77,7 +77,7 @@ export function CanvasPanel() {
       el.classList.remove('is-canvas-selected')
     })
     if (!selectedPath) return
-    const el = resolveLayerEl(scene as SceneJson, selectedPath, stage)
+    const el = resolveObjectEl(scene as SceneJson, selectedPath, stage)
     if (el) el.classList.add('is-canvas-selected')
   }, [scene, selectedPath])
 
@@ -127,9 +127,9 @@ export function CanvasPanel() {
       const x = Math.max(0, Math.min(STAGE_W, Math.round((e.clientX - rect.left) / scaleX)))
       const y = Math.max(0, Math.min(STAGE_H, Math.round((e.clientY - rect.top) / scaleY)))
       const newLayer = buildLayer(assetId, entry, { x, y }, scene as SceneJson)
-      addLayerAt('', scene.objects?.length ?? 0, newLayer)
+      addObjectAt('', scene.objects?.length ?? 0, newLayer)
     },
-    [scene, registry, addLayerAt],
+    [scene, registry, addObjectAt],
   )
 
   return (

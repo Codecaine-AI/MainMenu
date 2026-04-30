@@ -2,7 +2,7 @@
 
 import { useState, useCallback } from 'react'
 import { useEditorStore } from '@/store/editor-store'
-import { resolveLayer } from '@/lib/path'
+import { resolveObject } from '@/lib/path'
 import type { SceneJson } from '@/types/scene'
 import { HierarchyRow } from './HierarchyRow'
 
@@ -20,7 +20,7 @@ function computeRegion(e: React.DragEvent, row: HTMLElement, isGroup: boolean): 
 
 function regionToToPath(targetPath: string, region: string, scene: SceneJson): string {
   if (region === 'into') {
-    const layer = resolveLayer(scene, targetPath)
+    const layer = resolveObject(scene, targetPath)
     const childCount = Array.isArray(layer?.children) ? (layer!.children as unknown[]).length : 0
     return `${targetPath}.children.${childCount}`
   }
@@ -35,8 +35,8 @@ export function HierarchyPanel() {
   const scene = useEditorStore((s) => s.scene)
   const selectedPath = useEditorStore((s) => s.selectedPath)
   const setSelectedPath = useEditorStore((s) => s.setSelectedPath)
-  const mutateLayerAt = useEditorStore((s) => s.mutateLayerAt)
-  const moveLayer = useEditorStore((s) => s.moveLayer)
+  const mutateObjectAt = useEditorStore((s) => s.mutateObjectAt)
+  const moveObject = useEditorStore((s) => s.moveObject)
   const [collapsed, setCollapsed] = useState<Set<string>>(new Set())
   const [dropIndicator, setDropIndicator] = useState<{ path: string; region: string } | null>(null)
 
@@ -51,9 +51,9 @@ export function HierarchyPanel() {
 
   const handleToggleVisibility = useCallback(
     (path: string, currentlyHidden: boolean) => {
-      mutateLayerAt(path, { visible: currentlyHidden })
+      mutateObjectAt(path, { visible: currentlyHidden })
     },
-    [mutateLayerAt],
+    [mutateObjectAt],
   )
 
   const handleDragStart = useCallback((e: React.DragEvent, path: string) => {
@@ -68,7 +68,7 @@ export function HierarchyPanel() {
       e.dataTransfer.dropEffect = 'move'
       const row = (e.target as HTMLElement).closest('[data-path]') as HTMLElement | null
       if (!row || !scene) return
-      const layer = resolveLayer(scene as SceneJson, path)
+      const layer = resolveObject(scene as SceneJson, path)
       const isGroup = Array.isArray(layer?.children)
       const region = computeRegion(e, row, isGroup)
       setDropIndicator({ path, region })
@@ -88,13 +88,13 @@ export function HierarchyPanel() {
       if (!fromPath || !scene) return
       const row = (e.target as HTMLElement).closest('[data-path]') as HTMLElement | null
       if (!row) return
-      const layer = resolveLayer(scene as SceneJson, targetPath)
+      const layer = resolveObject(scene as SceneJson, targetPath)
       const isGroup = Array.isArray(layer?.children)
       const region = computeRegion(e, row, isGroup)
       const toPath = regionToToPath(targetPath, region, scene as SceneJson)
-      moveLayer(fromPath, toPath)
+      moveObject(fromPath, toPath)
     },
-    [scene, moveLayer],
+    [scene, moveObject],
   )
 
   if (!scene) {
