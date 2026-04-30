@@ -1739,7 +1739,7 @@
         "CP2",
         "CP3"
       ],
-      "status": "pending",
+      "status": "completed",
       "file_context": {
         "primary": [
           "apps/scene-engine/src/renderer/asset-renderers/glyph-group.js",

@@ -36,6 +36,26 @@
       "scope": { "type": "checkpoint", "ref": "4" },
       "category": "decision",
       "content": "Grab-bag fallback in LayerForm renders ONLY when no manifest is attached — when a manifest exists, it is authoritative even if it has zero properties (the section then renders nothing). Per plan: legacy data without manifest still surfaces, but a module with a manifest controls the inspector exactly."
+    },
+    {
+      "scope": { "type": "checkpoint", "ref": "5" },
+      "category": "deviation",
+      "content": "SlotsSection commits the FULL slots array on every appearance edit instead of using patchFromDottedKey('slots.${i}.appearance.${key}', value) as the plan suggested. Reason: deepMerge() in editor-store treats arrays as opaque (line 77: `Array.isArray(target) → return patch`), so patching with `{ slots: { 0: {...} } }` would replace the slots array with a plain object. Following the same pattern EventsSection uses for its full-array commits."
+    },
+    {
+      "scope": { "type": "checkpoint", "ref": "5" },
+      "category": "deviation",
+      "content": "AssetSwapDropdown takes (assetId, assetType, currentFile), not just a single containerId as the plan implied. SlotsSection resolves slot.asset against the registry to derive assetType + currentFile (mirroring LayerForm's pattern). Falls back to a ReadonlyValue if the registry doesn't yet have the entry."
+    },
+    {
+      "scope": { "type": "checkpoint", "ref": "5" },
+      "category": "decision",
+      "content": "Slot keeps its own `appearance` (Appearance from CP1). Renderer applies opacity/blend on the foreignObject and hue/fit on the inner leaf element. clip-path is mirrored from the SVG anchor element onto the foreignObject so video clips to letter shapes via the SVG-authored fill-clip — no per-slot clip field needed."
+    },
+    {
+      "scope": { "type": "checkpoint", "ref": "5" },
+      "category": "discovery",
+      "content": "Scene migration dropped 47 child entries from codecaine-logo (46 baked sub-layer overrides + 1 in-text-fire foreign child) → 1 slot entry. Hierarchy panel becomes dramatically lighter: codecaine-logo now exposes a single `in-text-fire` slot instead of 40+ nested rows."
     }
   ]
 }
