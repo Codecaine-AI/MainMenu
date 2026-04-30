@@ -158,6 +158,12 @@
         "sha": "af1272fe5527c7bcb2fd9b0474db7c8e4f3e10c3",
         "message": "checkpoint-5: SVG slot model — replace 40-child glyph-group array",
         "created_at": "2026-04-30T04:10:00+00:00"
+      },
+      {
+        "checkpoint_id": 6,
+        "sha": "bd8bd43014f6574460dc8a83160f4a8fc1be4394",
+        "message": "checkpoint-6: Project manifest + standalone export bundle",
+        "created_at": "2026-04-30T04:50:00+00:00"
       }
     ]
   }
