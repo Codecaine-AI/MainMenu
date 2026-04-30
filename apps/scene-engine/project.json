@@ -1,0 +1,9 @@
+{
+  "id": "codecaine",
+  "name": "Codecaine",
+  "entry": "title",
+  "scenes": [
+    { "id": "title", "name": "Title Screen" }
+  ],
+  "stage": { "width": 1440, "height": 1080 }
+}

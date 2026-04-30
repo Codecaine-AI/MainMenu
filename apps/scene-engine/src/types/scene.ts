@@ -169,3 +169,16 @@ export interface ModuleEntry {
 }
 
 export type Registry = Record<string, AssetContainer | ModuleEntry>
+
+export interface ProjectSceneRef {
+  id: string
+  name?: string
+}
+
+export interface ProjectManifest {
+  id: string
+  name: string
+  entry: string
+  scenes: ProjectSceneRef[]
+  stage: StageDef
+}

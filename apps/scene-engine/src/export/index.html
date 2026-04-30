@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Scene</title>
+  <style>
+    @font-face {
+      font-family: 'FolkPro';
+      src: url('./fonts/FolkPro%20_Family/A-OTF-FolkPro-Regular.otf') format('opentype');
+      font-weight: 400;
+      font-style: normal;
+      font-display: swap;
+    }
+    @font-face {
+      font-family: 'FolkPro';
+      src: url('./fonts/FolkPro%20_Family/A-OTF-FolkPro-Medium.otf') format('opentype');
+      font-weight: 500;
+      font-style: normal;
+      font-display: swap;
+    }
+    @font-face {
+      font-family: 'FolkPro';
+      src: url('./fonts/FolkPro%20_Family/A-OTF-FolkPro-Bold.otf') format('opentype');
+      font-weight: 700;
+      font-style: normal;
+      font-display: swap;
+    }
+    @font-face {
+      font-family: 'FolkPro';
+      src: url('./fonts/FolkPro%20_Family/A-OTF-FolkPro-Heavy.otf') format('opentype');
+      font-weight: 900;
+      font-style: normal;
+      font-display: swap;
+    }
+    html, body { margin: 0; padding: 0; height: 100%; }
+    body { background: #000; overflow: hidden; font-family: 'FolkPro', sans-serif; }
+    #stage-wrap {
+      position: fixed;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      overflow: hidden;
+    }
+    #stage {
+      width: 1440px;
+      height: 1080px;
+      position: relative;
+      background: #000;
+      transform-origin: center center;
+      overflow: hidden;
+    }
+  </style>
+</head>
+<body>
+  <div id="stage-wrap"><div id="stage"></div></div>
+  <script type="module" src="./boot.js"></script>
+</body>
+</html>

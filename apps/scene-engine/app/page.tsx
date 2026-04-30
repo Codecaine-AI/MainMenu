@@ -1,14 +1,15 @@
 import Link from 'next/link'
-import { discoverScenes } from '@/lib/scenes'
+import { discoverScenes, loadProject } from '@/lib/scenes'
 
 export default function DashboardPage() {
+  const project = loadProject()
   const scenes = discoverScenes()
 
   return (
     <div className="min-h-screen bg-[#111] p-8">
       <div className="flex items-center justify-between mb-6 max-w-xl">
         <h1 className="text-lg font-semibold text-gray-300 tracking-wide">
-          Scene Engine
+          {project?.name ?? 'Scene Engine'}
         </h1>
         <Link
           href="/upload"
@@ -18,7 +19,9 @@ export default function DashboardPage() {
         </Link>
       </div>
       {scenes.length === 0 ? (
-        <p className="text-gray-500 text-sm">No scenes found. Create a scene in <code className="text-gray-400">scenes/</code>.</p>
+        <p className="text-gray-500 text-sm">
+          No scenes found. Create a scene under <code className="text-gray-400">scenes/</code> and register it in <code className="text-gray-400">project.json</code>.
+        </p>
       ) : (
         <div className="grid gap-3 max-w-xl">
           {scenes.map((scene) => (
@@ -32,7 +35,12 @@ export default function DashboardPage() {
                   {scene.id} &middot; {scene.objectCount} object{scene.objectCount !== 1 ? 's' : ''}
                 </p>
               </div>
-              <div className="flex gap-2">
+              <div className="flex gap-2 items-center">
+                {scene.isEntry && (
+                  <span className="bg-[#173247] border border-[#2a6da3] text-[#cfe6ff] rounded-sm px-2 py-0.5 text-[10px] tracking-wider uppercase">
+                    Entry
+                  </span>
+                )}
                 <Link
                   href={`/scenes/${scene.id}`}
                   className="text-xs px-2.5 py-1 rounded-sm bg-[#222] border border-[#333] text-gray-300 hover:bg-[#2a2a2a] no-underline"

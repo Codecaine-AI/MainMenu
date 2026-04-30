@@ -56,6 +56,26 @@
       "scope": { "type": "checkpoint", "ref": "5" },
       "category": "discovery",
       "content": "Scene migration dropped 47 child entries from codecaine-logo (46 baked sub-layer overrides + 1 in-text-fire foreign child) → 1 slot entry. Hierarchy panel becomes dramatically lighter: codecaine-logo now exposes a single `in-text-fire` slot instead of 40+ nested rows."
+    },
+    {
+      "scope": { "type": "checkpoint", "ref": "6" },
+      "category": "deviation",
+      "content": "Export route rewrites absolute paths in copied artifacts so the bundle works under file:// or any static host. Both registry.json files have entry.file/entry.path values rewritten from '/foo/...' to './foo/...'. Renderer source files are run through a regex that replaces ([\"'(])/(assets|modules|fonts)/ with $1./$2/ — this catches the hard-coded fetch('/assets/registry.json') / fetch('/modules/registry.json') in asset-registry.js and any stray absolute paths in the asset-renderers. Plan task 6.3.2.3 implied loadRegistry already supported relative defaults; it doesn't, so the export route patches it instead of changing the runtime renderer (which still needs absolute paths under Next.js)."
+    },
+    {
+      "scope": { "type": "checkpoint", "ref": "6" },
+      "category": "decision",
+      "content": "Audio assets ship as a directory copy (start-cue/start-cue.js + sibling files) rather than a single file copy, because the registry.json `file` for audio points at a JS wrapper that may load sibling .mp3/.wav. Image/video/glyph entries copy a single file. Modules (effects + components) always copy the full containing directory so manifest.json and CSS siblings ride along."
+    },
+    {
+      "scope": { "type": "checkpoint", "ref": "6" },
+      "category": "decision",
+      "content": "loadProject() / discoverScenes() preserves the legacy directory-scan fallback (used when no project.json exists), so dev scenes that haven't been registered in project.json still appear on the dashboard with isEntry=false. Today the only project (codecaine) is fully registered, so the fallback is dormant."
+    },
+    {
+      "scope": { "type": "checkpoint", "ref": "6" },
+      "category": "discovery",
+      "content": "Verified the exported zip with a static HTTP server — index.html, project.json, scene.json, registries, the patched asset-registry.js, press-start manifest, and font file all return 200. file:// testing requires manual browser open (no headless tooling in build context); the static-server smoke test gives equivalent confidence in the asset graph."
     }
   ]
 }
