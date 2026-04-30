@@ -7,7 +7,7 @@
   "prior_sessions": [],
   "session_type": "full",
   "created_at": "2026-04-30T01:14:42+00:00",
-  "updated_at": "2026-04-30T03:16:04.993802+00:00",
+  "updated_at": "2026-04-30T03:16:32.751689+00:00",
   "current_phase": "build",
   "status": "active",
   "intake": {
@@ -106,6 +106,13 @@
     "branch": "main",
     "worktree": null,
     "base_branch": null,
-    "commits": []
+    "commits": [
+      {
+        "checkpoint_id": 1,
+        "sha": "c9cd77d92800ce6a81242228feca94e15b1b8a13",
+        "message": "checkpoint-1: Canonical types + scene migration",
+        "created_at": "2026-04-30T03:16:32.751689+00:00"
+      }
+    ]
   }
 }
