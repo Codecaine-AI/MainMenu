@@ -114,6 +114,12 @@
         "sha": "c9cd77d92800ce6a81242228feca94e15b1b8a13",
         "message": "checkpoint-1: Canonical types + scene migration",
         "created_at": "2026-04-30T03:16:32.751689+00:00"
+      },
+      {
+        "checkpoint_id": 2,
+        "sha": "9a39781afd388d5b9ae7aa8d4cb8b61acc65d1a5",
+        "message": "checkpoint-2: Renderer consumes canonical SceneObject shape",
+        "created_at": "2026-04-30T03:20:37+00:00"
       }
     ]
   }
