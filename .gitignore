@@ -10,6 +10,7 @@ __pycache__/
 dist/
 build/
 runs/
+apps/font-creation/font-studio/projects/*/outputs/
 assets/
 !apps/font-creation/generation/melee-3/inputs/assets/
 !apps/font-creation/generation/melee-3/inputs/assets/**
