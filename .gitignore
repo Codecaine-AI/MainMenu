@@ -1,15 +1,53 @@
-.env
+# OS/editor noise
 .DS_Store
+*.swp
+*.swo
+
+# Environment and secrets
+.env
+.env.*
+!.env.example
+
+# Node dependencies and package-manager state
 node_modules/
+.pnpm-store/
+.npm/
+.yarn/
+!.yarn/patches/
+!.yarn/plugins/
+!.yarn/releases/
+!.yarn/sdks/
+!.yarn/versions/
+
+# JavaScript/TypeScript build output and caches
+.next/
+**/.next/
+.turbo/
+**/.turbo/
+.vercel/
+**/.vercel/
+out/
+dist/
+build/
+coverage/
+*.tsbuildinfo
+next-env.d.ts
+
+# Python environments, bytecode, and tooling caches
 __pycache__/
 *.py[cod]
 .pytest_cache/
 .mypy_cache/
 .ruff_cache/
 .venv/
-dist/
-build/
+venv/
+
+# Test, run, and temporary output
 runs/
+tmp/
+temp/
+*.log
+logs/
 apps/font-creation/font-studio/projects/*/outputs/
 assets/
 !apps/font-creation/generation/melee-3/inputs/assets/

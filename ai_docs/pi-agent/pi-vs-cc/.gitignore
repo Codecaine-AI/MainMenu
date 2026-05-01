@@ -1,16 +1,36 @@
-node_modules/
-__pycache__/
-*.pyc
+# OS/editor noise
 .DS_Store
 *.swp
 *.swo
 
-# API keys — never commit real credentials
+# API keys - never commit real credentials
 .env
+.env.*
+!.env.example
 
+# Dependencies
+node_modules/
+
+# Python environments, bytecode, and tooling caches
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.venv/
+venv/
+
+# JavaScript/TypeScript build output and caches
+.next/
+.turbo/
+dist/
+build/
+coverage/
+*.tsbuildinfo
+
+# Local runtime output
 .pi/agent-sessions/
-
-
 .playwright-cli/
-
 tmp/
+*.log
+logs/

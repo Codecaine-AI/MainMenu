@@ -11,7 +11,9 @@
       "type": "video",
       "asset": "bg-video",
       "visible": false,
-      "transform": { "mode": "fill" },
+      "transform": {
+        "mode": "fill"
+      },
       "appearance": {
         "fit": "fill",
         "blend": "normal",
@@ -22,6 +24,7 @@
       "id": "codecaine-logo",
       "type": "glyph-group",
       "asset": "codecaine-logo",
+      "visible": false,
       "transform": {
         "x": 50,
         "y": 20,
@@ -46,11 +49,41 @@
       ]
     },
     {
+      "id": "codecaine-rounded-chrome-logo",
+      "type": "glyph-group",
+      "asset": "codecaine-rounded-chrome-logo",
+      "transform": {
+        "x": "center",
+        "y": 20,
+        "width": 80.5,
+        "height": "auto",
+        "anchor": "center"
+      },
+      "properties": {
+        "shimmer": true
+      },
+      "slots": [
+        {
+          "id": "base-layer",
+          "type": "video-fill",
+          "asset": "in-text-fire",
+          "appearance": {
+            "blend": "screen",
+            "opacity": 0.85,
+            "fit": "cover"
+          },
+          "properties": {
+            "repeat_x": 8
+          }
+        }
+      ]
+    },
+    {
       "id": "press-start",
       "type": "component",
       "asset": "press-start",
       "transform": {
-        "x": 50,
+        "x": "center",
         "y": 75,
         "width": 30,
         "height": "auto",
@@ -61,8 +94,16 @@
         "blink-rate": 1.1
       },
       "events": [
-        { "trigger": "click", "action": "navigate", "target": "menu" },
-        { "trigger": "click", "action": "play-audio", "target": "start-cue" }
+        {
+          "trigger": "click",
+          "action": "navigate",
+          "target": "menu"
+        },
+        {
+          "trigger": "click",
+          "action": "play-audio",
+          "target": "start-cue"
+        }
       ]
     },
     {
@@ -70,13 +111,18 @@
       "type": "audio",
       "asset": "start-cue",
       "visible": false,
-      "transform": { "mode": "fill" },
+      "transform": {
+        "mode": "fill"
+      },
       "properties": {
         "volume": 0.6,
         "loop": false
       },
       "events": [
-        { "trigger": "load", "action": "autoplay" }
+        {
+          "trigger": "load",
+          "action": "autoplay"
+        }
       ]
     },
     {
@@ -84,8 +130,17 @@
       "type": "effect",
       "asset": "crt-overlay",
       "visible": false,
-      "transform": { "mode": "fill" },
-      "appearance": { "opacity": 1 }
+      "transform": {
+        "mode": "fill"
+      },
+      "appearance": {
+        "opacity": 1
+      }
     }
-  ]
+  ],
+  "appearance": {
+    "opacity": 1,
+    "hue": -15,
+    "saturation": 1.4
+  }
 }

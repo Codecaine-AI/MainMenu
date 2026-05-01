@@ -74,7 +74,7 @@ body {
 .editor-shell {
   display: grid;
   height: calc(100vh - 36px);
-  grid-template-columns: 280px 1fr 320px;
+  grid-template-columns: 280px minmax(0, 1fr) 440px;
   grid-template-rows: 1fr 220px;
   grid-template-areas:
     'hierarchy canvas inspector'

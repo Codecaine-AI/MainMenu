@@ -5,6 +5,11 @@ import { useEditorStore } from '@/store/editor-store'
 import { resolveObject } from '@/lib/path'
 import type { SceneJson } from '@/types/scene'
 import { HierarchyRow } from './HierarchyRow'
+import { SceneSection } from './SceneSection'
+
+interface Props {
+  sceneId: string
+}
 
 function computeRegion(e: React.DragEvent, row: HTMLElement, isGroup: boolean): 'before' | 'after' | 'into' {
   const rect = row.getBoundingClientRect()
@@ -31,11 +36,10 @@ function regionToToPath(targetPath: string, region: string, scene: SceneJson): s
   return parts.join('.children.')
 }
 
-export function HierarchyPanel() {
+export function HierarchyPanel({ sceneId }: Props) {
   const scene = useEditorStore((s) => s.scene)
   const selectedPath = useEditorStore((s) => s.selectedPath)
   const setSelectedPath = useEditorStore((s) => s.setSelectedPath)
-  const mutateObjectAt = useEditorStore((s) => s.mutateObjectAt)
   const moveObject = useEditorStore((s) => s.moveObject)
   const [collapsed, setCollapsed] = useState<Set<string>>(new Set())
   const [dropIndicator, setDropIndicator] = useState<{ path: string; region: string } | null>(null)
@@ -48,13 +52,6 @@ export function HierarchyPanel() {
       return next
     })
   }, [])
-
-  const handleToggleVisibility = useCallback(
-    (path: string, currentlyHidden: boolean) => {
-      mutateObjectAt(path, { visible: currentlyHidden })
-    },
-    [mutateObjectAt],
-  )
 
   const handleDragStart = useCallback((e: React.DragEvent, path: string) => {
     e.dataTransfer.setData('application/x-layer-path', path)
@@ -100,6 +97,8 @@ export function HierarchyPanel() {
   if (!scene) {
     return (
       <section className="bg-[#1a1a1a] overflow-auto p-2" style={{ gridArea: 'hierarchy' }}>
+        <h3 className="text-[10px] uppercase tracking-wider text-gray-500 font-semibold mb-2">Globals</h3>
+        <p className="text-gray-600 text-xs italic mb-3">Loading...</p>
         <h3 className="text-[10px] uppercase tracking-wider text-gray-500 font-semibold mb-2">Hierarchy</h3>
         <p className="text-gray-600 text-xs italic">Loading...</p>
       </section>
@@ -108,6 +107,7 @@ export function HierarchyPanel() {
 
   return (
     <section className="bg-[#1a1a1a] overflow-auto p-2" style={{ gridArea: 'hierarchy' }}>
+      <SceneSection sceneId={sceneId} />
       <h3 className="text-[10px] uppercase tracking-wider text-gray-500 font-semibold mb-2">Hierarchy</h3>
       <ul className="list-none p-0 m-0">
         {(scene.objects as unknown as Record<string, unknown>[]).map((layer, i) => {
@@ -122,7 +122,6 @@ export function HierarchyPanel() {
               isCollapsed={collapsed.has(path)}
               onSelect={setSelectedPath}
               onToggle={handleToggle}
-              onToggleVisibility={handleToggleVisibility}
               collapsedSet={collapsed}
               selectedPath={selectedPath}
               onDragStart={handleDragStart}

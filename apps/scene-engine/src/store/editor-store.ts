@@ -12,6 +12,7 @@ export interface EditorStore {
   setSelectedPath: (path: string | null) => void
   markDirty: () => void
   markClean: () => void
+  mutateScene: (patch: Partial<SceneJson>) => void
   mutateObjectAt: (path: string, patch: Record<string, unknown>) => void
   addObjectAt: (parentPath: string, index: number, layer: Record<string, unknown>) => void
   removeObjectAt: (path: string) => Record<string, unknown> | null
@@ -100,6 +101,12 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
   setSelectedPath: (path) => set({ selectedPath: path }),
   markDirty: () => set({ dirty: true }),
   markClean: () => set({ dirty: false }),
+
+  mutateScene: (patch) => {
+    const { scene } = get()
+    if (!scene) return
+    set({ scene: deepMerge(scene, patch) as SceneJson, dirty: true })
+  },
 
   mutateObjectAt: (path, patch) => {
     const { scene } = get()

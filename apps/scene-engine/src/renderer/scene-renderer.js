@@ -1,5 +1,6 @@
 import { getRenderer } from './asset-renderers/index.js';
 import { loadRegistry, resolveAsset } from './asset-registry.js';
+import { syncMediaSurface } from './media-surface.js';
 import { applyTransform, applyAppearance } from './positioning.js';
 
 function isMediaType(type) {
@@ -23,7 +24,21 @@ function applyObjectStyles(el, obj, entry) {
 
   const isMedia = isMediaType(obj.type);
   const mediaEl = isMedia ? findMediaEl(el) : null;
-  applyAppearance(el, obj.appearance, { isMedia, mediaEl });
+  if (isMedia) {
+    if (typeof obj.appearance?.blend === 'string') {
+      el.style.mixBlendMode = obj.appearance.blend;
+    }
+  } else {
+    applyAppearance(el, obj.appearance, { isMedia, mediaEl });
+  }
+  if (isMedia) {
+    syncMediaSurface(el, {
+      type: obj.type,
+      entry,
+      appearance: obj.appearance,
+      properties: obj.properties,
+    });
+  }
 
   if (isMedia && mediaEl && entry?.file && mediaEl.src && !mediaEl.src.endsWith(entry.file)) {
     mediaEl.src = entry.file;
@@ -64,18 +79,27 @@ function updateGlyphGroup(wrapper, layer) {
       if (fo) updateForeignChild(fo, child);
     }
   }
+
+  for (const slot of (layer.slots ?? [])) {
+    const fo = svg.querySelector(`foreignObject [data-layer-id="${slot.id}"]`)?.closest('foreignObject');
+    if (fo) updateForeignChild(fo, slot);
+  }
 }
 
 function updateForeignChild(fo, child) {
   const props = child.properties || {};
-  if (typeof props.opacity === 'number') fo.style.opacity = String(props.opacity);
+  const appearance = child.appearance || {};
+  const hasMediaSurface = !!fo.querySelector('[data-media-surface="true"]');
+  if (!hasMediaSurface && typeof props.opacity === 'number') fo.style.opacity = String(props.opacity);
+  if (!hasMediaSurface && typeof appearance.opacity === 'number') fo.style.opacity = String(appearance.opacity);
   if (typeof props.blend === 'string') fo.style.mixBlendMode = props.blend;
+  if (typeof appearance.blend === 'string') fo.style.mixBlendMode = appearance.blend;
   if (typeof props.clip === 'string') {
     fo.setAttribute('clip-path', `url(#${props.clip})`);
   }
 
   const xhtmlWrap = fo.querySelector('div');
-  if (xhtmlWrap) {
+  if (xhtmlWrap && !xhtmlWrap.querySelector('[data-media-surface="true"]')) {
     const posX = props.position_x ?? 0;
     const posY = props.position_y ?? 0;
     const scale = props.scale ?? 1;
@@ -90,6 +114,18 @@ function updateForeignChild(fo, child) {
 
   const mediaEl = fo.querySelector('video, img');
   if (mediaEl) {
+    const entry = child.asset ? resolveAsset(child.asset) : null;
+    if (entry) {
+      const root = fo.querySelector('[data-layer-id]');
+      if (root) {
+        syncMediaSurface(root, {
+          type: child.type === 'image' ? 'image' : 'video',
+          entry,
+          appearance,
+          properties: props,
+        });
+      }
+    }
     if (typeof props.hue === 'number') {
       mediaEl.style.filter = props.hue !== 0 ? `hue-rotate(${props.hue}deg)` : '';
     }
@@ -162,6 +198,7 @@ export async function renderScene(scene, root) {
 
   root.style.width = scene.stage.width + 'px';
   root.style.height = scene.stage.height + 'px';
+  applyAppearance(root, scene.appearance);
 
   const existingTopLevel = new Map();
   for (const child of root.children) {

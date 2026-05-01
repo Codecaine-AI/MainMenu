@@ -11,6 +11,10 @@
     "type": "glyph-group",
     "path": "/assets/glyphs/CODECAINE.css-layers.svg"
   },
+  "codecaine-rounded-chrome-logo": {
+    "type": "glyph-group",
+    "path": "/assets/glyphs/CODECAINE.rounded-chrome.css-layers.svg"
+  },
   "in-text-fire": {
     "type": "media",
     "path": "/assets/media/test-fire-3.mp4"

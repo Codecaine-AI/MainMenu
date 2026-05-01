@@ -8,7 +8,6 @@ interface Props {
   isCollapsed: boolean
   onSelect: (path: string) => void
   onToggle: (path: string) => void
-  onToggleVisibility: (path: string, visible: boolean) => void
   collapsedSet: Set<string>
   selectedPath: string | null
   onDragStart?: (e: React.DragEvent, path: string) => void
@@ -26,7 +25,6 @@ export function HierarchyRow({
   isCollapsed,
   onSelect,
   onToggle,
-  onToggleVisibility,
   collapsedSet,
   selectedPath,
   onDragStart,
@@ -78,13 +76,6 @@ export function HierarchyRow({
           <span className="w-3.5 shrink-0" />
         )}
 
-        <button
-          onClick={(e) => { e.stopPropagation(); onToggleVisibility(path, isHidden) }}
-          className="bg-transparent border-0 text-gray-400 text-[10px] w-3.5 text-center shrink-0 cursor-pointer p-0 leading-none hover:text-gray-300"
-        >
-          {isHidden ? '○' : '●'}
-        </button>
-
         <span className="text-gray-300 flex-1 overflow-hidden text-ellipsis whitespace-nowrap">
           {(layer.name as string | undefined) ?? (layer.id as string)}{' '}
           <span className="text-gray-600">[{typeLabel}]</span>
@@ -105,7 +96,6 @@ export function HierarchyRow({
                 isCollapsed={collapsedSet.has(childPath)}
                 onSelect={onSelect}
                 onToggle={onToggle}
-                onToggleVisibility={onToggleVisibility}
                 collapsedSet={collapsedSet}
                 selectedPath={selectedPath}
                 onDragStart={onDragStart}

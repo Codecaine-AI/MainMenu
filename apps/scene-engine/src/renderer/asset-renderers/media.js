@@ -1,11 +1,17 @@
+import { syncMediaSurface } from '../media-surface.js';
+
 export function renderMedia(layer, entry) {
-  const video = document.createElement('video');
-  video.src = entry.file;
-  video.autoplay = true;
-  video.muted = true;
-  video.loop = true;
-  video.playsInline = true;
-  video.style.width = '100%';
-  video.style.height = '100%';
-  return video;
+  const wrapper = document.createElement('div');
+  wrapper.className = 'media-layer';
+  wrapper.style.width = '100%';
+  wrapper.style.height = '100%';
+  wrapper.style.position = 'relative';
+  wrapper.style.overflow = 'hidden';
+  syncMediaSurface(wrapper, {
+    type: layer.type,
+    entry,
+    appearance: layer.appearance,
+    properties: layer.properties,
+  });
+  return wrapper;
 }

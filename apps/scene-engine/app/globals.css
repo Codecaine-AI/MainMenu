@@ -1,0 +1,52 @@
+@import "tailwindcss";
+
+@font-face {
+  font-family: 'FolkPro';
+  src: url('/fonts/FolkPro%20_Family/A-OTF-FolkPro-Regular.otf') format('opentype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'FolkPro';
+  src: url('/fonts/FolkPro%20_Family/A-OTF-FolkPro-Medium.otf') format('opentype');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'FolkPro';
+  src: url('/fonts/FolkPro%20_Family/A-OTF-FolkPro-Bold.otf') format('opentype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'FolkPro';
+  src: url('/fonts/FolkPro%20_Family/A-OTF-FolkPro-Heavy.otf') format('opentype');
+  font-weight: 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  --amber: #f6c419;
+}
+
+.editor-shell {
+  display: grid;
+  height: 100vh;
+  grid-template-columns: 280px minmax(0, 1fr) 440px;
+  grid-template-rows: 1fr 220px;
+  grid-template-areas:
+    'hierarchy canvas inspector'
+    'asset asset asset';
+  gap: 1px;
+  background: #222;
+}
+
+.is-canvas-selected {
+  outline: 2px solid #ffd84d !important;
+  outline-offset: 2px;
+  box-shadow: 0 0 0 4px rgba(255, 216, 77, 0.18);
+}

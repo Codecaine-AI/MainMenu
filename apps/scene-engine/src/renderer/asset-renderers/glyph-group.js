@@ -1,4 +1,5 @@
 import { resolveAsset } from '../asset-registry.js';
+import { syncMediaSurface } from '../media-surface.js';
 
 const svgTextCache = new Map();
 function fetchSvgText(path) {
@@ -29,7 +30,22 @@ async function mountSlot(svg, slot, vb, anchorEl) {
   const { getRenderer } = await import('./index.js');
   const leafType = slot.type === 'video-fill' ? 'video' : slot.type;
   const rendererFn = getRenderer(leafType);
-  const el = await rendererFn(slot, entry);
+  const el = slot.type === 'video-fill'
+    ? document.createElement('div')
+    : await rendererFn(slot, entry);
+  if (slot.type === 'video-fill') {
+    el.dataset.layerId = slot.id;
+    el.style.width = '100%';
+    el.style.height = '100%';
+    el.style.position = 'relative';
+    el.style.overflow = 'hidden';
+    syncMediaSurface(el, {
+      type: 'video',
+      entry,
+      appearance: slot.appearance,
+      properties: slot.properties,
+    });
+  }
 
   const fo = document.createElementNS('http://www.w3.org/2000/svg', 'foreignObject');
   fo.setAttribute('x', '0');
@@ -41,16 +57,17 @@ async function mountSlot(svg, slot, vb, anchorEl) {
   if (clipPath) fo.setAttribute('clip-path', clipPath);
 
   const appearance = slot.appearance || {};
-  if (typeof appearance.opacity === 'number') fo.style.opacity = String(appearance.opacity);
+  if (slot.type !== 'video-fill' && typeof appearance.opacity === 'number') fo.style.opacity = String(appearance.opacity);
   if (typeof appearance.blend === 'string') fo.style.mixBlendMode = appearance.blend;
-  if (typeof appearance.hue === 'number' && appearance.hue !== 0) {
+  if (slot.type !== 'video-fill' && typeof appearance.hue === 'number' && appearance.hue !== 0) {
     const existing = (el.style.filter || '').trim();
     el.style.filter = existing
       ? `${existing} hue-rotate(${appearance.hue}deg)`
       : `hue-rotate(${appearance.hue}deg)`;
   }
-  if (typeof appearance.fit === 'string') {
-    el.style.objectFit = appearance.fit;
+  if (slot.type !== 'video-fill' && typeof appearance.fit === 'string') {
+    const mediaEl = el.querySelector?.('video, img') ?? el;
+    mediaEl.style.objectFit = appearance.fit;
   }
 
   const xhtmlWrap = document.createElementNS('http://www.w3.org/1999/xhtml', 'div');

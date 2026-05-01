@@ -14,9 +14,12 @@ export type Anchor =
   | 'bottom'
   | 'bottom-right'
 
+export type TransformX = number | 'left' | 'center' | 'right'
+export type TransformY = number | 'top' | 'center' | 'middle' | 'bottom'
+
 export interface TransformExplicit {
-  x: number
-  y: number
+  x: TransformX
+  y: TransformY
   width: number | 'auto'
   height: number | 'auto'
   rotation?: number
@@ -61,6 +64,16 @@ export interface Appearance {
   fit?: FitMode
 }
 
+export interface MediaProperties {
+  repeat_x?: number
+  repeat_y?: number
+  position_x?: number
+  position_y?: number
+  scale?: number
+  rotation?: number
+  speed?: number
+}
+
 export type SlotType = 'video-fill'
 
 export interface VideoFillSlot {
@@ -68,6 +81,7 @@ export interface VideoFillSlot {
   type: 'video-fill'
   asset: string
   appearance?: Appearance
+  properties?: MediaProperties
 }
 
 export type Slot = VideoFillSlot
@@ -159,6 +173,7 @@ export interface Manifest {
   name: string
   type: ModuleType
   sizing?: 'fill' | 'explicit'
+  aspectRatio?: number
   properties: Record<string, ManifestProperty>
 }
 

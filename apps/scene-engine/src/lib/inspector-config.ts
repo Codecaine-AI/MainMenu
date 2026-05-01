@@ -13,6 +13,9 @@ export const ANCHOR_OPTIONS = [
   'bottom-left', 'bottom', 'bottom-right',
 ] as const
 
+export const POSITION_X_OPTIONS = ['custom', 'left', 'center', 'right'] as const
+export const POSITION_Y_OPTIONS = ['custom', 'top', 'center', 'middle', 'bottom'] as const
+
 export const CLIP_OPTIONS = [
   { value: '', label: 'none' },
   { value: 'fill-clip', label: 'fill-clip (letter shapes)' },
@@ -30,8 +33,8 @@ export const NUMERIC_PROPERTY_STEPS: Record<string, { step: number; min: number;
   repeat_y: { step: 1, min: 1, max: 8 },
   x: { step: 0.5, min: -100, max: 200 },
   y: { step: 0.5, min: -100, max: 200 },
-  width: { step: 0.5, min: 0, max: 200 },
-  height: { step: 0.5, min: 0, max: 200 },
+  width: { step: 0.5, min: 0, max: 100 },
+  height: { step: 0.5, min: 0, max: 100 },
 }
 
 export const EVENT_TRIGGERS = ['click', 'hover', 'load'] as const

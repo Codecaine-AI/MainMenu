@@ -35,18 +35,44 @@ function buildLayer(
   scene: SceneJson,
 ): Record<string, unknown> {
   const id = uniqueId(assetId, scene)
+  const x = Number(((dropPos.x / STAGE_W) * 100).toFixed(2))
+  const y = Number(((dropPos.y / STAGE_H) * 100).toFixed(2))
   switch (entry.type) {
     case 'video':
     case 'image':
-      return { id, type: entry.type, asset: assetId, properties: { fit: 'cover', blend: 'normal', opacity: 1.0 } }
+      return {
+        id,
+        type: entry.type,
+        asset: assetId,
+        transform: { mode: 'fill' },
+        appearance: { fit: 'cover', blend: 'normal', opacity: 1.0 },
+      }
     case 'glyph':
-      return { id, type: 'glyph-group', asset: assetId, position: { x: dropPos.x, y: dropPos.y }, properties: { scale: 0.18 } }
+      return {
+        id,
+        type: 'glyph-group',
+        asset: assetId,
+        transform: { x, y, width: 'auto', height: 'auto', anchor: 'top-left' },
+        properties: { scale: 0.18 },
+      }
     case 'audio':
-      return { id, type: 'audio', asset: assetId, properties: { volume: 1.0, loop: true, autoplay: true } }
+      return {
+        id,
+        type: 'audio',
+        asset: assetId,
+        transform: { mode: 'fill' },
+        properties: { volume: 1.0, loop: true, autoplay: true },
+      }
     case 'effect':
-      return { id, type: 'effect', asset: assetId, properties: { opacity: 1.0 } }
+      return { id, type: 'effect', asset: assetId, transform: { mode: 'fill' }, appearance: { opacity: 1.0 } }
     case 'component':
-      return { id, type: 'component', asset: assetId, position: { x: dropPos.x, y: dropPos.y }, properties: {} }
+      return {
+        id,
+        type: 'component',
+        asset: assetId,
+        transform: { x, y, width: 'auto', height: 'auto', anchor: 'top-left' },
+        properties: {},
+      }
   }
 }
 
