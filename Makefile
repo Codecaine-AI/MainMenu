@@ -2,9 +2,10 @@ SHELL := /bin/bash
 
 FRONTEND_DIR ?= apps/scene-engine
 PIPELINE_DIR ?= apps/asset-extraction-pipeline
-FONT_MELEE3_APP_DIR ?= apps/font-creation/app/melee-3
-FONT_MELEE3_GENERATION_DIR ?= apps/font-creation/generation/melee-3
-FONT_MELEE3_PORT ?= 4177
+FONT_STUDIO_WEB_DIR ?= apps/font-creation/font-studio/web
+FONT_STUDIO_RENDERER_DIR ?= apps/font-creation/font-studio/renderer
+FONT_STUDIO_PROJECT_DIR ?= apps/font-creation/font-studio/projects/melee
+FONT_STUDIO_PORT ?= 4177
 RUNS_DIR ?= runs
 IMAGE ?= assets/Super-Smash-Bros-Melee07292023-112856-24048_thumb.jpg
 RUN_ID ?= first-pass
@@ -12,7 +13,7 @@ RUN_DIR ?= $(RUNS_DIR)/$(RUN_ID)
 MAX_WORKERS ?= 4
 
 .PHONY: help frontend dev build preview clean install \
-       font-melee3-install font-melee3-app font-melee3-build font-melee3-generate font-melee3-generate-quick font-melee3-bake \
+       font-studio-install font-studio-app font-studio-build font-studio-generate font-studio-generate-quick font-studio-bake \
        pipeline-help init dry-run run catalog extract extract-dry-run validate compile clean-runs
 
 help:
@@ -26,13 +27,13 @@ help:
 	@printf '%s\n' '  make install    Install npm dependencies'
 	@printf '%s\n' '  make clean      Delete dist/ and node_modules/'
 	@printf '%s\n' ''
-	@printf '%s\n' '── Font Creation / MELEE 3 ───────────────'
-	@printf '%s\n' '  make font-melee3-install     Install Vite app dependencies'
-	@printf '%s\n' '  make font-melee3-app         Start MELEE 3 font app at http://localhost:$(FONT_MELEE3_PORT)'
-	@printf '%s\n' '  make font-melee3-build       Build MELEE 3 font app'
-	@printf '%s\n' '  make font-melee3-generate       Regenerate ALL glyph SVGs from the recipe'
-	@printf '%s\n' '  make font-melee3-generate-quick Regenerate dev subset (@,A,R,F,K,*) + word only'
-	@printf '%s\n' '  make font-melee3-bake           Bake current word SVG to PNGs (requires dev server running)'
+	@printf '%s\n' '── Font Studio (apps/font-creation/font-studio) ───────────────'
+	@printf '%s\n' '  make font-studio-install        Install Vite app dependencies'
+	@printf '%s\n' '  make font-studio-app            Start font studio app at http://localhost:$(FONT_STUDIO_PORT)'
+	@printf '%s\n' '  make font-studio-build          Build font studio app'
+	@printf '%s\n' '  make font-studio-generate       Regenerate ALL glyph SVGs from the recipe'
+	@printf '%s\n' '  make font-studio-generate-quick Regenerate dev subset (@,A,R,F,K,*) + word only'
+	@printf '%s\n' '  make font-studio-bake           Bake current word SVG to PNGs (requires dev server running)'
 	@printf '%s\n' ''
 	@printf '%s\n' '── Pipeline (apps/asset-extraction-pipeline) ──'
 	@printf '%s\n' '  make dry-run IMAGE=assets/source.jpg RUN_ID=test'
@@ -54,7 +55,7 @@ help:
 	@printf '%s\n' '  RUN_ID=$(RUN_ID)'
 	@printf '%s\n' '  RUN_DIR=$(RUN_DIR)'
 	@printf '%s\n' '  MAX_WORKERS=$(MAX_WORKERS)'
-	@printf '%s\n' '  FONT_MELEE3_PORT=$(FONT_MELEE3_PORT)'
+	@printf '%s\n' '  FONT_STUDIO_PORT=$(FONT_STUDIO_PORT)'
 
 # ── Frontend ────────────────────────────────────────────────
 install:
@@ -74,24 +75,24 @@ preview: build
 clean:
 	rm -rf $(FRONTEND_DIR)/dist $(FRONTEND_DIR)/node_modules
 
-# ── Font Creation / MELEE 3 ──────────────────────────────────
-font-melee3-install:
-	cd $(FONT_MELEE3_APP_DIR) && npm install
+# ── Font Studio ──────────────────────────────────────────────
+font-studio-install:
+	cd $(FONT_STUDIO_WEB_DIR) && npm install
 
-font-melee3-app:
-	cd $(FONT_MELEE3_APP_DIR) && MELEE3_APP_PORT=$(FONT_MELEE3_PORT) npm run dev
+font-studio-app:
+	cd $(FONT_STUDIO_WEB_DIR) && FONT_STUDIO_APP_PORT=$(FONT_STUDIO_PORT) npm run dev
 
-font-melee3-build:
-	cd $(FONT_MELEE3_APP_DIR) && npm run build
+font-studio-build:
+	cd $(FONT_STUDIO_WEB_DIR) && npm run build
 
-font-melee3-generate:
-	cd $(FONT_MELEE3_GENERATION_DIR) && python3 -m scripts.render_recipe
+font-studio-generate:
+	cd $(FONT_STUDIO_RENDERER_DIR) && python3 -m scripts.render_recipe
 
-font-melee3-generate-quick:
-	cd $(FONT_MELEE3_GENERATION_DIR) && python3 -m scripts.render_recipe --glyphs dev
+font-studio-generate-quick:
+	cd $(FONT_STUDIO_RENDERER_DIR) && python3 -m scripts.render_recipe --glyphs dev
 
-font-melee3-bake:
-	cd $(FONT_MELEE3_APP_DIR) && node scripts/bake-svg.mjs $(FONT_MELEE3_GENERATION_DIR)/outputs/generated/word/CODECAINE.css-layers.svg $(FONT_MELEE3_PORT)
+font-studio-bake:
+	cd $(FONT_STUDIO_WEB_DIR) && node scripts/bake-svg.mjs "$(CURDIR)/$(FONT_STUDIO_PROJECT_DIR)/outputs/generated/word/CODECAINE.css-layers.svg" $(FONT_STUDIO_PORT)
 
 # ── Pipeline ─────────────────────────────────────────────────
 pipeline-help:

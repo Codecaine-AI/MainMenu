@@ -3,6 +3,7 @@ from __future__ import annotations
 import argparse
 import copy
 import math
+import re
 from concurrent.futures import ProcessPoolExecutor, as_completed
 from pathlib import Path
 from typing import Any
@@ -25,18 +26,28 @@ def records_for_text(
 ) -> tuple[list[tuple[dict[str, Any], float]], int, int, float]:
     units_per_em = int(next(iter(glyphs.values())).get("units_per_em", 1000))
     tracking = float(recipe.get("tracking", 4))
+    gap_adjustments = recipe.get("gap_adjustments", [])
+    if gap_adjustments is None:
+        gap_adjustments = []
+    if not isinstance(gap_adjustments, list):
+        raise ValueError("gap_adjustments must be a list.")
     padding_x = float(recipe.get("padding_x", 48))
     padding_y = float(recipe.get("padding_y", 40))
     current_x = padding_x
     records: list[tuple[dict[str, Any], float]] = []
 
-    for ch in text:
+    for index, ch in enumerate(text):
+        gap_adjustment = (
+            float(gap_adjustments[index]) if index < len(gap_adjustments) else 0.0
+        )
         if ch == " ":
-            current_x += units_per_em * 0.35 + tracking
+            current_x += units_per_em * 0.35 + tracking + gap_adjustment
             continue
+        if ch not in glyphs:
+            raise ValueError(f"No glyph path found for character {ch!r}.")
         record = glyphs[ch]
         records.append((record, current_x))
-        current_x += float(record["advance_width"]) + tracking
+        current_x += float(record["advance_width"]) + tracking + gap_adjustment
 
     width = int(math.ceil(current_x - tracking + padding_x))
     height = int(units_per_em + padding_y * 2)
@@ -100,6 +111,11 @@ def render_svg(
 DEV_GLYPHS = {"@", "A", "R", "F", "*", "K"}
 
 
+def safe_output_name(value: str) -> str:
+    name = re.sub(r"[^A-Za-z0-9._-]+", "_", value).strip("._-")
+    return name[:80] or "composition"
+
+
 def _render_task(task: dict[str, Any]) -> tuple[str, str]:
     svg = render_svg(
         task["records"],
@@ -143,6 +159,11 @@ def main() -> None:
         default=5,
         help="Worker process cap. 1 = sequential (debugging).",
     )
+    parser.add_argument(
+        "--word-only",
+        action="store_true",
+        help="Render only the composed word output and skip individual glyph SVGs.",
+    )
     args = parser.parse_args()
 
     paths = read_json(args.paths)
@@ -179,25 +200,26 @@ def main() -> None:
             "label": text,
             "variant_name": "word_display",
             "debug_dir": debug_dir,
-            "out_path": str(word_dir / f"{text}.css-layers.svg"),
+            "out_path": str(word_dir / f"{safe_output_name(text)}.css-layers.svg"),
         }
     ]
-    for record in paths["glyphs"]:
-        if subset is not None and record["glyph"] not in subset:
-            continue
-        tasks.append(
-            {
-                "records": [(record, 0.0)],
-                "width": int(record["advance_width"]),
-                "height": int(record.get("units_per_em", 1000)),
-                "y": 0.0,
-                "recipe": glyph_recipe,
-                "label": record["glyph"],
-                "variant_name": "glyph_display",
-                "debug_dir": debug_dir,
-                "out_path": str(glyph_dir / f"{record['glyph_name']}.css-layers.svg"),
-            }
-        )
+    if not args.word_only:
+        for record in paths["glyphs"]:
+            if subset is not None and record["glyph"] not in subset:
+                continue
+            tasks.append(
+                {
+                    "records": [(record, 0.0)],
+                    "width": int(record["advance_width"]),
+                    "height": int(record.get("units_per_em", 1000)),
+                    "y": 0.0,
+                    "recipe": glyph_recipe,
+                    "label": record["glyph"],
+                    "variant_name": "glyph_display",
+                    "debug_dir": debug_dir,
+                    "out_path": str(glyph_dir / f"{record['glyph_name']}.css-layers.svg"),
+                }
+            )
 
     total = len(paths["glyphs"])
     workers = max(1, min(args.max_workers, len(tasks)))

@@ -26,6 +26,7 @@ def renderer():
     css_gen = importlib.import_module("scripts.css_gen")
     return SimpleNamespace(
         render_svg=render_recipe.render_svg,
+        records_for_text=render_recipe.records_for_text,
         projected_shadow_layer_svg=layers.projected_shadow_layer_svg,
         lighting_overlay_layer_svg=layers.lighting_overlay_layer_svg,
         fill_layer_svg=layers.fill_layer_svg,
@@ -111,6 +112,52 @@ def test_relief_profile_supports_linear_and_preserves_smooth_default(renderer):
         renderer.smoothstep01(value)
     )
     assert renderer.relief_profile_t(value, {}) != pytest.approx(value)
+
+
+def test_records_for_text_applies_per_gap_adjustments(renderer):
+    glyphs = {
+        "A": {"glyph": "A", "advance_width": 100, "units_per_em": 1000},
+        "B": {"glyph": "B", "advance_width": 120, "units_per_em": 1000},
+        "C": {"glyph": "C", "advance_width": 80, "units_per_em": 1000},
+    }
+    recipe = {
+        "tracking": 10,
+        "padding_x": 20,
+        "padding_y": 30,
+        "gap_adjustments": [5, -3],
+    }
+
+    records, width, height, y = renderer.records_for_text("ABC", glyphs, recipe)
+
+    assert [x for _, x in records] == pytest.approx([20, 135, 262])
+    assert width == 362
+    assert height == 1060
+    assert y == 30
+
+
+def test_records_for_text_applies_space_gap_adjustments(renderer):
+    glyphs = {
+        "A": {"glyph": "A", "advance_width": 100, "units_per_em": 1000},
+        "B": {"glyph": "B", "advance_width": 120, "units_per_em": 1000},
+    }
+    recipe = {
+        "tracking": 10,
+        "padding_x": 20,
+        "padding_y": 30,
+        "gap_adjustments": [0, 40],
+    }
+
+    records, width, _, _ = renderer.records_for_text("A B", glyphs, recipe)
+
+    assert [x for _, x in records] == pytest.approx([20, 530])
+    assert width == 670
+
+
+def test_records_for_text_rejects_missing_glyphs(renderer):
+    glyphs = {"A": {"glyph": "A", "advance_width": 100, "units_per_em": 1000}}
+
+    with pytest.raises(ValueError, match="No glyph path found"):
+        renderer.records_for_text("AZ", glyphs, {})
 
 
 def test_normal_from_height_scales_raster_gradient_to_svg_units(renderer):

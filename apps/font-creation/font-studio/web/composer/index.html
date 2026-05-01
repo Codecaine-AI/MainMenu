@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Font Composer</title>
+  </head>
+  <body>
+    <main class="composer-shell">
+      <section class="composer-preview" aria-label="Font composition preview">
+        <div class="composer-stage">
+          <div class="stage-background" aria-hidden="true"></div>
+          <div class="composer-stage-content">
+            <div class="composer-preview-tabs" role="tablist" aria-label="Preview mode">
+              <button type="button" class="preview-tab is-active" id="fastPreviewButton">Fast</button>
+              <button type="button" class="preview-tab" id="exactPreviewButton">Exact</button>
+            </div>
+            <div class="fast-preview-mount" id="fastPreviewMount" aria-live="polite"></div>
+            <div class="exact-preview-mount" id="exactPreviewMount" aria-live="polite" hidden>
+              <div class="load-state">Render exact SVG to preview</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <aside class="control-panel composer-panel" aria-label="Composer controls">
+        <header class="panel-header">
+          <div>
+            <h1>Font composer</h1>
+            <nav class="app-nav" aria-label="Font Studio pages">
+              <a href="/">Glyph editor</a>
+              <a href="/composer/" aria-current="page">Composer</a>
+            </nav>
+          </div>
+
+          <div class="control-group header-picker">
+            <label for="composerRecipeSelect">Recipe</label>
+            <select id="composerRecipeSelect"></select>
+          </div>
+        </header>
+
+        <section class="composer-editor" aria-label="Text layout controls">
+          <label>
+            <span>Text</span>
+            <input id="composerText" class="composer-text-input" type="text" value="CODECAINE" autocomplete="off" spellcheck="false" />
+          </label>
+
+          <label>
+            <span>Tracking</span>
+            <span class="composer-slider-pair">
+              <input id="trackingRange" type="range" min="-160" max="240" step="1" value="4" />
+              <input id="trackingValue" type="number" min="-160" max="240" step="1" value="4" aria-label="Tracking value" />
+            </span>
+          </label>
+
+          <section class="gap-editor" aria-label="Pair spacing controls">
+            <div class="gap-editor-header">
+              <h2>Pair spacing</h2>
+              <button type="button" id="resetGapsButton">Reset</button>
+            </div>
+            <div class="gap-list" id="gapList"></div>
+          </section>
+        </section>
+
+        <section class="actions-editor" aria-label="Composer actions">
+          <h2>Actions</h2>
+          <div class="button-row">
+            <button type="button" id="renderExactButton">Render Exact SVG</button>
+            <button type="button" id="copyComposerLinkButton" disabled>Copy SVG Link</button>
+          </div>
+          <a class="composer-export-link" id="composerExportLink" href="#" hidden>Open generated SVG</a>
+          <p class="app-status" id="composerStatus" role="status" aria-live="polite"></p>
+        </section>
+      </aside>
+    </main>
+
+    <script type="module" src="/src/composer.js"></script>
+  </body>
+</html>

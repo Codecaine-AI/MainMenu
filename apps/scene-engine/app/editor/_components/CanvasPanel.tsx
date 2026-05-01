@@ -1,12 +1,17 @@
 'use client'
 
-import { useEffect, useLayoutEffect, useRef, useCallback, useState } from 'react'
+import { useEffect, useLayoutEffect, useRef, useCallback, useState, type CSSProperties } from 'react'
 import { useEditorStore } from '@/store/editor-store'
 import { resolveObjectEl } from '@/lib/path'
 import type { SceneJson, Registry, AssetContainer, ModuleEntry } from '@/types/scene'
 
 const STAGE_W = 1440
 const STAGE_H = 1080
+
+interface FrameMetrics {
+  width: number
+  height: number
+}
 
 function collectIds(scene: SceneJson): Set<string> {
   const set = new Set<string>()
@@ -83,6 +88,7 @@ export function CanvasPanel() {
   const addObjectAt = useEditorStore((s) => s.addObjectAt)
   const stageRef = useRef<HTMLDivElement>(null)
   const panelRef = useRef<HTMLDivElement>(null)
+  const [frame, setFrame] = useState<FrameMetrics | null>(null)
   const [isDropTarget, setIsDropTarget] = useState(false)
 
   useEffect(() => {
@@ -109,17 +115,29 @@ export function CanvasPanel() {
 
   const fitStage = useCallback(() => {
     if (!panelRef.current || !stageRef.current) return
-    const { clientWidth: w, clientHeight: h } = panelRef.current
-    const scale = Math.min(w / STAGE_W, h / STAGE_H)
+
+    const panel = panelRef.current
+    const scale = Math.min(panel.clientWidth / STAGE_W, panel.clientHeight / STAGE_H)
+    const width = STAGE_W * scale
+    const height = STAGE_H * scale
+
     stageRef.current.style.transform = `scale(${scale})`
+    setFrame({
+      width,
+      height,
+    })
   }, [])
 
   useEffect(() => {
     if (!panelRef.current) return
     const obs = new ResizeObserver(fitStage)
     obs.observe(panelRef.current)
+    window.addEventListener('resize', fitStage)
     fitStage()
-    return () => obs.disconnect()
+    return () => {
+      obs.disconnect()
+      window.removeEventListener('resize', fitStage)
+    }
   }, [fitStage])
 
   const handleDragOver = useCallback((e: React.DragEvent) => {
@@ -158,6 +176,19 @@ export function CanvasPanel() {
     [scene, registry, addObjectAt],
   )
 
+  const frameStyle: CSSProperties = frame
+    ? {
+        width: frame.width,
+        height: frame.height,
+      }
+    : {
+        left: '50%',
+        top: '50%',
+        width: 0,
+        height: 0,
+        transform: 'translate(-50%, -50%)',
+      }
+
   return (
     <section
       ref={panelRef}
@@ -167,16 +198,18 @@ export function CanvasPanel() {
       onDragLeave={handleDragLeave}
       onDrop={handleDrop}
     >
-      <div
-        ref={stageRef}
-        style={{
-          width: STAGE_W,
-          height: STAGE_H,
-          position: 'relative',
-          transformOrigin: 'center center',
-          background: '#000',
-        }}
-      />
+      <div className="editor-stage-frame" style={frameStyle}>
+        <div
+          ref={stageRef}
+          style={{
+            width: STAGE_W,
+            height: STAGE_H,
+            position: 'relative',
+            transformOrigin: 'top left',
+            background: '#000',
+          }}
+        />
+      </div>
     </section>
   )
 }

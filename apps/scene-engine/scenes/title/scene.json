@@ -84,9 +84,9 @@
       "asset": "press-start",
       "transform": {
         "x": "center",
-        "y": 75,
-        "width": 30,
-        "height": "auto",
+        "y": 80,
+        "width": 40,
+        "height": 16.07,
         "anchor": "center"
       },
       "properties": {

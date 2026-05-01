@@ -1,6 +1,6 @@
 import { spawn } from "node:child_process";
 import { existsSync } from "node:fs";
-import { readFile, writeFile, readdir } from "node:fs/promises";
+import { mkdir, readFile, writeFile, readdir } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import tailwindcss from "@tailwindcss/vite";
@@ -80,6 +80,8 @@ async function readGlyphPaths() {
   return data.glyphs.map((record) => ({
     glyph: record.glyph,
     glyph_name: record.glyph_name,
+    advance_width: record.advance_width,
+    units_per_em: record.units_per_em,
     label: record.glyph === record.glyph_name ? record.glyph : `${record.glyph} (${record.glyph_name})`,
     output_path_template: `/generation/outputs/generated/{recipeId}/glyphs/${record.glyph_name}.css-layers.svg`,
     default_output_path: `/generation/outputs/generated/${defaultRecipeId}/glyphs/${record.glyph_name}.css-layers.svg`,
@@ -102,7 +104,7 @@ async function readRecipes() {
     .sort((a, b) => a.label.localeCompare(b.label));
 }
 
-function runRenderer({ recipeId = defaultRecipeId, glyph, full = false } = {}) {
+function runRenderer({ recipeId = defaultRecipeId, glyph, full = false, recipePath, outDir, wordOnly = false } = {}) {
   const selectedRecipePath = recipePathForId(recipeId);
   const args = [
     "-m",
@@ -110,13 +112,16 @@ function runRenderer({ recipeId = defaultRecipeId, glyph, full = false } = {}) {
     "--paths",
     pathsPath,
     "--recipe",
-    selectedRecipePath,
+    recipePath || selectedRecipePath,
     "--out-dir",
-    recipeOutputDir(recipeId),
+    outDir || recipeOutputDir(recipeId),
   ];
 
   if (!full && glyph) {
     args.push("--glyph", glyph);
+  }
+  if (wordOnly) {
+    args.push("--word-only");
   }
 
   return new Promise((resolve, reject) => {
@@ -138,6 +143,65 @@ function runRenderer({ recipeId = defaultRecipeId, glyph, full = false } = {}) {
       }
     });
   });
+}
+
+function safeOutputName(value) {
+  const name = String(value || "")
+    .replace(/[^A-Za-z0-9._-]+/g, "_")
+    .replace(/^[._-]+|[._-]+$/g, "")
+    .slice(0, 80);
+  return name || "composition";
+}
+
+function normalizeText(value) {
+  return String(value || "").replace(/\s+/g, " ").trim();
+}
+
+function normalizeGapAdjustments(value, gapCount) {
+  if (!Array.isArray(value)) return Array.from({ length: gapCount }, () => 0);
+  return Array.from({ length: gapCount }, (_, index) => Number(value[index] || 0));
+}
+
+async function runComposer({ recipeId = defaultRecipeId, text, tracking, gapAdjustments }) {
+  const glyphs = await readGlyphPaths();
+  const supported = new Set(glyphs.map((record) => record.glyph));
+  const missing = Array.from(new Set(Array.from(text).filter((ch) => ch !== " " && !supported.has(ch))));
+  if (missing.length) {
+    const detail = missing.map((ch) => JSON.stringify(ch)).join(", ");
+    const error = new Error(`Missing glyph path for ${detail}.`);
+    error.status = 400;
+    throw error;
+  }
+
+  const sourceRecipePath = recipePathForId(recipeId);
+  const recipe = JSON.parse(await readFile(sourceRecipePath, "utf8"));
+  const gapCount = Math.max(0, Array.from(text).length - 1);
+  recipe.text = text;
+  recipe.tracking = Number(tracking ?? recipe.tracking ?? 4);
+  recipe.gap_adjustments = normalizeGapAdjustments(gapAdjustments, gapCount);
+
+  const composerDir = path.join(recipeOutputDir(recipeId), "composer");
+  await mkdir(composerDir, { recursive: true });
+  const recipePath = path.join(composerDir, `${safeOutputName(text)}.recipe.json`);
+  await writeFile(recipePath, `${JSON.stringify(recipe, null, 2)}\n`, "utf8");
+
+  const render = await runRenderer({
+    recipeId,
+    recipePath,
+    outDir: composerDir,
+    wordOnly: true,
+  });
+  const svgRelative = path.relative(projectRoot, path.join(composerDir, "word", `${safeOutputName(text)}.css-layers.svg`));
+
+  return {
+    ok: true,
+    recipeId,
+    text,
+    tracking: recipe.tracking,
+    gapAdjustments: recipe.gap_adjustments,
+    svg: `/generation/${svgRelative}`,
+    render,
+  };
 }
 
 function pythonExecutable() {
@@ -271,6 +335,23 @@ function fontGenerationApi() {
             return;
           }
 
+          if (req.method === "POST" && url.pathname === "/api/melee-3/compose") {
+            const payload = await readBody(req);
+            const text = normalizeText(payload.text);
+            if (!text) {
+              sendJson(res, 400, { ok: false, error: "Text is required." });
+              return;
+            }
+            const result = await runComposer({
+              recipeId: payload.recipeId || defaultRecipeId,
+              text,
+              tracking: payload.tracking,
+              gapAdjustments: payload.gapAdjustments,
+            });
+            sendJson(res, 200, result);
+            return;
+          }
+
           if (req.method === "POST" && url.pathname === "/api/melee-3/bake") {
             const payload = await readBody(req);
             const svgRelative = payload.svg;
@@ -330,7 +411,7 @@ function fontGenerationApi() {
             return;
           }
         } catch (error) {
-          sendJson(res, 500, { ok: false, error: error.message });
+          sendJson(res, error.status || 500, { ok: false, error: error.message });
           return;
         }
 
@@ -342,7 +423,15 @@ function fontGenerationApi() {
 
 export default defineConfig({
   plugins: [tailwindcss(), fontGenerationApi()],
+  build: {
+    rollupOptions: {
+      input: {
+        main: path.join(appDir, "index.html"),
+        composer: path.join(appDir, "composer/index.html"),
+      },
+    },
+  },
   server: {
-    port: Number(process.env.MELEE3_APP_PORT || 4177),
+    port: Number(process.env.FONT_STUDIO_APP_PORT || 4177),
   },
 });
