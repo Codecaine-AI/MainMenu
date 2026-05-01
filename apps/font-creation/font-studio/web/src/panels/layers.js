@@ -3,6 +3,7 @@ import { clamp, isSolidColor, formatBandValue, controlModeBadge } from "../utils
 import { applyRecipeLayerValue, applyRecipeLayerPaint } from "../recipe.js";
 import { svgLayers, layerPresentation } from "../layer-data.js";
 import { applyLayerVisibility } from "../viewer.js";
+import { layerMediaControls, loadMediaAssets } from "./media.js";
 
 function bandRangeText(layer) {
   const start = Number(layer?.start ?? 0);
@@ -62,7 +63,7 @@ function recipeControls(layer) {
   const recipe = recipeLayer(layer.id);
   if (!recipe) return null;
 
-  const controls = document.createElement("span");
+  const controls = document.createElement("div");
   controls.className = "layer-controls";
 
   if ("opacity" in recipe) {
@@ -93,6 +94,9 @@ function recipeControls(layer) {
     );
   }
 
+  const mediaControls = layerMediaControls(layer.id);
+  if (mediaControls) controls.append(mediaControls);
+
   controls.classList.toggle("is-disabled", recipe.type === "lighting-overlay" && state.activeRecipe?.lighting?.enabled === false);
   return controls.childElementCount ? controls : null;
 }
@@ -103,8 +107,97 @@ function updateLayerVisualizerRow(row, visible) {
   if (toggle) toggle.textContent = visible ? "On" : "Off";
 }
 
-export function renderLayerVisualizer() {
+function dependentRemovalIds(layerId) {
+  const ids = new Set([layerId]);
+  let changed = true;
+
+  while (changed) {
+    changed = false;
+    for (const layer of state.activeRecipe?.layers ?? []) {
+      if (ids.has(layer.id)) continue;
+      if (ids.has(layer.mask_ref) || ids.has(layer.caster_ref) || ids.has(layer.caster)) {
+        ids.add(layer.id);
+        changed = true;
+      }
+    }
+  }
+
+  return ids;
+}
+
+function pruneLayerReferences(ids) {
+  if (state.activeRecipe?.chrome_stack?.layer_ids) {
+    state.activeRecipe.chrome_stack.layer_ids = state.activeRecipe.chrome_stack.layer_ids.filter((id) => !ids.has(id));
+  }
+
+  if (Array.isArray(state.activeRecipe?.relief?.bands)) {
+    state.activeRecipe.relief.bands = state.activeRecipe.relief.bands.filter((band) => !ids.has(band.layer_id));
+  }
+
+  ids.forEach((id) => layerVisibility.delete(id));
+}
+
+function removeRecipeLayer(layerId) {
+  const recipe = recipeLayer(layerId);
+  if (!recipe || !state.activeRecipe?.layers) return;
+
+  const ids = dependentRemovalIds(layerId);
+  const removedNames = state.activeRecipe.layers
+    .filter((layer) => ids.has(layer.id))
+    .map((layer) => layer.name ?? layerPresentation[layer.id]?.name ?? layer.id);
+  const message = removedNames.length > 1
+    ? `Remove ${removedNames[0]} and ${removedNames.length - 1} dependent layer(s)?`
+    : `Remove ${removedNames[0]}?`;
+  if (!window.confirm(message)) return;
+
+  state.activeRecipe.layers = state.activeRecipe.layers.filter((layer) => !ids.has(layer.id));
+  pruneLayerReferences(ids);
+
+  const svg = dom.mount?.querySelector("svg");
+  ids.forEach((id) => svg?.querySelector(`#${CSS.escape(id)}`)?.remove());
+
+  setRecipeDirty(true);
+  renderLayerVisualizer();
+}
+
+function layerManagementControls(layer) {
+  const recipe = recipeLayer(layer.id);
+  if (!recipe) return null;
+
+  const controls = document.createElement("div");
+  const nameLabel = document.createElement("label");
+  const nameText = document.createElement("span");
+  const nameInput = document.createElement("input");
+  const removeButton = document.createElement("button");
+
+  controls.className = "layer-management-controls";
+  nameLabel.className = "layer-name-field";
+  nameText.textContent = "Name";
+  nameInput.type = "text";
+  nameInput.value = recipe.name ?? layer.name;
+  nameInput.placeholder = layerPresentation[layer.id]?.name ?? layer.id;
+  nameInput.setAttribute("aria-label", `Rename ${layer.name}`);
+  removeButton.type = "button";
+  removeButton.className = "layer-remove-button";
+  removeButton.textContent = "Remove";
+
+  nameInput.addEventListener("input", () => {
+    const value = nameInput.value.trim();
+    if (value) recipe.name = value;
+    else delete recipe.name;
+    setRecipeDirty(true);
+  });
+
+  removeButton.addEventListener("click", () => removeRecipeLayer(layer.id));
+
+  nameLabel.append(nameText, nameInput);
+  controls.append(nameLabel, removeButton);
+  return controls;
+}
+
+export async function renderLayerVisualizer() {
   if (!dom.layerStackMap) return;
+  await loadMediaAssets();
 
   const layers = svgLayers();
   dom.layerStackMap.replaceChildren();
@@ -119,24 +212,25 @@ export function renderLayerVisualizer() {
       dom.layerStackMap.append(category);
     }
 
-    const row = document.createElement("button");
-    const toggle = document.createElement("span");
-    const body = document.createElement("span");
+    const row = document.createElement("div");
+    const toggle = document.createElement("button");
+    const body = document.createElement("div");
     const name = document.createElement("span");
-    const metrics = document.createElement("span");
+    const metrics = document.createElement("div");
     const swatch = document.createElement("span");
     const colorInput = document.createElement("input");
     const recipe = recipeLayer(layer.id);
     const range = bandRange(layer.id);
     const controls = recipeControls(layer);
+    const managementControls = layerManagementControls(layer);
 
-    row.type = "button";
     row.className = `stack-row${layer.visible ? "" : " is-hidden"}`;
     if (recipe?.type) row.classList.add(`is-${recipe.type}-row`);
     row.dataset.layerId = layer.id;
     row.dataset.layerType = recipe?.type ?? "svg";
 
     toggle.className = "stack-toggle";
+    toggle.type = "button";
     toggle.textContent = layer.visible ? "On" : "Off";
     body.className = "stack-body";
     name.className = "visualizer-name";
@@ -144,6 +238,8 @@ export function renderLayerVisualizer() {
     metrics.className = "stack-metrics";
     swatch.className = "visualizer-swatch";
     swatch.style.setProperty("--layer-color", layer.color);
+    swatch.classList.toggle("is-media", !!layer.mediaActive);
+    if (layer.mediaActive) swatch.title = "Media surface active";
     if (layer.gradientKey) swatch.dataset.gradientKey = layer.gradientKey;
     if (recipe?.stops) swatch.dataset.stopLayer = layer.id;
     colorInput.type = "color";
@@ -161,6 +257,7 @@ export function renderLayerVisualizer() {
     }
 
     body.append(name);
+    if (managementControls) body.append(managementControls);
     if (controls) metrics.append(controls);
     if (range) metrics.append(range);
     if (metrics.childElementCount) body.append(metrics);

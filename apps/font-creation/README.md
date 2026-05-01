@@ -61,9 +61,8 @@ output/
 ## Core files
 
 ```text
-app/                         viewer/editor applications
 pipeline/                    reusable pipeline code, configs, source specs, tests
-generation/                  active generated-font workspaces used by apps
+font-studio/                 layered SVG font editor, renderer, and project workspaces
 
 pipeline/config/glyph-map.json
 pipeline/config/style.json
@@ -78,24 +77,30 @@ pipeline/scripts/run_pipeline.py
 pipeline/scripts/common.py
 ```
 
-## MELEE 3 layer app
+## Font Studio
 
-The current MELEE 3 tuning surface is split into an app and a generation workspace:
-
-```text
-app/melee-3
-generation/melee-3
-```
-
-`generation/` is the middle workspace. It is not the reusable pipeline and it is not the app. It holds the currently selected generated font state:
+The current layered SVG tuning surface is now grouped as one sub-project:
 
 ```text
-generation/melee-3/inputs/    copied source artifacts the app needs
-generation/melee-3/recipes/   editable recipe state
-generation/melee-3/outputs/   regenerated SVG outputs consumed by the app
+font-studio/
+  web/                  Vite editor and local API server
+  renderer/             Python SVG renderer
+  projects/
+    melee/              Current MELEE project inputs, recipes, and outputs
+  docs/                 Rendering and recipe docs
 ```
 
-That gives the app a stable workspace it can read from and write to without mutating the reusable pipeline inputs or timestamped pipeline runs.
+`projects/melee/` is the active editable font project. It is not the reusable
+pipeline and it is not the web app. It holds the current generated font state:
+
+```text
+font-studio/projects/melee/inputs/    copied source artifacts the app needs
+font-studio/projects/melee/recipes/   editable recipe state
+font-studio/projects/melee/outputs/   regenerated SVG outputs consumed by the app
+```
+
+That gives the app and renderer a stable workspace they can read from and write
+to without mutating reusable pipeline inputs or timestamped pipeline runs.
 
 Run the app:
 

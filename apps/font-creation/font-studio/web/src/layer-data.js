@@ -300,16 +300,19 @@ export function svgLayers() {
   return Array.from(svg.querySelectorAll(":scope > g[id]"))
     .map((layer, fileIndex) => {
       const presentation = layerPresentation[layer.id] ?? {};
+      const recipe = recipeLayer(layer.id);
+      const mediaActive = recipe?.media?.enabled && !!recipe.media.src;
       return {
         id: layer.id,
-        name: presentation.name ?? prettyLayerName(layer.id),
+        name: recipe?.name ?? presentation.name ?? prettyLayerName(layer.id),
         category: presentation.category ?? "Other",
         role: presentation.role ?? "SVG group",
         order: presentation.order ?? 1000 + fileIndex,
         fileIndex,
         color: layerPaint(layer, svg),
-        paint: recipeLayer(layer.id)?.paint,
-        gradientKey: gradientKeyFromPaint(recipeLayer(layer.id)?.paint),
+        paint: recipe?.paint,
+        gradientKey: gradientKeyFromPaint(recipe?.paint),
+        mediaActive,
         visible: isLayerVisible(layer.id),
       };
     })

@@ -7,7 +7,8 @@ import puppeteer from "puppeteer";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const appDir = path.resolve(__dirname, "..");
-const generationRoot = path.resolve(appDir, "../../../font-creation/generation/melee-3");
+const studioRoot = path.resolve(appDir, "..");
+const projectRoot = path.resolve(studioRoot, "projects/melee");
 
 const BAKE_GROUPS = [
   {
@@ -76,8 +77,11 @@ const LIVE_INTERIOR_LAYERS = [
 ];
 
 async function bake(svgPath, { port = 4177, scale = 2 } = {}) {
-  const svgRelative = svgPath.replace(generationRoot + "/", "");
-  const svgUrl = `http://localhost:${port}/generation/${svgRelative}`;
+  const svgRelative = path.relative(projectRoot, svgPath);
+  if (svgRelative.startsWith("..") || path.isAbsolute(svgRelative)) {
+    throw new Error(`SVG path is outside project workspace: ${svgPath}`);
+  }
+  const svgUrl = `http://127.0.0.1:${port}/generation/${svgRelative}`;
 
   const browser = await puppeteer.launch({
     headless: true,
@@ -206,7 +210,7 @@ async function bake(svgPath, { port = 4177, scale = 2 } = {}) {
       imageRefs.push({ name, filename });
     }
 
-    const bakedDirRelative = path.relative(generationRoot, outDir);
+    const bakedDirRelative = path.relative(projectRoot, outDir);
     const servingPrefix = `/generation/${bakedDirRelative}`;
 
     const bakedSvg = assembleBakedSvg({
@@ -302,13 +306,13 @@ if (!svgArg) {
   console.error("");
   console.error("Example:");
   console.error(
-    "  node scripts/bake-svg.mjs ../../../font-creation/generation/melee-3/outputs/generated/word/CODECAINE.css-layers.svg",
+    "  node scripts/bake-svg.mjs ../projects/melee/outputs/generated/layer-recipe/word/CODECAINE.css-layers.svg",
   );
   process.exit(1);
 }
 
 const resolvedSvg = path.resolve(svgArg);
-console.log(`Baking ${resolvedSvg} at ${scaleArg}x via localhost:${portArg}...`);
+console.log(`Baking ${resolvedSvg} at ${scaleArg}x via 127.0.0.1:${portArg}...`);
 
 bake(resolvedSvg, { port: portArg, scale: scaleArg })
   .then((result) => {

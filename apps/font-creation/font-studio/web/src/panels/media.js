@@ -1,40 +1,66 @@
-import { dom, state, setRecipeDirty } from "../state.js";
+import { dom, recipeLayer, state, setRecipeDirty } from "../state.js";
+
+const defaultMedia = {
+  enabled: false,
+  mode: "video",
+  src: "",
+  opacity: 1,
+  fit: "cover",
+  scale: 1,
+  position_x: 0,
+  position_y: 0,
+  repeat_x: 1,
+  repeat_y: 1,
+  rotation: 0,
+  speed: 1,
+  hue: 0,
+  autoplay: true,
+  muted: true,
+  loop: true,
+  playsinline: true,
+};
 
 let mediaAssets = [];
+let mediaAssetsLoaded = false;
+const gridKeys = new Map();
 
-function media() {
-  return state.activeRecipe?.interior_media;
+function legacyRecipeMedia(layerId) {
+  const media = state.activeRecipe?.interior_media;
+  return layerId === "fill-layer" && media && typeof media === "object" ? media : null;
 }
 
-function ensureMedia() {
-  if (!state.activeRecipe) return null;
-  if (!state.activeRecipe.interior_media) {
-    state.activeRecipe.interior_media = {
-      enabled: false,
-      mode: "video",
-      src: "",
-      opacity: 1,
-      fit: "cover",
-      scale: 1,
-      position_x: 0,
-      position_y: 0,
-      repeat_x: 1,
-      repeat_y: 1,
-      rotation: 0,
-      speed: 1,
-      hue: 0,
-      autoplay: true,
-      muted: true,
-      loop: true,
-      playsinline: true,
-    };
+function cloneMedia(media = {}) {
+  return { ...defaultMedia, ...structuredClone(media), mode: media.mode ?? "video" };
+}
+
+function layerMedia(layerId) {
+  const layer = recipeLayer(layerId);
+  return layer?.media ?? legacyRecipeMedia(layerId);
+}
+
+function ensureLayerMedia(layerId) {
+  const layer = recipeLayer(layerId);
+  if (!layer) return null;
+  if (!layer.media) layer.media = cloneMedia(legacyRecipeMedia(layerId) ?? {});
+  return layer.media;
+}
+
+function removeLegacyMedia(layerId) {
+  if (layerId === "fill-layer" && state.activeRecipe?.interior_media) {
+    delete state.activeRecipe.interior_media;
   }
-  return state.activeRecipe.interior_media;
 }
 
-function getVideoShell() {
+function getVideoShell(layerId) {
   const svg = dom.mount?.querySelector("svg");
-  return svg?.querySelector("#fill-layer .melee-fill-media-shell") ?? null;
+  return svg?.querySelector(`#${CSS.escape(layerId)} .melee-layer-media-shell, #${CSS.escape(layerId)} .melee-fill-media-shell`) ?? null;
+}
+
+function setPaintFallbackVisible(layerId, visible) {
+  const svg = dom.mount?.querySelector("svg");
+  svg?.querySelectorAll(`#${CSS.escape(layerId)} .melee-layer-paint-fallback`).forEach((node) => {
+    node.style.display = visible ? "" : "none";
+  });
 }
 
 function buildVideoElement(src, fit, opacity) {
@@ -53,14 +79,25 @@ function buildVideoElement(src, fit, opacity) {
   return video;
 }
 
-let lastGridKey = "";
-
-function applyVideoTransform() {
-  const m = media();
-  if (!m) return;
-
-  const shell = getVideoShell();
+function clearVideoShell(layerId) {
+  gridKeys.delete(layerId);
+  const shell = getVideoShell(layerId);
   if (!shell) return;
+  shell.querySelectorAll("video").forEach((video) => video.remove());
+  shell.style.display = "none";
+  setPaintFallbackVisible(layerId, true);
+}
+
+function applyVideoTransform(layerId) {
+  const m = layerMedia(layerId);
+  if (!m?.enabled || !m.src) {
+    clearVideoShell(layerId);
+    return;
+  }
+
+  const shell = getVideoShell(layerId);
+  if (!shell) return;
+  setPaintFallbackVisible(layerId, false);
 
   const repeatX = Math.max(1, Math.round(m.repeat_x ?? 1));
   const repeatY = Math.max(1, Math.round(m.repeat_y ?? 1));
@@ -77,12 +114,11 @@ function applyVideoTransform() {
   const targetCount = repeatX * repeatY;
   const gridKey = `${targetCount}:${src}`;
 
-  if (gridKey !== lastGridKey) {
-    lastGridKey = gridKey;
-    const existing = Array.from(shell.querySelectorAll("video"));
-    for (const v of existing) v.remove();
+  if (gridKey !== gridKeys.get(layerId)) {
+    gridKeys.set(layerId, gridKey);
+    shell.querySelectorAll("video").forEach((video) => video.remove());
 
-    for (let i = 0; i < targetCount; i++) {
+    for (let i = 0; i < targetCount; i += 1) {
       const video = buildVideoElement(src, fit, opacity);
       shell.appendChild(video);
       video.play().catch(() => {});
@@ -102,28 +138,26 @@ function applyVideoTransform() {
   shell.style.transform = `translate(${posX}%, ${posY}%) scale(${scale}) rotate(${rotation}deg)`;
   shell.style.transformOrigin = "center center";
 
-  shell.querySelectorAll("video").forEach((v) => {
-    v.style.objectFit = fit;
-    v.style.opacity = String(opacity);
-    v.style.filter = hue !== 0 ? `hue-rotate(${hue}deg)` : "";
-    v.playbackRate = speed;
+  shell.querySelectorAll("video").forEach((video) => {
+    video.style.objectFit = fit;
+    video.style.opacity = String(opacity);
+    video.style.filter = hue !== 0 ? `hue-rotate(${hue}deg)` : "";
+    video.playbackRate = speed;
   });
 }
 
-function swapVideoSource(src) {
-  lastGridKey = "";
-  applyVideoTransform();
-}
-
-async function fetchMediaAssets() {
+export async function loadMediaAssets() {
+  if (mediaAssetsLoaded) return mediaAssets;
+  mediaAssetsLoaded = true;
   try {
     const response = await fetch("/api/melee-3/media-assets");
-    if (!response.ok) return [];
+    if (!response.ok) return mediaAssets;
     const data = await response.json();
-    return data.assets ?? [];
+    mediaAssets = data.assets ?? [];
   } catch {
-    return [];
+    mediaAssets = [];
   }
+  return mediaAssets;
 }
 
 function mediaSlider(labelText, value, min, max, step, onChange) {
@@ -168,17 +202,25 @@ function mediaSlider(labelText, value, min, max, step, onChange) {
   return label;
 }
 
-export async function renderMediaEditor() {
-  const list = dom.mediaControlList;
-  if (!list) return;
-  list.replaceChildren();
+function markMediaDirty(layerId) {
+  removeLegacyMedia(layerId);
+  setRecipeDirty(true);
+}
 
-  if (!mediaAssets.length) {
-    mediaAssets = await fetchMediaAssets();
-  }
+function writableLayerMedia(layerId) {
+  return ensureLayerMedia(layerId);
+}
 
-  const m = ensureMedia();
-  if (!m) return;
+export function layerMediaControls(layerId) {
+  const layer = recipeLayer(layerId);
+  const mediaLayerTypes = new Set(["fill", "stroke", "rect-fill"]);
+  if (!layer || !mediaLayerTypes.has(layer.type)) return null;
+
+  const wrapper = document.createElement("div");
+  wrapper.className = "layer-media-controls";
+  let m = layerMedia(layerId) ?? defaultMedia;
+  if (!layer.media && legacyRecipeMedia(layerId)) m = ensureLayerMedia(layerId);
+  if (!m) return null;
 
   const sourceSection = document.createElement("div");
   sourceSection.className = "media-control-section";
@@ -186,13 +228,13 @@ export async function renderMediaEditor() {
   const sourceLabel = document.createElement("label");
   sourceLabel.className = "media-source-label";
   const sourceName = document.createElement("span");
-  sourceName.textContent = "Video Source";
+  sourceName.textContent = "Surface";
   const sourceSelect = document.createElement("select");
   sourceSelect.className = "media-source-select";
 
   const noneOption = document.createElement("option");
   noneOption.value = "";
-  noneOption.textContent = "None (disabled)";
+  noneOption.textContent = "Paint / gradient";
   sourceSelect.append(noneOption);
 
   for (const asset of mediaAssets) {
@@ -203,7 +245,7 @@ export async function renderMediaEditor() {
     sourceSelect.append(option);
   }
 
-  if (m.src && !mediaAssets.some((a) => a.path === m.src)) {
+  if (m.src && !mediaAssets.some((asset) => asset.path === m.src)) {
     const option = document.createElement("option");
     option.value = m.src;
     option.textContent = m.src.split("/").pop();
@@ -211,41 +253,15 @@ export async function renderMediaEditor() {
     sourceSelect.append(option);
   }
 
-  if (!m.src) {
-    noneOption.selected = true;
-  }
-
-  sourceSelect.addEventListener("change", () => {
-    const val = sourceSelect.value;
-    m.src = val;
-    m.enabled = !!val;
-    if (val) {
-      swapVideoSource(val);
-    }
-    setRecipeDirty(true);
-    renderControls();
-  });
-
-  sourceLabel.append(sourceName, sourceSelect);
-  sourceSection.append(sourceLabel);
-  list.append(sourceSection);
+  if (!m.src) noneOption.selected = true;
 
   const controlsContainer = document.createElement("div");
-  controlsContainer.id = "mediaControlsContainer";
-  list.append(controlsContainer);
-
-  renderControls();
+  controlsContainer.className = "layer-media-transform-controls";
 
   function renderControls() {
-    const container = document.getElementById("mediaControlsContainer");
-    if (!container) return;
-    container.replaceChildren();
+    controlsContainer.replaceChildren();
 
     if (!m.enabled || !m.src) {
-      const hint = document.createElement("p");
-      hint.className = "media-hint";
-      hint.textContent = "Select a video source to enable media controls.";
-      container.append(hint);
       return;
     }
 
@@ -259,42 +275,40 @@ export async function renderMediaEditor() {
     transformSection.append(
       mediaSlider("Opacity", m.opacity ?? 1, 0, 1, 0.01, (v) => {
         m.opacity = v;
-        applyVideoTransform();
-        setRecipeDirty(true);
+        applyVideoTransform(layerId);
+        markMediaDirty(layerId);
       }),
       mediaSlider("Scale", m.scale ?? 1, 0.1, 5, 0.05, (v) => {
         m.scale = v;
-        applyVideoTransform();
-        setRecipeDirty(true);
+        applyVideoTransform(layerId);
+        markMediaDirty(layerId);
       }),
       mediaSlider("Position X", m.position_x ?? 0, -100, 100, 1, (v) => {
         m.position_x = v;
-        applyVideoTransform();
-        setRecipeDirty(true);
+        applyVideoTransform(layerId);
+        markMediaDirty(layerId);
       }),
       mediaSlider("Position Y", m.position_y ?? 0, -100, 100, 1, (v) => {
         m.position_y = v;
-        applyVideoTransform();
-        setRecipeDirty(true);
+        applyVideoTransform(layerId);
+        markMediaDirty(layerId);
       }),
       mediaSlider("Rotation", m.rotation ?? 0, -180, 180, 1, (v) => {
         m.rotation = v;
-        applyVideoTransform();
-        setRecipeDirty(true);
+        applyVideoTransform(layerId);
+        markMediaDirty(layerId);
       }),
       mediaSlider("Speed", m.speed ?? 1, 0.05, 4, 0.05, (v) => {
         m.speed = v;
-        applyVideoTransform();
-        setRecipeDirty(true);
+        applyVideoTransform(layerId);
+        markMediaDirty(layerId);
       }),
       mediaSlider("Hue", m.hue ?? 0, -180, 180, 1, (v) => {
         m.hue = v;
-        applyVideoTransform();
-        setRecipeDirty(true);
+        applyVideoTransform(layerId);
+        markMediaDirty(layerId);
       }),
     );
-
-    container.append(transformSection);
 
     const fitSection = document.createElement("div");
     fitSection.className = "media-control-section";
@@ -317,8 +331,8 @@ export async function renderMediaEditor() {
     }
     fitSelect.addEventListener("change", () => {
       m.fit = fitSelect.value;
-      applyVideoTransform();
-      setRecipeDirty(true);
+      applyVideoTransform(layerId);
+      markMediaDirty(layerId);
     });
     fitLabel.append(fitName, fitSelect);
     fitSection.append(fitLabel);
@@ -326,26 +340,46 @@ export async function renderMediaEditor() {
     fitSection.append(
       mediaSlider("Repeat X", m.repeat_x ?? 1, 1, 8, 1, (v) => {
         m.repeat_x = Math.round(v);
-        applyVideoTransform();
-        setRecipeDirty(true);
+        applyVideoTransform(layerId);
+        markMediaDirty(layerId);
       }),
       mediaSlider("Repeat Y", m.repeat_y ?? 1, 1, 8, 1, (v) => {
         m.repeat_y = Math.round(v);
-        applyVideoTransform();
-        setRecipeDirty(true);
+        applyVideoTransform(layerId);
+        markMediaDirty(layerId);
       }),
     );
 
-    container.append(fitSection);
-
-    requestAnimationFrame(() => applyVideoTransform());
+    controlsContainer.append(transformSection, fitSection);
+    requestAnimationFrame(() => applyVideoTransform(layerId));
   }
+
+  sourceSelect.addEventListener("change", () => {
+    m = writableLayerMedia(layerId);
+    if (!m) return;
+    m.src = sourceSelect.value;
+    m.enabled = !!m.src;
+    gridKeys.delete(layerId);
+    if (m.enabled) {
+      applyVideoTransform(layerId);
+    } else {
+      clearVideoShell(layerId);
+    }
+    markMediaDirty(layerId);
+    renderControls();
+  });
+
+  sourceLabel.append(sourceName, sourceSelect);
+  sourceSection.append(sourceLabel);
+  wrapper.append(sourceSection, controlsContainer);
+  renderControls();
+  return wrapper;
 }
 
 export function syncMediaOnLoad() {
-  lastGridKey = "";
-  const m = media();
-  if (m?.enabled) {
-    requestAnimationFrame(() => applyVideoTransform());
-  }
+  gridKeys.clear();
+  state.activeRecipe?.layers?.forEach((layer) => {
+    const m = layerMedia(layer.id);
+    if (m?.enabled) requestAnimationFrame(() => applyVideoTransform(layer.id));
+  });
 }

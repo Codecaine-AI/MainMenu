@@ -1,30 +1,28 @@
-export const defaultTilt = { x: 0, y: 0 };
-export const tilt = { x: 0, y: 0 };
-export const tiltLimit = { x: 28, y: 34 };
 export const layerVisibility = new Map();
 export const defaultVisibleLayers = new Set(["fill-layer", "red-lip-boundary-layer"]);
 
 export const state = {
+  recipes: [],
+  glyphPaths: [],
+  selectedRecipeId: "layer-recipe",
+  selectedGlyph: "@",
+  currentSvgSrc: "",
   activeRecipe: null,
   savedRecipe: null,
   recipeDirty: false,
   chromeEditing: false,
-  tiltDrag: null,
-  pendingTiltFrame: 0,
-  tiltResponseEnabled: true,
-  tiltResponseIntensity: 1.0,
 };
 
 export const dom = {
   workbench: null,
   scene: null,
-  stageTilt: null,
   mount: null,
   assetSelect: null,
+  recipeSelect: null,
   regenerateButton: null,
-  resetTiltButton: null,
   copyButton: null,
   fullRegenerateButton: null,
+  regenerateAllButton: null,
   appStatus: null,
   layerStackMap: null,
   chromeLayerSelect: null,
@@ -33,8 +31,6 @@ export const dom = {
   chromeEditButton: null,
   chromeSaveButton: null,
   chromeResetButton: null,
-  mediaControlList: null,
-  mediaSaveButton: null,
   lightingControlList: null,
   lightingSaveButton: null,
   bakeButton: null,
@@ -47,13 +43,13 @@ export const dom = {
 export function initDom() {
   dom.workbench = document.querySelector(".workbench");
   dom.scene = document.querySelector("#scene");
-  dom.stageTilt = document.querySelector("#stageTilt");
   dom.mount = document.querySelector("#svgMount");
   dom.assetSelect = document.querySelector("#assetSelect");
+  dom.recipeSelect = document.querySelector("#recipeSelect");
   dom.regenerateButton = document.querySelector("#regenerateButton");
-  dom.resetTiltButton = document.querySelector("#resetTiltButton");
   dom.copyButton = document.querySelector("#copyButton");
   dom.fullRegenerateButton = document.querySelector("#fullRegenerateButton");
+  dom.regenerateAllButton = document.querySelector("#regenerateAllButton");
   dom.appStatus = document.querySelector("#appStatus");
   dom.layerStackMap = document.querySelector("#layerStackMap");
   dom.chromeLayerSelect = document.querySelector("#chromeLayerSelect");
@@ -62,8 +58,6 @@ export function initDom() {
   dom.chromeEditButton = document.querySelector("#chromeEditButton");
   dom.chromeSaveButton = document.querySelector("#chromeSaveButton");
   dom.chromeResetButton = document.querySelector("#chromeResetButton");
-  dom.mediaControlList = document.querySelector("#mediaControlList");
-  dom.mediaSaveButton = document.querySelector("#mediaSaveButton");
   dom.lightingControlList = document.querySelector("#lightingControlList");
   dom.lightingSaveButton = document.querySelector("#lightingSaveButton");
   dom.bakeButton = document.querySelector("#bakeButton");
@@ -81,7 +75,6 @@ export function setRecipeDirty(isDirty) {
   state.recipeDirty = isDirty;
   dom.regenerateButton.disabled = !state.recipeDirty;
   if (dom.chromeSaveButton) dom.chromeSaveButton.disabled = !state.recipeDirty;
-  if (dom.mediaSaveButton) dom.mediaSaveButton.disabled = !state.recipeDirty;
   if (dom.lightingSaveButton) dom.lightingSaveButton.disabled = !state.recipeDirty;
 }
 
@@ -111,9 +104,11 @@ export function syncRecipeVisibility() {
   });
 }
 
-export async function loadRecipe() {
-  const response = await fetch("/api/melee-3/recipe");
+export async function loadRecipe(recipeId = state.selectedRecipeId) {
+  const response = await fetch(`/api/melee-3/recipe?id=${encodeURIComponent(recipeId)}`);
   if (!response.ok) throw new Error("Recipe API unavailable.");
   state.activeRecipe = await response.json();
   state.savedRecipe = structuredClone(state.activeRecipe);
+  state.selectedRecipeId = recipeId;
+  setRecipeDirty(false);
 }

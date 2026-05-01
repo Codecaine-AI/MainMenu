@@ -7,12 +7,12 @@
   </head>
   <body>
     <main class="lab-shell">
-      <section class="workbench" aria-label="MELEE 3 layer preview">
+      <section class="workbench" aria-label="Font Studio layer preview">
         <div class="scene" id="scene">
           <div class="stage-background" aria-hidden="true"></div>
-          <div class="stage-tilt" id="stageTilt">
+          <div class="stage-content">
             <div class="logo-mount" id="svgMount" aria-live="polite">
-              <div class="load-state">Loading MELEE 3 asset</div>
+              <div class="load-state">Loading Font Studio asset</div>
             </div>
           </div>
         </div>
@@ -22,26 +22,22 @@
         <header class="panel-header">
           <h1>Font layer app</h1>
 
-          <div class="control-group header-asset-picker">
-            <label for="assetSelect">Asset</label>
-            <select id="assetSelect">
-              <option value="/generation/outputs/generated/word/CODECAINE.css-layers.svg">CODECAINE</option>
-              <option value="/generation/outputs/generated/glyphs/at.css-layers.svg" selected>@</option>
-              <option value="/generation/outputs/generated/glyphs/A.css-layers.svg">A</option>
-              <option value="/generation/outputs/generated/glyphs/R.css-layers.svg">R</option>
-              <option value="/generation/outputs/generated/glyphs/F.css-layers.svg">F</option>
-              <option value="/generation/outputs/generated/glyphs/K.css-layers.svg">K</option>
-              <option value="/generation/outputs/generated/glyphs/asterisk.css-layers.svg">*</option>
-            </select>
+          <div class="header-selectors">
+            <div class="control-group header-picker">
+              <label for="recipeSelect">Recipe</label>
+              <select id="recipeSelect"></select>
+            </div>
+            <div class="control-group header-picker">
+              <label for="assetSelect">Glyph</label>
+              <select id="assetSelect"></select>
+            </div>
           </div>
         </header>
 
         <div class="editor-tabs">
           <div class="editor-tab-list" role="tablist" aria-label="Editor sections">
             <button type="button" class="tab-button is-active" id="layerEditorTab" role="tab" aria-selected="true" aria-controls="layerEditorPanel" data-editor-tab="layers">Layers</button>
-            <button type="button" class="tab-button" id="mediaEditorTab" role="tab" aria-selected="false" aria-controls="mediaEditorPanel" data-editor-tab="media">Media</button>
-            <button type="button" class="tab-button" id="lightingEditorTab" role="tab" aria-selected="false" aria-controls="lightingEditorPanel" data-editor-tab="lighting">Lighting</button>
-            <button type="button" class="tab-button" id="styleEditorTab" role="tab" aria-selected="false" aria-controls="styleEditorPanel" data-editor-tab="style">Styling</button>
+            <button type="button" class="tab-button" id="compositionEditorTab" role="tab" aria-selected="false" aria-controls="compositionEditorPanel" data-editor-tab="composition">Composition</button>
             <button type="button" class="tab-button" id="actionsEditorTab" role="tab" aria-selected="false" aria-controls="actionsEditorPanel" data-editor-tab="actions">Actions</button>
           </div>
 
@@ -56,17 +52,7 @@
             </section>
           </section>
 
-          <section class="tab-panel" id="mediaEditorPanel" role="tabpanel" aria-labelledby="mediaEditorTab" data-editor-panel="media" hidden>
-            <section class="media-editor" aria-label="Video media controls">
-              <div class="media-editor-header">
-                <h2>Video Media</h2>
-                <button type="button" id="mediaSaveButton" disabled>Save</button>
-              </div>
-              <div class="media-control-list" id="mediaControlList"></div>
-            </section>
-          </section>
-
-          <section class="tab-panel" id="lightingEditorPanel" role="tabpanel" aria-labelledby="lightingEditorTab" data-editor-panel="lighting" hidden>
+          <section class="tab-panel" id="compositionEditorPanel" role="tabpanel" aria-labelledby="compositionEditorTab" data-editor-panel="composition" hidden>
             <section class="lighting-editor" aria-label="Lighting controls">
               <div class="lighting-editor-header">
                 <h2>Lighting</h2>
@@ -74,9 +60,7 @@
               </div>
               <div class="lighting-control-list" id="lightingControlList"></div>
             </section>
-          </section>
 
-          <section class="tab-panel" id="styleEditorPanel" role="tabpanel" aria-labelledby="styleEditorTab" data-editor-panel="style" hidden>
             <section class="style-editor" aria-label="CSS styling controls">
               <h2>Styling</h2>
 
@@ -95,20 +79,6 @@
                   </label>
                 </div>
               </section>
-
-              <section class="style-section" aria-label="Tilt response controls">
-                <h3>Tilt Response</h3>
-                <div class="control-grid compact-grid">
-                  <label class="tilt-toggle-label">
-                    <span>Enabled</span>
-                    <input type="checkbox" id="tiltResponseToggle" checked />
-                  </label>
-                  <label>
-                    <span>Intensity</span>
-                    <input type="range" min="0" max="2" step="0.1" value="1" id="tiltResponseIntensity" aria-label="Tilt response intensity" />
-                  </label>
-                </div>
-              </section>
             </section>
           </section>
 
@@ -117,7 +87,7 @@
               <h2>Actions</h2>
               <div class="button-row">
                 <button type="button" id="fullRegenerateButton">Full Regenerate (all glyphs)</button>
-                <button type="button" id="resetTiltButton">Reset Tilt</button>
+                <button type="button" id="regenerateAllButton">Rebuild All Recipes</button>
                 <button type="button" id="copyButton">Copy CSS</button>
               </div>
               <div class="button-row" style="margin-top: 0.5rem">

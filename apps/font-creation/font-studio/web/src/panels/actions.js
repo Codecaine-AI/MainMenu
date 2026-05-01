@@ -1,4 +1,4 @@
-import { dom, tilt } from "../state.js";
+import { dom } from "../state.js";
 
 export function cssSnapshot() {
   const styleLines = dom.styleControls.map((control) => {
@@ -7,8 +7,6 @@ export function cssSnapshot() {
 
   return [
     ".melee-3-layer-lab {",
-    `  --tilt-x: ${tilt.x}deg;`,
-    `  --tilt-y: ${tilt.y}deg;`,
     ...styleLines,
     "}",
     "",

@@ -2,10 +2,6 @@ export function clamp(value, min, max) {
   return Math.max(min, Math.min(max, value));
 }
 
-export function tiltValue(value) {
-  return Number.parseFloat(value.toFixed(2));
-}
-
 export function unitValue(value, unit = "px") {
   return `${Number(value)}${unit}`;
 }
