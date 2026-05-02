@@ -5,6 +5,7 @@ import { useEditorStore } from '@/store/editor-store'
 import { resolveObjectEl } from '@/lib/path'
 import { pickScenePathAt } from '@/lib/hit-test'
 import { createObjectFromAsset } from '@/lib/create-scene-object'
+import useCanvasDrag from './canvas/useCanvasDrag'
 import type { SceneJson, Registry } from '@/types/scene'
 
 const STAGE_W = 1440
@@ -38,6 +39,7 @@ export function CanvasPanel() {
   const panelRef = useRef<HTMLDivElement>(null)
   const [frame, setFrame] = useState<FrameMetrics | null>(null)
   const [isDropTarget, setIsDropTarget] = useState(false)
+  const { onMouseDown: handleStageMouseDown, suppressNextClickRef } = useCanvasDrag({ stageRef })
 
   useEffect(() => {
     if (!scene || !stageRef.current) return
@@ -90,6 +92,10 @@ export function CanvasPanel() {
 
   const handleStageClick = useCallback(
     (e: React.MouseEvent<HTMLDivElement>) => {
+      if (suppressNextClickRef.current) {
+        suppressNextClickRef.current = false
+        return
+      }
       const cmd = e.metaKey || e.ctrlKey
       const path = pickScenePathAt(e, { cmd, stageEl: stageRef.current ?? undefined })
       if (!path) {
@@ -107,7 +113,7 @@ export function CanvasPanel() {
       setSelectedPath(stack[depth])
       setDrillCursor({ x: e.clientX, y: e.clientY })
     },
-    [setSelectedPath, setDrillCursor, drillCursor, selectedPath],
+    [setSelectedPath, setDrillCursor, drillCursor, selectedPath, suppressNextClickRef],
   )
 
   const handleDragOver = useCallback((e: React.DragEvent) => {
@@ -171,6 +177,7 @@ export function CanvasPanel() {
       <div className="editor-stage-frame" style={frameStyle}>
         <div
           ref={stageRef}
+          onMouseDown={handleStageMouseDown}
           onClick={handleStageClick}
           style={{
             width: STAGE_W,

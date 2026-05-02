@@ -1,0 +1,36 @@
+{
+  "$schema": "DevNotes - deviations, discoveries, decisions captured during build",
+  "session_id": "2026-05-02_click-to-select-and-drag-objects-on-canv_mnbnvr",
+  "notes": [
+    {
+      "scope": { "type": "task", "ref": "1.1.1" },
+      "category": "decision",
+      "content": "reorderChildren now always re-stamps dataset.scenePath at the end (not gated behind needsReorder). Cheap, idempotent, and ensures paths stay correct on any code path that calls it. The redundant stamps when no reorder occurred are harmless."
+    },
+    {
+      "scope": { "type": "task", "ref": "1.2.1" },
+      "category": "decision",
+      "content": "pickScenePathAt also returns null when data-scene-path is the empty string. The root stage div has no scenePath set, but defensive — empty path would be ambiguous (root vs top-level layer 0)."
+    },
+    {
+      "scope": { "type": "checkpoint", "ref": "1" },
+      "category": "discovery",
+      "content": "CanvasPanel onClick on the inner stageRef div fires AFTER drop completes (drop fires onDrop on the outer section, click event from drop is suppressed by the browser). Click suppression for drag/drop will need explicit handling in CP3 when canvas-drag is wired."
+    },
+    {
+      "scope": { "type": "task", "ref": "3.1.1" },
+      "category": "decision",
+      "content": "resolveDragTarget guards against NaN parts (parts.some(Number.isNaN) → null) before walking ancestors. Defensive against malformed hitPath strings that would otherwise loop calling resolveObject with NaN indices."
+    },
+    {
+      "scope": { "type": "task", "ref": "3.2.1" },
+      "category": "decision",
+      "content": "onMove and onUp are defined inside onMouseDown so they close over the live state. They detach themselves on mouseup ({ once: true } on mouseup, manual removeEventListener for mousemove inside onUp). The unmount cleanup useEffect removes them via stored references on dragStateRef as a defensive backstop if the component unmounts mid-drag."
+    },
+    {
+      "scope": { "type": "checkpoint", "ref": "3" },
+      "category": "discovery",
+      "content": "Build passes (npm run build): no type errors. Full manual verification on http://localhost:3000/editor?scene=title still pending — the dev server was not exercised in this autonomous build run."
+    }
+  ]
+}
