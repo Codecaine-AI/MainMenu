@@ -64,23 +64,23 @@
     "status": "finalized",
     "checkpoints_total": 4,
     "checkpoints_detailed": 4,
-    "current_checkpoint": 2,
+    "current_checkpoint": 3,
     "current_task_group": null,
     "current_task": null,
-    "checkpoints_completed": [1],
-    "last_updated": "2026-05-02T16:45:00+00:00",
-    "summary": "CP1 (arc-letterbox sectioned property schema) complete."
+    "checkpoints_completed": [1, 2],
+    "last_updated": "2026-05-02T17:05:00+00:00",
+    "summary": "CP1 (arc-letterbox) + CP2 (orbit-press-start) sectioned property schemas complete."
   },
   "build": {
     "status": "in_progress",
     "started_at": "2026-05-02T16:40:00+00:00",
     "completed_at": null,
-    "last_updated": "2026-05-02T16:45:00+00:00",
+    "last_updated": "2026-05-02T17:05:00+00:00",
     "data": {
-      "current_checkpoint": 2,
+      "current_checkpoint": 3,
       "current_task_group": null,
       "current_task": null,
-      "checkpoints_completed": [1]
+      "checkpoints_completed": [1, 2]
     }
   },
   "docs": {
@@ -96,6 +96,19 @@
     "branch": "relayer-sidebar",
     "worktree": null,
     "base_branch": null,
-    "commits": []
+    "commits": [
+      {
+        "checkpoint_id": 1,
+        "sha": "37a1c12",
+        "message": "checkpoint-1: arc-letterbox sectioned property schema",
+        "created_at": "2026-05-02T16:45:00+00:00"
+      },
+      {
+        "checkpoint_id": 2,
+        "sha": "44cbb82",
+        "message": "checkpoint-2: orbit-press-start sectioned property schema",
+        "created_at": "2026-05-02T17:05:00+00:00"
+      }
+    ]
   }
 }

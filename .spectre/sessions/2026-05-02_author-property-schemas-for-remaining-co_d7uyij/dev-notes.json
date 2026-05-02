@@ -1,0 +1,11 @@
+{
+  "$schema": "Session dev notes — append-only deviations/discoveries/decisions/blockers/resolutions",
+  "session_id": "2026-05-02_author-property-schemas-for-remaining-co_d7uyij",
+  "notes": [
+    {
+      "scope": { "type": "checkpoint", "ref": "2" },
+      "category": "discovery",
+      "content": "Plan summary on action 50 said '36 keys (30 active + 6 legacy)' but the explicit comma-separated list in the same action contains 37 keys (31 active + 6 legacy). Cross-checked against the renderer (tiltDegrees + drawCenter + drawFrame + drawLetter + render): 37 distinct property keys are read. The schema authored matches the explicit list and the renderer reads exactly — the headline count was off by one. No action needed; flagging so CP3/CP4 verification doesn't re-bump on the same arithmetic."
+    }
+  ]
+}
