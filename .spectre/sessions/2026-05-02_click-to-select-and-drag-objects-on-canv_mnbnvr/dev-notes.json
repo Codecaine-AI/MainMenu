@@ -31,6 +31,21 @@
       "scope": { "type": "checkpoint", "ref": "3" },
       "category": "discovery",
       "content": "Build passes (npm run build): no type errors. Full manual verification on http://localhost:3000/editor?scene=title still pending — the dev server was not exercised in this autonomous build run."
+    },
+    {
+      "scope": { "type": "task", "ref": "4.3.2" },
+      "category": "deviation",
+      "content": "Plan listed `Anchor` in the import set for useCanvasResize, but the implementation only string-checks the anchor (`includes('left')`/`'right'`/`'top'`/`'bottom'`) so the Anchor type was not imported — would trigger TS unused-import. Same for `pickScenePathAt`/etc; only what's actually consumed got imported."
+    },
+    {
+      "scope": { "type": "task", "ref": "4.3.3" },
+      "category": "deviation",
+      "content": "Passed `scene as SceneJson | null` to useSelectionBox: store types `scene` as `SceneJson | null`, but the SceneObject deepMerge path elsewhere widens it slightly. Cast preserves call-site type clarity without needing to widen the hook signature."
+    },
+    {
+      "scope": { "type": "checkpoint", "ref": "4" },
+      "category": "discovery",
+      "content": "Build passes (npm run build): no type errors. Manual verification of resize-from-corner / shift-aspect-lock / `auto`-width resolution / overlay-doesn't-block-video-playback still pending — dev server not exercised in this autonomous run."
     }
   ]
 }

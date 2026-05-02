@@ -63,9 +63,3 @@
 .editor-stage-frame > * {
   pointer-events: auto;
 }
-
-.is-canvas-selected {
-  outline: 2px solid #ffd84d !important;
-  outline-offset: 2px;
-  box-shadow: 0 0 0 4px rgba(255, 216, 77, 0.18);
-}

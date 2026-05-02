@@ -1229,7 +1229,7 @@
       "prerequisites": [
         3
       ],
-      "status": "pending",
+      "status": "completed",
       "testing_strategy": "Manual: select any layer → 8 handles appear (corners + edges), outline aligns with the layer's rendered bounding box. Drag right edge → layer widens to the right, left edge stays put, `transform.width` is a percent number. Drag bottom-right corner → width and height grow freely. Hold shift while dragging the corner → aspect ratio stays locked. Resize a layer with `width:\"auto\"` → width converts to a percent on first drag. Underneath the overlay, the rendered video keeps playing during drag (overlay is `pointer-events:none` except handles). Resize updates are written back as numeric percent.",
       "task_groups": [
         {

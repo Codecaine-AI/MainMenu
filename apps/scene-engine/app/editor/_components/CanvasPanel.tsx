@@ -1,11 +1,13 @@
 'use client'
 
-import { useEffect, useLayoutEffect, useRef, useCallback, useState, type CSSProperties } from 'react'
+import { useEffect, useRef, useCallback, useState, type CSSProperties } from 'react'
 import { useEditorStore } from '@/store/editor-store'
-import { resolveObjectEl } from '@/lib/path'
 import { pickScenePathAt } from '@/lib/hit-test'
 import { createObjectFromAsset } from '@/lib/create-scene-object'
 import useCanvasDrag from './canvas/useCanvasDrag'
+import useCanvasResize from './canvas/useCanvasResize'
+import useSelectionBox from './canvas/useSelectionBox'
+import SelectionOverlay from './canvas/SelectionOverlay'
 import type { SceneJson, Registry } from '@/types/scene'
 
 const STAGE_W = 1440
@@ -37,9 +39,12 @@ export function CanvasPanel() {
   const setDrillCursor = useEditorStore((s) => s.setDrillCursor)
   const stageRef = useRef<HTMLDivElement>(null)
   const panelRef = useRef<HTMLDivElement>(null)
+  const frameRef = useRef<HTMLDivElement>(null)
   const [frame, setFrame] = useState<FrameMetrics | null>(null)
   const [isDropTarget, setIsDropTarget] = useState(false)
   const { onMouseDown: handleStageMouseDown, suppressNextClickRef } = useCanvasDrag({ stageRef })
+  const { onHandleMouseDown, suppressNextClickRef: resizeSuppressRef } = useCanvasResize({ stageRef })
+  const selectionBox = useSelectionBox({ stageRef, frameRef, scene: scene as SceneJson | null, selectedPath })
 
   useEffect(() => {
     if (!scene || !stageRef.current) return
@@ -51,17 +56,6 @@ export function CanvasPanel() {
     })
     return () => { cancelled = true }
   }, [scene, registry])
-
-  useLayoutEffect(() => {
-    if (!stageRef.current || !scene) return
-    const stage = stageRef.current
-    stage.querySelectorAll('.is-canvas-selected').forEach((el) => {
-      el.classList.remove('is-canvas-selected')
-    })
-    if (!selectedPath) return
-    const el = resolveObjectEl(scene as SceneJson, selectedPath, stage)
-    if (el) el.classList.add('is-canvas-selected')
-  }, [scene, selectedPath])
 
   const fitStage = useCallback(() => {
     if (!panelRef.current || !stageRef.current) return
@@ -92,8 +86,9 @@ export function CanvasPanel() {
 
   const handleStageClick = useCallback(
     (e: React.MouseEvent<HTMLDivElement>) => {
-      if (suppressNextClickRef.current) {
+      if (suppressNextClickRef.current || resizeSuppressRef.current) {
         suppressNextClickRef.current = false
+        resizeSuppressRef.current = false
         return
       }
       const cmd = e.metaKey || e.ctrlKey
@@ -113,7 +108,7 @@ export function CanvasPanel() {
       setSelectedPath(stack[depth])
       setDrillCursor({ x: e.clientX, y: e.clientY })
     },
-    [setSelectedPath, setDrillCursor, drillCursor, selectedPath, suppressNextClickRef],
+    [setSelectedPath, setDrillCursor, drillCursor, selectedPath, suppressNextClickRef, resizeSuppressRef],
   )
 
   const handleDragOver = useCallback((e: React.DragEvent) => {
@@ -174,7 +169,7 @@ export function CanvasPanel() {
       onDragLeave={handleDragLeave}
       onDrop={handleDrop}
     >
-      <div className="editor-stage-frame" style={frameStyle}>
+      <div className="editor-stage-frame" ref={frameRef} style={frameStyle}>
         <div
           ref={stageRef}
           onMouseDown={handleStageMouseDown}
@@ -187,6 +182,7 @@ export function CanvasPanel() {
             background: '#000',
           }}
         />
+        <SelectionOverlay box={selectionBox} onHandleMouseDown={onHandleMouseDown} />
       </div>
     </section>
   )

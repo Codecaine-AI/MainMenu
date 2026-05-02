@@ -1,7 +1,7 @@
 import type { TransformExplicit, TransformX, TransformY } from '@/types/scene'
 
-const NAMED_X: Record<string, number> = { left: 0, center: 50, right: 100 }
-const NAMED_Y: Record<string, number> = { top: 0, center: 50, middle: 50, bottom: 100 }
+export const NAMED_X: Record<string, number> = { left: 0, center: 50, right: 100 }
+export const NAMED_Y: Record<string, number> = { top: 0, center: 50, middle: 50, bottom: 100 }
 const MOVED_THRESHOLD = 0.01
 
 function resolveAxis(value: number | string, named: Record<string, number>): number {
