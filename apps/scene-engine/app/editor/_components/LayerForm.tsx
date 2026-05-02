@@ -202,6 +202,7 @@ export function LayerForm({ layer, path }: Props) {
   const layerType = layer.type as string | undefined
   const isMedia = layerType ? MEDIA_TYPES.has(layerType) : false
   const isText = layerType === 'text'
+  const isSubLayerOverride = typeof layer.layer === 'string' && typeof layer.type !== 'string'
 
   const assetId = layer.asset as string | undefined
   const containerEntry = assetId && registry ? registry[assetId] : undefined
@@ -330,20 +331,20 @@ export function LayerForm({ layer, path }: Props) {
     <div className="text-[12px] font-mono">
       <InspectorHeader
         name={(layer.name as string | undefined) ?? (layer.id as string)}
-        type={layerType}
+        type={isSubLayerOverride ? 'sub-layer' : layerType}
         visible={layer.visible !== false}
         onToggleVisible={(visible) => commit('visible', visible)}
         onRename={(name) => commit('name', name || undefined)}
         onDelete={handleDelete}
       />
 
-      {assetId && (
+      {!isSubLayerOverride && assetId && (
         <FieldRow label="Asset">
           <ReadonlyValue value={assetId} />
         </FieldRow>
       )}
 
-      {assetType && assetId && currentFile && (
+      {!isSubLayerOverride && assetType && assetId && currentFile && (
         <FieldRow label="File">
           <AssetSwapDropdown
             assetId={assetId}
@@ -353,6 +354,7 @@ export function LayerForm({ layer, path }: Props) {
         </FieldRow>
       )}
 
+      {!isSubLayerOverride && (
       <InspectorSection title="Transform">
         <FieldRow label="Fill">
           <input
@@ -455,7 +457,9 @@ export function LayerForm({ layer, path }: Props) {
           </FieldRow>
         )}
       </InspectorSection>
+      )}
 
+      {!isSubLayerOverride && (
       <InspectorSection title="Appearance">
         <FieldRow label="Opacity">
           <RangedInput
@@ -486,6 +490,7 @@ export function LayerForm({ layer, path }: Props) {
           </FieldRow>
         )}
       </InspectorSection>
+      )}
 
       {layerSchema && (() => {
         const schemaValues: Record<string, unknown> = isMedia

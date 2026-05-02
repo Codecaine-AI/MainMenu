@@ -1,0 +1,20 @@
+{
+  "$schema": "DevNotes captured during build phase",
+  "notes": [
+    {
+      "scope": { "type": "task", "ref": "4.1.1" },
+      "category": "decision",
+      "content": "Wrapped Transform / Appearance InspectorSection blocks and Asset / File rows in `{!isSubLayerOverride && (...)}` guards rather than introducing an early-return for the override case. Diff is minimal and the schema/General render path keeps firing unchanged for sub-layer overrides."
+    },
+    {
+      "scope": { "type": "task", "ref": "4.1.2" },
+      "category": "discovery",
+      "content": "MEDIA_TYPES in LayerForm is `new Set(['video', 'image'])` and BUILTIN_PROPERTY_SCHEMAS is keyed on `video` / `image` — there is no `'media'` SceneObjectType. The CLAUDE.md note records the actual layer types (`video` | `image`) for foreign media children rather than the umbrella `'media'` shorthand the plan/spec used."
+    },
+    {
+      "scope": { "type": "task", "ref": "4.3.1" },
+      "category": "deviation",
+      "content": "The plan's procedural-cylinder schema spec missed three runtime keys that the title scene's procedural-cylinder layer actually carries: `radius-x` and `radius-z` (legacy fallbacks for `radius`, read at procedural-cylinder.js:451) and `sequence-fade-duration` (read at line 405). Added all three to the schema (radius-x/z under Geometry, sequence-fade-duration under Sequence) so the title scene opens with zero orphan warnings on procedural-cylinder. Also added two scene-only legacy keys ignored by the runtime — `intersection-glow` and `pulse-offset` — under the Dot Field section, marked '(legacy)' in their labels and descriptions, for the same reason."
+    }
+  ]
+}

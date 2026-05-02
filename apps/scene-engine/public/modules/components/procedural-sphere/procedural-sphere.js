@@ -359,3 +359,249 @@ export default function ({ properties = {}, layerId } = {}) {
 
   return wrap;
 }
+
+// Inspector schema — editor-only; the runtime ignores this export.
+export const properties = {
+  sections: [
+    {
+      id: 'mode',
+      label: 'Mode',
+      description:
+        'Whether the sphere is rendered as a solid filled globe (standard) or a wireframe interior view (interior). Each mode uses a different subset of the properties below.',
+      properties: {
+        mode: {
+          type: 'select',
+          label: 'Render Mode',
+          description: 'Solid (standard) or wireframe interior (interior).',
+          options: ['standard', 'interior'],
+        },
+      },
+    },
+    {
+      id: 'rotation',
+      label: 'Rotation',
+      description:
+        'Auto-rotation around each axis. Speed is the spin rate; rotate-x/y/z are static tilt offsets in degrees applied before the spin.',
+      properties: {
+        'rotation-speed': {
+          type: 'number',
+          label: 'Rotation Speed',
+          description: 'Radians per second the sphere auto-rotates around its primary axis.',
+          min: -2,
+          max: 2,
+          step: 0.01,
+        },
+        'rotate-x': {
+          type: 'number',
+          label: 'Tilt X (deg)',
+          description: 'Static rotation around the X axis, in degrees, applied before auto-rotation.',
+          min: -180,
+          max: 180,
+          step: 1,
+        },
+        'rotate-y': {
+          type: 'number',
+          label: 'Tilt Y (deg)',
+          description: 'Static rotation around the Y axis, in degrees.',
+          min: -180,
+          max: 180,
+          step: 1,
+        },
+        'rotate-z': {
+          type: 'number',
+          label: 'Tilt Z (deg)',
+          description: 'Static rotation around the Z axis, in degrees.',
+          min: -180,
+          max: 180,
+          step: 1,
+        },
+        tilt: {
+          type: 'number',
+          label: 'Legacy Tilt (deg)',
+          description:
+            'Legacy single-axis tilt — fallback for rotate-x when rotate-x is unset. New scenes should use rotate-x directly.',
+          min: -180,
+          max: 180,
+          step: 1,
+        },
+      },
+    },
+    {
+      id: 'geometry',
+      label: 'Geometry',
+      description:
+        'Number of meridian/parallel lines drawn, line width, and (interior mode) the polar cap radius and gap.',
+      properties: {
+        longitudes: {
+          type: 'number',
+          label: 'Longitudes',
+          description: 'Number of vertical meridian lines.',
+          min: 4,
+          max: 96,
+          step: 1,
+        },
+        latitudes: {
+          type: 'number',
+          label: 'Latitudes',
+          description: 'Number of horizontal parallel lines.',
+          min: 3,
+          max: 64,
+          step: 1,
+        },
+        'line-width': {
+          type: 'number',
+          label: 'Line Width',
+          description: 'Stroke width of the grid lines, in CSS pixels.',
+          min: 0.25,
+          max: 6,
+          step: 0.05,
+        },
+        'radius-scale': {
+          type: 'number',
+          label: 'Radius Scale (standard)',
+          description:
+            "Standard mode only. Sphere radius as a fraction of the layer's shorter side. Ignored in interior mode.",
+          min: 0.05,
+          max: 1,
+          step: 0.01,
+        },
+        'pole-radius': {
+          type: 'number',
+          label: 'Pole Cap Radius (interior)',
+          description: 'Interior mode only. Angular radius of the polar caps, in radians.',
+          min: 0,
+          max: 1.5,
+          step: 0.01,
+        },
+        'pole-gap': {
+          type: 'number',
+          label: 'Pole Gap (interior)',
+          description:
+            'Interior mode only. Angular gap between the polar cap and the meridian grid, in radians.',
+          min: 0,
+          max: 0.5,
+          step: 0.01,
+        },
+      },
+    },
+    {
+      id: 'position',
+      label: 'Position (3D)',
+      description:
+        "Interior mode only. Translates and stretches the sphere within the layer's viewport — sphere-width/height stretch along the camera's X/Y, sphere-x/y/z translate.",
+      properties: {
+        'sphere-width': {
+          type: 'number',
+          label: 'Sphere Width',
+          description: 'Horizontal radius scale (interior).',
+          min: 0.1,
+          max: 5,
+          step: 0.01,
+        },
+        'sphere-height': {
+          type: 'number',
+          label: 'Sphere Height',
+          description: 'Vertical radius scale (interior).',
+          min: 0.1,
+          max: 5,
+          step: 0.01,
+        },
+        'sphere-x': {
+          type: 'number',
+          label: 'Sphere X',
+          description: 'Horizontal offset within the layer, fraction of layer width.',
+          min: -2,
+          max: 2,
+          step: 0.01,
+        },
+        'sphere-y': {
+          type: 'number',
+          label: 'Sphere Y',
+          description: 'Vertical offset within the layer, fraction of layer height.',
+          min: -2,
+          max: 2,
+          step: 0.01,
+        },
+        'sphere-z': {
+          type: 'number',
+          label: 'Sphere Z',
+          description: 'Depth offset (interior). Negative pushes the sphere away from the camera.',
+          min: -3,
+          max: 3,
+          step: 0.01,
+        },
+        depth: {
+          type: 'number',
+          label: 'Depth (legacy)',
+          description:
+            'Legacy depth knob — read by some scenes alongside sphere-z. New scenes should set sphere-z directly.',
+          min: -3,
+          max: 3,
+          step: 0.01,
+        },
+      },
+    },
+    {
+      id: 'camera',
+      label: 'Camera (interior)',
+      description:
+        'Interior mode only. Near-clip distance and field-of-view multiplier control how aggressively the camera zooms into the wireframe.',
+      properties: {
+        'camera-near': {
+          type: 'number',
+          label: 'Near Clip',
+          description: 'Closest depth before geometry is culled (interior).',
+          min: 0.01,
+          max: 1,
+          step: 0.01,
+        },
+        'camera-fov': {
+          type: 'number',
+          label: 'Field of View',
+          description: 'Camera focal multiplier (interior). Larger values widen the apparent FOV.',
+          min: 0.05,
+          max: 1.5,
+          step: 0.01,
+        },
+      },
+    },
+    {
+      id: 'colors',
+      label: 'Colors',
+      description:
+        'CSS color strings (rgba(), hex, named). Plain strings in v1; a dedicated color-picker type may arrive later.',
+      properties: {
+        fill: {
+          type: 'string',
+          label: 'Fill (standard)',
+          description: 'Sphere body fill color. CSS color string.',
+        },
+        highlight: {
+          type: 'string',
+          label: 'Highlight (standard)',
+          description: 'Specular highlight color. CSS color string.',
+        },
+        grid: {
+          type: 'string',
+          label: 'Grid',
+          description: 'Meridian/parallel line color. CSS color string. Used by both modes.',
+        },
+        rim: {
+          type: 'string',
+          label: 'Rim (standard)',
+          description: 'Outline color around the sphere silhouette. CSS color string.',
+        },
+        scan: {
+          type: 'string',
+          label: 'Scan (standard)',
+          description: 'Color of the two horizontal scan lines drawn over the sphere. CSS color string.',
+        },
+        vignette: {
+          type: 'string',
+          label: 'Vignette (interior)',
+          description: 'Outer gradient color for the interior view. CSS color string.',
+        },
+      },
+    },
+  ],
+};
