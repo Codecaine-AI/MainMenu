@@ -3,6 +3,7 @@
 import { useEffect, useLayoutEffect, useRef, useCallback, useState, type CSSProperties } from 'react'
 import { useEditorStore } from '@/store/editor-store'
 import { resolveObjectEl } from '@/lib/path'
+import { pickScenePathAt } from '@/lib/hit-test'
 import { createObjectFromAsset } from '@/lib/create-scene-object'
 import type { SceneJson, Registry } from '@/types/scene'
 
@@ -19,6 +20,7 @@ export function CanvasPanel() {
   const selectedPath = useEditorStore((s) => s.selectedPath)
   const registry = useEditorStore((s) => s.registry)
   const addObjectAt = useEditorStore((s) => s.addObjectAt)
+  const setSelectedPath = useEditorStore((s) => s.setSelectedPath)
   const stageRef = useRef<HTMLDivElement>(null)
   const panelRef = useRef<HTMLDivElement>(null)
   const [frame, setFrame] = useState<FrameMetrics | null>(null)
@@ -72,6 +74,14 @@ export function CanvasPanel() {
       window.removeEventListener('resize', fitStage)
     }
   }, [fitStage])
+
+  const handleStageClick = useCallback(
+    (e: React.MouseEvent<HTMLDivElement>) => {
+      const path = pickScenePathAt(e, { topLevelOnly: true })
+      if (path) setSelectedPath(path)
+    },
+    [setSelectedPath],
+  )
 
   const handleDragOver = useCallback((e: React.DragEvent) => {
     if (!e.dataTransfer.types.includes('application/x-asset-id')) return
@@ -134,6 +144,7 @@ export function CanvasPanel() {
       <div className="editor-stage-frame" style={frameStyle}>
         <div
           ref={stageRef}
+          onClick={handleStageClick}
           style={{
             width: STAGE_W,
             height: STAGE_H,
