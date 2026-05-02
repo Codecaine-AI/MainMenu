@@ -1,8 +1,9 @@
-// Built-in (non-component) layer property schemas. CP1 ships only the shared
-// `media` schema (used for video + image). CP2 will append glyph-group, effect,
-// and audio entries to BUILTIN_PROPERTY_SCHEMAS.
+// Built-in (non-component) layer property schemas. Effect and component layers
+// are intentionally absent — those flow through the per-module manifest path in
+// LayerForm.
 
-import type { PropertySchema } from '@/types/property-schema'
+import { NUMERIC_PROPERTY_STEPS } from '@/lib/inspector-config'
+import type { PropertyDef, PropertySchema, Section } from '@/types/property-schema'
 import type { SceneObjectType } from '@/types/scene'
 
 const mediaSchema: PropertySchema = {
@@ -78,9 +79,38 @@ const mediaSchema: PropertySchema = {
   ],
 }
 
+const glyphGroupSchema: PropertySchema = {
+  sections: [
+    {
+      id: 'glyph-group',
+      label: 'Glyph Group',
+      properties: {
+        shimmer: {
+          type: 'boolean',
+          label: 'Shimmer',
+          description:
+            'Apply the animated shimmer/pearlescent gradient overlay to the glyph fills.',
+        },
+      },
+    },
+  ],
+}
+
+const audioSchema: PropertySchema = {
+  sections: [
+    {
+      id: 'audio',
+      label: 'Audio',
+      properties: {},
+    },
+  ],
+}
+
 export const BUILTIN_PROPERTY_SCHEMAS: Partial<Record<SceneObjectType, PropertySchema>> = {
   video: mediaSchema,
   image: mediaSchema,
+  'glyph-group': glyphGroupSchema,
+  audio: audioSchema,
 }
 
 export function getBuiltinPropertySchema(
@@ -88,4 +118,40 @@ export function getBuiltinPropertySchema(
 ): PropertySchema | undefined {
   if (!type) return undefined
   return BUILTIN_PROPERTY_SCHEMAS[type]
+}
+
+export function extractSchemaPropertyKeys(schema: PropertySchema): Set<string> {
+  const keys = new Set<string>()
+  function walk(section: Section) {
+    for (const key of Object.keys(section.properties ?? {})) keys.add(key)
+    for (const child of section.sections ?? []) walk(child)
+  }
+  for (const section of schema.sections) walk(section)
+  return keys
+}
+
+export function inferPropertyDef(key: string, value: unknown): PropertyDef {
+  if (typeof value === 'number') {
+    const steps = NUMERIC_PROPERTY_STEPS[key]
+    if (steps) {
+      return { type: 'number', label: key, min: steps.min, max: steps.max, step: steps.step }
+    }
+    return { type: 'number', label: key }
+  }
+  if (typeof value === 'boolean') {
+    return { type: 'boolean', label: key }
+  }
+  return { type: 'string', label: key }
+}
+
+export function buildGeneralSection(orphans: Array<[string, unknown]>): Section {
+  return {
+    id: 'general',
+    label: 'General',
+    description:
+      "Saved properties not declared in this layer's schema. Update the schema to give them a proper label and description.",
+    properties: Object.fromEntries(
+      orphans.map(([key, value]) => [key, inferPropertyDef(key, value)]),
+    ),
+  }
 }

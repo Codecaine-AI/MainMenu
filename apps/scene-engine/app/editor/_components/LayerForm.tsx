@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useEditorStore } from '@/store/editor-store'
 import { patchFromDottedKey } from '@/lib/patch'
 import { NUMERIC_PROPERTY_STEPS, POSITION_X_OPTIONS, POSITION_Y_OPTIONS } from '@/lib/inspector-config'
@@ -16,7 +16,11 @@ import { SlotsSection } from './SlotsSection'
 import { TextSection } from './TextSection'
 import { InspectorHeader, InspectorSection, FieldRow, ReadonlyValue } from './inputs/InspectorSection'
 import { PropertySection } from './PropertySection'
-import { getBuiltinPropertySchema } from '@/lib/builtin-property-schemas'
+import {
+  buildGeneralSection,
+  extractSchemaPropertyKeys,
+  getBuiltinPropertySchema,
+} from '@/lib/builtin-property-schemas'
 import type { Registry, Transform, Appearance, EventBinding, Slot, AssetContainer, ModuleEntry, SceneObjectType } from '@/types/scene'
 
 interface Props {
@@ -35,15 +39,6 @@ const TEXT_PROPERTY_KEYS = new Set([
   'letterSpacing',
   'textAlign',
   'customCss',
-])
-const MEDIA_PROPERTY_KEYS = new Set([
-  'repeat_x',
-  'repeat_y',
-  'position_x',
-  'position_y',
-  'scale',
-  'rotation',
-  'speed',
 ])
 const MEDIA_PROPERTY_DEFAULTS = {
   repeat_x: 1,
@@ -217,6 +212,34 @@ export function LayerForm({ layer, path }: Props) {
     (containerEntry && 'manifest' in containerEntry ? containerEntry.manifest : undefined) ?? null
   const stageWidth = scene?.stage?.width ?? 1440
   const stageHeight = scene?.stage?.height ?? 1080
+
+  const builtinSchema = useMemo(
+    () => getBuiltinPropertySchema(layerType as SceneObjectType | undefined),
+    [layerType],
+  )
+  const declaredKeys = useMemo(
+    () => (builtinSchema ? extractSchemaPropertyKeys(builtinSchema) : new Set<string>()),
+    [builtinSchema],
+  )
+  const orphans = useMemo(
+    () =>
+      Object.entries(props).filter(
+        ([k]) => !declaredKeys.has(k) && !(isText && TEXT_PROPERTY_KEYS.has(k)),
+      ),
+    [props, declaredKeys, isText],
+  )
+  const orphanKeySignature = orphans.map(([k]) => k).join(',')
+
+  useEffect(() => {
+    if (!orphans.length) return
+    if (manifest) return
+    for (const [key] of orphans) {
+      console.warn(
+        `[builtin-property-schemas] orphan property '${key}' on layer type '${layerType}' — not declared in schema`,
+      )
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [layerType, orphanKeySignature, manifest])
 
   useEffect(() => {
     let cancelled = false
@@ -452,32 +475,34 @@ export function LayerForm({ layer, path }: Props) {
         )}
       </InspectorSection>
 
-      {isMedia && (() => {
-        const mediaSchema = getBuiltinPropertySchema(layerType as SceneObjectType | undefined)
-        const mediaSection = mediaSchema?.sections[0]
-        if (!mediaSection) return null
-        const mediaValues = {
-          repeat_x: (props.repeat_x as number | undefined) ?? MEDIA_PROPERTY_DEFAULTS.repeat_x,
-          repeat_y: (props.repeat_y as number | undefined) ?? MEDIA_PROPERTY_DEFAULTS.repeat_y,
-          position_x: (props.position_x as number | undefined) ?? MEDIA_PROPERTY_DEFAULTS.position_x,
-          position_y: (props.position_y as number | undefined) ?? MEDIA_PROPERTY_DEFAULTS.position_y,
-          scale: (props.scale as number | undefined) ?? MEDIA_PROPERTY_DEFAULTS.scale,
-          rotation: (props.rotation as number | undefined) ?? MEDIA_PROPERTY_DEFAULTS.rotation,
-          speed: (props.speed as number | undefined) ?? MEDIA_PROPERTY_DEFAULTS.speed,
-        }
-        return (
+      {builtinSchema && !manifest && (() => {
+        const schemaValues: Record<string, unknown> = isMedia
+          ? { ...MEDIA_PROPERTY_DEFAULTS, ...props }
+          : props
+        return builtinSchema.sections.map((section) => (
           <PropertySection
-            section={mediaSection}
-            values={mediaValues}
+            key={section.id}
+            section={section}
+            values={schemaValues}
             onChange={(key, value) =>
               commit(
                 `properties.${key}`,
-                key === 'repeat_x' || key === 'repeat_y' ? Math.round(value as number) : value,
+                key === 'repeat_x' || key === 'repeat_y'
+                  ? Math.round(value as number)
+                  : value,
               )
             }
           />
-        )
+        ))
       })()}
+
+      {!manifest && orphans.length > 0 && (
+        <PropertySection
+          section={buildGeneralSection(orphans)}
+          values={Object.fromEntries(orphans)}
+          onChange={(key, value) => commit(`properties.${key}`, value)}
+        />
+      )}
 
       {isText && (
         <TextSection
@@ -487,7 +512,7 @@ export function LayerForm({ layer, path }: Props) {
         />
       )}
 
-      {manifest && Object.keys(manifest.properties).length > 0 ? (
+      {manifest && Object.keys(manifest.properties).length > 0 && (
         <InspectorSection title="Properties">
           {Object.entries(manifest.properties).map(([name, schema]) => (
             <FieldRow key={name} label={name}>
@@ -500,58 +525,6 @@ export function LayerForm({ layer, path }: Props) {
             </FieldRow>
           ))}
         </InspectorSection>
-      ) : (
-        !manifest &&
-        Object.entries(props).some(([k]) => !(isMedia && MEDIA_PROPERTY_KEYS.has(k)) && !(isText && TEXT_PROPERTY_KEYS.has(k))) && (
-          <InspectorSection title="Properties">
-            {Object.entries(props)
-              .filter(([k]) => !(isMedia && MEDIA_PROPERTY_KEYS.has(k)) && !(isText && TEXT_PROPERTY_KEYS.has(k)))
-              .map(([k, v]) => {
-              const dotted = `properties.${k}`
-              if (NUMERIC_PROPERTY_STEPS[k] && typeof v === 'number') {
-                return (
-                  <FieldRow key={k} label={k}>
-                    <RangedInput value={v} {...NUMERIC_PROPERTY_STEPS[k]} onChange={(val) => commit(dotted, val)} />
-                  </FieldRow>
-                )
-              }
-              if (typeof v === 'number') {
-                return (
-                  <FieldRow key={k} label={k}>
-                    <input
-                      type="number"
-                      step="any"
-                      defaultValue={v}
-                      onChange={(e) => {
-                        const n = Number(e.target.value)
-                        if (Number.isFinite(n)) commit(dotted, n)
-                      }}
-                      className="w-full bg-[#222] border border-[#333] text-gray-300 text-[11px] font-mono px-1 py-[3px] rounded-sm focus:border-[#4a8fc2] focus:outline-none"
-                    />
-                  </FieldRow>
-                )
-              }
-              if (typeof v === 'boolean') {
-                return (
-                  <FieldRow key={k} label={k}>
-                    <input type="checkbox" defaultChecked={v} onChange={(e) => commit(dotted, e.target.checked)} className="accent-[#4a8fc2]" />
-                  </FieldRow>
-                )
-              }
-              return (
-                <FieldRow key={k} label={k}>
-                  <input
-                    type="text"
-                    defaultValue={String(v)}
-                    onBlur={(e) => commit(dotted, e.target.value)}
-                    onKeyDown={(e) => { if (e.key === 'Enter') (e.target as HTMLInputElement).blur() }}
-                    className="w-full bg-[#222] border border-[#333] text-gray-300 text-[11px] font-mono px-1 py-[3px] rounded-sm focus:border-[#4a8fc2] focus:outline-none"
-                  />
-                </FieldRow>
-              )
-            })}
-          </InspectorSection>
-        )
       )}
 
       {layerType === 'glyph-group' && Array.isArray(layer.slots) && (layer.slots as Slot[]).length > 0 && (
