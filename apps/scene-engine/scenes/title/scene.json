@@ -288,6 +288,34 @@
       "visible": true
     },
     {
+      "id": "text-2",
+      "name": "Text",
+      "type": "text",
+      "transform": {
+        "x": "center",
+        "y": 89,
+        "width": "auto",
+        "height": "auto",
+        "anchor": "center"
+      },
+      "appearance": {
+        "opacity": 0.79,
+        "blend": "normal"
+      },
+      "properties": {
+        "text": "A Lascari AI Product",
+        "fontFamily": "Impact",
+        "fontSize": 51,
+        "fontWeight": 400,
+        "color": "#ffffff",
+        "lineHeight": 1,
+        "letterSpacing": 0,
+        "textAlign": "center",
+        "customCss": ""
+      },
+      "visible": false
+    },
+    {
       "id": "crt",
       "type": "effect",
       "asset": "crt-overlay",
@@ -311,6 +339,6 @@
   "appearance": {
     "opacity": 1,
     "hue": 0,
-    "saturation": 1.4
+    "saturation": 1.38
   }
 }
