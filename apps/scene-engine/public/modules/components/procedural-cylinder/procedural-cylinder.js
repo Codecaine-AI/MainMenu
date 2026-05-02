@@ -1,4 +1,4 @@
-const MAX_ROTATION_SPEED = 0.25;
+const MAX_ROTATION_SPEED = 0.5;
 const MAX_SCAN_SPEED = 0.2;
 const MAX_DOT_SPEED = 1.2;
 

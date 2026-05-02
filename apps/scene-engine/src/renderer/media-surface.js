@@ -1,6 +1,6 @@
 function clampRepeat(value) {
   const n = Math.round(Number(value ?? 1));
-  return Number.isFinite(n) ? Math.max(1, Math.min(8, n)) : 1;
+  return Number.isFinite(n) ? Math.max(1, Math.min(40, n)) : 1;
 }
 
 function num(value, fallback) {

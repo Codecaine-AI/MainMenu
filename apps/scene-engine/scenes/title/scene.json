@@ -15,39 +15,47 @@
         "mode": "fill"
       },
       "appearance": {
-        "opacity": 0.38,
+        "opacity": 0.5,
         "blend": "screen"
       },
       "properties": {
         "animate": true,
-        "color-start": "#2030ff",
-        "color-mid": "#3f2dff",
-        "color-end": "#ff2f75",
-        "color-cycle": -3.1,
-        "color-offset": 1.71,
-        "color-speed": 0.238,
-        "color-bias": 0.9,
-        "texture-angle": -18,
-        "texture-speed": 0,
-        "texture-scale": 1.25,
-        "texture-resolution": 0.4,
-        "strip-count": 33,
-        "strip-width": 0.86,
-        "curve-steps": 8,
-        "opacity": 0.72,
-        "minimum-open": 0.085,
+        "palette-mode": "melee-spectrum",
+        "color-start": "#1100ff",
+        "color-mid": "#3000db",
+        "color-end": "#c70060",
+        "color-magenta": "#57003e",
+        "color-cycle": 15.05,
+        "color-offset": 0.08,
+        "color-speed": 0.251,
+        "color-bias": 1,
+        "wheel-hue-shift": 214,
+        "wheel-saturation": 0.66,
+        "wheel-lightness": 0.53,
+        "wheel-mint-lift": 0.15,
+        "wheel-softness": 0.6,
+        "wheel-contrast": 0.9,
+        "texture-angle": -46,
+        "texture-speed": 0.391,
+        "texture-scale": 2.1,
+        "texture-resolution": 1,
+        "strip-count": 36,
+        "strip-width": 0.7,
+        "curve-steps": 6,
+        "opacity": 0.78,
+        "minimum-open": 0.07,
         "rotation-offset": 0,
-        "open-speed": 0.088,
-        "visible-width": 0.52,
-        "feather": 0.2,
-        "pulse-offset": 0.37,
+        "closed-hold-seconds": 4,
+        "transition-seconds": 8,
+        "open-hold-seconds": 4,
+        "gate-offset-seconds": 0,
         "center-x": 0.5,
         "center-y": 0.5,
         "radius": 1.56,
         "inner-radius": 0.04,
         "outer-radius": 1.8,
-        "depth-curve": 1.18,
-        "target-fps": 24,
+        "depth-curve": 1.81,
+        "target-fps": 30,
         "dpr-cap": 1
       },
       "visible": true
@@ -61,7 +69,7 @@
       },
       "appearance": {
         "opacity": 1,
-        "blend": "screen"
+        "blend": "difference"
       },
       "properties": {
         "mode": "interior",
@@ -79,7 +87,7 @@
         "rotate-x": 0,
         "rotate-y": -16,
         "rotate-z": -2,
-        "grid": "#c2c2c2",
+        "grid": "#dedede",
         "vignette": "rgba(0, 0, 0, 0.84)",
         "pole-gap": 0.035
       },
@@ -103,16 +111,16 @@
         "animation-one": false,
         "animation-two": false,
         "cylinder-color": "#e8dfa6",
-        "rotation-speed": 0.25,
-        "pulse-speed": 0.15,
+        "rotation-speed": 0.5,
+        "pulse-speed": 0.2,
         "pulse-width": 0.06,
         "pulse-trail": 0.05,
         "sequence-dot-cycles": 2,
         "sequence-fade-duration": 0.7,
-        "dot-speed": 0.22,
-        "dot-size": 3.2,
+        "dot-speed": 0.209,
+        "dot-size": 4.2,
         "segment-width": 0.032,
-        "dot-density": 4,
+        "dot-density": 6,
         "line-segment-density": 4,
         "ring-segment-density": 1,
         "dot-trail": 0.04,
@@ -126,11 +134,11 @@
         "radius-z": 0.8,
         "cylinder-height": 10,
         "camera-gap": 0.17,
-        "position-x": 0.34,
-        "position-y": -0.34,
+        "position-x": -0.16,
+        "position-y": -0.28,
         "position-z": 0.8,
-        "center-x": 0.6,
-        "center-y": 0.48,
+        "center-x": 0.69,
+        "center-y": 0.44,
         "tilt-x": 0,
         "tilt-y": 0,
         "tilt-z": 0,
@@ -138,7 +146,8 @@
         "near-clip": 1,
         "max-perspective": 20,
         "radius": 1,
-        "animation-three": true
+        "animation-three": true,
+        "sequence-scan-duration": 8
       },
       "visible": true
     },
@@ -164,19 +173,21 @@
           "appearance": {
             "blend": "normal",
             "opacity": 1,
-            "fit": "cover",
-            "hue": -180
+            "fit": "fill",
+            "hue": -121
           },
           "properties": {
             "repeat_x": 8,
             "position_x": -1,
-            "position_y": -20,
-            "repeat_y": 1
+            "position_y": -68,
+            "repeat_y": 1,
+            "scale": 2
           }
         }
       ],
       "appearance": {
-        "hue": 0
+        "hue": -87,
+        "blend": "normal"
       },
       "name": "Codecaine Logo Chrome"
     },
@@ -288,34 +299,6 @@
       "visible": true
     },
     {
-      "id": "text-2",
-      "name": "Text",
-      "type": "text",
-      "transform": {
-        "x": "center",
-        "y": 89,
-        "width": "auto",
-        "height": "auto",
-        "anchor": "center"
-      },
-      "appearance": {
-        "opacity": 0.79,
-        "blend": "normal"
-      },
-      "properties": {
-        "text": "A Lascari AI Product",
-        "fontFamily": "Impact",
-        "fontSize": 51,
-        "fontWeight": 400,
-        "color": "#ffffff",
-        "lineHeight": 1,
-        "letterSpacing": 0,
-        "textAlign": "center",
-        "customCss": ""
-      },
-      "visible": false
-    },
-    {
       "id": "crt",
       "type": "effect",
       "asset": "crt-overlay",
@@ -339,6 +322,6 @@
   "appearance": {
     "opacity": 1,
     "hue": 0,
-    "saturation": 1.38
+    "saturation": 1.6
   }
 }

@@ -39,6 +39,35 @@ function pulseWindow(phase, width, feather) {
   return 1 - smoothstep(halfWidth, halfWidth + feather, distance);
 }
 
+function oscillateWindow(phase, hold, transition) {
+  const endpointHold = clamp(hold, 0, 0.45);
+  const edge = Math.max(0.001, transition);
+  const total = endpointHold * 2 + edge * 2;
+  const t = wrapUnit(phase) * total;
+
+  if (t < endpointHold) return 0;
+  if (t < endpointHold + edge) {
+    return smoothstep(0, 1, (t - endpointHold) / edge);
+  }
+  if (t < endpointHold + edge + endpointHold) return 1;
+  return 1 - smoothstep(0, 1, (t - endpointHold - edge - endpointHold) / edge);
+}
+
+function timedGate(elapsed, closedHoldSeconds, transitionSeconds, openHoldSeconds, offsetSeconds) {
+  const closedHold = Math.max(0, closedHoldSeconds);
+  const transition = Math.max(0.001, transitionSeconds);
+  const openHold = Math.max(0, openHoldSeconds);
+  const total = closedHold + transition + openHold + transition;
+  const t = wrapUnit((elapsed + offsetSeconds) / total) * total;
+
+  if (t < closedHold) return 0;
+  if (t < closedHold + transition) {
+    return smoothstep(0, 1, (t - closedHold) / transition);
+  }
+  if (t < closedHold + transition + openHold) return 1;
+  return 1 - smoothstep(0, 1, (t - closedHold - transition - openHold) / transition);
+}
+
 function setupCanvas(canvas, ctx, width, height, dprCap) {
   const dpr = Math.min(Math.max(1, window.devicePixelRatio || 1), dprCap);
   const nextWidth = Math.max(1, Math.round(width * dpr));
@@ -79,10 +108,136 @@ function mixColor(a, b, t) {
   };
 }
 
+function wrapDegrees(value) {
+  return ((value % 360) + 360) % 360;
+}
+
+function hslToRgb(hue, saturation, lightness) {
+  const h = wrapDegrees(hue) / 360;
+  const s = clamp(saturation, 0, 1);
+  const l = clamp(lightness, 0, 1);
+
+  if (s === 0) {
+    const value = Math.round(l * 255);
+    return { r: value, g: value, b: value };
+  }
+
+  const hueToChannel = (p, q, t) => {
+    let next = t;
+    if (next < 0) next += 1;
+    if (next > 1) next -= 1;
+    if (next < 1 / 6) return p + (q - p) * 6 * next;
+    if (next < 1 / 2) return q;
+    if (next < 2 / 3) return p + (q - p) * (2 / 3 - next) * 6;
+    return p;
+  };
+
+  const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+  const p = 2 * l - q;
+  return {
+    r: Math.round(hueToChannel(p, q, h + 1 / 3) * 255),
+    g: Math.round(hueToChannel(p, q, h) * 255),
+    b: Math.round(hueToChannel(p, q, h - 1 / 3) * 255),
+  };
+}
+
+function hueDistance(a, b) {
+  const delta = Math.abs(wrapDegrees(a) - wrapDegrees(b));
+  return Math.min(delta, 360 - delta);
+}
+
+function hueWindow(hue, center, width) {
+  const halfWidth = Math.max(1, width) * 0.5;
+  const distance = hueDistance(hue, center);
+  return 1 - smoothstep(halfWidth * 0.42, halfWidth, distance);
+}
+
+function applyColorContrast(color, contrast) {
+  const amount = clamp(contrast, 0, 1.5);
+  return {
+    r: Math.round(clamp(128 + (color.r - 128) * amount, 0, 255)),
+    g: Math.round(clamp(128 + (color.g - 128) * amount, 0, 255)),
+    b: Math.round(clamp(128 + (color.b - 128) * amount, 0, 255)),
+  };
+}
+
 function colorAt(position, colorA, colorB, colorC, bias) {
   const t = Math.pow(wrapUnit(position), Math.max(0.1, bias));
   if (t < 0.5) return mixColor(colorA, colorB, t * 2);
   return mixColor(colorB, colorC, (t - 0.5) * 2);
+}
+
+function colorAtHueWheel(position, options) {
+  const {
+    wheelHueShift,
+    wheelSaturation,
+    wheelLightness,
+    wheelMintLift,
+    wheelSoftness,
+    wheelContrast,
+  } = options;
+  const hue = wrapDegrees(wheelHueShift + wrapUnit(position) * 360);
+  const softness = clamp(wheelSoftness, 0, 1);
+  const mintBand = Math.max(
+    hueWindow(hue, 84, 74 + softness * 86),
+    hueWindow(hue, 148, 58 + softness * 70) * 0.72,
+  );
+  const blueBand = Math.max(
+    hueWindow(hue, 226, 78 + softness * 42),
+    hueWindow(hue, 264, 58 + softness * 38) * 0.78,
+  );
+  const magentaBand = hueWindow(hue, 322, 72 + softness * 34);
+  const warmBand = hueWindow(hue, 24, 58 + softness * 38);
+  const saturation = clamp(
+    wheelSaturation * (1 - mintBand * 0.38 - warmBand * 0.08) + magentaBand * 0.04,
+    0,
+    1,
+  );
+  const lightness = clamp(
+    wheelLightness + mintBand * wheelMintLift + warmBand * 0.035 + magentaBand * 0.02 - blueBand * 0.045,
+    0.08,
+    0.86,
+  );
+  return applyColorContrast(hslToRgb(hue, saturation, lightness), wheelContrast);
+}
+
+function colorAtMeleeSpectrum(position, options) {
+  const t = Math.pow(wrapUnit(position), Math.max(0.1, options.colorBias));
+  const blue = options.colorA;
+  const violet = options.colorB;
+  const red = options.colorC;
+  const magenta = options.colorD || mixColor(violet, red, 0.48);
+  const stops = [
+    { at: 0, color: blue },
+    { at: 0.2, color: violet },
+    { at: 0.38, color: magenta },
+    { at: 0.55, color: red },
+    { at: 0.72, color: magenta },
+    { at: 0.86, color: violet },
+    { at: 1, color: blue },
+  ];
+
+  for (let i = 1; i < stops.length; i += 1) {
+      const prev = stops[i - 1];
+      const next = stops[i];
+      if (t <= next.at) {
+        const local = smoothstep(0, 1, (t - prev.at) / Math.max(0.0001, next.at - prev.at));
+        const color = mixColor(prev.color, next.color, local);
+      return applyColorContrast(color, options.wheelContrast);
+    }
+  }
+
+  return stops[0].color;
+}
+
+function paletteColorAt(position, options) {
+  if (options.paletteMode === 'melee-spectrum') {
+    return colorAtMeleeSpectrum(position, options);
+  }
+  if (options.paletteMode === 'hue-wheel') {
+    return colorAtHueWheel(position, options);
+  }
+  return colorAt(position, options.colorA, options.colorB, options.colorC, options.colorBias);
 }
 
 function rgba(color, alpha) {
@@ -107,13 +262,17 @@ function paintTexture(texture, textureCtx, width, height, options) {
     colorCycle,
     colorOffset,
     colorPhase,
+    paletteMode,
     textureAngle,
     textureScale,
   } = options;
   const tw = texture.width;
   const th = texture.height;
   const diagonal = Math.hypot(tw, th) * 1.35;
-  const bandCount = Math.max(3, Math.ceil(8 * textureScale));
+  const colorCycleDensity = Math.max(1, Math.abs(colorCycle));
+  const bandCount = paletteMode === 'hue-wheel' || paletteMode === 'melee-spectrum'
+    ? Math.min(240, Math.max(48, Math.ceil(48 * textureScale * colorCycleDensity)))
+    : Math.max(3, Math.ceil(8 * textureScale));
 
   textureCtx.clearRect(0, 0, tw, th);
   textureCtx.save();
@@ -123,7 +282,7 @@ function paintTexture(texture, textureCtx, width, height, options) {
   const gradient = textureCtx.createLinearGradient(-diagonal / 2, 0, diagonal / 2, 0);
   for (let i = 0; i <= bandCount; i += 1) {
     const stop = i / bandCount;
-    const color = colorAt(stop * colorCycle + colorOffset + colorPhase, colorA, colorB, colorC, colorBias);
+    const color = paletteColorAt(stop * colorCycle + colorOffset + colorPhase, options);
     gradient.addColorStop(stop, rgba(color, 1));
   }
 
@@ -187,14 +346,21 @@ function drawCylinderStrips(ctx, texture, textureCtx, width, height, properties,
   const opacity = clamp(numberProp(properties, 'opacity', 0.26), 0, 1);
   const minimumOpen = clamp(numberProp(properties, 'minimum-open', 0), 0, 1);
   const rotationOffset = numberProp(properties, 'rotation-offset', 0) * Math.PI / 180;
-  const openSpeed = clamp(numberProp(properties, 'open-speed', 0.16), -MAX_OPEN_SPEED, MAX_OPEN_SPEED);
-  const visibleWidth = clamp(numberProp(properties, 'visible-width', 0.42), 0.01, 1);
-  const feather = clamp(numberProp(properties, 'feather', 0.2), 0.001, 0.5);
-  const pulseOffset = numberProp(properties, 'pulse-offset', 0);
+  const closedHoldSeconds = clamp(numberProp(properties, 'closed-hold-seconds', 0.12), 0, 10);
+  const openHoldSeconds = clamp(numberProp(properties, 'open-hold-seconds', 0.12), 0, 10);
+  const transitionSeconds = clamp(numberProp(properties, 'transition-seconds', 0.45), 0.02, 10);
+  const gateOffsetSeconds = numberProp(properties, 'gate-offset-seconds', 0);
   const colorCycle = numberProp(properties, 'color-cycle', 1.25);
   const colorOffset = numberProp(properties, 'color-offset', 0);
   const colorSpeed = numberProp(properties, 'color-speed', 0.04);
   const colorBias = numberProp(properties, 'color-bias', 0.9);
+  const paletteMode = colorProp(properties, 'palette-mode', 'melee-spectrum');
+  const wheelHueShift = numberProp(properties, 'wheel-hue-shift', 226);
+  const wheelSaturation = clamp(numberProp(properties, 'wheel-saturation', 0.82), 0, 1.2);
+  const wheelLightness = clamp(numberProp(properties, 'wheel-lightness', 0.53), 0.08, 0.86);
+  const wheelMintLift = clamp(numberProp(properties, 'wheel-mint-lift', 0.16), -0.2, 0.35);
+  const wheelSoftness = clamp(numberProp(properties, 'wheel-softness', 0.58), 0, 1);
+  const wheelContrast = clamp(numberProp(properties, 'wheel-contrast', 0.92), 0, 1.5);
   const textureAngle = numberProp(properties, 'texture-angle', -18) * Math.PI / 180;
   const textureSpeed = numberProp(properties, 'texture-speed', 0.08);
   const textureScale = clamp(numberProp(properties, 'texture-scale', 1), 0.2, 4);
@@ -202,7 +368,8 @@ function drawCylinderStrips(ctx, texture, textureCtx, width, height, properties,
   const colorA = parseHexColor(colorProp(properties, 'color-start', '#2030ff')) || { r: 32, g: 48, b: 255 };
   const colorB = parseHexColor(colorProp(properties, 'color-mid', '#3f2dff')) || { r: 63, g: 45, b: 255 };
   const colorC = parseHexColor(colorProp(properties, 'color-end', '#ff2f75')) || { r: 255, g: 47, b: 117 };
-  const openPhase = animate ? elapsed * openSpeed + pulseOffset : pulseOffset;
+  const colorD = parseHexColor(colorProp(properties, 'color-magenta', '#ac2ba0'));
+  const gateTime = animate ? elapsed : 0;
   const colorPhase = animate ? elapsed * colorSpeed + elapsed * textureSpeed : 0;
   const stripArc = TAU / stripCount;
   const options = {
@@ -217,10 +384,18 @@ function drawCylinderStrips(ctx, texture, textureCtx, width, height, properties,
     colorA,
     colorB,
     colorC,
+    colorD,
     colorBias,
     colorCycle,
     colorOffset,
     colorPhase,
+    paletteMode,
+    wheelHueShift,
+    wheelSaturation,
+    wheelLightness,
+    wheelMintLift,
+    wheelSoftness,
+    wheelContrast,
     textureAngle,
     textureScale,
   };
@@ -232,7 +407,13 @@ function drawCylinderStrips(ctx, texture, textureCtx, width, height, properties,
 
   ctx.save();
   ctx.beginPath();
-  const openGate = pulseWindow(openPhase, visibleWidth, feather);
+  const openGate = timedGate(
+    gateTime,
+    closedHoldSeconds,
+    transitionSeconds,
+    openHoldSeconds,
+    gateOffsetSeconds,
+  );
   const open = minimumOpen + (1 - minimumOpen) * openGate;
   for (let strip = 0; strip < stripCount; strip += 1) {
     const stripNorm = strip / stripCount;
