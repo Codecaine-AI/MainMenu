@@ -6,19 +6,19 @@
   position: absolute; inset: 0;
   background: repeating-linear-gradient(to bottom,
     rgba(0,0,0,0) 0px,
-    rgba(0,0,0,0) 2px,
-    rgba(0,0,0,0.25) 3px,
-    rgba(0,0,0,0) 4px);
+    rgba(0,0,0,0) calc(var(--crt-scan-gap, 3px) - 1px),
+    rgba(0,0,0,var(--crt-scan-opacity, 0.25)) var(--crt-scan-gap, 3px),
+    rgba(0,0,0,0) calc(var(--crt-scan-gap, 3px) + 1px));
   mix-blend-mode: multiply;
 }
 .crt .vign {
   position: absolute; inset: 0;
-  background: radial-gradient(ellipse at center, transparent 55%, rgba(0,0,0,0.55) 100%);
+  background: radial-gradient(ellipse at center, transparent 55%, rgba(0,0,0,var(--crt-vignette-opacity, 0.55)) 100%);
 }
 .crt .rgb {
   position: absolute; inset: 0;
   background:
-    linear-gradient(to right, rgba(255,50,80,.04), transparent 8%, transparent 92%, rgba(80,200,255,.04));
+    linear-gradient(to right, rgba(255,50,80,var(--crt-rgb-opacity, 0.04)), transparent 8%, transparent 92%, rgba(80,200,255,var(--crt-rgb-opacity, 0.04)));
   mix-blend-mode: screen;
 }
 .crt.off { display: none; }

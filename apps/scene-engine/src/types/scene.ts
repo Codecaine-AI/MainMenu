@@ -127,12 +127,15 @@ export interface SceneJson {
   objects: SceneObject[]
 }
 
-export type AssetType = 'audio' | 'image' | 'video' | 'glyph'
+export type AssetType = 'audio' | 'image' | 'video' | 'glyph' | 'font'
 export type ModuleType = 'effect' | 'component'
 
 export interface AssetContainer {
   type: AssetType
   file: string
+  family?: string
+  weight?: number
+  style?: string
 }
 
 export interface ManifestNumberProperty {
@@ -146,6 +149,12 @@ export interface ManifestNumberProperty {
 
 export interface ManifestStringProperty {
   type: 'string'
+  default?: string
+  description?: string
+}
+
+export interface ManifestColorProperty {
+  type: 'color'
   default?: string
   description?: string
 }
@@ -166,6 +175,7 @@ export interface ManifestEnumProperty {
 export type ManifestProperty =
   | ManifestNumberProperty
   | ManifestStringProperty
+  | ManifestColorProperty
   | ManifestBooleanProperty
   | ManifestEnumProperty
 

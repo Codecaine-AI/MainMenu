@@ -2,9 +2,36 @@ import { getRenderer } from './asset-renderers/index.js';
 import { loadRegistry, resolveAsset } from './asset-registry.js';
 import { syncMediaSurface } from './media-surface.js';
 import { applyTransform, applyAppearance } from './positioning.js';
+import { applyCssEffectProperties } from './asset-renderers/css-effect.js';
+import { applyTextProperties } from './asset-renderers/text.js';
+import { loadFontAssets } from './font-registry.js';
 
 function isMediaType(type) {
   return type === 'video' || type === 'image' || type === 'media';
+}
+
+function renderSignature(obj) {
+  return JSON.stringify({
+    type: obj.type,
+    asset: obj.asset,
+    properties: obj.properties ?? null,
+  });
+}
+
+function shouldRemountObject(el, obj) {
+  if (!el) return false;
+  if (el.dataset?.layerType && el.dataset.layerType !== obj.type) return true;
+  if (el.dataset?.layerAsset && el.dataset.layerAsset !== obj.asset) return true;
+  return obj.type === 'component' && el.dataset.renderSignature !== renderSignature(obj);
+}
+
+function isAssetlessObject(obj) {
+  return obj.type === 'group' || obj.type === 'text';
+}
+
+function resolveObjectEntry(obj) {
+  if (isAssetlessObject(obj)) return null;
+  return resolveAsset(obj.asset);
 }
 
 function findMediaEl(el) {
@@ -46,6 +73,10 @@ function applyObjectStyles(el, obj, entry) {
 
   if (obj.type === 'glyph-group') {
     updateGlyphGroup(el, obj);
+  } else if (obj.type === 'text') {
+    applyTextProperties(el, obj);
+  } else if (obj.type === 'effect') {
+    applyCssEffectProperties(el, obj.properties);
   } else if (Array.isArray(obj.children) && obj.children.length > 0) {
     el.style.position = el.style.position || 'absolute';
   }
@@ -137,9 +168,9 @@ function updateForeignChild(fo, child) {
   }
 }
 
-async function mountObject(parent, obj) {
-  const entry = resolveAsset(obj.asset);
-  if (!entry) {
+async function mountObject(parent, obj, beforeEl = null) {
+  const entry = resolveObjectEntry(obj);
+  if (!entry && !isAssetlessObject(obj)) {
     console.warn(`[scene-renderer] Skipping object ${obj.id}: unknown asset ${obj.asset}`);
     return null;
   }
@@ -147,7 +178,11 @@ async function mountObject(parent, obj) {
 
   const wrapper = await getRenderer(obj.type)(obj, entry);
   wrapper.dataset.layerId = obj.id;
-  parent.appendChild(wrapper);
+  wrapper.dataset.layerType = obj.type;
+  if (obj.asset) wrapper.dataset.layerAsset = obj.asset;
+  wrapper.dataset.renderSignature = renderSignature(obj);
+  if (beforeEl) parent.insertBefore(wrapper, beforeEl);
+  else parent.appendChild(wrapper);
   applyObjectStyles(wrapper, obj, entry);
 
   if (obj.type !== 'glyph-group' && Array.isArray(obj.children) && obj.children.length > 0) {
@@ -159,6 +194,12 @@ async function mountObject(parent, obj) {
   }
 
   return wrapper;
+}
+
+async function remountObject(parent, oldEl, obj) {
+  const nextEl = await mountObject(parent, obj, oldEl);
+  oldEl.remove();
+  return nextEl;
 }
 
 async function updateChildren(parentEl, childArray) {
@@ -178,9 +219,13 @@ async function updateChildren(parentEl, childArray) {
 
   for (const child of childArray) {
     const el = existing.get(child.id);
-    const entry = resolveAsset(child.asset);
-    if (!entry) continue;
+    const entry = resolveObjectEntry(child);
+    if (!entry && !isAssetlessObject(child)) continue;
     if (el) {
+      if (shouldRemountObject(el, child)) {
+        await remountObject(parentEl, el, child);
+        continue;
+      }
       applyObjectStyles(el, child, entry);
       if (child.type !== 'glyph-group' && Array.isArray(child.children) && child.children.length > 0) {
         await updateChildren(el, child.children);
@@ -194,7 +239,8 @@ async function updateChildren(parentEl, childArray) {
 }
 
 export async function renderScene(scene, root) {
-  await loadRegistry();
+  const registry = await loadRegistry();
+  await loadFontAssets(registry);
 
   root.style.width = scene.stage.width + 'px';
   root.style.height = scene.stage.height + 'px';

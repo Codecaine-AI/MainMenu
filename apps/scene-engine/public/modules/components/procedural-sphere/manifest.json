@@ -1,0 +1,122 @@
+{
+  "name": "Procedural Sphere",
+  "type": "component",
+  "properties": {
+    "rotation-speed": {
+      "type": "number",
+      "default": 0.45,
+      "min": -4,
+      "max": 4,
+      "step": 0.05
+    },
+    "rotate-x": {
+      "type": "number",
+      "default": 0,
+      "min": -180,
+      "max": 180,
+      "step": 1
+    },
+    "rotate-y": {
+      "type": "number",
+      "default": 0,
+      "min": -180,
+      "max": 180,
+      "step": 1
+    },
+    "rotate-z": {
+      "type": "number",
+      "default": 0,
+      "min": -180,
+      "max": 180,
+      "step": 1
+    },
+    "longitudes": {
+      "type": "number",
+      "default": 28,
+      "min": 4,
+      "max": 128,
+      "step": 1
+    },
+    "latitudes": {
+      "type": "number",
+      "default": 18,
+      "min": 3,
+      "max": 128,
+      "step": 1
+    },
+    "line-width": {
+      "type": "number",
+      "default": 1.4,
+      "min": 0.1,
+      "max": 8,
+      "step": 0.05
+    },
+    "pole-radius": {
+      "type": "number",
+      "default": 0.18,
+      "min": 0,
+      "max": 1.2,
+      "step": 0.01
+    },
+    "pole-gap": {
+      "type": "number",
+      "default": 0.1,
+      "min": 0,
+      "max": 1.2,
+      "step": 0.01
+    },
+    "sphere-width": {
+      "type": "number",
+      "default": 1,
+      "min": 0.1,
+      "max": 6,
+      "step": 0.05
+    },
+    "sphere-height": {
+      "type": "number",
+      "default": 1,
+      "min": 0.1,
+      "max": 6,
+      "step": 0.05
+    },
+    "sphere-x": {
+      "type": "number",
+      "default": 0,
+      "min": -1,
+      "max": 1,
+      "step": 0.01
+    },
+    "sphere-y": {
+      "type": "number",
+      "default": 0,
+      "min": -1,
+      "max": 1,
+      "step": 0.01
+    },
+    "sphere-z": {
+      "type": "number",
+      "default": 0,
+      "min": -1,
+      "max": 1,
+      "step": 0.01
+    },
+    "camera-near": {
+      "type": "number",
+      "default": 0.12,
+      "min": 0.01,
+      "max": 1,
+      "step": 0.01
+    },
+    "camera-fov": {
+      "type": "number",
+      "default": 0.32,
+      "min": 0.05,
+      "max": 2,
+      "step": 0.01
+    },
+    "grid": {
+      "type": "color",
+      "default": "#4e5f6c"
+    }
+  }
+}

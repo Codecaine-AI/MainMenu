@@ -1,5 +1,55 @@
 'use client'
 
+import { useCallback, useEffect, useRef, useState } from 'react'
+
+function OverflowTooltipText({
+  children,
+  className,
+  wrapperClassName = '',
+}: {
+  children: string
+  className: string
+  wrapperClassName?: string
+}) {
+  const ref = useRef<HTMLSpanElement>(null)
+  const [isOverflowing, setIsOverflowing] = useState(false)
+
+  const measure = useCallback(() => {
+    const el = ref.current
+    if (!el) return
+    setIsOverflowing(el.scrollWidth > el.clientWidth || el.scrollHeight > el.clientHeight)
+  }, [])
+
+  useEffect(() => {
+    measure()
+    const el = ref.current
+    if (!el || typeof ResizeObserver === 'undefined') return
+    const observer = new ResizeObserver(measure)
+    observer.observe(el)
+    return () => observer.disconnect()
+  }, [children, measure])
+
+  return (
+    <span
+      className={`group relative block min-w-0 ${wrapperClassName}`}
+      onMouseEnter={measure}
+      onFocus={measure}
+    >
+      <span
+        ref={ref}
+        className={className}
+      >
+        {children}
+      </span>
+      {isOverflowing && (
+        <span className="pointer-events-none absolute left-0 top-full z-50 mt-1 hidden max-w-[260px] rounded-sm border border-[#3a3a3a] bg-[#111] px-2 py-1 text-[11px] leading-tight text-gray-200 shadow-lg group-hover:block group-focus-within:block">
+          {children}
+        </span>
+      )}
+    </span>
+  )
+}
+
 interface SectionProps {
   title: string
   defaultOpen?: boolean
@@ -9,10 +59,12 @@ interface SectionProps {
 export function InspectorSection({ title, children }: SectionProps) {
   return (
     <div className="mt-1.5">
-      <div className="w-full flex items-center gap-1 py-[3px] px-1 bg-[#282828] border-t border-b border-[#333]">
-        <span className="text-[12px] font-semibold text-gray-300">
-          {title}
-        </span>
+      <div className="w-full flex items-center gap-1 py-1 px-1.5 bg-[#303030] border-t border-b border-[#444]">
+        <OverflowTooltipText
+          className="text-[13px] font-bold text-gray-100 truncate block flex-1 min-w-0"
+          wrapperClassName="flex-1"
+          children={title}
+        />
       </div>
       <div className="pt-1.5 pb-0.5 px-1">
         {children}
@@ -29,8 +81,11 @@ interface FieldRowProps {
 export function FieldRow({ label, children }: FieldRowProps) {
   return (
     <div className="flex items-center gap-2 min-h-[22px] mb-[3px]">
-      <label className="text-[12px] text-gray-500 w-20 shrink-0 select-none truncate">
-        {label}
+      <label className="group w-20 shrink-0 select-none min-w-0">
+        <OverflowTooltipText
+          className="text-[12px] text-gray-300 truncate block"
+          children={label}
+        />
       </label>
       <div className="flex-1 min-w-0">
         {children}
@@ -83,9 +138,10 @@ interface ReadonlyFieldProps {
 
 export function ReadonlyValue({ value }: ReadonlyFieldProps) {
   return (
-    <span className="text-[12px] text-gray-500 font-mono truncate block">
-      {value}
-    </span>
+    <OverflowTooltipText
+      className="text-[12px] text-gray-500 font-mono truncate block"
+      children={value}
+    />
   )
 }
 
@@ -94,14 +150,28 @@ export function InspectorHeader({
   type,
   visible,
   onToggleVisible,
+  onRename,
   onDelete,
 }: {
   name: string
   type?: string
   visible?: boolean
   onToggleVisible?: (v: boolean) => void
+  onRename?: (name: string) => void
   onDelete?: () => void
 }) {
+  const [draftName, setDraftName] = useState(name)
+
+  useEffect(() => {
+    setDraftName(name)
+  }, [name])
+
+  function commitName() {
+    if (!onRename) return
+    const nextName = draftName.trim()
+    if (nextName !== name) onRename(nextName)
+  }
+
   return (
     <div className="mb-2 pb-1.5 border-b border-[#333]">
       <div className="flex items-center gap-2">
@@ -111,9 +181,29 @@ export function InspectorHeader({
           onChange={(e) => onToggleVisible?.(e.target.checked)}
           className="accent-[#4a8fc2] shrink-0"
         />
-        <span className="text-[14px] font-semibold text-gray-200 truncate flex-1" title={name}>
-          {name}
-        </span>
+        {onRename ? (
+          <input
+            type="text"
+            value={draftName}
+            onChange={(e) => setDraftName(e.target.value)}
+            onBlur={commitName}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') e.currentTarget.blur()
+              if (e.key === 'Escape') {
+                setDraftName(name)
+                e.currentTarget.blur()
+              }
+            }}
+            className="min-w-0 flex-1 bg-transparent border border-transparent rounded-sm px-1 py-0.5 text-[14px] font-semibold text-gray-200 outline-none hover:border-[#333] focus:border-[#4a8fc2] focus:bg-[#191919]"
+            aria-label="Object name"
+          />
+        ) : (
+          <OverflowTooltipText
+            className="text-[14px] font-semibold text-gray-200 truncate flex-1"
+            wrapperClassName="flex-1"
+            children={name}
+          />
+        )}
         {onDelete && (
           <button
             onClick={onDelete}

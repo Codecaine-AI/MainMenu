@@ -1,137 +1,304 @@
 # Agent Guide: Scene Engine
 
-How to author and edit scenes programmatically from Claude Code or any file-based agent.
+How to author, edit, and verify scenes programmatically from Claude Code or any file-based agent.
 
-## Quick start
+## Quick Start
 
-The dev server is running at **http://localhost:5173**. You do not need to start it.
+The Scene Engine is a Next.js + React + Tailwind + Zustand app. Each page is a **scene**: a JSON manifest of typed asset objects rendered onto a 1440x1080 stage.
 
-### List available scenes
+The dev server runs at **http://localhost:3000**.
+
+- Dashboard: http://localhost:3000/
+- Editor: http://localhost:3000/editor?scene=title
+- Scene preview: http://localhost:3000/scenes/title
+- Asset upload: http://localhost:3000/upload
+
+Assume the dev server is already running in the user's dev container unless a request or failed health check proves otherwise. Next dev uses hot reload, so scene JSON, public module, component, CSS, and manifest edits should be checked through the running dev server/browser, not by rebuilding.
+
+Start if needed:
 
 ```bash
-curl -s http://localhost:5173/api/scenes | jq
+npm run dev
 ```
 
-### Read a scene
+Or from the repo root:
 
 ```bash
-cat apps/scene-engine/scenes/title/scene.json
+make dev
 ```
 
-Or fetch from the dev server:
+Build:
+
 ```bash
-curl -s http://localhost:5173/scenes/title/scene.json | jq
+npm run build
 ```
 
-### Edit a scene
+Do **not** run `npm run build` after routine scene/component edits while the dev server is active. A production build rewrites `.next` and can destabilize a running `next dev` process with stale or missing chunks. Use build only when explicitly requested, before production handoff, or after app-level changes where production compilation is the specific thing being verified.
 
-Edit `scenes/{id}/scene.json` directly. The editor picks up changes on reload (Reload button or browser refresh).
-
-### Save via API
+Serve production:
 
 ```bash
-curl -X PUT http://localhost:5173/api/scenes/title \
+npm run start
+```
+
+## Common Commands
+
+List available scenes:
+
+```bash
+curl -s http://localhost:3000/api/scenes | jq
+```
+
+Read a scene from disk:
+
+```bash
+cat apps/scene-engine/scenes/title/scene.json | jq
+```
+
+Fetch a scene from the dev server:
+
+```bash
+curl -s http://localhost:3000/api/scenes/title | jq
+```
+
+Save a scene through the API:
+
+```bash
+curl -X PUT http://localhost:3000/api/scenes/title \
   -H 'Content-Type: application/json' \
   -d @apps/scene-engine/scenes/title/scene.json
 ```
 
 The PUT endpoint writes the JSON to disk with stable 2-space formatting.
 
-## Scene JSON structure
+## Project Layout
+
+```text
+apps/scene-engine/
+  next.config.ts             Next.js configuration
+  tsconfig.json              TypeScript config, strict, @/* path alias
+  postcss.config.mjs         Tailwind PostCSS plugin
+  package.json               Dependencies: next, react, zustand, tailwindcss
+
+  scenes/{id}/scene.json     Scene definitions, one per page, writable by API
+
+  public/
+    assets/registry.json     Asset containers: { id: { type, file } }
+    assets/audio/            Sound effects
+    assets/image/            Static images
+    assets/video/            Video loops
+    assets/glyph/            SVG font assets
+    modules/registry.json    Module entries: { id: { type, path } }
+    modules/effects/         CSS effect stylesheets
+    modules/components/      Data-driven JS components
+    fonts/                   FolkPro font family
+
+  app/
+    page.tsx                 Dashboard
+    scenes/[id]/page.tsx     Scene preview
+    upload/page.tsx          Asset upload form
+    editor/page.tsx          Editor shell
+    api/scenes/route.ts      GET /api/scenes
+    api/scenes/[id]/route.ts GET scene.json, PUT to save
+    api/upload/route.ts      POST asset upload
+    api/assets/[type]/route.ts
+    api/registry/[id]/route.ts
+
+  src/
+    store/editor-store.ts    Zustand editor store
+    hooks/useSceneLoader.ts  Fetches registry + scene
+    lib/                     Shared scene, path, patch, asset utilities
+    types/scene.ts           TypeScript scene interfaces
+    renderer/                Imperative vanilla JS scene renderer
+```
+
+## Scene Data
+
+Canonical scene files live at:
+
+```text
+scenes/{id}/scene.json
+```
+
+The current renderer uses an `objects` array. Z-order is array position: index 0 is back, last object is on top.
 
 ```json
 {
-  "id": "scene-id",
-  "name": "Human-readable Name",
+  "id": "title",
+  "name": "Title Screen",
   "stage": { "width": 1440, "height": 1080 },
-  "layers": [ ... ]
+  "objects": [
+    {
+      "id": "bg-video",
+      "type": "video",
+      "asset": "bg-video",
+      "transform": { "mode": "fill" },
+      "appearance": { "fit": "fill", "blend": "normal", "opacity": 0.75 }
+    },
+    {
+      "id": "press-start",
+      "type": "component",
+      "asset": "orbit-press-start",
+      "transform": {
+        "x": "center",
+        "y": 79,
+        "width": 46,
+        "height": 16,
+        "anchor": "center"
+      },
+      "properties": {
+        "text": "PRESS  START"
+      }
+    }
+  ]
 }
 ```
 
-### Layer schema
+Object fields:
 
-Every layer has `id`, `type`, and `asset` (registry ID). Optional: `position`, `properties`, `children`.
+- `id`: unique object ID
+- `type`: renderer type
+- `asset`: registry ID, except assetless object types such as `group` or `text`
+- `visible`: optional boolean
+- `transform`: placement and sizing
+- `appearance`: opacity, blend, hue, saturation, fit
+- `properties`: renderer/component-specific data
+- `children`, `slots`, `events`: optional object-specific configuration
 
-| type         | what it renders                          | key properties                    |
-|--------------|------------------------------------------|-----------------------------------|
-| media        | video or image                           | fit, blend, opacity               |
-| effect       | CSS overlay (CRT, vortex)                | opacity                           |
-| glyph-group  | layered SVG (chrome font glyphs)         | scale, shimmer                    |
-| component    | JS component (press-start, menu)         | varies per component              |
-| audio        | Web Audio sound                          | volume, loop, autoplay            |
+Common object types:
 
-### Position
+| type | what it renders |
+| --- | --- |
+| `video`, `image`, `media` | video or image assets |
+| `effect` | CSS overlay effects |
+| `glyph-group` | layered SVG font/glyph assets |
+| `component` | authored JS components |
+| `audio` | Web Audio assets |
+| `group` | assetless grouping object |
+| `text` | assetless text object |
+
+## Transform
+
+Full-stage objects:
 
 ```json
-"position": { "x": "center", "y": "33%" }
+"transform": { "mode": "fill" }
 ```
-Values: `"center"`, percentage string (`"75%"`), or pixel number. Omit for full-stage layers (media backgrounds, effects).
 
-### Z-order
-
-Array position in `layers` determines z-order. Index 0 is the back; last element is on top.
-
-### Group children (glyph-group only)
+Positioned objects:
 
 ```json
-"children": [
-  { "id": "sub-id", "layer": "data-layer-attribute", "visible": true, "properties": { "hue": 20 } },
-  { "id": "foreign-id", "type": "media", "asset": "registry-id", "properties": { "blend": "screen" } }
-]
+"transform": {
+  "x": "center",
+  "y": 33,
+  "width": 80.5,
+  "height": "auto",
+  "anchor": "center"
+}
 ```
 
-Two kinds of children:
-- **Named sub-layer**: references an SVG layer by its `data-layer` attribute. Can override `visible` and `properties`.
-- **Foreign asset**: a full layer (`type` + `asset`) interleaved between the group's SVG layers.
+Numeric `x`, `y`, `width`, and `height` values are percentages. Pin values like `"center"`, `"top"`, `"bottom"`, `"left"`, and `"right"` are supported where applicable. `rotation` and `scale` may also be used.
 
-## Adding assets
+## Asset Registries
 
-1. Place the file under `assets/{type}/` (e.g. `assets/media/my-video.mp4`)
-2. Add an entry to `assets/registry.json`:
-   ```json
-   "my-video": {
-     "type": "media",
-     "path": "/assets/media/my-video.mp4"
-   }
-   ```
-3. Reference it in a scene layer with `"asset": "my-video"`
+There are two registries, merged at runtime by `src/renderer/asset-registry.js`.
 
-## Creating a new scene
+`public/assets/registry.json` is for uploadable file containers:
 
-1. Create `scenes/{id}/scene.json` with the scene JSON structure above
-2. The dev server auto-discovers it (restart may be needed since discovery runs at config load)
-3. The dashboard at http://localhost:5173/ will show the new scene
+```json
+{
+  "bg-video": {
+    "type": "video",
+    "file": "/assets/video/test-fire-2.mp4"
+  }
+}
+```
 
-Scene IDs must be lowercase kebab-case: `^[a-z0-9]+(?:-[a-z0-9]+)*$`
+Container types: `audio`, `image`, `video`, `glyph`.
 
-## Current scenes
+`public/modules/registry.json` is for authored code modules:
 
-| id    | name         | description                                                    |
-|-------|--------------|----------------------------------------------------------------|
-| title | Title Screen | CODECAINE chrome logo, fire interleave, PRESS START, CRT, audio |
+```json
+{
+  "orbit-press-start": {
+    "type": "component",
+    "path": "/modules/components/orbit-press-start/orbit-press-start.js"
+  }
+}
+```
 
-## Current assets (registry.json)
+Module types: `effect`, `component`.
 
-| id              | type        | path                                          |
-|-----------------|-------------|-----------------------------------------------|
-| bg-video        | media       | /assets/media/test-fire-2.mp4                 |
-| in-text-fire    | media       | /assets/media/test-fire-3.mp4                 |
-| crt-overlay     | effect      | /assets/effects/crt-overlay.css               |
-| codecaine-logo  | glyph-group | /assets/glyphs/CODECAINE.css-layers.svg       |
-| press-start     | component   | /assets/components/press-start/press-start.js |
-| start-cue       | audio       | /assets/audio/start-cue/start-cue.js          |
+Layers/objects reference container IDs only. Swapping a file in a container updates every scene using that container. Prefer the `/upload` page for adding new file assets; it writes under `public/assets/{type}/` and registers the container automatically.
 
-## Verifying changes
+## API Endpoints
 
-After editing a scene.json, confirm it renders:
+- `GET /api/scenes` — list all scenes
+- `GET /api/scenes/{id}` — read `scene.json`
+- `PUT /api/scenes/{id}` — save full scene JSON
+- `POST /api/upload` — multipart `file` + `type`; writes file and registers container
+- `GET /api/assets/{type}` — list files in `public/assets/{type}/`
+- `PATCH /api/registry/{id}` — body `{ "file": "..." }`; updates a container's file pointer
+
+## Editing Scenes
+
+Edit `scenes/{id}/scene.json` directly. The editor picks up changes after Reload or browser refresh.
+
+Scene IDs must match:
+
+```text
+^[a-z0-9]+(?:-[a-z0-9]+)*$
+```
+
+To create a new scene:
+
+1. Create `scenes/{id}/scene.json`.
+2. Use the standard scene JSON shape with `id`, `name`, `stage`, and `objects`.
+3. Refresh the dashboard at http://localhost:3000/.
+
+## Components And Effects
+
+Component and audio assets are loaded dynamically from public static files. Component modules should default-export a function:
+
+```js
+export default function ({ properties = {}, layerId } = {}) {
+  const el = document.createElement('div');
+  if (layerId) el.dataset.layerId = layerId;
+  return el;
+}
+```
+
+For components, the renderer automatically loads a sibling CSS file with the same base name when present.
+
+Module manifests may live next to component/effect modules as `manifest.json`. The editor uses them to expose configurable properties.
+
+## Architecture Notes
+
+- `src/renderer/` is an imperative vanilla JS renderer. React mounts it through `useEffect` and `useRef`.
+- Zustand replaces the old EventTarget pub/sub editor state.
+- Renderer imports happen inside `useEffect` for SSR safety.
+- Dynamic imports from `public/` static files can produce expected benign webpack warnings.
+- The inspector has focus guards so slider edits do not constantly remount the form.
+
+## Verification
+
+After editing a scene or public component/module, prefer lightweight validation against the hot-reloading dev server:
 
 ```bash
-# Check the JSON is valid
 cat apps/scene-engine/scenes/title/scene.json | jq . > /dev/null && echo "valid"
-
-# Check the dev server serves it
-curl -s -o /dev/null -w "%{http_code}" http://localhost:5173/scenes/title/scene.json
-# expect: 200
+cat apps/scene-engine/public/modules/components/orbit-press-start/manifest.json | jq . > /dev/null && echo "manifest valid"
+curl -s -o /dev/null -w "%{http_code}" http://localhost:3000/api/scenes/title
 ```
 
-The visual result must be verified in the browser at http://localhost:5173/scenes/title/ (production view) or http://localhost:5173/editor/?scene=title (editor view).
+Expected HTTP status: `200`.
+
+Always verify the visual result in the already-running browser/dev server:
+
+- Preview: http://localhost:3000/scenes/title
+- Editor: http://localhost:3000/editor?scene=title
+
+## Current Scene
+
+| id | name | description |
+| --- | --- | --- |
+| `title` | Title Screen | CODECAINE chrome logo, procedural sphere, orbiting PRESS START component, CRT, audio |

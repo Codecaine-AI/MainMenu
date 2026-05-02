@@ -8,6 +8,7 @@ interface Props {
   isCollapsed: boolean
   onSelect: (path: string) => void
   onToggle: (path: string) => void
+  onAddChild: (path: string) => void
   collapsedSet: Set<string>
   selectedPath: string | null
   onDragStart?: (e: React.DragEvent, path: string) => void
@@ -25,6 +26,7 @@ export function HierarchyRow({
   isCollapsed,
   onSelect,
   onToggle,
+  onAddChild,
   collapsedSet,
   selectedPath,
   onDragStart,
@@ -36,6 +38,7 @@ export function HierarchyRow({
   const hasChildren = Array.isArray(layer.children) && (layer.children as unknown[]).length > 0
   const isHidden = layer.visible === false
   const typeLabel = (layer.type as string) ?? (layer.layer ? 'sub-layer' : '')
+  const canAddChildren = layer.type === 'group'
 
   const isDropBefore = dropIndicator?.path === path && dropIndicator.region === 'before'
   const isDropAfter = dropIndicator?.path === path && dropIndicator.region === 'after'
@@ -44,7 +47,7 @@ export function HierarchyRow({
   return (
     <li>
       <div
-        className={`relative flex items-center gap-1 py-0.5 px-1 cursor-default select-none text-xs font-mono
+        className={`relative flex items-center gap-1 py-1 px-1 cursor-default select-none text-[12px] font-mono
           ${isSelected ? 'bg-[#1d3247] outline outline-1 outline-[#2a6da3]' : 'hover:bg-[#222]'}
           ${isHidden ? 'opacity-40' : ''}
           ${isDropInto ? 'bg-[rgba(255,216,77,0.18)] outline outline-1 outline-[#ffd84d]' : ''}
@@ -68,7 +71,7 @@ export function HierarchyRow({
         {hasChildren ? (
           <button
             onClick={(e) => { e.stopPropagation(); onToggle(path) }}
-            className="bg-transparent border-0 text-gray-400 text-xs w-3.5 text-center shrink-0 cursor-pointer p-0"
+            className="bg-transparent border-0 text-gray-300 text-xs w-3.5 text-center shrink-0 cursor-pointer p-0"
           >
             {isCollapsed ? '▶' : '▼'}
           </button>
@@ -76,10 +79,21 @@ export function HierarchyRow({
           <span className="w-3.5 shrink-0" />
         )}
 
-        <span className="text-gray-300 flex-1 overflow-hidden text-ellipsis whitespace-nowrap">
+        <span className="text-gray-100 flex-1 overflow-hidden text-ellipsis whitespace-nowrap">
           {(layer.name as string | undefined) ?? (layer.id as string)}{' '}
-          <span className="text-gray-600">[{typeLabel}]</span>
+          <span className="text-gray-400">[{typeLabel}]</span>
         </span>
+
+        {canAddChildren && (
+          <button
+            type="button"
+            onClick={(e) => { e.stopPropagation(); onAddChild(path) }}
+            className="h-4 w-4 shrink-0 border border-[#444] bg-[#242424] text-[11px] leading-none text-gray-100 hover:bg-[#303030] active:translate-y-px"
+            aria-label={`Add child layer to ${(layer.name as string | undefined) ?? (layer.id as string)}`}
+          >
+            +
+          </button>
+        )}
       </div>
 
       {hasChildren && !isCollapsed && (
@@ -96,6 +110,7 @@ export function HierarchyRow({
                 isCollapsed={collapsedSet.has(childPath)}
                 onSelect={onSelect}
                 onToggle={onToggle}
+                onAddChild={onAddChild}
                 collapsedSet={collapsedSet}
                 selectedPath={selectedPath}
                 onDragStart={onDragStart}

@@ -6,7 +6,6 @@ import { useSceneLoader } from '@/hooks/useSceneLoader'
 import { CanvasPanel } from './_components/CanvasPanel'
 import { HierarchyPanel } from './_components/HierarchyPanel'
 import { InspectorPanel } from './_components/InspectorPanel'
-import { AssetBrowserPanel } from './_components/AssetBrowserPanel'
 
 function EditorContent() {
   const params = useSearchParams()
@@ -26,9 +25,6 @@ function EditorContent() {
           <section className="bg-[#1a1a1a] overflow-auto p-2" style={{ gridArea: 'inspector' }}>
             <p className="text-gray-600 text-xs italic">Loading...</p>
           </section>
-          <section className="bg-[#161616] overflow-auto p-2" style={{ gridArea: 'asset' }}>
-            <p className="text-gray-600 text-xs italic">Loading...</p>
-          </section>
         </>
       ) : error ? (
         <section className="bg-[#1a1a1a] p-4 col-span-3 row-span-2">
@@ -39,7 +35,6 @@ function EditorContent() {
           <HierarchyPanel sceneId={sceneId} />
           <CanvasPanel />
           <InspectorPanel />
-          <AssetBrowserPanel />
         </>
       )}
     </div>

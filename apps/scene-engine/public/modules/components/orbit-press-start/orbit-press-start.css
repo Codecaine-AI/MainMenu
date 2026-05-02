@@ -1,0 +1,15 @@
+.orbit-press-start {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  cursor: pointer;
+  overflow: visible;
+  user-select: none;
+}
+
+.orbit-press-start canvas {
+  position: absolute;
+  display: block;
+  max-width: none;
+  max-height: none;
+}

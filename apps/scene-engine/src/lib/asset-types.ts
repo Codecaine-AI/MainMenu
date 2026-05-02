@@ -2,7 +2,7 @@ import type { AssetType } from '@/types/scene'
 
 export type { AssetType } from '@/types/scene'
 
-export const ASSET_TYPES = ['audio', 'image', 'video', 'glyph'] as const
+export const ASSET_TYPES = ['audio', 'image', 'video', 'glyph', 'font'] as const
 
 export const ASSET_TYPE_RULES: Record<AssetType, { extensions: string[]; mimes: string[] }> = {
   audio: {
@@ -20,6 +20,21 @@ export const ASSET_TYPE_RULES: Record<AssetType, { extensions: string[]; mimes: 
   glyph: {
     extensions: ['svg'],
     mimes: ['image/svg+xml'],
+  },
+  font: {
+    extensions: ['otf', 'ttf', 'woff', 'woff2'],
+    mimes: [
+      'font/otf',
+      'font/ttf',
+      'font/woff',
+      'font/woff2',
+      'application/font-sfnt',
+      'application/font-woff',
+      'application/x-font-ttf',
+      'application/x-font-otf',
+      'application/octet-stream',
+      '',
+    ],
   },
 }
 

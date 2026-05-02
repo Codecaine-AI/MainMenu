@@ -23,6 +23,14 @@
     "type": "component",
     "path": "/assets/components/press-start/press-start.js"
   },
+  "orbit-press-start": {
+    "type": "component",
+    "path": "/assets/components/orbit-press-start/orbit-press-start.js"
+  },
+  "procedural-sphere": {
+    "type": "component",
+    "path": "/assets/components/procedural-sphere/procedural-sphere.js"
+  },
   "start-cue": {
     "type": "audio",
     "path": "/assets/audio/start-cue/start-cue.js"

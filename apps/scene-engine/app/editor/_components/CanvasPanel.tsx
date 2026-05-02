@@ -3,7 +3,8 @@
 import { useEffect, useLayoutEffect, useRef, useCallback, useState, type CSSProperties } from 'react'
 import { useEditorStore } from '@/store/editor-store'
 import { resolveObjectEl } from '@/lib/path'
-import type { SceneJson, Registry, AssetContainer, ModuleEntry } from '@/types/scene'
+import { createObjectFromAsset } from '@/lib/create-scene-object'
+import type { SceneJson, Registry } from '@/types/scene'
 
 const STAGE_W = 1440
 const STAGE_H = 1080
@@ -11,74 +12,6 @@ const STAGE_H = 1080
 interface FrameMetrics {
   width: number
   height: number
-}
-
-function collectIds(scene: SceneJson): Set<string> {
-  const set = new Set<string>()
-  const walk = (objects: Record<string, unknown>[]) => {
-    for (const l of objects) {
-      if (l.id) set.add(l.id as string)
-      if (l.children) walk(l.children as Record<string, unknown>[])
-    }
-  }
-  walk(scene.objects as unknown as Record<string, unknown>[])
-  return set
-}
-
-function uniqueId(base: string, scene: SceneJson): string {
-  const used = collectIds(scene)
-  if (!used.has(base)) return base
-  let n = 2
-  while (used.has(`${base}-${n}`)) n++
-  return `${base}-${n}`
-}
-
-function buildLayer(
-  assetId: string,
-  entry: AssetContainer | ModuleEntry,
-  dropPos: { x: number; y: number },
-  scene: SceneJson,
-): Record<string, unknown> {
-  const id = uniqueId(assetId, scene)
-  const x = Number(((dropPos.x / STAGE_W) * 100).toFixed(2))
-  const y = Number(((dropPos.y / STAGE_H) * 100).toFixed(2))
-  switch (entry.type) {
-    case 'video':
-    case 'image':
-      return {
-        id,
-        type: entry.type,
-        asset: assetId,
-        transform: { mode: 'fill' },
-        appearance: { fit: 'cover', blend: 'normal', opacity: 1.0 },
-      }
-    case 'glyph':
-      return {
-        id,
-        type: 'glyph-group',
-        asset: assetId,
-        transform: { x, y, width: 'auto', height: 'auto', anchor: 'top-left' },
-        properties: { scale: 0.18 },
-      }
-    case 'audio':
-      return {
-        id,
-        type: 'audio',
-        asset: assetId,
-        transform: { mode: 'fill' },
-        properties: { volume: 1.0, loop: true, autoplay: true },
-      }
-    case 'effect':
-      return { id, type: 'effect', asset: assetId, transform: { mode: 'fill' }, appearance: { opacity: 1.0 } }
-    case 'component':
-      return {
-        id,
-        type: 'component',
-        asset: assetId,
-        transform: { x, y, width: 'auto', height: 'auto', anchor: 'top-left' },
-        properties: {},
-      }
-  }
 }
 
 export function CanvasPanel() {
@@ -170,7 +103,7 @@ export function CanvasPanel() {
       const scaleY = rect.height === 0 ? 1 : rect.height / STAGE_H
       const x = Math.max(0, Math.min(STAGE_W, Math.round((e.clientX - rect.left) / scaleX)))
       const y = Math.max(0, Math.min(STAGE_H, Math.round((e.clientY - rect.top) / scaleY)))
-      const newLayer = buildLayer(assetId, entry, { x, y }, scene as SceneJson)
+      const newLayer = createObjectFromAsset(assetId, entry, scene as SceneJson, { x, y })
       addObjectAt('', scene.objects?.length ?? 0, newLayer)
     },
     [scene, registry, addObjectAt],

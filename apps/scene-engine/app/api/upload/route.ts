@@ -7,6 +7,14 @@ import type { AssetContainer, AssetType } from '@/types/scene'
 
 const REGISTRY_PATH = path.join(process.cwd(), 'public', 'assets', 'registry.json')
 
+function titleCaseFamily(slug: string): string {
+  return slug
+    .split('-')
+    .filter(Boolean)
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+    .join(' ')
+}
+
 export async function POST(req: Request) {
   try {
     const form = await req.formData()
@@ -40,6 +48,11 @@ export async function POST(req: Request) {
     const text = await readFile(REGISTRY_PATH, 'utf-8')
     const registry = JSON.parse(text) as Record<string, AssetContainer>
     registry[slug] = { type, file: `/assets/${type}/${filename}` }
+    if (type === 'font') {
+      registry[slug].family = titleCaseFamily(slug)
+      registry[slug].weight = 400
+      registry[slug].style = 'normal'
+    }
     await writeFile(REGISTRY_PATH, JSON.stringify(registry, null, 2) + '\n', 'utf-8')
 
     return NextResponse.json({ id: slug, type, file: registry[slug].file })

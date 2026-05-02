@@ -1,0 +1,33 @@
+{
+  "name": "Orbit Press Start",
+  "type": "component",
+  "properties": {
+    "text": { "type": "string", "default": "PRESS  START" },
+    "font-family": { "type": "string", "default": "Impact, FolkPro, sans-serif" },
+    "copies": { "type": "number", "default": 2, "min": 1, "max": 4, "step": 1 },
+    "rotation-speed": { "type": "number", "default": 0.46, "min": -3, "max": 3, "step": 0.01 },
+    "direction": { "type": "number", "default": 1, "min": -1, "max": 1, "step": 2 },
+    "phase": { "type": "number", "default": 0, "min": 0, "max": 360, "step": 1 },
+    "tilt-x": { "type": "number", "default": 0, "min": -75, "max": 75, "step": 1 },
+    "tilt-y": { "type": "number", "default": 0, "min": -75, "max": 75, "step": 1 },
+    "tilt-z": { "type": "number", "default": -8, "min": -75, "max": 75, "step": 1 },
+    "position-x": { "type": "number", "default": 0, "min": -500, "max": 500, "step": 1 },
+    "position-y": { "type": "number", "default": 0, "min": -500, "max": 500, "step": 1 },
+    "position-z": { "type": "number", "default": 0, "min": -800, "max": 800, "step": 1 },
+    "camera-distance": { "type": "number", "default": 900, "min": 100, "max": 3000, "step": 10 },
+    "viewport-padding": { "type": "number", "default": 180, "min": 0, "max": 600, "step": 1 },
+    "font-size": { "type": "number", "default": 34, "min": 8, "max": 96, "step": 1 },
+    "letter-angle-spacing": { "type": "number", "default": 10.5, "min": 2, "max": 30, "step": 0.5 },
+    "letter-cell-width": { "type": "number", "default": 43, "min": 8, "max": 120, "step": 1 },
+    "letter-cell-height": { "type": "number", "default": 48, "min": 8, "max": 120, "step": 1 },
+    "edge-scale": { "type": "number", "default": 0.3, "min": 0.05, "max": 1, "step": 0.01 },
+    "back-marker-margin": { "type": "number", "default": 5, "min": 0, "max": 40, "step": 0.5 },
+    "orbit-radius-x": { "type": "number", "default": 164, "min": 20, "max": 500, "step": 1 },
+    "copy-spacing": { "type": "number", "default": 0, "min": -120, "max": 120, "step": 1 },
+    "center-radius": { "type": "number", "default": 42, "min": 0, "max": 160, "step": 1 },
+    "text-color": { "type": "color", "default": "#ffd52d" },
+    "panel-color": { "type": "color", "default": "#090908" },
+    "center-fill": { "type": "color", "default": "#7c7d7a" },
+    "back-marker-color": { "type": "color", "default": "#737476" }
+  }
+}

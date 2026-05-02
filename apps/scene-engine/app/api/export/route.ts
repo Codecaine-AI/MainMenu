@@ -3,6 +3,7 @@ import JSZip from 'jszip'
 import { readFile, readdir } from 'node:fs/promises'
 import path from 'node:path'
 import { loadProject } from '@/lib/scenes'
+import { discoverFontAssets } from '@/lib/font-discovery'
 
 async function addFileToZip(zip: JSZip, absPath: string, zipPath: string) {
   const buf = await readFile(absPath)
@@ -76,8 +77,13 @@ export async function POST() {
     zip.file('boot.js', await readFile(path.join(root, 'src/export/boot.js')))
 
     const assetsRegRaw = await readFile(path.join(root, 'public/assets/registry.json'), 'utf-8')
+    const discoveredFonts = await discoverFontAssets(root)
     zip.file('assets/registry.json', rewriteRegistryPaths(assetsRegRaw))
-    const assetsReg = JSON.parse(assetsRegRaw) as Record<string, { file: string }>
+    zip.file('fonts/registry.json', rewriteRegistryPaths(JSON.stringify(discoveredFonts, null, 2)))
+    const assetsReg = {
+      ...JSON.parse(assetsRegRaw) as Record<string, { file: string }>,
+      ...discoveredFonts,
+    }
     const copiedAssetDirs = new Set<string>()
     for (const entry of Object.values(assetsReg)) {
       if (!entry.file?.startsWith('/')) continue

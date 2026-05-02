@@ -6,5 +6,17 @@
   "press-start": {
     "type": "component",
     "path": "/modules/components/press-start/press-start.js"
+  },
+  "orbit-press-start": {
+    "type": "component",
+    "path": "/modules/components/orbit-press-start/orbit-press-start.js"
+  },
+  "procedural-sphere": {
+    "type": "component",
+    "path": "/modules/components/procedural-sphere/procedural-sphere.js"
+  },
+  "procedural-cylinder": {
+    "type": "component",
+    "path": "/modules/components/procedural-cylinder/procedural-cylinder.js"
   }
 }

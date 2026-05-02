@@ -28,6 +28,14 @@
   font-style: normal;
   font-display: swap;
 }
+@font-face {
+  font-family: 'Impact';
+  src: url('/fonts/Impact/Impact-Wide.woff2') format('woff2'),
+       url('/fonts/Impact/Impact-Wide.ttf') format('truetype');
+  font-weight: 400 900;
+  font-style: normal;
+  font-display: swap;
+}
 
 :root {
   --amber: #f6c419;
@@ -37,10 +45,9 @@
   display: grid;
   height: 100vh;
   grid-template-columns: 280px minmax(0, 1fr) 440px;
-  grid-template-rows: 1fr 220px;
+  grid-template-rows: 1fr;
   grid-template-areas:
-    'hierarchy canvas inspector'
-    'asset asset asset';
+    'hierarchy canvas inspector';
   gap: 1px;
   background: #222;
 }

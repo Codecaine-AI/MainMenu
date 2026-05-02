@@ -10,6 +10,13 @@
       "max": 10,
       "step": 0.5
     },
+    "scan-line-thickness": {
+      "type": "number",
+      "default": 1,
+      "min": 0.25,
+      "max": 6,
+      "step": 0.25
+    },
     "vignette-intensity": {
       "type": "number",
       "default": 0.55,

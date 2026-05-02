@@ -25,7 +25,7 @@ export function InspectorPanel() {
 
   return (
     <section className="bg-[#1e1e1e] overflow-auto p-2 pr-3" style={{ gridArea: 'inspector' }}>
-      <h3 className="text-[10px] uppercase tracking-wider text-gray-600 font-semibold mb-2">
+      <h3 className="text-[13px] uppercase tracking-wide text-gray-100 font-bold mb-2">
         Inspector
       </h3>
       {content}

@@ -12,6 +12,16 @@ async function fetchManifest(url) {
   }
 }
 
+async function fetchOptionalManifest(url) {
+  try {
+    const res = await fetch(url);
+    if (!res.ok) return {};
+    return await res.json();
+  } catch {
+    return {};
+  }
+}
+
 function deriveManifestUrl(entryPath) {
   if (typeof entryPath !== 'string') return null;
   const lastSlash = entryPath.lastIndexOf('/');
@@ -38,11 +48,13 @@ export async function loadRegistry() {
   if (mergedRegistry) return mergedRegistry;
   if (loadPromise) return loadPromise;
   loadPromise = (async () => {
-    const [assets, modules] = await Promise.all([
+    const [assets, modules, discoveredFonts, exportedFonts] = await Promise.all([
       fetchManifest('/assets/registry.json'),
       fetchManifest('/modules/registry.json'),
+      fetchOptionalManifest('/api/fonts'),
+      fetchOptionalManifest('/fonts/registry.json'),
     ]);
-    const merged = { ...assets };
+    const merged = { ...exportedFonts, ...discoveredFonts, ...assets };
     for (const [id, entry] of Object.entries(modules)) {
       if (id in merged) {
         console.warn(`[asset-registry] id collision: ${id} — module overrides asset`);

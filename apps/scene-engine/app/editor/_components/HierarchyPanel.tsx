@@ -3,9 +3,10 @@
 import { useState, useCallback } from 'react'
 import { useEditorStore } from '@/store/editor-store'
 import { resolveObject } from '@/lib/path'
-import type { SceneJson } from '@/types/scene'
+import type { Registry, SceneJson } from '@/types/scene'
 import { HierarchyRow } from './HierarchyRow'
 import { SceneSection } from './SceneSection'
+import { AddLayerDialog } from './AddLayerDialog'
 
 interface Props {
   sceneId: string
@@ -38,11 +39,14 @@ function regionToToPath(targetPath: string, region: string, scene: SceneJson): s
 
 export function HierarchyPanel({ sceneId }: Props) {
   const scene = useEditorStore((s) => s.scene)
+  const registry = useEditorStore((s) => s.registry) as Registry | null
   const selectedPath = useEditorStore((s) => s.selectedPath)
   const setSelectedPath = useEditorStore((s) => s.setSelectedPath)
+  const addObjectAt = useEditorStore((s) => s.addObjectAt)
   const moveObject = useEditorStore((s) => s.moveObject)
   const [collapsed, setCollapsed] = useState<Set<string>>(new Set())
   const [dropIndicator, setDropIndicator] = useState<{ path: string; region: string } | null>(null)
+  const [addTarget, setAddTarget] = useState<{ parentPath: string; insertIndex: number } | null>(null)
 
   const handleToggle = useCallback((path: string) => {
     setCollapsed((prev) => {
@@ -57,6 +61,33 @@ export function HierarchyPanel({ sceneId }: Props) {
     e.dataTransfer.setData('application/x-layer-path', path)
     e.dataTransfer.effectAllowed = 'move'
   }, [])
+
+  const openTopLevelAdd = useCallback(() => {
+    setAddTarget({ parentPath: '', insertIndex: scene?.objects?.length ?? 0 })
+  }, [scene])
+
+  const openChildAdd = useCallback(
+    (path: string) => {
+      const object = scene ? resolveObject(scene as SceneJson, path) : null
+      const childCount = Array.isArray(object?.children) ? (object!.children as unknown[]).length : 0
+      setCollapsed((prev) => {
+        const next = new Set(prev)
+        next.delete(path)
+        return next
+      })
+      setAddTarget({ parentPath: path, insertIndex: childCount })
+    },
+    [scene],
+  )
+
+  const handleAddObject = useCallback(
+    (object: Record<string, unknown>, parentPath: string, insertIndex: number) => {
+      addObjectAt(parentPath, insertIndex, object)
+      setSelectedPath(parentPath === '' ? String(insertIndex) : `${parentPath}.children.${insertIndex}`)
+      setAddTarget(null)
+    },
+    [addObjectAt, setSelectedPath],
+  )
 
   const handleDragOver = useCallback(
     (e: React.DragEvent, path: string) => {
@@ -97,9 +128,9 @@ export function HierarchyPanel({ sceneId }: Props) {
   if (!scene) {
     return (
       <section className="bg-[#1a1a1a] overflow-auto p-2" style={{ gridArea: 'hierarchy' }}>
-        <h3 className="text-[10px] uppercase tracking-wider text-gray-500 font-semibold mb-2">Globals</h3>
+        <h3 className="text-[13px] uppercase tracking-wide text-gray-100 font-bold mb-2">Globals</h3>
         <p className="text-gray-600 text-xs italic mb-3">Loading...</p>
-        <h3 className="text-[10px] uppercase tracking-wider text-gray-500 font-semibold mb-2">Hierarchy</h3>
+        <h3 className="text-[13px] uppercase tracking-wide text-gray-100 font-bold mb-2">Hierarchy</h3>
         <p className="text-gray-600 text-xs italic">Loading...</p>
       </section>
     )
@@ -108,7 +139,17 @@ export function HierarchyPanel({ sceneId }: Props) {
   return (
     <section className="bg-[#1a1a1a] overflow-auto p-2" style={{ gridArea: 'hierarchy' }}>
       <SceneSection sceneId={sceneId} />
-      <h3 className="text-[10px] uppercase tracking-wider text-gray-500 font-semibold mb-2">Hierarchy</h3>
+      <div className="mb-2 flex items-center justify-between gap-2">
+        <h3 className="m-0 text-[13px] uppercase tracking-wide text-gray-100 font-bold">Hierarchy</h3>
+        <button
+          type="button"
+          onClick={openTopLevelAdd}
+          className="h-5 w-5 border border-[#4a4a4a] bg-[#242424] text-sm leading-none text-gray-100 hover:bg-[#303030] active:translate-y-px"
+          aria-label="Add top-level layer"
+        >
+          +
+        </button>
+      </div>
       <ul className="list-none p-0 m-0">
         {(scene.objects as unknown as Record<string, unknown>[]).map((layer, i) => {
           const path = String(i)
@@ -122,6 +163,7 @@ export function HierarchyPanel({ sceneId }: Props) {
               isCollapsed={collapsed.has(path)}
               onSelect={setSelectedPath}
               onToggle={handleToggle}
+              onAddChild={openChildAdd}
               collapsedSet={collapsed}
               selectedPath={selectedPath}
               onDragStart={handleDragStart}
@@ -133,6 +175,16 @@ export function HierarchyPanel({ sceneId }: Props) {
           )
         })}
       </ul>
+      {addTarget && (
+        <AddLayerDialog
+          scene={scene as SceneJson}
+          registry={registry}
+          parentPath={addTarget.parentPath}
+          insertIndex={addTarget.insertIndex}
+          onAdd={handleAddObject}
+          onClose={() => setAddTarget(null)}
+        />
+      )}
     </section>
   )
 }

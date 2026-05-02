@@ -3,6 +3,8 @@ import { renderCssEffect } from './css-effect.js';
 import { renderGlyphGroup } from './glyph-group.js';
 import { renderComponent } from './component.js';
 import { renderAudio } from './audio.js';
+import { renderText } from './text.js';
+import { renderGroup } from './group.js';
 
 const registry = new Map();
 
@@ -22,3 +24,5 @@ registerRenderer('effect', renderCssEffect);
 registerRenderer('glyph-group', renderGlyphGroup);
 registerRenderer('component', renderComponent);
 registerRenderer('audio', renderAudio);
+registerRenderer('text', renderText);
+registerRenderer('group', renderGroup);

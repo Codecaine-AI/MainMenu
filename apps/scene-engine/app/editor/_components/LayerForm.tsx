@@ -13,6 +13,7 @@ import { AssetSwapDropdown } from './AssetSwapDropdown'
 import { EventsSection } from './inputs/EventsSection'
 import { ManifestPropertyField } from './inputs/ManifestPropertyField'
 import { SlotsSection } from './SlotsSection'
+import { TextSection } from './TextSection'
 import { InspectorHeader, InspectorSection, FieldRow, ReadonlyValue } from './inputs/InspectorSection'
 import type { Registry, Transform, Appearance, EventBinding, Slot, AssetContainer, ModuleEntry } from '@/types/scene'
 
@@ -22,6 +23,17 @@ interface Props {
 }
 
 const MEDIA_TYPES = new Set(['video', 'image'])
+const TEXT_PROPERTY_KEYS = new Set([
+  'text',
+  'fontFamily',
+  'fontSize',
+  'fontWeight',
+  'color',
+  'lineHeight',
+  'letterSpacing',
+  'textAlign',
+  'customCss',
+])
 const MEDIA_PROPERTY_KEYS = new Set([
   'repeat_x',
   'repeat_y',
@@ -191,6 +203,7 @@ export function LayerForm({ layer, path }: Props) {
   const explicit = !isFill ? (transform as { x?: number | string; y?: number | string; width?: number | 'auto'; height?: number | 'auto'; rotation?: number; scale?: number; anchor?: string } | undefined) : undefined
   const layerType = layer.type as string | undefined
   const isMedia = layerType ? MEDIA_TYPES.has(layerType) : false
+  const isText = layerType === 'text'
 
   const assetId = layer.asset as string | undefined
   const containerEntry = assetId && registry ? registry[assetId] : undefined
@@ -283,6 +296,7 @@ export function LayerForm({ layer, path }: Props) {
         type={layerType}
         visible={layer.visible !== false}
         onToggleVisible={(visible) => commit('visible', visible)}
+        onRename={(name) => commit('name', name || undefined)}
         onDelete={handleDelete}
       />
 
@@ -490,6 +504,14 @@ export function LayerForm({ layer, path }: Props) {
         </InspectorSection>
       )}
 
+      {isText && (
+        <TextSection
+          properties={props}
+          registry={registry}
+          onChange={(key, value) => commit(`properties.${key}`, value)}
+        />
+      )}
+
       {manifest && Object.keys(manifest.properties).length > 0 ? (
         <InspectorSection title="Properties">
           {Object.entries(manifest.properties).map(([name, schema]) => (
@@ -505,9 +527,11 @@ export function LayerForm({ layer, path }: Props) {
         </InspectorSection>
       ) : (
         !manifest &&
-        Object.entries(props).some(([k]) => !(isMedia && MEDIA_PROPERTY_KEYS.has(k))) && (
+        Object.entries(props).some(([k]) => !(isMedia && MEDIA_PROPERTY_KEYS.has(k)) && !(isText && TEXT_PROPERTY_KEYS.has(k))) && (
           <InspectorSection title="Properties">
-            {Object.entries(props).filter(([k]) => !(isMedia && MEDIA_PROPERTY_KEYS.has(k))).map(([k, v]) => {
+            {Object.entries(props)
+              .filter(([k]) => !(isMedia && MEDIA_PROPERTY_KEYS.has(k)) && !(isText && TEXT_PROPERTY_KEYS.has(k)))
+              .map(([k, v]) => {
               const dotted = `properties.${k}`
               if (NUMERIC_PROPERTY_STEPS[k] && typeof v === 'number') {
                 return (
