@@ -8,7 +8,7 @@
   "session_type": "full",
   "created_at": "2026-05-02T15:10:04+00:00",
   "updated_at": "2026-05-02T15:10:04+00:00",
-  "current_phase": "plan",
+  "current_phase": "build",
   "status": "in_progress",
   "intake": {
     "status": "in_progress",
@@ -64,20 +64,23 @@
     "status": "finalized",
     "checkpoints_total": 4,
     "checkpoints_detailed": 4,
-    "current_checkpoint": 4,
-    "checkpoints_completed": [],
-    "last_updated": "2026-05-02T16:30:00+00:00"
+    "current_checkpoint": 2,
+    "current_task_group": null,
+    "current_task": null,
+    "checkpoints_completed": [1],
+    "last_updated": "2026-05-02T16:45:00+00:00",
+    "summary": "CP1 (arc-letterbox sectioned property schema) complete."
   },
   "build": {
-    "status": "pending",
-    "started_at": null,
+    "status": "in_progress",
+    "started_at": "2026-05-02T16:40:00+00:00",
     "completed_at": null,
-    "last_updated": null,
+    "last_updated": "2026-05-02T16:45:00+00:00",
     "data": {
-      "current_checkpoint": null,
+      "current_checkpoint": 2,
       "current_task_group": null,
       "current_task": null,
-      "checkpoints_completed": []
+      "checkpoints_completed": [1]
     }
   },
   "docs": {

@@ -11,7 +11,7 @@
       "title": "arc-letterbox — sectioned property schema",
       "goal": "Add a sectioned `properties` export to `arc-letterbox.js` so every field has a Title-Case label, a sentence-case description, and is grouped by intent (Top Bar / Bottom Bar / Curvature / Appearance). The `arc-letterbox` layer opens cleanly in the inspector with no `General` orphan fallback and no orphan-warning, and renders identically in the canvas.",
       "prerequisites": [],
-      "status": "pending",
+      "status": "completed",
       "testing_strategy": "Manual: `npm run dev` in `apps/scene-engine`, open http://localhost:3000/editor?scene=title (or any scene with an `arc-letterbox` layer; if the title scene lacks one, drag in or temporarily add one). Verify: (1) the inspector shows the new sections (e.g. `Top Bar`, `Bottom Bar`, `Curvature`, `Appearance`) instead of a single `General` block; (2) every field has a label and clicking the label opens the description popover with the authored text; (3) editing each field still mutates the underlying property and the canvas updates immediately; (4) no orphan-warning chip appears for any property; (5) selecting another component (e.g. `press-start`) and returning still works — no inspector regressions. Type check: `npm run build` from `apps/scene-engine` passes.",
       "task_groups": [
         {
