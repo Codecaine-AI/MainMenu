@@ -55,7 +55,7 @@
     "data": {
       "oversight_mode": "stepped",
       "current_level": "checkpoint",
-      "current_checkpoint": 4,
+      "current_checkpoint": null,
       "current_task_group": null,
       "current_task": null
     }
@@ -64,23 +64,23 @@
     "status": "finalized",
     "checkpoints_total": 4,
     "checkpoints_detailed": 4,
-    "current_checkpoint": 3,
+    "current_checkpoint": null,
     "current_task_group": null,
     "current_task": null,
-    "checkpoints_completed": [1, 2],
-    "last_updated": "2026-05-02T17:05:00+00:00",
-    "summary": "CP1 (arc-letterbox) + CP2 (orbit-press-start) sectioned property schemas complete."
+    "checkpoints_completed": [1, 2, 3, 4],
+    "last_updated": "2026-05-02T17:55:00+00:00",
+    "summary": "All four checkpoints complete: CP1 (arc-letterbox), CP2 (orbit-press-start), CP3 (procedural-cylinder-strips-mask), CP4 (procedural-cylinder-strips-straight) sectioned property schemas authored."
   },
   "build": {
-    "status": "in_progress",
+    "status": "completed",
     "started_at": "2026-05-02T16:40:00+00:00",
-    "completed_at": null,
-    "last_updated": "2026-05-02T17:05:00+00:00",
+    "completed_at": "2026-05-02T17:55:00+00:00",
+    "last_updated": "2026-05-02T17:55:00+00:00",
     "data": {
-      "current_checkpoint": 3,
+      "current_checkpoint": null,
       "current_task_group": null,
       "current_task": null,
-      "checkpoints_completed": [1, 2]
+      "checkpoints_completed": [1, 2, 3, 4]
     }
   },
   "docs": {
@@ -105,9 +105,15 @@
       },
       {
         "checkpoint_id": 2,
-        "sha": "44cbb82",
+        "sha": "c21b048",
         "message": "checkpoint-2: orbit-press-start sectioned property schema",
         "created_at": "2026-05-02T17:05:00+00:00"
+      },
+      {
+        "checkpoint_id": 3,
+        "sha": "5aff2e5",
+        "message": "checkpoint-3: procedural-cylinder-strips-mask sectioned property schema",
+        "created_at": "2026-05-02T17:30:00+00:00"
       }
     ]
   }

@@ -550,7 +550,7 @@
       "prerequisites": [
         2
       ],
-      "status": "pending",
+      "status": "completed",
       "testing_strategy": "Manual: `npm run dev`, open the editor on a scene that uses a `procedural-cylinder-strips-mask` layer (the title scene does). Verify: (1) the inspector renders the authored sections instead of `General`; (2) every property the renderer reads has a labeled, described field, including palette-mode-specific knobs (e.g. wheel-* fields, melee-spectrum colors); (3) switching `palette-mode` between `melee-spectrum`, `hue-wheel`, and `tri-color` still works and rerenders correctly; (4) editing a representative field per section (e.g. `strip-count`, `transition-seconds`, `color-start`, `texture-resolution`) still mutates the layer and updates the canvas; (5) no orphan-warning chip appears; (6) the layer continues to render visually identically with its existing saved values. Type check passes.",
       "task_groups": [
         {
@@ -962,7 +962,7 @@
       "prerequisites": [
         3
       ],
-      "status": "pending",
+      "status": "completed",
       "testing_strategy": "Manual: `npm run dev`, open the editor on a scene that uses a `procedural-cylinder-strips-straight` layer (the title scene does). Verify: (1) the inspector renders the same sections as the mask variant; (2) every property the renderer reads appears with a labeled, described field; (3) editing a representative field per section still mutates the layer and updates the canvas; (4) no orphan-warning chip appears; (5) the layer continues to render visually identically with its existing saved values. Type check passes. Cross-check: both strips schemas are character-identical except for any intentional documented divergence (none expected).",
       "task_groups": [
         {
