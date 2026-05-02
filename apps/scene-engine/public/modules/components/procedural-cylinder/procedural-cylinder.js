@@ -587,3 +587,422 @@ export default function ({ properties = {}, layerId } = {}) {
 
   return wrap;
 }
+
+// Inspector schema — editor-only; the runtime ignores this export.
+export const properties = {
+  sections: [
+    {
+      id: 'mode',
+      label: 'Animation Mode',
+      description:
+        'Selects the animation pass. Static draws no movement; Scan sweeps a vertical pulse along the lines; Dot Field flows lit dot trails along each line and ring; Sequence cycles scan→dot→reverse-scan→dot continuously.',
+      properties: {
+        'disable-animation': {
+          type: 'boolean',
+          label: 'Static (Disable Animation)',
+          description: 'When true, no animation runs — only the static grid and glow render.',
+        },
+        'animation-one': {
+          type: 'boolean',
+          label: 'Mode: Scan',
+          description:
+            'Enable the scan pulse animation (mutually exclusive with the other animation toggles).',
+        },
+        'animation-two': {
+          type: 'boolean',
+          label: 'Mode: Dot Field',
+          description: 'Enable the lit dot-trail animation along lines and rings.',
+        },
+        'animation-three': {
+          type: 'boolean',
+          label: 'Mode: Sequence',
+          description: 'Cycle through scan → dot-field → reverse-scan → dot-field on a loop.',
+        },
+        animate: {
+          type: 'boolean',
+          label: 'Animate (legacy)',
+          description:
+            'Legacy on/off used before the four-mode toggles existed. Treated as scan-mode when no other mode toggle is set.',
+        },
+      },
+    },
+    {
+      id: 'rotation',
+      label: 'Rotation',
+      description: 'Auto-rotation of the cylinder around its primary axis.',
+      properties: {
+        'rotation-speed': {
+          type: 'number',
+          label: 'Rotation Speed',
+          description: 'Radians per second the cylinder auto-rotates. Clamped to ±0.25 internally.',
+          min: -0.25,
+          max: 0.25,
+          step: 0.005,
+        },
+      },
+    },
+    {
+      id: 'geometry',
+      label: 'Geometry',
+      description:
+        "Number of vertical lines and horizontal rings, line stroke width, and the cylinder's radius/height.",
+      properties: {
+        lines: {
+          type: 'number',
+          label: 'Lines',
+          description: 'Number of vertical lines around the cylinder.',
+          min: 4,
+          max: 256,
+          step: 1,
+        },
+        rings: {
+          type: 'number',
+          label: 'Rings',
+          description: 'Number of horizontal rings (including caps).',
+          min: 2,
+          max: 64,
+          step: 1,
+        },
+        'line-width': {
+          type: 'number',
+          label: 'Line Width',
+          description: 'Stroke width of grid lines, in CSS pixels.',
+          min: 0.25,
+          max: 6,
+          step: 0.05,
+        },
+        radius: {
+          type: 'number',
+          label: 'Radius',
+          description: 'Cylinder radius as a fraction of layer width.',
+          min: 0.05,
+          max: 2,
+          step: 0.01,
+        },
+        'radius-x': {
+          type: 'number',
+          label: 'Radius X (legacy)',
+          description: 'Legacy fallback for radius when radius and radius-z are unset.',
+          min: 0.05,
+          max: 2,
+          step: 0.01,
+        },
+        'radius-z': {
+          type: 'number',
+          label: 'Radius Z (legacy)',
+          description: 'Legacy fallback for radius when radius is unset; takes precedence over radius-x.',
+          min: 0.05,
+          max: 2,
+          step: 0.01,
+        },
+        'cylinder-height': {
+          type: 'number',
+          label: 'Cylinder Height',
+          description: 'Cylinder body height as a fraction of layer height.',
+          min: 0.05,
+          max: 2,
+          step: 0.01,
+        },
+        depth: {
+          type: 'number',
+          label: 'Depth (legacy)',
+          description: 'Legacy fallback for cylinder-height when cylinder-height is unset.',
+          min: 0.05,
+          max: 2,
+          step: 0.01,
+        },
+      },
+    },
+    {
+      id: 'position',
+      label: 'Position (3D)',
+      description:
+        'Where the cylinder sits within the layer. center-x/y are the projection center; position-x/y/z translate the cylinder in world space before projection.',
+      properties: {
+        'center-x': {
+          type: 'number',
+          label: 'Center X',
+          description: 'Horizontal projection center, fraction of layer width.',
+          min: -1,
+          max: 2,
+          step: 0.01,
+        },
+        'center-y': {
+          type: 'number',
+          label: 'Center Y',
+          description: 'Vertical projection center, fraction of layer height.',
+          min: -1,
+          max: 2,
+          step: 0.01,
+        },
+        'position-x': {
+          type: 'number',
+          label: 'Position X',
+          description: 'World-space X translation, fraction of layer width.',
+          min: -2,
+          max: 2,
+          step: 0.01,
+        },
+        'position-y': {
+          type: 'number',
+          label: 'Position Y',
+          description: 'World-space Y translation, fraction of layer height.',
+          min: -2,
+          max: 2,
+          step: 0.01,
+        },
+        'position-z': {
+          type: 'number',
+          label: 'Position Z',
+          description:
+            'World-space Z translation. Negative pushes the cylinder away from the camera.',
+          min: -2,
+          max: 2,
+          step: 0.01,
+        },
+      },
+    },
+    {
+      id: 'tilt',
+      label: 'Tilt',
+      description:
+        'Static rotation around each axis (in degrees) applied before the auto-rotation. Tilt-X has a 90° baseline added internally so the default lays the cylinder vertical.',
+      properties: {
+        'tilt-x': {
+          type: 'number',
+          label: 'Tilt X (deg)',
+          description: 'Tilt around the X axis, in degrees.',
+          min: -180,
+          max: 180,
+          step: 1,
+        },
+        'tilt-y': {
+          type: 'number',
+          label: 'Tilt Y (deg)',
+          description: 'Tilt around the Y axis, in degrees.',
+          min: -180,
+          max: 180,
+          step: 1,
+        },
+        'tilt-z': {
+          type: 'number',
+          label: 'Tilt Z (deg)',
+          description: 'Tilt around the Z axis, in degrees.',
+          min: -180,
+          max: 180,
+          step: 1,
+        },
+      },
+    },
+    {
+      id: 'camera',
+      label: 'Camera',
+      description:
+        'Pinhole projection parameters. camera-distance is the camera→origin distance; camera-gap shrinks the visible top end; near-clip drops geometry too close; max-perspective caps the divergence ratio.',
+      properties: {
+        'camera-distance': {
+          type: 'number',
+          label: 'Camera Distance',
+          description: 'Distance from the camera to world-origin, in pixels.',
+          min: 100,
+          max: 4000,
+          step: 10,
+        },
+        'camera-gap': {
+          type: 'number',
+          label: 'Camera Gap',
+          description: 'Top-end gap as a fraction of camera distance. Internally clamped to 0–0.8.',
+          min: 0,
+          max: 0.8,
+          step: 0.01,
+        },
+        'near-clip': {
+          type: 'number',
+          label: 'Near Clip',
+          description: 'Closest depth before geometry is culled, in pixels.',
+          min: 1,
+          max: 1000,
+          step: 1,
+        },
+        'max-perspective': {
+          type: 'number',
+          label: 'Max Perspective',
+          description:
+            'Cap on the perspective divergence ratio (cameraDistance / depth). Higher = more wide-angle.',
+          min: 1.5,
+          max: 12,
+          step: 0.1,
+        },
+      },
+    },
+    {
+      id: 'color',
+      label: 'Color',
+      description: 'CSS color string for the cylinder grid. Plain string in v1.',
+      properties: {
+        'cylinder-color': {
+          type: 'color',
+          label: 'Cylinder Color',
+          description: 'CSS color (hex, rgba, named) for grid lines and glow.',
+        },
+      },
+    },
+    {
+      id: 'scan',
+      label: 'Scan Animation',
+      description:
+        'Tunables for the scan pulse pass. pulse-width is the head-of-pulse half-width; pulse-trail is the trailing fade length; pulse-speed controls direction and rate (negative reverses).',
+      properties: {
+        'pulse-width': {
+          type: 'number',
+          label: 'Pulse Width',
+          description: 'Half-width of the scan pulse head, fraction of cylinder length.',
+          min: 0.01,
+          max: 0.5,
+          step: 0.005,
+        },
+        'pulse-trail': {
+          type: 'number',
+          label: 'Pulse Trail',
+          description: 'Trailing fade length behind the pulse head, fraction of cylinder length.',
+          min: 0,
+          max: 0.5,
+          step: 0.005,
+        },
+        'pulse-speed': {
+          type: 'number',
+          label: 'Pulse Speed',
+          description:
+            'Scan oscillation rate. Internally clamped to ±0.2; negative inverts direction.',
+          min: -0.2,
+          max: 0.2,
+          step: 0.005,
+        },
+      },
+    },
+    {
+      id: 'dot-field',
+      label: 'Dot Field Animation',
+      description:
+        'Tunables for the dot-field pass — lit dot trails flow along each line and ring at lane-staggered phases.',
+      properties: {
+        'dot-speed': {
+          type: 'number',
+          label: 'Dot Speed',
+          description:
+            'Flow rate of the dot lanes. Internally clamped to ±1.2; negative inverts direction.',
+          min: -1.2,
+          max: 1.2,
+          step: 0.01,
+        },
+        'dot-size': {
+          type: 'number',
+          label: 'Dot Size',
+          description: 'Stroke width of each dot trail segment, in CSS pixels.',
+          min: 0.25,
+          max: 8,
+          step: 0.05,
+        },
+        'dot-density': {
+          type: 'number',
+          label: 'Dot Density',
+          description: 'Number of concurrent dot lanes per line. Higher = busier field.',
+          min: 1,
+          max: 8,
+          step: 1,
+        },
+        'dot-trail': {
+          type: 'number',
+          label: 'Dot Trail',
+          description: 'Trailing fade length behind each dot, fraction of segment.',
+          min: 0,
+          max: 0.45,
+          step: 0.005,
+        },
+        'dot-alpha': {
+          type: 'number',
+          label: 'Dot Alpha',
+          description:
+            'Maximum opacity of dot trails. Values >1 over-saturate via lighter compositing.',
+          min: 0,
+          max: 1.5,
+          step: 0.05,
+        },
+        'line-segment-density': {
+          type: 'number',
+          label: 'Line Segment Density',
+          description: 'Lanes-per-line override. Defaults to dot-density when unset.',
+          min: 1,
+          max: 8,
+          step: 1,
+        },
+        'ring-segment-density': {
+          type: 'number',
+          label: 'Ring Segment Density',
+          description: 'Lanes-per-ring override. Defaults to min(2, dot-density) when unset.',
+          min: 1,
+          max: 8,
+          step: 1,
+        },
+        'segment-width': {
+          type: 'number',
+          label: 'Segment Width',
+          description: 'Width of the lit head along a line/ring, fraction of segment length.',
+          min: 0.002,
+          max: 0.25,
+          step: 0.001,
+        },
+        'intersection-glow': {
+          type: 'number',
+          label: 'Intersection Glow (legacy)',
+          description:
+            'Legacy intersection-glow knob carried by some scenes. Currently ignored by the runtime; kept here so existing scenes do not orphan.',
+          min: 0,
+          max: 2,
+          step: 0.01,
+        },
+        'pulse-offset': {
+          type: 'number',
+          label: 'Pulse Offset (legacy)',
+          description:
+            'Legacy phase-offset knob carried by some scenes. Currently ignored by the runtime; kept here so existing scenes do not orphan.',
+          min: -1,
+          max: 1,
+          step: 0.01,
+        },
+      },
+    },
+    {
+      id: 'sequence',
+      label: 'Sequence Animation',
+      description:
+        'Tunables for the sequence pass — alternates scan and dot-field windows. Durations are in seconds.',
+      properties: {
+        'sequence-scan-duration': {
+          type: 'number',
+          label: 'Scan Duration (s)',
+          description: 'Seconds per scan window in the sequence loop.',
+          min: 0.1,
+          max: 30,
+          step: 0.1,
+        },
+        'sequence-dot-cycles': {
+          type: 'number',
+          label: 'Dot Cycles',
+          description: 'Number of full dot-field cycles per dot window in the sequence loop.',
+          min: 0.1,
+          max: 10,
+          step: 0.1,
+        },
+        'sequence-fade-duration': {
+          type: 'number',
+          label: 'Fade Duration (s)',
+          description: 'Seconds of crossfade between scan and dot windows in the sequence loop.',
+          min: 0,
+          max: 5,
+          step: 0.05,
+        },
+      },
+    },
+  ],
+};

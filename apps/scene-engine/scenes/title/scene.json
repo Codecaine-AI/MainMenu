@@ -21,9 +21,9 @@
       "properties": {
         "animate": true,
         "palette-mode": "melee-spectrum",
-        "color-start": "#1100ff",
-        "color-mid": "#3000db",
-        "color-end": "#c70060",
+        "color-start": "#560dc5",
+        "color-mid": "#00178a",
+        "color-end": "#ff00a2",
         "color-magenta": "#57003e",
         "color-cycle": 15.05,
         "color-offset": 0.08,
@@ -74,22 +74,26 @@
       "properties": {
         "mode": "interior",
         "rotation-speed": 0.1,
-        "longitudes": 42,
-        "latitudes": 32,
+        "longitudes": 32,
+        "latitudes": 24,
         "depth": 1.76,
         "sphere-width": 2.85,
         "sphere-height": 1.05,
         "sphere-x": 0.26,
         "sphere-y": 0,
         "sphere-z": -0.54,
-        "line-width": 3.5,
+        "line-width": 4,
         "pole-radius": 0.03,
         "rotate-x": 0,
         "rotate-y": -16,
         "rotate-z": -2,
-        "grid": "#dedede",
-        "vignette": "rgba(0, 0, 0, 0.84)",
-        "pole-gap": 0.035
+        "grid": "#ffffff",
+        "vignette": "#000000",
+        "pole-gap": 0.035,
+        "tilt": 0,
+        "fill": "#586e7e",
+        "rim": "#b8c0c7",
+        "scan": "#ffffff"
       },
       "name": "Background Sphere",
       "visible": true
@@ -122,7 +126,7 @@
         "segment-width": 0.032,
         "dot-density": 6,
         "line-segment-density": 4,
-        "ring-segment-density": 1,
+        "ring-segment-density": 2,
         "dot-trail": 0.04,
         "dot-alpha": 0.73,
         "intersection-glow": 0.74,
@@ -283,7 +287,7 @@
         "mode": "fill"
       },
       "appearance": {
-        "opacity": 0.55,
+        "opacity": 0.6,
         "blend": "normal"
       },
       "properties": {
@@ -302,7 +306,7 @@
       "id": "crt",
       "type": "effect",
       "asset": "crt-overlay",
-      "visible": true,
+      "visible": false,
       "transform": {
         "mode": "fill"
       },

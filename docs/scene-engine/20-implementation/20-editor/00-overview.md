@@ -1,8 +1,8 @@
 ---
-covers: Visual editor — Next.js client app, Zustand store, four panels, save/export toolbar.
+covers: Visual editor — Next.js client app, Zustand store, four panels, save/export toolbar, schema-driven property inspector.
 type: overview
-concepts: [editor, react, zustand, panels, mutations, manifest-driven]
-design_refs: [10-system-design/40-authoring-surfaces.md]
+concepts: [editor, react, zustand, panels, mutations, schema-driven, property-schema]
+design_refs: [10-system-design/40-authoring-surfaces.md, 10-system-design/16-property-schema.md]
 ---
 
 # Visual Editor
@@ -24,7 +24,10 @@ apps/scene-engine/app/editor/
     ├── HierarchyPanel.tsx              object tree, drag reorder, add menu
     ├── HierarchyRow.tsx                recursive tree row
     ├── InspectorPanel.tsx              shell that resolves selected object
-    ├── LayerForm.tsx                   always-present sections + manifest fields
+    ├── LayerForm.tsx                   always-present sections + schema-driven properties
+    ├── PropertySection.tsx             section header + nested properties + nested sections
+    ├── PropertyField.tsx               clickable label + input dispatch by schema type
+    ├── DescriptionPopover.tsx          floating popover (anchored, click-away/Esc dismiss)
     ├── SlotsSection.tsx                glyph-group slot editor
     ├── AssetSwapDropdown.tsx           per-container file swap
     ├── SceneSection.tsx                scene-level header
@@ -33,17 +36,22 @@ apps/scene-engine/app/editor/
         ├── BlendSelect.tsx             blend-mode dropdown
         ├── FitSelect.tsx               object-fit dropdown
         ├── AnchorSelect.tsx            9-position anchor selector
+        ├── ClipSelect.tsx              clip-path dropdown
         ├── EventsSection.tsx           event binding rows
-        ├── ManifestPropertyField.tsx   one field per manifest descriptor
+        ├── ManifestPropertyField.tsx   one field per manifest descriptor (effects only)
         └── InspectorSection.tsx        Header / Section / FieldRow / ReadonlyValue
 
 apps/scene-engine/src/
-├── store/editor-store.ts               Zustand store + mutations
-├── hooks/useSceneLoader.ts             fetch scene + registry, seed store
+├── store/editor-store.ts               Zustand store + mutations + componentSchemas cache
+├── hooks/useSceneLoader.ts             fetch scene + registry, seed store, preload component schemas
+├── types/
+│   └── property-schema.ts             PropertySchema / Section / PropertyDef types
 └── lib/
     ├── path.ts                         resolveObject, resolveLayerEl
     ├── patch.ts                        patchFromDottedKey
-    └── inspector-config.ts             BLEND_MODES, FIT_OPTIONS, NUMERIC_PROPERTY_STEPS
+    ├── inspector-config.ts             BLEND_MODES, FIT_OPTIONS, NUMERIC_PROPERTY_STEPS
+    ├── builtin-property-schemas.ts     schemas for media / glyph-group / audio + orphan helpers
+    └── component-schema-loader.ts      dynamic-import component .js, extract properties export, cache
 ```
 
 ## Contents
@@ -59,13 +67,14 @@ The React components — Toolbar, Canvas, Hierarchy, Inspector — including alw
 
 ## Key Concepts
 
-| Concept                | Description |
-|------------------------|-------------|
-| Zustand store          | `{ scene, registry, selectedPath, dirty }` plus mutations. Selectors drive granular re-renders. |
-| Object path            | Dotted string like `0`, `2.children.1`, `0.children.3.children.0`. Encodes a position in the scene tree. |
-| Mutation               | A function that produces a new scene tree (via `structuredClone`), replaces the store's `scene`, and marks dirty. |
-| Always-present section | Transform and Appearance render on every selection, even when the JSON omits them. |
-| Manifest-driven field  | Property field generated from the asset's `manifest.json` descriptor — no per-component code path. |
-| Slot                   | Glyph-group sub-surface edited under the parent object, not as a separate hierarchy entry. |
-| Event binding          | Trigger → action → target row stored on the object's `events[]`. |
-| Dirty                  | A boolean toggled by mutations and reset on save. Drives the toolbar's dirty indicator and Save button. |
+| Concept                     | Description |
+|-----------------------------|-------------|
+| Zustand store               | `{ scene, registry, selectedPath, dirty, componentSchemas }` plus mutations. Selectors drive granular re-renders. |
+| Object path                 | Dotted string like `0`, `2.children.1`, `0.children.3.children.0`. Encodes a position in the scene tree. |
+| Mutation                    | A function that produces a new scene tree (via `structuredClone`), replaces the store's `scene`, and marks dirty. |
+| Always-present section      | Transform and Appearance render on every selection, even when the JSON omits them. |
+| Schema-driven property field| Property field rendered from a `PropertySchema` — sections, clickable labels, description popovers. Covers components and built-in layer types. |
+| Manifest-driven field       | Property field generated from the asset's `manifest.json` descriptor. Used only for effects. |
+| Slot                        | Glyph-group sub-surface edited under the parent object, not as a separate hierarchy entry. |
+| Event binding               | Trigger → action → target row stored on the object's `events[]`. |
+| Dirty                       | A boolean toggled by mutations and reset on save. Drives the toolbar's dirty indicator and Save button. |

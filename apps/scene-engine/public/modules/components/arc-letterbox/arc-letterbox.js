@@ -70,3 +70,95 @@ export default function ({ properties = {}, layerId } = {}) {
 
   return root;
 }
+
+// Inspector schema for editor use only — runtime ignores it.
+export const properties = {
+  sections: [
+    {
+      id: 'top-bar',
+      label: 'Top Bar',
+      properties: {
+        'top-height': {
+          type: 'number',
+          label: 'Top Height',
+          description: 'Height of the top letterbox bar as a percentage of layer height. 0 hides the top bar.',
+          min: 0,
+          max: 50,
+          step: 0.5,
+        },
+        'top-curve': {
+          type: 'number',
+          label: 'Top Curve',
+          description: "Vertical position of the top bar's inner curve control point. Lower values make the curve sweep upward more aggressively.",
+          min: 0,
+          max: 50,
+          step: 0.5,
+        },
+      },
+    },
+    {
+      id: 'bottom-bar',
+      label: 'Bottom Bar',
+      properties: {
+        'bottom-height': {
+          type: 'number',
+          label: 'Bottom Height',
+          description: 'Height of the bottom letterbox bar as a percentage of layer height. 0 hides the bottom bar.',
+          min: 0,
+          max: 50,
+          step: 0.5,
+        },
+        'bottom-curve': {
+          type: 'number',
+          label: 'Bottom Curve',
+          description: "Vertical position of the bottom bar's inner curve control point. Higher values make the curve sweep downward more aggressively.",
+          min: 50,
+          max: 100,
+          step: 0.5,
+        },
+      },
+    },
+    {
+      id: 'curvature',
+      label: 'Curvature',
+      description: 'The contour value sets the bezier control inset shared by both bars — it shapes how dramatically the inner edges arc inward.',
+      properties: {
+        contour: {
+          type: 'number',
+          label: 'Contour',
+          description: 'Horizontal inset of the curve control points from the layer edges. Lower values pull the bezier handles toward the center, narrowing the arc; higher values flatten it.',
+          min: 0,
+          max: 50,
+          step: 0.5,
+        },
+      },
+    },
+    {
+      id: 'appearance',
+      label: 'Appearance',
+      properties: {
+        color: {
+          type: 'string',
+          label: 'Color',
+          description: 'Fill color of both letterbox bars. CSS color string (hex, rgba, named).',
+        },
+        opacity: {
+          type: 'number',
+          label: 'Opacity',
+          description: 'Per-bar opacity, 0–1. Applied to both bars uniformly.',
+          min: 0,
+          max: 1,
+          step: 0.01,
+        },
+        'edge-feather': {
+          type: 'number',
+          label: 'Edge Feather',
+          description: 'Gaussian blur applied to both bar edges, 0–8. 0 leaves edges crisp; higher values soften the silhouette.',
+          min: 0,
+          max: 8,
+          step: 0.1,
+        },
+      },
+    },
+  ],
+};

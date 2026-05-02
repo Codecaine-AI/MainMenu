@@ -1,11 +1,15 @@
 ---
-covers: The manifest convention for effects and components — what properties they expose, how the editor reads them, sizing hints.
+covers: The manifest convention for effects and components — module-level metadata, sizing hints, and effect property descriptors.
 concepts: [manifest, component, effect, module, properties, sizing, extensibility]
 ---
 
 # Component Manifest
 
-Effects and components are **self-describing**. Each module ships a `manifest.json` next to its code that declares what editable properties exist, their types, and their defaults. The editor reads the manifest to render property fields without hardcoding per-component knowledge. The renderer passes the resolved properties into the component's render function unchanged.
+Effects and components ship a `manifest.json` next to their code. The manifest declares module-level metadata — name, type, sizing hint — and, for effects, the editable property descriptors that drive the inspector.
+
+For **components** and built-in layer types (media, glyph-group, audio), property editing is driven by the [property schema convention](16-property-schema.md), not the manifest. The manifest is still required for name, type, and sizing metadata, but component property fields come from the schema exported by the component's code module.
+
+For **effects**, the manifest remains the authoritative source of property descriptors. Effects are pure CSS and have no code module to attach a schema to.
 
 This is the contract that makes the system open for extension — a new contributor can drop in a CSS file (effect) or JS file (component) plus a manifest, and it just works in both the editor and the runtime.
 
@@ -135,7 +139,9 @@ No further coupling — components are responsible for their own DOM and lifecyc
 
 ## Editor Integration
 
-When the inspector renders an object whose asset is a manifest-bearing module, it iterates the manifest's `properties` and renders one field per descriptor (`ManifestPropertyField`). The same descriptor drives the input type, the slider range, the default, and the tooltip — there is no per-component code path in the editor.
+**Effects**: the inspector iterates the manifest's `properties` and renders one field per descriptor. The descriptor drives the input type, slider range, default, and tooltip.
+
+**Components**: the inspector ignores the manifest's `properties` (if present) and reads the component's [property schema](16-property-schema.md) instead — a sectioned structure exported from the component's code module that provides grouping, labels, descriptions, and a richer type taxonomy. The manifest is still used for `name` (display in the asset browser) and `sizing` (default transform hint).
 
 When the asset browser lists modules, it groups by `type` (effect / component) and shows the manifest's `name`. Dragging a module onto the stage creates a new scene object whose `type` matches the module type, with the asset wired up and a transform seeded from the `sizing` hint.
 

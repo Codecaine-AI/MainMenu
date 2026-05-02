@@ -11,6 +11,9 @@ What the scene-engine is, why it exists, and the mental model behind it. Read th
 
 ## Contents
 
+### [05-origin.md](05-origin.md)
+Where the project came from — a Melee home screen recreation that outgrew hand-coding and revealed a gap between Figma and Unity for game-menu-style websites.
+
 ### [10-problem.md](10-problem.md)
 The friction that motivated the scene-engine: hand-wired pages don't compose, and the asset library has outgrown the per-page approach.
 

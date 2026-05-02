@@ -170,3 +170,8 @@ Layers reference container IDs only; swapping the file in a container updates ev
 - Asset renderer interface: each `asset-renderers/*.js` exports a `render(layer, registryEntry)` function returning a DOM element.
 - Scene IDs must match `^[a-z0-9]+(?:-[a-z0-9]+)*$`.
 - SVG sub-layer names use kebab-case `data-layer` attributes (e.g. `chrome-extrusion-shadow-layer`).
+
+### Foreign media children + sectioned inspector
+
+Foreign media children — `{ type: "video" | "image", asset, properties: { ... } }` nested under a glyph-group's `children` — render through `LayerForm` identically to top-level media layers and pick up the shared `video`/`image` built-in schema, so sectioning + clickable-label descriptions apply automatically. Named SVG sub-layer overrides (`{ layer: "data-layer-id", visible, properties? }`) skip the Transform / Appearance / Asset chrome and fall through to the schema/General render path with orphan warnings for any unknown keys.
+

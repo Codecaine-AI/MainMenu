@@ -19,6 +19,7 @@ docs/10-system-design/
 ├── 05-project-model.md       Project manifest, scenes list, navigation
 ├── 10-scene-data-model.md    Canonical SceneObject shape, transform, slots, events
 ├── 15-component-manifest.md  manifest.json convention for effects/components
+├── 16-property-schema.md     Sectioned property schemas — labels, descriptions, type taxonomy
 ├── 20-asset-registry.md      Containers, dual asset/module manifests, lookup
 ├── 30-rendering-pipeline.md  Scene → DOM, dispatch, slots, scene-level grading
 ├── 40-authoring-surfaces.md  Editor and agent — same data, always-present sections
@@ -37,7 +38,10 @@ The project manifest: how multiple scenes form a deliverable site, the `entry` s
 The canonical scene shape: stage, scene-level appearance, the universal SceneObject (transform, appearance, properties, slots, events, children), the eight built-in object types, and z-order semantics.
 
 ### [15-component-manifest.md](15-component-manifest.md)
-The convention every effect and component follows: a `manifest.json` declaring editable properties, sizing hints, and metadata. The contract that makes the system extensible.
+The manifest convention: a `manifest.json` declaring module-level metadata (name, type, sizing) and, for effects, editable property descriptors. Components use the property schema instead of manifest properties.
+
+### [16-property-schema.md](16-property-schema.md)
+The property schema convention: sectioned property declarations with labels, descriptions, and a locked type taxonomy. Drives the inspector for components and built-in layer types. Defines the General fallback, orphan handling, and description popovers.
 
 ### [20-asset-registry.md](20-asset-registry.md)
 The container indirection between scenes and files: dual asset/module manifests, the four asset types, swap-by-id semantics, and how registry lookup affects renderer dispatch.
@@ -46,7 +50,7 @@ The container indirection between scenes and files: dual asset/module manifests,
 How a scene becomes DOM: registry load, type dispatch, transform/appearance application, glyph-group slot mounting, scene-level color grading, mount-vs-update reconciliation.
 
 ### [40-authoring-surfaces.md](40-authoring-surfaces.md)
-The dual-surface authoring contract: visual editor and agent both read and write the same `scene.json`. Always-present inspector sections, manifest-driven property fields, dirty tracking, save and export semantics.
+The dual-surface authoring contract: visual editor and agent both read and write the same `scene.json`. Always-present inspector sections, schema-driven property fields with sections and description popovers, dirty tracking, save and export semantics.
 
 ### [50-build-output.md](50-build-output.md)
 How a project becomes a deployable site: `/api/export` bundles renderer + scenes + assets + modules + fonts + boot into a standalone zip. No build step, no server runtime.
@@ -66,7 +70,8 @@ How new asset files enter the system and how container file pointers are swapped
 | Transform            | Spatial section. Either explicit (`x`, `y`, `width`, `height`, `anchor`) or `mode: "fill"`. |
 | Appearance           | Visual section: `opacity`, `blend`, `hue`, `saturation`, `fit`. Available at scene and object level. |
 | Slot                 | An exposed editable sub-surface inside a glyph-group SVG. Replaces the legacy 40-child array. |
-| Manifest             | A `manifest.json` next to a component or effect declaring editable properties and sizing. Drives the inspector. |
+| Manifest             | A `manifest.json` next to a component or effect declaring module-level metadata and, for effects, property descriptors. |
+| Property schema      | A sectioned property declaration (labels, descriptions, locked type taxonomy) that drives the inspector for components and built-in layer types. |
 | Asset                | An external file (audio, image, video, glyph) referenced by container ID. |
 | Module               | An authored code unit (effect, component) referenced by container ID. |
 | Container            | A typed registry entry that points at a file. Scenes reference containers; swapping the file propagates to every consumer. |

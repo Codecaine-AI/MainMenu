@@ -1,0 +1,16 @@
+{
+  "$schema": "Session dev notes — append-only deviations/discoveries/decisions/blockers/resolutions",
+  "session_id": "2026-05-02_author-property-schemas-for-remaining-co_d7uyij",
+  "notes": [
+    {
+      "scope": { "type": "checkpoint", "ref": "2" },
+      "category": "discovery",
+      "content": "Plan summary on action 50 said '36 keys (30 active + 6 legacy)' but the explicit comma-separated list in the same action contains 37 keys (31 active + 6 legacy). Cross-checked against the renderer (tiltDegrees + drawCenter + drawFrame + drawLetter + render): 37 distinct property keys are read. The schema authored matches the explicit list and the renderer reads exactly — the headline count was off by one. No action needed; flagging so CP3/CP4 verification doesn't re-bump on the same arithmetic."
+    },
+    {
+      "scope": { "type": "checkpoint", "ref": "4" },
+      "category": "discovery",
+      "content": "CP4 plan claimed the mask and straight files would 'continue to differ above the schema block (different render bodies)'. Actual diff: lines 1-490 are byte-identical between the two files prior to the schema append. The two component variants currently share an identical implementation and only differ by file name / module-registry entry. The verbatim schema copy still applies as planned — the pre-condition was even stronger than expected — but the divergence claim in the plan was outdated."
+    }
+  ]
+}

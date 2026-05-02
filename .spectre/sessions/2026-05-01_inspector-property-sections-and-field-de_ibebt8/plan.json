@@ -3,7 +3,7 @@
   "session_id": "2026-05-01_inspector-property-sections-and-field-de_ibebt8",
   "spec_reference": "./spec.md",
   "created_at": "2026-05-02T03:00:00+00:00",
-  "updated_at": "2026-05-02T02:44:42+00:00",
+  "updated_at": "2026-05-02T04:40:21+00:00",
   "status": "complete",
   "checkpoints": [
     {
@@ -11,7 +11,7 @@
       "title": "Foundation \u2014 schema types, popover, property primitives, and first built-in schema (media)",
       "goal": "End-to-end tracer bullet: a `media` layer's properties render via a schema-driven PropertySection in the inspector, and clicking a property label opens a DescriptionPopover with the full label + description. No regressions in existing media editing.",
       "prerequisites": [],
-      "status": "pending",
+      "status": "completed",
       "testing_strategy": "Manual: `npm run dev` in apps/scene-engine, open http://localhost:3000/editor?scene=title, select the `bg-video` media layer. Verify: (1) the previously hand-written `Media` section is now rendered through PropertySection but visually identical (Repeat X/Y, Position X/Y, Scale, Rotation, Speed); (2) clicking the `Repeat X` label opens a small floating popover anchored to the label, showing the full label and a description; (3) clicking outside or pressing Esc dismisses the popover; (4) editing a slider still mutates `properties.repeat_x` (etc.) and the canvas updates immediately. Type check: `npm run build` (or `tsc --noEmit`) passes.",
       "task_groups": [
         {
@@ -722,21 +722,21 @@
       "prerequisites": [
         1
       ],
-      "status": "pending",
+      "status": "completed",
       "testing_strategy": "Manual: `npm run dev` in apps/scene-engine, open http://localhost:3000/editor?scene=title. (1) Select `codecaine-rounded-chrome-logo` (glyph-group) \u2014 verify a `Glyph Group` section appears with a `Shimmer` checkbox that toggles `properties.shimmer` (canvas reflects change immediately). (2) Save the scene with an extra unknown key (e.g. add `properties.legacyFlag: true` directly via JSON or via the inspector after a schema rename) \u2014 verify it renders under an auto `General` section with a checkbox and that `console.warn` logs `[builtin-property-schemas] orphan property 'legacyFlag' on layer type 'glyph-group' \u2014 not declared in schema`. (3) Select an `effect` layer (`crt`) \u2014 its manifest-driven `Properties` section must still render (untouched by this CP). (4) Select an `audio` layer if present, or temporarily add one \u2014 verify it does not error. (5) Re-select the `bg-video` media layer \u2014 its Media section still renders identically (CP1 regression check). Type check: `npm run build` (or `tsc --noEmit`) passes.",
       "task_groups": [
         {
           "id": 1,
           "title": "Add remaining built-in schemas (glyph-group, audio) + orphan/General helpers",
           "objective": "Extend `src/lib/builtin-property-schemas.ts` with schema entries for `glyph-group` (one `Glyph Group` section, just `shimmer` boolean for v1) and `audio` (single empty `Audio` section \u2014 no scene-level audio properties exist today, so this entry is intentionally empty and exists only to satisfy the spec's enumeration). Also add the helpers needed by LayerForm to render the General fallback: a key-collector that walks a schema (recursing into nested sections) and returns the set of declared property keys; a value-type-inferrer that converts a runtime (key, value) pair into a `PropertyDef` (number/boolean/string + step lookup from inspector-config.NUMERIC_PROPERTY_STEPS when known); and a section-builder that wraps the inferred entries into a synthetic `General` section. `effect` is intentionally NOT given a built-in schema \u2014 effect properties always come from the per-component manifest (handled by the existing manifest-driven path in LayerForm) and CP3 will subsume that path. The contract for `getBuiltinPropertySchema` therefore returns `undefined` for effect/component, and Task Group 2's wiring will treat that as 'use the existing manifest path; do not synthesize General for declared manifest keys'.",
-          "status": "pending",
+          "status": "completed",
           "task_seeds": [],
           "tasks": [
             {
               "id": 1,
               "title": "Add glyph-group + audio entries to BUILTIN_PROPERTY_SCHEMAS",
               "description": "Append two entries to the `BUILTIN_PROPERTY_SCHEMAS` map exported from `apps/scene-engine/src/lib/builtin-property-schemas.ts` (created in CP1 task 2.1). The `glyph-group` entry is a `PropertySchema` with one section `{ id: 'glyph-group', label: 'Glyph Group', properties: { shimmer: { type: 'boolean', label: 'Shimmer', description: 'Apply the animated shimmer/pearlescent gradient overlay to the glyph fills.' } } }`. The `audio` entry is a `PropertySchema` with one empty section `{ id: 'audio', label: 'Audio', properties: {} }` \u2014 no scene-level audio properties exist today, but the entry must exist so the inspector renders an `Audio` header even when the layer has no `properties` (and so future props land naturally). Do NOT add a built-in entry for `effect` or `component` \u2014 those continue to flow through the manifest-driven path. Keep the file's module-level note (added in CP1) accurate; remove the 'add glyph-group/audio in CP2' line now that they exist.",
-              "status": "pending",
+              "status": "completed",
               "context": {
                 "read_before": [
                   {
@@ -787,25 +787,25 @@
                   "id": 1,
                   "command": "ADD VAR glyphGroupSchema: PropertySchema = { sections: [ { id: 'glyph-group', label: 'Glyph Group', properties: { shimmer: { type: 'boolean', label: 'Shimmer', description: 'Apply the animated shimmer/pearlescent gradient overlay to the glyph fills.' } } } ] } IN apps/scene-engine/src/lib/builtin-property-schemas.ts BEFORE the BUILTIN_PROPERTY_SCHEMAS declaration",
                   "file": "apps/scene-engine/src/lib/builtin-property-schemas.ts",
-                  "status": "pending"
+                  "status": "completed"
                 },
                 {
                   "id": 2,
                   "command": "ADD VAR audioSchema: PropertySchema = { sections: [ { id: 'audio', label: 'Audio', properties: {} } ] } IN apps/scene-engine/src/lib/builtin-property-schemas.ts BEFORE the BUILTIN_PROPERTY_SCHEMAS declaration",
                   "file": "apps/scene-engine/src/lib/builtin-property-schemas.ts",
-                  "status": "pending"
+                  "status": "completed"
                 },
                 {
                   "id": 3,
                   "command": "UPDATE BUILTIN_PROPERTY_SCHEMAS object literal to ADD entries 'glyph-group': glyphGroupSchema AND audio: audioSchema (preserve existing video/image entries)",
                   "file": "apps/scene-engine/src/lib/builtin-property-schemas.ts",
-                  "status": "pending"
+                  "status": "completed"
                 },
                 {
                   "id": 4,
                   "command": "UPDATE the module-level COMMENT \u2014 remove the CP2 TODO line ('add glyph-group/audio in CP2'); leave a brief sentence describing the file's purpose (built-in non-component layer schemas) and a note that `effect`/`component` are handled by the manifest path",
                   "file": "apps/scene-engine/src/lib/builtin-property-schemas.ts",
-                  "status": "pending"
+                  "status": "completed"
                 }
               ]
             },
@@ -813,7 +813,7 @@
               "id": 2,
               "title": "Add schema introspection + General-section builder helpers",
               "description": "In the same file `apps/scene-engine/src/lib/builtin-property-schemas.ts`, add three pure functions used by LayerForm's general-fallback wiring (Task Group 2). (1) `extractSchemaPropertyKeys(schema: PropertySchema): Set<string>` \u2014 recursively walks `schema.sections` and every `section.sections`, collecting every key from each `section.properties`. Returns a Set keyed by raw property name. (2) `inferPropertyDef(key: string, value: unknown): PropertyDef` \u2014 converts a runtime (key, value) pair into a PropertyDef: if `typeof value === 'number'`, returns `{ type: 'number', label: key, ...(NUMERIC_PROPERTY_STEPS[key] ?? { min: undefined, max: undefined, step: undefined }) }` (only spread the known min/max/step keys when present); if `typeof value === 'boolean'`, returns `{ type: 'boolean', label: key }`; otherwise returns `{ type: 'string', label: key }`. The label is the raw key (no humanization) \u2014 these are intentionally minimal to flag 'this came from General fallback'. (3) `buildGeneralSection(orphans: Array<[string, unknown]>): Section` \u2014 builds a synthetic Section with `id: 'general'`, `label: 'General'`, `description: 'Saved properties not declared in this layer's schema. Update the schema to give them a proper label and description.'`, and `properties` populated by mapping each `[key, value]` through `inferPropertyDef`. Insertion order is the input array order; callers pass entries in declaration order. All three exported.",
-              "status": "pending",
+              "status": "completed",
               "context": {
                 "read_before": [
                   {
@@ -864,37 +864,37 @@
                   "id": 1,
                   "command": "ADD IMPORT { NUMERIC_PROPERTY_STEPS } FROM '@/lib/inspector-config' AT TOP OF apps/scene-engine/src/lib/builtin-property-schemas.ts",
                   "file": "apps/scene-engine/src/lib/builtin-property-schemas.ts",
-                  "status": "pending"
+                  "status": "completed"
                 },
                 {
                   "id": 2,
                   "command": "ADD IMPORT type { Section, PropertyDef, PropertySchema } FROM '@/types/property-schema' (extend the existing type-only import if one already exists)",
                   "file": "apps/scene-engine/src/lib/builtin-property-schemas.ts",
-                  "status": "pending"
+                  "status": "completed"
                 },
                 {
                   "id": 3,
                   "command": "ADD FUNCTION extractSchemaPropertyKeys(schema: PropertySchema): Set<string> \u2014 initializes empty Set, defines inner walk(section: Section) that adds every key from Object.keys(section.properties ?? {}) and recurses on every entry of section.sections ?? []; iterates schema.sections; returns the Set",
                   "file": "apps/scene-engine/src/lib/builtin-property-schemas.ts",
-                  "status": "pending"
+                  "status": "completed"
                 },
                 {
                   "id": 4,
                   "command": "ADD FUNCTION inferPropertyDef(key: string, value: unknown): PropertyDef \u2014 if typeof value === 'number': const steps = NUMERIC_PROPERTY_STEPS[key]; return { type: 'number', label: key, ...(steps ? { min: steps.min, max: steps.max, step: steps.step } : {}) } as PropertyDef; if typeof value === 'boolean': return { type: 'boolean', label: key }; otherwise return { type: 'string', label: key }",
                   "file": "apps/scene-engine/src/lib/builtin-property-schemas.ts",
-                  "status": "pending"
+                  "status": "completed"
                 },
                 {
                   "id": 5,
                   "command": "ADD FUNCTION buildGeneralSection(orphans: Array<[string, unknown]>): Section \u2014 return { id: 'general', label: 'General', description: \"Saved properties not declared in this layer's schema. Update the schema to give them a proper label and description.\", properties: Object.fromEntries(orphans.map(([k, v]) => [k, inferPropertyDef(k, v)])) }",
                   "file": "apps/scene-engine/src/lib/builtin-property-schemas.ts",
-                  "status": "pending"
+                  "status": "completed"
                 },
                 {
                   "id": 6,
                   "command": "EXPORT extractSchemaPropertyKeys, inferPropertyDef, buildGeneralSection (append to existing export list)",
                   "file": "apps/scene-engine/src/lib/builtin-property-schemas.ts",
-                  "status": "pending"
+                  "status": "completed"
                 }
               ]
             }
@@ -904,14 +904,14 @@
           "id": 2,
           "title": "Wire LayerForm to render all built-in schemas + General orphan section",
           "objective": "Generalize the CP1 media-only PropertySection wiring in `LayerForm.tsx` to drive every built-in layer type: resolve the schema via `getBuiltinPropertySchema(layerType)`, render its declared sections, compute orphan keys (saved `properties.*` keys not declared in the schema, with `text` keys excluded for text layers), and render those orphans under a synthesized `General` section using `buildGeneralSection`. Each orphan triggers exactly one `console.warn` per render naming the orphan key, layer type, and schema source. The pre-existing manifest-driven `Properties` InspectorSection (used by component/effect manifests) is NOT touched by this CP \u2014 CP3 replaces it. Remove the now-redundant inference-based fallback `else` branch (LayerForm.tsx ~528-580) since the General-section path replaces it; keep `MEDIA_PROPERTY_KEYS` only if it is still referenced after the cleanup, otherwise delete it.",
-          "status": "pending",
+          "status": "completed",
           "task_seeds": [],
           "tasks": [
             {
               "id": 1,
               "title": "Replace media-only PropertySection wiring with all-built-in-types render + orphan General",
               "description": "Modify `apps/scene-engine/app/editor/_components/LayerForm.tsx`. After CP1, the file contains a media-only block that calls `<PropertySection>` with `getBuiltinPropertySchema(layerType)` resolved to `mediaSchema.sections[0]`. Generalize this so every built-in layer type uses the same render path. New flow within the existing JSX, replacing the entire `{isMedia && (<PropertySection .../>)}` block from CP1: (a) Resolve `const builtinSchema = getBuiltinPropertySchema(layerType as SceneObjectType | undefined)`. (b) When `builtinSchema && !manifest` (manifest path takes precedence for component/effect \u2014 CP3 will subsume it): build a `values` lookup by reading `props` directly with the per-layer-type defaults already in scope (for media layers, fall back to `MEDIA_PROPERTY_DEFAULTS[key]`; for non-media layers, fall back to `undefined`). Render every section in `builtinSchema.sections` via `<PropertySection>` (one per section, mapped by `section.id`). (c) Compute orphans: `const declaredKeys = builtinSchema ? extractSchemaPropertyKeys(builtinSchema) : new Set<string>(); const excludedKeys = new Set<string>([...declaredKeys, ...(isText ? Array.from(TEXT_PROPERTY_KEYS) : [])]); const orphans = Object.entries(props).filter(([k]) => !excludedKeys.has(k))`. When the layer has NO builtinSchema AND no manifest, skip the schema render block; orphans then equals all of `props` minus text keys. (d) When `orphans.length > 0` (and either there's a builtinSchema OR no manifest), render `<PropertySection section={buildGeneralSection(orphans)} values={Object.fromEntries(orphans)} onChange={(key, value) => commit(`properties.${key}`, value)} />`. (e) For each orphan, call `console.warn` exactly once per render with format `[builtin-property-schemas] orphan property '${key}' on layer type '${layerType}' \u2014 not declared in schema` \u2014 guard with a `useEffect` that runs when `(layerType, orphans.map(o => o[0]).join(','))` changes so the warning fires once per unique orphan set, not on every prop edit. (f) Number-rounding rule that CP1 applied to repeat_x/repeat_y stays \u2014 extract it into the same `onChange` adapter used for the schema-driven sections (only the media schema currently has those keys, so the adapter can be a single closure: `function applyMediaRounding(key, value) { return key === 'repeat_x' || key === 'repeat_y' ? Math.round(value as number) : value }`). Existing `transform`/`appearance`/`text`/`SlotsSection`/`EventsSection` blocks remain untouched.",
-              "status": "pending",
+              "status": "completed",
               "context": {
                 "read_before": [
                   {
@@ -973,79 +973,79 @@
                   "id": 1,
                   "command": "UPDATE IMPORT FROM '@/lib/builtin-property-schemas' TO ALSO INCLUDE { extractSchemaPropertyKeys, buildGeneralSection } (existing import already brings in getBuiltinPropertySchema)",
                   "file": "apps/scene-engine/app/editor/_components/LayerForm.tsx",
-                  "status": "pending"
+                  "status": "completed"
                 },
                 {
                   "id": 2,
                   "command": "ADD IMPORT { useMemo } FROM 'react' (extend existing react import)",
                   "file": "apps/scene-engine/app/editor/_components/LayerForm.tsx",
-                  "status": "pending"
+                  "status": "completed"
                 },
                 {
                   "id": 3,
                   "command": "ADD VAR builtinSchema = useMemo(() => getBuiltinPropertySchema(layerType as SceneObjectType | undefined), [layerType]) IN LayerForm BEFORE the return statement",
                   "file": "apps/scene-engine/app/editor/_components/LayerForm.tsx",
-                  "status": "pending"
+                  "status": "completed"
                 },
                 {
                   "id": 4,
                   "command": "ADD VAR declaredKeys = useMemo(() => builtinSchema ? extractSchemaPropertyKeys(builtinSchema) : new Set<string>(), [builtinSchema]) IN LayerForm",
                   "file": "apps/scene-engine/app/editor/_components/LayerForm.tsx",
-                  "status": "pending"
+                  "status": "completed"
                 },
                 {
                   "id": 5,
                   "command": "ADD VAR orphans = useMemo(() => Object.entries(props).filter(([k]) => !declaredKeys.has(k) && !(isText && TEXT_PROPERTY_KEYS.has(k))), [props, declaredKeys, isText])",
                   "file": "apps/scene-engine/app/editor/_components/LayerForm.tsx",
-                  "status": "pending"
+                  "status": "completed"
                 },
                 {
                   "id": 6,
                   "command": "ADD FUNCTION applyMediaRounding(key: string, value: unknown): unknown \u2014 return (key === 'repeat_x' || key === 'repeat_y') && typeof value === 'number' ? Math.round(value) : value",
                   "file": "apps/scene-engine/app/editor/_components/LayerForm.tsx",
-                  "status": "pending"
+                  "status": "completed"
                 },
                 {
                   "id": 7,
                   "command": "ADD VAR mediaValues IF isMedia: { repeat_x: props.repeat_x ?? MEDIA_PROPERTY_DEFAULTS.repeat_x, repeat_y: ?? defaults, position_x, position_y, scale, rotation, speed } \u2014 same shape as CP1; build only when builtinSchema && isMedia, otherwise schemaValues = props as Record<string, unknown>",
                   "file": "apps/scene-engine/app/editor/_components/LayerForm.tsx",
-                  "status": "pending"
+                  "status": "completed"
                 },
                 {
                   "id": 8,
                   "command": "REPLACE the CP1 `{isMedia && builtinSchema && (<PropertySection ... />)}` JSX block WITH a generalized JSX block: `{builtinSchema && !manifest && builtinSchema.sections.map(section => (<PropertySection key={section.id} section={section} values={isMedia ? mediaValues : props} onChange={(key, value) => commit(`properties.${key}`, applyMediaRounding(key, value))} />))}`",
                   "file": "apps/scene-engine/app/editor/_components/LayerForm.tsx",
-                  "status": "pending"
+                  "status": "completed"
                 },
                 {
                   "id": 9,
                   "command": "ADD JSX AFTER the schema-driven block: `{!manifest && orphans.length > 0 && (<PropertySection section={buildGeneralSection(orphans)} values={Object.fromEntries(orphans)} onChange={(key, value) => commit(`properties.${key}`, value)} />)}` (no rounding for orphans \u2014 they're inferred types)",
                   "file": "apps/scene-engine/app/editor/_components/LayerForm.tsx",
-                  "status": "pending"
+                  "status": "completed"
                 },
                 {
                   "id": 10,
                   "command": "ADD useEffect \u2014 log a console.warn for each orphan when the orphan key set or layerType changes; dependency array = [layerType, orphans.map(o => o[0]).join(',')]; body iterates orphans and calls console.warn(`[builtin-property-schemas] orphan property '${key}' on layer type '${layerType}' \u2014 not declared in schema`)",
                   "file": "apps/scene-engine/app/editor/_components/LayerForm.tsx",
-                  "status": "pending"
+                  "status": "completed"
                 },
                 {
                   "id": 11,
                   "command": "REMOVE the `!manifest && Object.entries(props).some(...)` else-branch InspectorSection (current LayerForm.tsx ~lines 528-580) \u2014 the General-section render now covers it",
                   "file": "apps/scene-engine/app/editor/_components/LayerForm.tsx",
-                  "status": "pending"
+                  "status": "completed"
                 },
                 {
                   "id": 12,
                   "command": "REMOVE VAR MEDIA_PROPERTY_KEYS IF no remaining references after the else-branch deletion (verify via final-file grep); leave MEDIA_PROPERTY_DEFAULTS in place \u2014 it is still used by mediaValues",
                   "file": "apps/scene-engine/app/editor/_components/LayerForm.tsx",
-                  "status": "pending"
+                  "status": "completed"
                 },
                 {
                   "id": 13,
                   "command": "VERIFY existing manifest-driven `<InspectorSection title='Properties'>` block (the `manifest && Object.keys(manifest.properties).length > 0 ?` branch) is left untouched \u2014 CP3 owns that path",
                   "file": "apps/scene-engine/app/editor/_components/LayerForm.tsx",
-                  "status": "pending"
+                  "status": "completed"
                 }
               ]
             }
@@ -1061,21 +1061,21 @@
         1,
         2
       ],
-      "status": "pending",
+      "status": "completed",
       "testing_strategy": "Manual: `npm run dev` in apps/scene-engine, open http://localhost:3000/editor?scene=title. (1) Select the `press-start` component layer. Within ~one tick of scene load, verify two named sections render: `Text` (with `Display Text` string field) and `Animation` (with `Blink Rate` number slider). Clicking either section's label or any property label opens the DescriptionPopover with the full label + description. Editing `Display Text` and `Blink Rate` still mutates `properties.text` / `properties['blink-rate']` and the canvas reflects the change immediately. (2) Confirm no `[builtin-property-schemas] orphan property` warning fires for `text` or `blink-rate` once the schema has loaded \u2014 only orphan warnings should appear if a saved key is genuinely undeclared. (3) Briefly during the loading window (e.g. on hard reload, before the dynamic import resolves), the press-start layer renders its properties under an auto `General` section \u2014 this is the intended fallback. (4) Select the `crt` effect layer \u2014 its manifest-driven `Properties` section still renders identically (manifest path is preserved for `effect` layers only). (5) Re-select the `bg-video` media layer and the `codecaine-rounded-chrome-logo` glyph-group \u2014 their CP1/CP2 sections still render (regression check). Type check: `npm run build` (or `tsc --noEmit`) passes.",
       "task_groups": [
         {
           "id": 1,
           "title": "Component schema cache + dynamic-import loader + scene-load wiring",
           "objective": "Add a `componentSchemas` cache to the editor store (keyed by component asset id), write a `loadComponentSchema` util that fetches a component module's source, dynamic-imports it via Blob URL (mirroring the renderer's existing pattern), reads its named `properties` export, and validates the rough shape. Wire `useSceneLoader` so that after scene + registry load, the loader fires once per unique component asset id referenced anywhere in the scene tree (recursing into children) and populates the cache as schemas resolve. The cache distinguishes 'not yet loaded' (key absent) from 'loaded with no export' (value `null`) from 'loaded with schema' (value `PropertySchema`).",
-          "status": "pending",
+          "status": "completed",
           "task_seeds": [],
           "tasks": [
             {
               "id": 1,
               "title": "Add componentSchemas cache + setter to editor-store",
               "description": "Extend `apps/scene-engine/src/store/editor-store.ts` with a per-session cache for component property schemas, keyed by the component's *asset id* (which is the layer's `asset` field \u2014 i.e. the registry id). Cache value is `PropertySchema | null`: `PropertySchema` when the module exported a valid `properties` schema; `null` when the module loaded but had no (or invalid) `properties` export. Absence of the key means 'not yet loaded'. Add (a) a `componentSchemas: Record<string, PropertySchema | null>` field to `EditorStore`, (b) a `setComponentSchema(componentId: string, schema: PropertySchema | null): void` method, and (c) initialize `componentSchemas: {}` in the `create` body. The setter writes immutably (`set(state => ({ componentSchemas: { ...state.componentSchemas, [id]: schema } }))`) so consumers using shallow comparisons re-render. Do NOT clear the cache when `setScene` runs \u2014 schemas are keyed by component id and survive scene swaps; if a module is hot-reloaded in dev, the editor reload reinitializes the store anyway.",
-              "status": "pending",
+              "status": "completed",
               "context": {
                 "read_before": [
                   {
@@ -1121,31 +1121,31 @@
                   "id": 1,
                   "command": "ADD IMPORT type { PropertySchema } FROM '@/types/property-schema' AT TOP OF apps/scene-engine/src/store/editor-store.ts",
                   "file": "apps/scene-engine/src/store/editor-store.ts",
-                  "status": "pending"
+                  "status": "completed"
                 },
                 {
                   "id": 2,
                   "command": "ADD FIELD componentSchemas: Record<string, PropertySchema | null> TO interface EditorStore (place near `registry: Registry | null`)",
                   "file": "apps/scene-engine/src/store/editor-store.ts",
-                  "status": "pending"
+                  "status": "completed"
                 },
                 {
                   "id": 3,
                   "command": "ADD METHOD setComponentSchema: (componentId: string, schema: PropertySchema | null) => void TO interface EditorStore",
                   "file": "apps/scene-engine/src/store/editor-store.ts",
-                  "status": "pending"
+                  "status": "completed"
                 },
                 {
                   "id": 4,
                   "command": "ADD INITIAL VALUE componentSchemas: {} INSIDE create<EditorStore>(set => ({ ... })) (place alongside scene/registry/selectedPath/dirty)",
                   "file": "apps/scene-engine/src/store/editor-store.ts",
-                  "status": "pending"
+                  "status": "completed"
                 },
                 {
                   "id": 5,
                   "command": "ADD FUNCTION setComponentSchema: (componentId, schema) => set(state => ({ componentSchemas: { ...state.componentSchemas, [componentId]: schema } })) INSIDE create body",
                   "file": "apps/scene-engine/src/store/editor-store.ts",
-                  "status": "pending"
+                  "status": "completed"
                 }
               ]
             },
@@ -1200,39 +1200,40 @@
                   "id": 1,
                   "command": "CREATE apps/scene-engine/src/lib/component-schema-loader.ts",
                   "file": "apps/scene-engine/src/lib/component-schema-loader.ts",
-                  "status": "pending"
+                  "status": "completed"
                 },
                 {
                   "id": 2,
                   "command": "ADD IMPORT type { PropertySchema } FROM '@/types/property-schema'",
                   "file": "apps/scene-engine/src/lib/component-schema-loader.ts",
-                  "status": "pending"
+                  "status": "completed"
                 },
                 {
                   "id": 3,
                   "command": "ADD VAR moduleCache = new Map<string, Promise<PropertySchema | null>>() AT MODULE SCOPE",
                   "file": "apps/scene-engine/src/lib/component-schema-loader.ts",
-                  "status": "pending"
+                  "status": "completed"
                 },
                 {
                   "id": 4,
                   "command": "ADD FUNCTION isPropertySchemaShape(value: unknown): value is PropertySchema \u2014 return typeof value === 'object' && value !== null && Array.isArray((value as { sections?: unknown }).sections)",
                   "file": "apps/scene-engine/src/lib/component-schema-loader.ts",
-                  "status": "pending"
+                  "status": "completed"
                 },
                 {
                   "id": 5,
                   "command": "ADD FUNCTION loadComponentSchema(modulePath: string): Promise<PropertySchema | null> \u2014 if moduleCache has modulePath return cached promise; else build promise that fetch(modulePath) \u2192 res.text() \u2192 new Blob([code], { type: 'application/javascript' }) \u2192 URL.createObjectURL(blob) \u2192 import(/* webpackIgnore: true */ url) \u2192 if isPropertySchemaShape(mod.properties) return mod.properties as PropertySchema else return null; on any error console.warn('[component-schema-loader] failed to load', modulePath, err) and return null AND moduleCache.delete(modulePath); store the promise in moduleCache before returning",
                   "file": "apps/scene-engine/src/lib/component-schema-loader.ts",
-                  "status": "pending"
+                  "status": "completed"
                 },
                 {
                   "id": 6,
                   "command": "EXPORT loadComponentSchema",
                   "file": "apps/scene-engine/src/lib/component-schema-loader.ts",
-                  "status": "pending"
+                  "status": "completed"
                 }
-              ]
+              ],
+              "status": "completed"
             },
             {
               "id": 3,
@@ -1296,39 +1297,40 @@
                   "id": 1,
                   "command": "ADD IMPORT { loadComponentSchema } FROM '@/lib/component-schema-loader' AT TOP OF apps/scene-engine/src/hooks/useSceneLoader.ts",
                   "file": "apps/scene-engine/src/hooks/useSceneLoader.ts",
-                  "status": "pending"
+                  "status": "completed"
                 },
                 {
                   "id": 2,
                   "command": "ADD IMPORT type { SceneJson, SceneObject } FROM '@/types/scene'",
                   "file": "apps/scene-engine/src/hooks/useSceneLoader.ts",
-                  "status": "pending"
+                  "status": "completed"
                 },
                 {
                   "id": 3,
                   "command": "UPDATE useEditorStore destructure to ALSO PULL setComponentSchema (along with existing setScene/setRegistry/markClean)",
                   "file": "apps/scene-engine/src/hooks/useSceneLoader.ts",
-                  "status": "pending"
+                  "status": "completed"
                 },
                 {
                   "id": 4,
                   "command": "ADD FUNCTION collectComponentAssetIds(scene: SceneJson): string[] AT MODULE SCOPE \u2014 initializes Set<string>; defines inner walk(layers: SceneObject[]) that for each layer: if layer.type === 'component' && typeof layer.asset === 'string' add to Set; if Array.isArray(layer.children) recurse; iterate scene.objects through walk; return Array.from(set)",
                   "file": "apps/scene-engine/src/hooks/useSceneLoader.ts",
-                  "status": "pending"
+                  "status": "completed"
                 },
                 {
                   "id": 5,
                   "command": "ADD CODE INSIDE load() AFTER setScene(scene) AND markClean() \u2014 capture const reg = getRegistry(); const ids = collectComponentAssetIds(scene); for (const id of ids) { const entry = reg?.[id]; if (entry && (entry as { type?: string }).type === 'component' && typeof (entry as { path?: string }).path === 'string') { loadComponentSchema((entry as { path: string }).path).then(schema => { if (thisLoad === loadCount.current) setComponentSchema(id, schema); }); } } \u2014 fire-and-forget, no await, guarded by thisLoad === loadCount.current inside the .then so stale scenes don't pollute the cache",
                   "file": "apps/scene-engine/src/hooks/useSceneLoader.ts",
-                  "status": "pending"
+                  "status": "completed"
                 },
                 {
                   "id": 6,
                   "command": "UPDATE useCallback dependency array TO INCLUDE setComponentSchema",
                   "file": "apps/scene-engine/src/hooks/useSceneLoader.ts",
-                  "status": "pending"
+                  "status": "completed"
                 }
-              ]
+              ],
+              "status": "completed"
             }
           ]
         },
@@ -1336,7 +1338,7 @@
           "id": 2,
           "title": "LayerForm: route component layers through schema path; narrow manifest path to effect-only",
           "objective": "Generalize the CP2 schema-render block in `LayerForm.tsx` so that component layers also use the `PropertySection` path: resolve the layer's component schema from `componentSchemas[asset]`, merge into the schema-resolution that previously only handled built-ins, and recompute orphans against the unioned declared-key set. Narrow the surviving `<InspectorSection title='Properties'>` manifest-driven branch to `layerType === 'effect'` so component layers no longer flow through it. The General-section orphan path now also covers component layers (during the loading window, all of `properties.*` renders there; once the schema resolves, declared keys move into their authored sections).",
-          "status": "pending",
+          "status": "completed",
           "task_seeds": [],
           "tasks": [
             {
@@ -1404,33 +1406,34 @@
                   "id": 1,
                   "command": "UPDATE useEditorStore destructure IN LayerForm function body TO ALSO PULL componentSchemas (extend the existing const { ... } = useEditorStore() line)",
                   "file": "apps/scene-engine/app/editor/_components/LayerForm.tsx",
-                  "status": "pending"
+                  "status": "completed"
                 },
                 {
                   "id": 2,
                   "command": "ADD VAR componentSchema = useMemo(() => layerType === 'component' && typeof assetId === 'string' ? (componentSchemas[assetId] ?? null) : null, [layerType, assetId, componentSchemas]) \u2014 place immediately after the CP2-added builtinSchema useMemo",
                   "file": "apps/scene-engine/app/editor/_components/LayerForm.tsx",
-                  "status": "pending"
+                  "status": "completed"
                 },
                 {
                   "id": 3,
                   "command": "ADD VAR layerSchema = useMemo(() => builtinSchema ?? componentSchema, [builtinSchema, componentSchema]) \u2014 placed immediately after componentSchema",
                   "file": "apps/scene-engine/app/editor/_components/LayerForm.tsx",
-                  "status": "pending"
+                  "status": "completed"
                 },
                 {
                   "id": 4,
                   "command": "UPDATE declaredKeys useMemo TO REFERENCE layerSchema INSTEAD OF builtinSchema (i.e. const declaredKeys = useMemo(() => layerSchema ? extractSchemaPropertyKeys(layerSchema) : new Set<string>(), [layerSchema]))",
                   "file": "apps/scene-engine/app/editor/_components/LayerForm.tsx",
-                  "status": "pending"
+                  "status": "completed"
                 },
                 {
                   "id": 5,
                   "command": "UPDATE the CP2 schema-render JSX block CONDITION: REPLACE `{builtinSchema && !manifest && builtinSchema.sections.map(...)}` WITH `{layerSchema && layerSchema.sections.map(section => (<PropertySection key={section.id} section={section} values={isMedia ? mediaValues : (props as Record<string, unknown>)} onChange={(key, value) => commit(`properties.${key}`, applyMediaRounding(key, value))} />))}` \u2014 drops the !manifest guard (no longer needed since manifest path is narrowed to effect) and uses layerSchema",
                   "file": "apps/scene-engine/app/editor/_components/LayerForm.tsx",
-                  "status": "pending"
+                  "status": "completed"
                 }
-              ]
+              ],
+              "status": "completed"
             },
             {
               "id": 2,
@@ -1486,27 +1489,28 @@
                   "id": 1,
                   "command": "UPDATE the manifest InspectorSection ternary condition FROM `manifest && Object.keys(manifest.properties).length > 0` TO `layerType === 'effect' && manifest && Object.keys(manifest.properties).length > 0` (the JSX inside the then-branch is unchanged)",
                   "file": "apps/scene-engine/app/editor/_components/LayerForm.tsx",
-                  "status": "pending"
+                  "status": "completed"
                 },
                 {
                   "id": 2,
                   "command": "UPDATE the General orphan-section render condition FROM `!manifest && orphans.length > 0` TO `layerType !== 'effect' && orphans.length > 0` (CP2 action 9 location)",
                   "file": "apps/scene-engine/app/editor/_components/LayerForm.tsx",
-                  "status": "pending"
+                  "status": "completed"
                 },
                 {
                   "id": 3,
                   "command": "UPDATE the orphan-warn useEffect (CP2 action 10) TO short-circuit when layerType === 'effect' \u2014 top of effect body: if (layerType === 'effect') return; then iterate orphans and console.warn",
                   "file": "apps/scene-engine/app/editor/_components/LayerForm.tsx",
-                  "status": "pending"
+                  "status": "completed"
                 },
                 {
                   "id": 4,
                   "command": "VERIFY by inspecting the final file that: (a) for layerType === 'component' the manifest InspectorSection no longer renders; (b) for layerType === 'effect' the General orphan block no longer renders; (c) the `ManifestPropertyField` import is still used by the (effect-only) manifest path; do NOT remove it",
                   "file": "apps/scene-engine/app/editor/_components/LayerForm.tsx",
-                  "status": "pending"
+                  "status": "completed"
                 }
-              ]
+              ],
+              "status": "completed"
             }
           ]
         },
@@ -1514,7 +1518,7 @@
           "id": 3,
           "title": "Authored press-start component schema",
           "objective": "Add a named `properties` export to `press-start.js` declaring the two-section schema (Text + Animation) for `text` and `blink-rate`. This proves the dynamic-import flow end-to-end on a real component and is the canonical example future component authors will copy.",
-          "status": "pending",
+          "status": "completed",
           "task_seeds": [],
           "tasks": [
             {
@@ -1571,21 +1575,22 @@
                   "id": 1,
                   "command": "ADD COMMENT '// Inspector schema for editor use only \u2014 runtime ignores it.' AT END OF FILE (above the new export)",
                   "file": "apps/scene-engine/public/modules/components/press-start/press-start.js",
-                  "status": "pending"
+                  "status": "completed"
                 },
                 {
                   "id": 2,
                   "command": "ADD NAMED EXPORT `export const properties = { sections: [{ id: 'text', label: 'Text', properties: { text: { type: 'string', label: 'Display Text', description: 'The text shown on screen. Two consecutive spaces render as a wider gap (e.g. \"PRESS  START\").' } } }, { id: 'animation', label: 'Animation', properties: { 'blink-rate': { type: 'number', label: 'Blink Rate', description: 'Duration in seconds for one full blink cycle. Lower values blink faster.', min: 0.1, max: 5, step: 0.1 } } }] };` AT END OF FILE",
                   "file": "apps/scene-engine/public/modules/components/press-start/press-start.js",
-                  "status": "pending"
+                  "status": "completed"
                 },
                 {
                   "id": 3,
                   "command": "VERIFY default export render function (function ({ properties = {}, layerId } = {}) { ... }) is unchanged AND that the new named export uses the keys 'text' and 'blink-rate' exactly (with the hyphen \u2014 must match runtime usage on line 6)",
                   "file": "apps/scene-engine/public/modules/components/press-start/press-start.js",
-                  "status": "pending"
+                  "status": "completed"
                 }
-              ]
+              ],
+              "status": "completed"
             }
           ]
         }
@@ -1600,21 +1605,21 @@
         2,
         3
       ],
-      "status": "pending",
+      "status": "completed",
       "testing_strategy": "Manual: `npm run dev` in apps/scene-engine, open http://localhost:3000/editor?scene=title. (1) Select the `procedural-sphere` layer \u2014 verify properties render under named sections (Mode, Rotation, Geometry, Position 3D, Camera, Colors) in declaration order; clicking a property label opens a DescriptionPopover; clicking a section label whose section carries a description opens the same popover; switching the `mode` select between `standard` and `interior` keeps the inspector responsive (orphan warnings for the now-unused mode's keys are acceptable and expected). (2) Edit `apps/scene-engine/scenes/title/scene.json` to give the existing `base-barber-cylinder` (procedural-cylinder-strips-mask) a sibling `procedural-cylinder` component layer (or modify the asset id of an existing layer) \u2014 verify the cylinder schema renders with sections (Mode, Rotation, Geometry, Position 3D, Tilt, Camera, Color, Scan, Dot-Field, Sequence) and that property labels open the popover. (3) Sub-layer override smoke test: temporarily edit scene.json to add a glyph-group with a `children` entry of shape `{ id: 'sub-test', layer: 'some-data-layer', visible: true, properties: { foo: 1 } }`; select that child in the hierarchy \u2014 verify the inspector header renders, no Transform / Appearance / Asset sections appear, and the `foo` property renders under an auto-generated 'General' section with a console warning naming the orphan. Revert the scene.json edit when done. (4) Foreign media child smoke test: add a `{ type: 'media', asset: 'bg-video', properties: { repeat_x: 1, repeat_y: 1 } }` child to any glyph-group; select it \u2014 verify the media schema renders with the seven Media properties under their section, label-click opens the popover. Revert. (5) Type check: `npm run build` (or `npx tsc --noEmit`) passes. (6) Console-clean: rapidly re-select layers in the hierarchy panel \u2014 no React warnings, no uncaught errors, no leaked popovers.",
       "task_groups": [
         {
           "id": 1,
           "title": "LayerForm \u2014 render named sub-layer overrides through the schema / General path",
           "objective": "Make `LayerForm.tsx` correctly render a named SVG sub-layer override (a child object of shape `{ id, layer: <data-layer-id>, visible?, properties? }` \u2014 has no `type`, no `transform`, no `asset`). Currently after CP1\u2013CP3 such an override falls through every type-specific branch and the orphan/General path picks up its `properties`, but it ALSO renders empty Transform / Appearance InspectorSections and an empty Asset/File row pair, which is misleading. Detect the override case and skip those chrome sections, while keeping the InspectorHeader (visible toggle, rename, delete) and the schema/General render path intact. Foreign media children (`{ type: 'media', ... }` nested under a glyph-group) are already real media layers and pick up the CP1 media schema with no LayerForm change \u2014 this task only needs a verification smoke test, not new code, for that branch.",
-          "status": "pending",
+          "status": "completed",
           "task_seeds": [],
           "tasks": [
             {
               "id": 1,
               "title": "Detect named sub-layer override in LayerForm and skip chrome sections",
               "description": "Modify `apps/scene-engine/app/editor/_components/LayerForm.tsx` so a layer whose shape is `{ id, layer: <data-layer-id>, visible?, properties? }` (a named SVG sub-layer override under a glyph-group's `children`) no longer renders empty Transform / Appearance InspectorSections or the Asset / File rows. Detection: add `const isSubLayerOverride = typeof layer.layer === 'string' && typeof layer.type !== 'string'` alongside the existing `isMedia` / `isText` derivations. Behavior when `isSubLayerOverride === true`: (a) the `<InspectorSection title='Transform'>` block (and its Fill / Position X / Position Y / Width / Height / Rotation / Scale / Anchor sub-rows) is NOT rendered. (b) the `<InspectorSection title='Appearance'>` block (Opacity / Blend / Hue / Fit) is NOT rendered. (c) the Asset readonly row and the AssetSwapDropdown row are NOT rendered. (d) the `isMedia && <InspectorSection title='Media'>` and `isText && <TextSection ... />` branches are skipped (they're already gated on type-specific flags, but the new flag must take precedence \u2014 a sub-layer override never has `type` so they're already false; this sub-bullet is a sanity-check, not a code change). (e) the manifest-driven `<InspectorSection title='Properties'>` is NOT rendered (gated on `manifest && layerType === 'effect'` after CP3 \u2014 sub-layer overrides have no manifest, so this is already correct; confirm but do not modify). (f) the `SlotsSection` and `EventsSection` ARE STILL rendered if applicable (they each gate on their own conditions: SlotsSection on `layerType === 'glyph-group' && Array.isArray(layer.slots)` \u2014 false for a sub-layer override; EventsSection on the events array length \u2014 usually empty for sub-layer overrides but allow them to participate). (g) the schema-driven render block (the CP3 `{layerSchema && layerSchema.sections.map(...)}` JSX) is unchanged \u2014 `layerSchema` resolves to `null` for a sub-layer override (no `builtinSchema`, no `componentSchema`), so the orphan/General fallback (CP2) handles its `properties` keys. (h) the InspectorHeader at the top of LayerForm continues to render \u2014 its rename/delete/visible-toggle controls remain useful for a sub-layer override. The header's `type` argument should pass `'sub-layer'` (a literal string) when `isSubLayerOverride` is true so the badge reads e.g. `[sub-layer]` instead of `[undefined]`. Implementation guidance: wrap the Transform InspectorSection JSX, the Appearance InspectorSection JSX, the Asset readonly row, and the AssetSwapDropdown row each in an `{!isSubLayerOverride && (...)}` guard, OR introduce a single early-return shape that renders only `<InspectorHeader />` + the schema/General path + EventsSection. The wrap-in-guards approach keeps the diff smaller and is preferred. Do NOT alter the schema render path, the General-orphan logic, or any other CP1\u2013CP3 work.",
-              "status": "pending",
+              "status": "completed",
               "context": {
                 "read_before": [
                   {
@@ -1670,43 +1675,43 @@
                   "id": 1,
                   "command": "ADD VAR isSubLayerOverride = typeof layer.layer === 'string' && typeof layer.type !== 'string' INSIDE LayerForm \u2014 place immediately after the existing `const isText = layerType === 'text'` line",
                   "file": "apps/scene-engine/app/editor/_components/LayerForm.tsx",
-                  "status": "pending"
+                  "status": "completed"
                 },
                 {
                   "id": 2,
                   "command": "UPDATE InspectorHeader `type` PROP \u2014 pass `isSubLayerOverride ? 'sub-layer' : layerType` instead of bare `layerType`",
                   "file": "apps/scene-engine/app/editor/_components/LayerForm.tsx",
-                  "status": "pending"
+                  "status": "completed"
                 },
                 {
                   "id": 3,
                   "command": "WRAP the existing Asset readonly `<FieldRow label=\"Asset\">` (and its sibling AssetSwapDropdown `<FieldRow label=\"File\">`) IN `{!isSubLayerOverride && (...)}` SO neither renders for a sub-layer override",
                   "file": "apps/scene-engine/app/editor/_components/LayerForm.tsx",
-                  "status": "pending"
+                  "status": "completed"
                 },
                 {
                   "id": 4,
                   "command": "WRAP the entire `<InspectorSection title=\"Transform\">...</InspectorSection>` block IN `{!isSubLayerOverride && (...)}` (covers the Fill / Position X / Position Y / Width / Height / Rotation / Scale / Anchor sub-rows)",
                   "file": "apps/scene-engine/app/editor/_components/LayerForm.tsx",
-                  "status": "pending"
+                  "status": "completed"
                 },
                 {
                   "id": 5,
                   "command": "WRAP the entire `<InspectorSection title=\"Appearance\">...</InspectorSection>` block IN `{!isSubLayerOverride && (...)}`",
                   "file": "apps/scene-engine/app/editor/_components/LayerForm.tsx",
-                  "status": "pending"
+                  "status": "completed"
                 },
                 {
                   "id": 6,
                   "command": "VERIFY (no code change) the schema/orphan render block from CP1\u2013CP3 is OUTSIDE the new guards so it still fires for a sub-layer override and routes its `properties` keys through PropertySection / General fallback",
                   "file": "apps/scene-engine/app/editor/_components/LayerForm.tsx",
-                  "status": "pending"
+                  "status": "completed"
                 },
                 {
                   "id": 7,
                   "command": "VERIFY (no code change) SlotsSection (`layerType === 'glyph-group' && Array.isArray(layer.slots)`) and EventsSection are unaffected \u2014 their conditions already exclude or correctly include sub-layer overrides",
                   "file": "apps/scene-engine/app/editor/_components/LayerForm.tsx",
-                  "status": "pending"
+                  "status": "completed"
                 }
               ]
             },
@@ -1714,7 +1719,7 @@
               "id": 2,
               "title": "Smoke-verify foreign media child rendering through the media schema",
               "description": "Verification-only task \u2014 produces no code edits unless a regression is found. Read `apps/scene-engine/app/editor/_components/LayerForm.tsx` and `apps/scene-engine/src/lib/builtin-property-schemas.ts` and confirm that a foreign media child of shape `{ id, type: 'media', asset: <id>, properties: { ... } }` nested under a glyph-group's `children` is treated identically to a top-level media layer by LayerForm: (a) `layerType === 'media'` so `isMedia === true` and the seven media properties (repeat_x, repeat_y, position_x, position_y, scale, rotation, speed) are picked up by the CP1 `BUILTIN_PROPERTY_SCHEMAS.video|image` schema (the foreign media child can carry either container type \u2014 confirm both). (b) the schema render path emits a `<PropertySection>` with section id `media`, label `Media`, and clickable label-popovers. (c) Transform / Appearance / Asset rows still render \u2014 a foreign media child is a real media layer, not a sub-layer override, so it has its own transform/appearance. (d) Slots / Events sections behave normally. If any of (a)\u2013(d) does NOT hold, document the discrepancy in `apps/scene-engine/CLAUDE.md`'s 'Foreign media children' note and add a follow-up TODO to the next session \u2014 DO NOT silently patch LayerForm in this task. Output: a one-paragraph verification note appended at the bottom of `apps/scene-engine/CLAUDE.md` under a new line `### Foreign media children + sectioned inspector` (only if the note doesn't already exist), summarizing that foreign media children render via the same media schema as top-level media layers. If everything checks out, this task is satisfied by the note alone.",
-              "status": "pending",
+              "status": "completed",
               "context": {
                 "read_before": [
                   {
@@ -1762,19 +1767,19 @@
                   "id": 1,
                   "command": "READ apps/scene-engine/app/editor/_components/LayerForm.tsx lines 199-260 AND apps/scene-engine/src/lib/builtin-property-schemas.ts TO CONFIRM that a `{ type: 'media', asset, properties }` child object follows the exact same code path as a top-level media layer (layerType derivation does not differ; built-in schema lookup keys on layerType only)",
                   "file": "(verification only)",
-                  "status": "pending"
+                  "status": "completed"
                 },
                 {
                   "id": 2,
                   "command": "APPEND new heading `### Foreign media children + sectioned inspector` AT END OF apps/scene-engine/CLAUDE.md WITH a one-paragraph note: 'Foreign media children \u2014 `{ type: \"media\", asset, properties: { ... } }` nested under a glyph-group\\'s `children` \u2014 render through `LayerForm` identically to top-level media layers and pick up the shared `media` built-in schema, so sectioning + clickable-label descriptions apply automatically. Named SVG sub-layer overrides (`{ layer: \"data-layer-id\", visible, properties? }`) skip the Transform / Appearance / Asset chrome and fall through to the schema/General render path with orphan warnings for any unknown keys.'",
                   "file": "apps/scene-engine/CLAUDE.md",
-                  "status": "pending"
+                  "status": "completed"
                 },
                 {
                   "id": 3,
                   "command": "IF VERIFICATION FAILS (any of (a)\u2013(d) in the task description does not hold) DO NOT silently patch LayerForm \u2014 instead append a `TODO(next-session): foreign media child renders incorrectly \u2014 <one-line description>` line to apps/scene-engine/CLAUDE.md under the same heading, AND mark this task `status: 'blocked'` for build-time follow-up",
                   "file": "apps/scene-engine/CLAUDE.md",
-                  "status": "pending"
+                  "status": "completed"
                 }
               ]
             }
@@ -1784,14 +1789,14 @@
           "id": 2,
           "title": "Authored procedural-sphere component schema",
           "objective": "Add a `properties` named export to `apps/scene-engine/public/modules/components/procedural-sphere/procedural-sphere.js` that declares a sectioned schema covering both rendering modes (standard `drawSphere` + `interior` `drawInteriorSphere`) and every property key the runtime currently reads. The declared keys must be a strict superset of the keys the title scene's `procedural-sphere` layer carries (`mode`, `rotation-speed`, `longitudes`, `latitudes`, `depth`, `sphere-width`, `sphere-height`, `sphere-x`, `sphere-y`, `sphere-z`, `line-width`, `pole-radius`, `rotate-x`, `rotate-y`, \u2026) so that opening that layer in the inspector produces zero orphan warnings.",
-          "status": "pending",
+          "status": "completed",
           "task_seeds": [],
           "tasks": [
             {
               "id": 1,
               "title": "Add named `properties` export to procedural-sphere.js",
               "description": "Modify `apps/scene-engine/public/modules/components/procedural-sphere/procedural-sphere.js` to additionally `export const properties = { sections: [...] }` declaring a sectioned schema for every property the runtime currently reads. The default render export at the bottom of the file is unchanged. The file is plain JS (not TypeScript) \u2014 write the schema as a plain object literal, no type annotations. The shape must match the `PropertySchema` type from CP1 task 1.1.1 so the dynamic-import loader (CP3 task 3.1.2) accepts it. Sections IN THIS DECLARATION ORDER (matters \u2014 properties render top-to-bottom in section order, declaration order within section): 1) `mode` \u2014 section id `'mode'`, label `'Mode'`, description `'Whether the sphere is rendered as a solid filled globe (standard) or a wireframe interior view (interior). Each mode uses a different subset of the properties below.'`, single property `mode: { type: 'select', label: 'Render Mode', description: 'Solid (standard) or wireframe interior (interior).', options: ['standard', 'interior'] }`. The runtime checks `properties.mode === 'interior'` (line 338); any other value falls back to standard. 2) `rotation` \u2014 id `'rotation'`, label `'Rotation'`, description `'Auto-rotation around each axis. Speed is the spin rate; rotate-x/y/z are static tilt offsets in degrees applied before the spin.'`, properties in order:   `rotation-speed: { type: 'number', label: 'Rotation Speed', description: 'Radians per second the sphere auto-rotates around its primary axis.', min: -2, max: 2, step: 0.01 }`,   `rotate-x: { type: 'number', label: 'Tilt X (deg)', description: 'Static rotation around the X axis, in degrees, applied before auto-rotation.', min: -180, max: 180, step: 1 }`,   `rotate-y: { type: 'number', label: 'Tilt Y (deg)', description: 'Static rotation around the Y axis, in degrees.', min: -180, max: 180, step: 1 }`,   `rotate-z: { type: 'number', label: 'Tilt Z (deg)', description: 'Static rotation around the Z axis, in degrees.', min: -180, max: 180, step: 1 }`,   `tilt: { type: 'number', label: 'Legacy Tilt (deg)', description: 'Legacy single-axis tilt \u2014 fallback for rotate-x when rotate-x is unset. New scenes should use rotate-x directly.', min: -180, max: 180, step: 1 }`. 3) `geometry` \u2014 id `'geometry'`, label `'Geometry'`, description `'Number of meridian/parallel lines drawn, line width, and (interior mode) the polar cap radius and gap.'`, properties in order:   `longitudes: { type: 'number', label: 'Longitudes', description: 'Number of vertical meridian lines.', min: 4, max: 96, step: 1 }`,   `latitudes: { type: 'number', label: 'Latitudes', description: 'Number of horizontal parallel lines.', min: 3, max: 64, step: 1 }`,   `line-width: { type: 'number', label: 'Line Width', description: 'Stroke width of the grid lines, in CSS pixels.', min: 0.25, max: 6, step: 0.05 }`,   `radius-scale: { type: 'number', label: 'Radius Scale (standard)', description: 'Standard mode only. Sphere radius as a fraction of the layer\\'s shorter side. Ignored in interior mode.', min: 0.05, max: 1, step: 0.01 }`,   `pole-radius: { type: 'number', label: 'Pole Cap Radius (interior)', description: 'Interior mode only. Angular radius of the polar caps, in radians.', min: 0, max: 1.5, step: 0.01 }`,   `pole-gap: { type: 'number', label: 'Pole Gap (interior)', description: 'Interior mode only. Angular gap between the polar cap and the meridian grid, in radians.', min: 0, max: 0.5, step: 0.01 }`. 4) `position` \u2014 id `'position'`, label `'Position (3D)'`, description `'Interior mode only. Translates and stretches the sphere within the layer\\'s viewport \u2014 sphere-width/height stretch along the camera\\'s X/Y, sphere-x/y/z translate.'`, properties in order:   `sphere-width: { type: 'number', label: 'Sphere Width', description: 'Horizontal radius scale (interior).', min: 0.1, max: 5, step: 0.01 }`,   `sphere-height: { type: 'number', label: 'Sphere Height', description: 'Vertical radius scale (interior).', min: 0.1, max: 5, step: 0.01 }`,   `sphere-x: { type: 'number', label: 'Sphere X', description: 'Horizontal offset within the layer, fraction of layer width.', min: -2, max: 2, step: 0.01 }`,   `sphere-y: { type: 'number', label: 'Sphere Y', description: 'Vertical offset within the layer, fraction of layer height.', min: -2, max: 2, step: 0.01 }`,   `sphere-z: { type: 'number', label: 'Sphere Z', description: 'Depth offset (interior). Negative pushes the sphere away from the camera.', min: -3, max: 3, step: 0.01 }`,   `depth: { type: 'number', label: 'Depth (legacy)', description: 'Legacy depth knob \u2014 read by some scenes alongside sphere-z. New scenes should set sphere-z directly.', min: -3, max: 3, step: 0.01 }`. 5) `camera` \u2014 id `'camera'`, label `'Camera (interior)'`, description `'Interior mode only. Near-clip distance and field-of-view multiplier control how aggressively the camera zooms into the wireframe.'`, properties in order:   `camera-near: { type: 'number', label: 'Near Clip', description: 'Closest depth before geometry is culled (interior).', min: 0.01, max: 1, step: 0.01 }`,   `camera-fov: { type: 'number', label: 'Field of View', description: 'Camera focal multiplier (interior). Larger values widen the apparent FOV.', min: 0.05, max: 1.5, step: 0.01 }`. 6) `colors` \u2014 id `'colors'`, label `'Colors'`, description `'CSS color strings (rgba(), hex, named). Plain strings in v1; a dedicated color-picker type may arrive later.'`, properties in order \u2014 every entry is `type: 'string'` (the locked v1 taxonomy has no color type yet):   `fill: { type: 'string', label: 'Fill (standard)', description: 'Sphere body fill color. CSS color string.' }`,   `highlight: { type: 'string', label: 'Highlight (standard)', description: 'Specular highlight color. CSS color string.' }`,   `grid: { type: 'string', label: 'Grid', description: 'Meridian/parallel line color. CSS color string. Used by both modes.' }`,   `rim: { type: 'string', label: 'Rim (standard)', description: 'Outline color around the sphere silhouette. CSS color string.' }`,   `scan: { type: 'string', label: 'Scan (standard)', description: 'Color of the two horizontal scan lines drawn over the sphere. CSS color string.' }`,   `vignette: { type: 'string', label: 'Vignette (interior)', description: 'Outer gradient color for the interior view. CSS color string.' }`. Add a one-line comment immediately above the new export: `// Inspector schema \u2014 editor-only; the runtime ignores this export.`. Property keys MUST match the exact strings the runtime reads (preserve the hyphens \u2014 `rotation-speed`, `sphere-x`, `pole-radius`, etc.). Verify by cross-referencing every `numberProp(properties, '<key>', ...)` and `colorProp(properties, '<key>', ...)` call in the file (lines 26-30, 137-151, 228-238) against the schema keys. Do NOT add defaults to the schema (defaults stay in the runtime via `numberProp`'s third argument). Do NOT change any other code in the file.",
-              "status": "pending",
+              "status": "completed",
               "context": {
                 "read_before": [
                   {
@@ -1857,55 +1862,55 @@
                   "id": 1,
                   "command": "APPEND COMMENT `// Inspector schema \u2014 editor-only; the runtime ignores this export.` AT END OF apps/scene-engine/public/modules/components/procedural-sphere/procedural-sphere.js (one blank line below the existing default export's closing brace)",
                   "file": "apps/scene-engine/public/modules/components/procedural-sphere/procedural-sphere.js",
-                  "status": "pending"
+                  "status": "completed"
                 },
                 {
                   "id": 2,
                   "command": "ADD NAMED EXPORT `export const properties = { sections: [...] }` AT END OF FILE \u2014 section 1 `mode` with property `mode` (type 'select', options: ['standard', 'interior'])",
                   "file": "apps/scene-engine/public/modules/components/procedural-sphere/procedural-sphere.js",
-                  "status": "pending"
+                  "status": "completed"
                 },
                 {
                   "id": 3,
                   "command": "ADD section 2 `rotation` to the schema \u2014 properties in declaration order: rotation-speed (number, -2..2 step 0.01), rotate-x/y/z (number, -180..180 step 1), tilt (number legacy, -180..180 step 1). Each carries label + plain-text description per the task description.",
                   "file": "apps/scene-engine/public/modules/components/procedural-sphere/procedural-sphere.js",
-                  "status": "pending"
+                  "status": "completed"
                 },
                 {
                   "id": 4,
                   "command": "ADD section 3 `geometry` \u2014 longitudes (4..96 step 1), latitudes (3..64 step 1), line-width (0.25..6 step 0.05), radius-scale (0.05..1 step 0.01), pole-radius (0..1.5 step 0.01), pole-gap (0..0.5 step 0.01)",
                   "file": "apps/scene-engine/public/modules/components/procedural-sphere/procedural-sphere.js",
-                  "status": "pending"
+                  "status": "completed"
                 },
                 {
                   "id": 5,
                   "command": "ADD section 4 `position` (label 'Position (3D)') \u2014 sphere-width/height (0.1..5 step 0.01), sphere-x/y (-2..2 step 0.01), sphere-z (-3..3 step 0.01), depth (legacy, -3..3 step 0.01)",
                   "file": "apps/scene-engine/public/modules/components/procedural-sphere/procedural-sphere.js",
-                  "status": "pending"
+                  "status": "completed"
                 },
                 {
                   "id": 6,
                   "command": "ADD section 5 `camera` (label 'Camera (interior)') \u2014 camera-near (0.01..1 step 0.01), camera-fov (0.05..1.5 step 0.01)",
                   "file": "apps/scene-engine/public/modules/components/procedural-sphere/procedural-sphere.js",
-                  "status": "pending"
+                  "status": "completed"
                 },
                 {
                   "id": 7,
                   "command": "ADD section 6 `colors` \u2014 fill, highlight, grid, rim, scan, vignette \u2014 each `type: 'string'` with label + description matching the task spec",
                   "file": "apps/scene-engine/public/modules/components/procedural-sphere/procedural-sphere.js",
-                  "status": "pending"
+                  "status": "completed"
                 },
                 {
                   "id": 8,
                   "command": "VERIFY by grep: every `numberProp(properties, '<key>'` / `colorProp(properties, '<key>'` call in apps/scene-engine/public/modules/components/procedural-sphere/procedural-sphere.js (lines 26-30, 137-151, 228-238) has a matching property key in the new schema. Cross-check the title scene's procedural-sphere properties block (apps/scene-engine/scenes/title/scene.json lines 47-90) \u2014 every key there must appear in the schema. NO orphan warnings should fire when opening the title scene.",
                   "file": "apps/scene-engine/public/modules/components/procedural-sphere/procedural-sphere.js",
-                  "status": "pending"
+                  "status": "completed"
                 },
                 {
                   "id": 9,
                   "command": "VERIFY default export (line 314 \u2014 `export default function ({ properties = {}, layerId } = {}) { ... }`) is unchanged AND the new named export is syntactically valid JS (no trailing commas inside option arrays, single quotes consistent with file style, no TypeScript annotations)",
                   "file": "apps/scene-engine/public/modules/components/procedural-sphere/procedural-sphere.js",
-                  "status": "pending"
+                  "status": "completed"
                 }
               ]
             }
@@ -1915,14 +1920,14 @@
           "id": 3,
           "title": "Authored procedural-cylinder component schema",
           "objective": "Add a `properties` named export to `apps/scene-engine/public/modules/components/procedural-cylinder/procedural-cylinder.js` that declares a sectioned schema covering all four animation modes (static / scan / dot-field / sequence), the geometry, the 3D position + tilt block, the camera block, the color, and each animation mode's tunables. Every property key the runtime currently reads via `numberProp` / `colorProp` / `booleanProp` is included so a future cylinder layer in any scene picks up the schema without orphan warnings.",
-          "status": "pending",
+          "status": "completed",
           "task_seeds": [],
           "tasks": [
             {
               "id": 1,
               "title": "Add named `properties` export to procedural-cylinder.js",
               "description": "Modify `apps/scene-engine/public/modules/components/procedural-cylinder/procedural-cylinder.js` to add `export const properties = { sections: [...] }` declaring a sectioned schema for every property key the runtime reads. The default render export is unchanged. Sections IN THIS DECLARATION ORDER: 1) `mode` \u2014 id `'mode'`, label `'Animation Mode'`, description `'Selects the animation pass. Static draws no movement; Scan sweeps a vertical pulse along the lines; Dot Field flows lit dot trails along each line and ring; Sequence cycles scan\u2192dot\u2192reverse-scan\u2192dot continuously.'`, properties in order:   `disable-animation: { type: 'boolean', label: 'Static (Disable Animation)', description: 'When true, no animation runs \u2014 only the static grid and glow render.' }`,   `animation-one: { type: 'boolean', label: 'Mode: Scan', description: 'Enable the scan pulse animation (mutually exclusive with the other animation toggles).' }`,   `animation-two: { type: 'boolean', label: 'Mode: Dot Field', description: 'Enable the lit dot-trail animation along lines and rings.' }`,   `animation-three: { type: 'boolean', label: 'Mode: Sequence', description: 'Cycle through scan \u2192 dot-field \u2192 reverse-scan \u2192 dot-field on a loop.' }`,   `animate: { type: 'boolean', label: 'Animate (legacy)', description: 'Legacy on/off used before the four-mode toggles existed. Treated as scan-mode when no other mode toggle is set.' }`. 2) `rotation` \u2014 id `'rotation'`, label `'Rotation'`, description `'Auto-rotation of the cylinder around its primary axis.'`, properties in order:   `rotation-speed: { type: 'number', label: 'Rotation Speed', description: 'Radians per second the cylinder auto-rotates. Clamped to \u00b10.25 internally.', min: -0.25, max: 0.25, step: 0.005 }`. 3) `geometry` \u2014 id `'geometry'`, label `'Geometry'`, description `'Number of vertical lines and horizontal rings, line stroke width, and the cylinder\\'s radius/height.'`, properties in order:   `lines: { type: 'number', label: 'Lines', description: 'Number of vertical lines around the cylinder.', min: 4, max: 256, step: 1 }`,   `rings: { type: 'number', label: 'Rings', description: 'Number of horizontal rings (including caps).', min: 2, max: 64, step: 1 }`,   `line-width: { type: 'number', label: 'Line Width', description: 'Stroke width of grid lines, in CSS pixels.', min: 0.25, max: 6, step: 0.05 }`,   `radius: { type: 'number', label: 'Radius', description: 'Cylinder radius as a fraction of layer width.', min: 0.05, max: 2, step: 0.01 }`,   `cylinder-height: { type: 'number', label: 'Cylinder Height', description: 'Cylinder body height as a fraction of layer height.', min: 0.05, max: 2, step: 0.01 }`,   `depth: { type: 'number', label: 'Depth (legacy)', description: 'Legacy fallback for cylinder-height when cylinder-height is unset.', min: 0.05, max: 2, step: 0.01 }`. 4) `position` \u2014 id `'position'`, label `'Position (3D)'`, description `'Where the cylinder sits within the layer. center-x/y are the projection center; position-x/y/z translate the cylinder in world space before projection.'`, properties in order:   `center-x: { type: 'number', label: 'Center X', description: 'Horizontal projection center, fraction of layer width.', min: -1, max: 2, step: 0.01 }`,   `center-y: { type: 'number', label: 'Center Y', description: 'Vertical projection center, fraction of layer height.', min: -1, max: 2, step: 0.01 }`,   `position-x: { type: 'number', label: 'Position X', description: 'World-space X translation, fraction of layer width.', min: -2, max: 2, step: 0.01 }`,   `position-y: { type: 'number', label: 'Position Y', description: 'World-space Y translation, fraction of layer height.', min: -2, max: 2, step: 0.01 }`,   `position-z: { type: 'number', label: 'Position Z', description: 'World-space Z translation. Negative pushes the cylinder away from the camera.', min: -2, max: 2, step: 0.01 }`. 5) `tilt` \u2014 id `'tilt'`, label `'Tilt'`, description `'Static rotation around each axis (in degrees) applied before the auto-rotation. Tilt-X has a 90\u00b0 baseline added internally so the default lays the cylinder vertical.'`, properties in order:   `tilt-x: { type: 'number', label: 'Tilt X (deg)', description: 'Tilt around the X axis, in degrees.', min: -180, max: 180, step: 1 }`,   `tilt-y: { type: 'number', label: 'Tilt Y (deg)', description: 'Tilt around the Y axis, in degrees.', min: -180, max: 180, step: 1 }`,   `tilt-z: { type: 'number', label: 'Tilt Z (deg)', description: 'Tilt around the Z axis, in degrees.', min: -180, max: 180, step: 1 }`. 6) `camera` \u2014 id `'camera'`, label `'Camera'`, description `'Pinhole projection parameters. camera-distance is the camera\u2192origin distance; camera-gap shrinks the visible top end; near-clip drops geometry too close; max-perspective caps the divergence ratio.'`, properties in order:   `camera-distance: { type: 'number', label: 'Camera Distance', description: 'Distance from the camera to world-origin, in pixels.', min: 100, max: 4000, step: 10 }`,   `camera-gap: { type: 'number', label: 'Camera Gap', description: 'Top-end gap as a fraction of camera distance. Internally clamped to 0\u20130.8.', min: 0, max: 0.8, step: 0.01 }`,   `near-clip: { type: 'number', label: 'Near Clip', description: 'Closest depth before geometry is culled, in pixels.', min: 1, max: 1000, step: 1 }`,   `max-perspective: { type: 'number', label: 'Max Perspective', description: 'Cap on the perspective divergence ratio (cameraDistance / depth). Higher = more wide-angle.', min: 1.5, max: 12, step: 0.1 }`. 7) `color` \u2014 id `'color'`, label `'Color'`, description `'CSS color string for the cylinder grid. Plain string in v1.'`, properties in order:   `cylinder-color: { type: 'string', label: 'Cylinder Color', description: 'CSS color (hex, rgba, named) for grid lines and glow.' }`. 8) `scan` \u2014 id `'scan'`, label `'Scan Animation'`, description `'Tunables for the scan pulse pass. pulse-width is the head-of-pulse half-width; pulse-trail is the trailing fade length; pulse-speed controls direction and rate (negative reverses).'`, properties in order:   `pulse-width: { type: 'number', label: 'Pulse Width', description: 'Half-width of the scan pulse head, fraction of cylinder length.', min: 0.01, max: 0.5, step: 0.005 }`,   `pulse-trail: { type: 'number', label: 'Pulse Trail', description: 'Trailing fade length behind the pulse head, fraction of cylinder length.', min: 0, max: 0.5, step: 0.005 }`,   `pulse-speed: { type: 'number', label: 'Pulse Speed', description: 'Scan oscillation rate. Internally clamped to \u00b10.2; negative inverts direction.', min: -0.2, max: 0.2, step: 0.005 }`. 9) `dot-field` \u2014 id `'dot-field'`, label `'Dot Field Animation'`, description `'Tunables for the dot-field pass \u2014 lit dot trails flow along each line and ring at lane-staggered phases.'`, properties in order:   `dot-speed: { type: 'number', label: 'Dot Speed', description: 'Flow rate of the dot lanes. Internally clamped to \u00b11.2; negative inverts direction.', min: -1.2, max: 1.2, step: 0.01 }`,   `dot-size: { type: 'number', label: 'Dot Size', description: 'Stroke width of each dot trail segment, in CSS pixels.', min: 0.25, max: 8, step: 0.05 }`,   `dot-density: { type: 'number', label: 'Dot Density', description: 'Number of concurrent dot lanes per line. Higher = busier field.', min: 1, max: 8, step: 1 }`,   `dot-trail: { type: 'number', label: 'Dot Trail', description: 'Trailing fade length behind each dot, fraction of segment.', min: 0, max: 0.45, step: 0.005 }`,   `dot-alpha: { type: 'number', label: 'Dot Alpha', description: 'Maximum opacity of dot trails. Values >1 over-saturate via lighter compositing.', min: 0, max: 1.5, step: 0.05 }`,   `line-segment-density: { type: 'number', label: 'Line Segment Density', description: 'Lanes-per-line override. Defaults to dot-density when unset.', min: 1, max: 8, step: 1 }`,   `ring-segment-density: { type: 'number', label: 'Ring Segment Density', description: 'Lanes-per-ring override. Defaults to min(2, dot-density) when unset.', min: 1, max: 8, step: 1 }`,   `segment-width: { type: 'number', label: 'Segment Width', description: 'Width of the lit head along a line/ring, fraction of segment length.', min: 0.002, max: 0.25, step: 0.001 }`. 10) `sequence` \u2014 id `'sequence'`, label `'Sequence Animation'`, description `'Tunables for the sequence pass \u2014 alternates scan and dot-field windows. Durations are in seconds.'`, properties in order:   `sequence-scan-duration: { type: 'number', label: 'Scan Duration (s)', description: 'Seconds per scan window in the sequence loop.', min: 0.1, max: 30, step: 0.1 }`,   `sequence-dot-cycles: { type: 'number', label: 'Dot Cycles', description: 'Number of full dot-field cycles per dot window in the sequence loop.', min: 0.1, max: 10, step: 0.1 }`. Add a one-line comment above the new export: `// Inspector schema \u2014 editor-only; the runtime ignores this export.`. Property keys MUST match the runtime keys verbatim (hyphenated). Verify by cross-referencing every `numberProp(properties, '<key>', ...)` / `colorProp(properties, '<key>', ...)` / `booleanProp(properties, '<key>', ...)` call in the file (lines 22-37, 319-321, 339, 347-355, 395-401, 430-449) against the schema keys. Do NOT add defaults; defaults stay in the runtime.",
-              "status": "pending",
+              "status": "completed",
               "context": {
                 "read_before": [
                   {
@@ -1983,79 +1988,79 @@
                   "id": 1,
                   "command": "APPEND COMMENT `// Inspector schema \u2014 editor-only; the runtime ignores this export.` AT END OF apps/scene-engine/public/modules/components/procedural-cylinder/procedural-cylinder.js (one blank line below the existing default export's closing brace)",
                   "file": "apps/scene-engine/public/modules/components/procedural-cylinder/procedural-cylinder.js",
-                  "status": "pending"
+                  "status": "completed"
                 },
                 {
                   "id": 2,
                   "command": "ADD NAMED EXPORT `export const properties = { sections: [...] }` AT END OF FILE \u2014 section 1 `mode` (label 'Animation Mode') with boolean toggles disable-animation, animation-one (Scan), animation-two (Dot Field), animation-three (Sequence), animate (legacy)",
                   "file": "apps/scene-engine/public/modules/components/procedural-cylinder/procedural-cylinder.js",
-                  "status": "pending"
+                  "status": "completed"
                 },
                 {
                   "id": 3,
                   "command": "ADD section 2 `rotation` \u2014 rotation-speed (number, -0.25..0.25 step 0.005)",
                   "file": "apps/scene-engine/public/modules/components/procedural-cylinder/procedural-cylinder.js",
-                  "status": "pending"
+                  "status": "completed"
                 },
                 {
                   "id": 4,
                   "command": "ADD section 3 `geometry` \u2014 lines (4..256 step 1), rings (2..64 step 1), line-width (0.25..6 step 0.05), radius (0.05..2 step 0.01), cylinder-height (0.05..2 step 0.01), depth (legacy, 0.05..2 step 0.01)",
                   "file": "apps/scene-engine/public/modules/components/procedural-cylinder/procedural-cylinder.js",
-                  "status": "pending"
+                  "status": "completed"
                 },
                 {
                   "id": 5,
                   "command": "ADD section 4 `position` (label 'Position (3D)') \u2014 center-x/y (-1..2 step 0.01), position-x/y/z (-2..2 step 0.01)",
                   "file": "apps/scene-engine/public/modules/components/procedural-cylinder/procedural-cylinder.js",
-                  "status": "pending"
+                  "status": "completed"
                 },
                 {
                   "id": 6,
                   "command": "ADD section 5 `tilt` \u2014 tilt-x/y/z (-180..180 step 1, all 'number')",
                   "file": "apps/scene-engine/public/modules/components/procedural-cylinder/procedural-cylinder.js",
-                  "status": "pending"
+                  "status": "completed"
                 },
                 {
                   "id": 7,
                   "command": "ADD section 6 `camera` \u2014 camera-distance (100..4000 step 10), camera-gap (0..0.8 step 0.01), near-clip (1..1000 step 1), max-perspective (1.5..12 step 0.1)",
                   "file": "apps/scene-engine/public/modules/components/procedural-cylinder/procedural-cylinder.js",
-                  "status": "pending"
+                  "status": "completed"
                 },
                 {
                   "id": 8,
                   "command": "ADD section 7 `color` \u2014 cylinder-color (`type: 'string'`)",
                   "file": "apps/scene-engine/public/modules/components/procedural-cylinder/procedural-cylinder.js",
-                  "status": "pending"
+                  "status": "completed"
                 },
                 {
                   "id": 9,
                   "command": "ADD section 8 `scan` (label 'Scan Animation') \u2014 pulse-width (0.01..0.5 step 0.005), pulse-trail (0..0.5 step 0.005), pulse-speed (-0.2..0.2 step 0.005)",
                   "file": "apps/scene-engine/public/modules/components/procedural-cylinder/procedural-cylinder.js",
-                  "status": "pending"
+                  "status": "completed"
                 },
                 {
                   "id": 10,
                   "command": "ADD section 9 `dot-field` (label 'Dot Field Animation') \u2014 dot-speed (-1.2..1.2 step 0.01), dot-size (0.25..8 step 0.05), dot-density (1..8 step 1), dot-trail (0..0.45 step 0.005), dot-alpha (0..1.5 step 0.05), line-segment-density (1..8 step 1), ring-segment-density (1..8 step 1), segment-width (0.002..0.25 step 0.001)",
                   "file": "apps/scene-engine/public/modules/components/procedural-cylinder/procedural-cylinder.js",
-                  "status": "pending"
+                  "status": "completed"
                 },
                 {
                   "id": 11,
                   "command": "ADD section 10 `sequence` (label 'Sequence Animation') \u2014 sequence-scan-duration (0.1..30 step 0.1), sequence-dot-cycles (0.1..10 step 0.1)",
                   "file": "apps/scene-engine/public/modules/components/procedural-cylinder/procedural-cylinder.js",
-                  "status": "pending"
+                  "status": "completed"
                 },
                 {
                   "id": 12,
                   "command": "VERIFY by grep: every `numberProp(properties, '<key>'` / `colorProp(properties, '<key>'` / `booleanProp(properties, '<key>'` call in apps/scene-engine/public/modules/components/procedural-cylinder/procedural-cylinder.js (lines 22-37, 319-321, 339, 347-355, 395-401, 430-449) has a matching property key in the schema. Run editor against the title scene to confirm no orphan warnings fire for any procedural-cylinder layers (note: title scene uses `procedural-cylinder-strips-mask`, a different component \u2014 orphans for that layer are unrelated and out of CP4 scope).",
                   "file": "apps/scene-engine/public/modules/components/procedural-cylinder/procedural-cylinder.js",
-                  "status": "pending"
+                  "status": "completed"
                 },
                 {
                   "id": 13,
                   "command": "VERIFY default export (line 527 \u2014 `export default function ({ properties = {}, layerId } = {}) { ... }`) is unchanged AND the named export is syntactically valid JS (no trailing commas, single quotes, no TS annotations)",
                   "file": "apps/scene-engine/public/modules/components/procedural-cylinder/procedural-cylinder.js",
-                  "status": "pending"
+                  "status": "completed"
                 }
               ]
             }

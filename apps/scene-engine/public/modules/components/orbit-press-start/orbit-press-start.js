@@ -297,3 +297,312 @@ export default function ({ properties = {}, layerId } = {}) {
 
   return wrap;
 }
+
+// Inspector schema for editor use only — runtime ignores it.
+export const properties = {
+  sections: [
+    {
+      id: 'text',
+      label: 'Text',
+      properties: {
+        text: {
+          type: 'string',
+          label: 'Display Text',
+          description: 'The orbiting marquee text. Two consecutive spaces render as a wider gap (e.g. "PRESS  START"); single spaces are skipped entirely so each visible character gets its own letter cell.',
+        },
+        'font-family': {
+          type: 'string',
+          label: 'Font Family',
+          description: 'CSS font-family stack used for every letter. Falls back through the list if the primary face fails to load.',
+        },
+        'font-weight': {
+          type: 'string',
+          label: 'Font Weight',
+          description: 'CSS font-weight applied to every letter (e.g. "400", "700", "900").',
+        },
+        'font-size': {
+          type: 'number',
+          label: 'Font Size',
+          description: 'Glyph height in pixels at the front of the orbit. Letters at the back of the orbit appear smaller after perspective scaling.',
+          min: 1,
+          step: 1,
+        },
+      },
+    },
+    {
+      id: 'animation',
+      label: 'Animation',
+      description: 'Controls how the marquee spins around the central hub.',
+      properties: {
+        'rotation-speed': {
+          type: 'number',
+          label: 'Rotation Speed',
+          description: 'Angular velocity of the orbit in radians per second. Higher values spin the marquee faster; 0 freezes it.',
+          min: 0,
+          step: 0.01,
+        },
+        direction: {
+          type: 'number',
+          label: 'Direction',
+          description: 'Spin direction. Positive values rotate one way; negative values reverse it. Sign is the only thing that matters.',
+          min: -1,
+          max: 1,
+          step: 1,
+        },
+        phase: {
+          type: 'number',
+          label: 'Phase Offset',
+          description: 'Starting rotation in degrees. Use to dial in which letter is at the front when the scene loads.',
+          min: 0,
+          max: 360,
+          step: 1,
+        },
+      },
+    },
+    {
+      id: 'tilt',
+      label: 'Tilt',
+      description: 'The three axes set the camera-relative orientation of the orbit ring; the legacy `tilt` key seeded only the Z axis.',
+      properties: {
+        'tilt-x': {
+          type: 'number',
+          label: 'Tilt X',
+          description: 'Pitch of the orbit ring in degrees. Positive values tip the front of the ring downward.',
+          step: 0.5,
+        },
+        'tilt-y': {
+          type: 'number',
+          label: 'Tilt Y',
+          description: 'Yaw of the orbit ring in degrees. Positive values rotate the ring around the vertical axis.',
+          step: 0.5,
+        },
+        'tilt-z': {
+          type: 'number',
+          label: 'Tilt Z',
+          description: 'Roll of the entire layer in degrees. Rotates the canvas around the layer center after the orbit is projected.',
+          step: 0.5,
+        },
+        tilt: {
+          type: 'number',
+          label: 'Tilt (legacy)',
+          description: 'Legacy fallback for `tilt-z`. Older scenes set this single key to control roll; new scenes should use `tilt-z` directly.',
+          step: 0.5,
+        },
+      },
+    },
+    {
+      id: 'position',
+      label: 'Position',
+      description: 'Offsets translate the projected orbit relative to the layer center; legacy `offset-x` / `offset-y` keys feed the same values.',
+      properties: {
+        'position-x': {
+          type: 'number',
+          label: 'Position X',
+          description: 'Horizontal offset of the orbit center in pixels, relative to the layer center.',
+          step: 1,
+        },
+        'position-y': {
+          type: 'number',
+          label: 'Position Y',
+          description: 'Vertical offset of the orbit center in pixels, relative to the layer center.',
+          step: 1,
+        },
+        'position-z': {
+          type: 'number',
+          label: 'Position Z',
+          description: 'Depth offset of the orbit center, in the same units as the camera distance. Negative values push the orbit away from the camera; positive values pull it closer.',
+          step: 1,
+        },
+        'offset-x': {
+          type: 'number',
+          label: 'Offset X (legacy)',
+          description: 'Legacy fallback for `position-x`. Older scenes set this key to translate the orbit horizontally; new scenes should use `position-x`.',
+          step: 1,
+        },
+        'offset-y': {
+          type: 'number',
+          label: 'Offset Y (legacy)',
+          description: 'Legacy fallback for `position-y`. Older scenes set this key to translate the orbit vertically; new scenes should use `position-y`.',
+          step: 1,
+        },
+      },
+    },
+    {
+      id: 'orbit',
+      label: 'Orbit',
+      description: 'Knobs that shape the ring itself — how many copies of the text travel around it, how wide the ring is, and how the letters are spaced.',
+      properties: {
+        copies: {
+          type: 'number',
+          label: 'Copies',
+          description: 'How many evenly-spaced copies of the text travel around the orbit. 1 puts a single string on the ring; higher values stagger duplicates around it.',
+          min: 1,
+          step: 1,
+        },
+        'orbit-radius-x': {
+          type: 'number',
+          label: 'Orbit Radius',
+          description: 'Horizontal radius of the orbit in pixels, measured before perspective is applied.',
+          min: 0,
+          step: 1,
+        },
+        'letter-angle-spacing': {
+          type: 'number',
+          label: 'Letter Angle Spacing',
+          description: 'Angular gap between consecutive letters in degrees. Larger values spread the letters further around the ring.',
+          min: 0,
+          max: 90,
+          step: 0.1,
+        },
+        'edge-scale': {
+          type: 'number',
+          label: 'Edge Scale',
+          description: 'Minimum horizontal scale applied to letters at the side of the ring (90° from camera). Lower values flatten side letters more aggressively, selling the 3D illusion.',
+          min: 0.01,
+          max: 1,
+          step: 0.01,
+        },
+        repeat: {
+          type: 'number',
+          label: 'Repeat (legacy)',
+          description: 'Legacy fallback for `copies`. Older scenes set this key to control how many copies of the text orbit; new scenes should use `copies`.',
+          min: 1,
+          step: 1,
+        },
+      },
+    },
+    {
+      id: 'letter-cells',
+      label: 'Letter Cells',
+      description: 'Each visible character gets a rounded panel cell behind it; these knobs size the cell and round its corners.',
+      properties: {
+        'letter-cell-width': {
+          type: 'number',
+          label: 'Cell Width',
+          description: 'Width of each letter panel in pixels, measured at the front of the orbit.',
+          min: 1,
+          step: 1,
+        },
+        'letter-cell-height': {
+          type: 'number',
+          label: 'Cell Height',
+          description: 'Height of each letter panel in pixels, measured at the front of the orbit.',
+          min: 1,
+          step: 1,
+        },
+        'letter-radius': {
+          type: 'number',
+          label: 'Cell Corner Radius',
+          description: 'Corner radius of each letter panel in pixels. 0 gives sharp rectangles.',
+          min: 0,
+          step: 0.5,
+        },
+        'panel-height': {
+          type: 'number',
+          label: 'Panel Height (legacy)',
+          description: 'Legacy fallback for `letter-cell-height`. Older scenes set this key to size the panel; new scenes should use `letter-cell-height`.',
+          min: 1,
+          step: 1,
+        },
+        'panel-radius': {
+          type: 'number',
+          label: 'Panel Radius (legacy)',
+          description: 'Legacy fallback for `letter-radius`. Older scenes set this key to round panel corners; new scenes should use `letter-radius`.',
+          min: 0,
+          step: 0.5,
+        },
+      },
+    },
+    {
+      id: 'back-markers',
+      label: 'Back Markers',
+      description: 'Letters on the back half of the orbit are replaced by simpler rounded markers so the front-facing text stays readable.',
+      properties: {
+        'back-marker-margin': {
+          type: 'number',
+          label: 'Back Marker Margin',
+          description: 'Inset in pixels applied to each back marker, shrinking it relative to the letter cell. Higher values produce smaller, more recessed markers.',
+          min: 0,
+          step: 0.5,
+        },
+        'back-marker-color': {
+          type: 'string',
+          label: 'Back Marker Color',
+          description: 'Fill color of the rounded markers shown on the back half of the orbit. CSS color string.',
+        },
+      },
+    },
+    {
+      id: 'center-hub',
+      label: 'Center Hub',
+      description: 'The hub is the radial-gradient disc at the orbit center; size and the three gradient stops are tuned independently.',
+      properties: {
+        'center-radius': {
+          type: 'number',
+          label: 'Hub Radius',
+          description: 'Radius of the central hub in pixels, measured before perspective is applied.',
+          min: 0,
+          step: 1,
+        },
+        'center-fill': {
+          type: 'string',
+          label: 'Hub Fill',
+          description: 'Mid-stop color of the hub radial gradient. Sets the dominant body color of the disc. CSS color string.',
+        },
+        'center-rim': {
+          type: 'string',
+          label: 'Hub Rim',
+          description: 'Stroke color drawn around the outside of the hub. CSS color string.',
+        },
+        'center-highlight': {
+          type: 'string',
+          label: 'Hub Highlight',
+          description: 'Inner-stop color of the hub radial gradient — typically a translucent white that creates the specular sheen near the upper-left.',
+        },
+      },
+    },
+    {
+      id: 'colors',
+      label: 'Colors',
+      description: 'Per-letter colors — the glyph fill, the panel background behind the glyph, and the glow shadow under the glyph.',
+      properties: {
+        'text-color': {
+          type: 'string',
+          label: 'Text Color',
+          description: 'Glyph fill color. CSS color string.',
+        },
+        'panel-color': {
+          type: 'string',
+          label: 'Panel Color',
+          description: 'Background color of the rounded letter panel sitting behind each glyph. CSS color string.',
+        },
+        'glow-color': {
+          type: 'string',
+          label: 'Glow Color',
+          description: 'Shadow color used for the soft glow under each glyph. CSS color string (typically a translucent variant of the text color).',
+        },
+      },
+    },
+    {
+      id: 'camera',
+      label: 'Camera',
+      description: 'Camera distance controls perspective foreshortening; viewport padding extends the canvas beyond the layer bounds so out-of-bounds letters are not clipped.',
+      properties: {
+        'camera-distance': {
+          type: 'number',
+          label: 'Camera Distance',
+          description: 'Distance from the camera to the orbit center, in the same units as `position-z`. Larger values flatten the perspective; smaller values exaggerate it.',
+          min: 1,
+          step: 10,
+        },
+        'viewport-padding': {
+          type: 'number',
+          label: 'Viewport Padding',
+          description: 'Extra pixels of canvas added on every side of the layer bounds. Increase if letters get clipped at the edges of the layer.',
+          min: 0,
+          step: 10,
+        },
+      },
+    },
+  ],
+};
