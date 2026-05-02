@@ -1,14 +1,17 @@
 import { create } from 'zustand'
 import type { SceneJson, Registry } from '@/types/scene'
+import type { PropertySchema } from '@/types/property-schema'
 
 export interface EditorStore {
   scene: SceneJson | null
   registry: Registry | null
+  componentSchemas: Record<string, PropertySchema | null>
   selectedPath: string | null
   dirty: boolean
 
   setScene: (scene: SceneJson) => void
   setRegistry: (registry: Registry) => void
+  setComponentSchema: (componentId: string, schema: PropertySchema | null) => void
   setSelectedPath: (path: string | null) => void
   markDirty: () => void
   markClean: () => void
@@ -93,11 +96,16 @@ function deepMerge(target: unknown, patch: unknown): unknown {
 export const useEditorStore = create<EditorStore>((set, get) => ({
   scene: null,
   registry: null,
+  componentSchemas: {},
   selectedPath: null,
   dirty: false,
 
   setScene: (scene) => set({ scene }),
   setRegistry: (registry) => set({ registry }),
+  setComponentSchema: (componentId, schema) =>
+    set((state) => ({
+      componentSchemas: { ...state.componentSchemas, [componentId]: schema },
+    })),
   setSelectedPath: (path) => set({ selectedPath: path }),
   markDirty: () => set({ dirty: true }),
   markClean: () => set({ dirty: false }),

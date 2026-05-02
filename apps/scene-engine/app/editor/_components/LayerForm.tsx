@@ -182,6 +182,7 @@ export function LayerForm({ layer, path }: Props) {
   const setSelectedPath = useEditorStore((s) => s.setSelectedPath)
   const registry = useEditorStore((s) => s.registry) as Registry | null
   const scene = useEditorStore((s) => s.scene)
+  const componentSchemas = useEditorStore((s) => s.componentSchemas)
   const [aspectRatio, setAspectRatio] = useState<number | null>(null)
 
   function commit(dottedKey: string, value: unknown) {
@@ -217,9 +218,20 @@ export function LayerForm({ layer, path }: Props) {
     () => getBuiltinPropertySchema(layerType as SceneObjectType | undefined),
     [layerType],
   )
+  const componentSchema = useMemo(
+    () =>
+      layerType === 'component' && typeof assetId === 'string'
+        ? componentSchemas[assetId] ?? null
+        : null,
+    [layerType, assetId, componentSchemas],
+  )
+  const layerSchema = useMemo(
+    () => builtinSchema ?? componentSchema,
+    [builtinSchema, componentSchema],
+  )
   const declaredKeys = useMemo(
-    () => (builtinSchema ? extractSchemaPropertyKeys(builtinSchema) : new Set<string>()),
-    [builtinSchema],
+    () => (layerSchema ? extractSchemaPropertyKeys(layerSchema) : new Set<string>()),
+    [layerSchema],
   )
   const orphans = useMemo(
     () =>
@@ -231,15 +243,15 @@ export function LayerForm({ layer, path }: Props) {
   const orphanKeySignature = orphans.map(([k]) => k).join(',')
 
   useEffect(() => {
+    if (layerType === 'effect') return
     if (!orphans.length) return
-    if (manifest) return
     for (const [key] of orphans) {
       console.warn(
         `[builtin-property-schemas] orphan property '${key}' on layer type '${layerType}' — not declared in schema`,
       )
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [layerType, orphanKeySignature, manifest])
+  }, [layerType, orphanKeySignature])
 
   useEffect(() => {
     let cancelled = false
@@ -475,11 +487,11 @@ export function LayerForm({ layer, path }: Props) {
         )}
       </InspectorSection>
 
-      {builtinSchema && !manifest && (() => {
+      {layerSchema && (() => {
         const schemaValues: Record<string, unknown> = isMedia
           ? { ...MEDIA_PROPERTY_DEFAULTS, ...props }
           : props
-        return builtinSchema.sections.map((section) => (
+        return layerSchema.sections.map((section) => (
           <PropertySection
             key={section.id}
             section={section}
@@ -496,7 +508,7 @@ export function LayerForm({ layer, path }: Props) {
         ))
       })()}
 
-      {!manifest && orphans.length > 0 && (
+      {layerType !== 'effect' && orphans.length > 0 && (
         <PropertySection
           section={buildGeneralSection(orphans)}
           values={Object.fromEntries(orphans)}
@@ -512,7 +524,7 @@ export function LayerForm({ layer, path }: Props) {
         />
       )}
 
-      {manifest && Object.keys(manifest.properties).length > 0 && (
+      {layerType === 'effect' && manifest && Object.keys(manifest.properties).length > 0 && (
         <InspectorSection title="Properties">
           {Object.entries(manifest.properties).map(([name, schema]) => (
             <FieldRow key={name} label={name}>
