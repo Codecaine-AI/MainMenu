@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef } from 'react'
 import { useEditorStore } from '@/store/editor-store'
 import { pickScenePathAt } from '@/lib/hit-test'
+import { isPathLocked } from '@/lib/path'
 import { resolveDragTarget } from '@/lib/drag-target'
 import { applyDragDelta } from '@/lib/transform-units'
 import type { TransformExplicit } from '@/types/scene'
@@ -39,7 +40,8 @@ export default function useCanvasDrag({
       if (!scene || !stageRef.current) return
 
       const cmd = e.metaKey || e.ctrlKey
-      const hitPath = pickScenePathAt(e, { cmd, stageEl: stageRef.current })
+      const isLocked = (p: string) => (scene ? isPathLocked(scene, p) : false)
+      const hitPath = pickScenePathAt(e, { cmd, stageEl: stageRef.current, isPathLocked: isLocked })
       if (!hitPath) return
 
       const target = resolveDragTarget(scene, hitPath)

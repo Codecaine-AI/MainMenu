@@ -9,6 +9,7 @@ interface Props {
   onSelect: (path: string) => void
   onToggle: (path: string) => void
   onAddChild: (path: string) => void
+  onToggleLock: (path: string) => void
   collapsedSet: Set<string>
   selectedPath: string | null
   onDragStart?: (e: React.DragEvent, path: string) => void
@@ -27,6 +28,7 @@ export function HierarchyRow({
   onSelect,
   onToggle,
   onAddChild,
+  onToggleLock,
   collapsedSet,
   selectedPath,
   onDragStart,
@@ -37,6 +39,7 @@ export function HierarchyRow({
 }: Props) {
   const hasChildren = Array.isArray(layer.children) && (layer.children as unknown[]).length > 0
   const isHidden = layer.visible === false
+  const isLocked = layer.locked === true
   const typeLabel = (layer.type as string) ?? (layer.layer ? 'sub-layer' : '')
   const canAddChildren = layer.type === 'group'
 
@@ -50,6 +53,7 @@ export function HierarchyRow({
         className={`relative flex items-center gap-1 py-1 px-1 cursor-default select-none text-[12px] font-mono
           ${isSelected ? 'bg-[#1d3247] outline outline-1 outline-[#2a6da3]' : 'hover:bg-[#222]'}
           ${isHidden ? 'opacity-40' : ''}
+          ${isLocked ? 'opacity-40' : ''}
           ${isDropInto ? 'bg-[rgba(255,216,77,0.18)] outline outline-1 outline-[#ffd84d]' : ''}
         `}
         style={{ paddingLeft: depth * 14 + 4 }}
@@ -84,6 +88,15 @@ export function HierarchyRow({
           <span className="text-gray-400">[{typeLabel}]</span>
         </span>
 
+        <button
+          type="button"
+          onClick={(e) => { e.stopPropagation(); onToggleLock(path) }}
+          className="h-4 w-4 shrink-0 border border-[#444] bg-[#242424] text-[11px] leading-none text-gray-100 hover:bg-[#303030] active:translate-y-px"
+          aria-label={`${isLocked ? 'Unlock' : 'Lock'} ${(layer.name as string | undefined) ?? (layer.id as string)} on canvas`}
+        >
+          {isLocked ? '🔒' : '🔓'}
+        </button>
+
         {canAddChildren && (
           <button
             type="button"
@@ -111,6 +124,7 @@ export function HierarchyRow({
                 onSelect={onSelect}
                 onToggle={onToggle}
                 onAddChild={onAddChild}
+                onToggleLock={onToggleLock}
                 collapsedSet={collapsedSet}
                 selectedPath={selectedPath}
                 onDragStart={onDragStart}

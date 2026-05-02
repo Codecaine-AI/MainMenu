@@ -3,10 +3,12 @@
 import { useEffect, useRef, useCallback, useState, type CSSProperties } from 'react'
 import { useEditorStore } from '@/store/editor-store'
 import { pickScenePathAt } from '@/lib/hit-test'
+import { isPathLocked } from '@/lib/path'
 import { createObjectFromAsset } from '@/lib/create-scene-object'
 import useCanvasDrag from './canvas/useCanvasDrag'
 import useCanvasResize from './canvas/useCanvasResize'
 import useSelectionBox from './canvas/useSelectionBox'
+import useCanvasKeyboardNudge from './canvas/useCanvasKeyboardNudge'
 import SelectionOverlay from './canvas/SelectionOverlay'
 import type { SceneJson, Registry } from '@/types/scene'
 
@@ -45,6 +47,7 @@ export function CanvasPanel() {
   const { onMouseDown: handleStageMouseDown, suppressNextClickRef } = useCanvasDrag({ stageRef })
   const { onHandleMouseDown, suppressNextClickRef: resizeSuppressRef } = useCanvasResize({ stageRef })
   const selectionBox = useSelectionBox({ stageRef, frameRef, scene: scene as SceneJson | null, selectedPath })
+  useCanvasKeyboardNudge()
 
   useEffect(() => {
     if (!scene || !stageRef.current) return
@@ -92,7 +95,8 @@ export function CanvasPanel() {
         return
       }
       const cmd = e.metaKey || e.ctrlKey
-      const path = pickScenePathAt(e, { cmd, stageEl: stageRef.current ?? undefined })
+      const isLocked = (p: string) => (scene ? isPathLocked(scene as SceneJson, p) : false)
+      const path = pickScenePathAt(e, { cmd, stageEl: stageRef.current ?? undefined, isPathLocked: isLocked })
       if (!path) {
         setSelectedPath(null)
         setDrillCursor(null)
@@ -108,7 +112,7 @@ export function CanvasPanel() {
       setSelectedPath(stack[depth])
       setDrillCursor({ x: e.clientX, y: e.clientY })
     },
-    [setSelectedPath, setDrillCursor, drillCursor, selectedPath, suppressNextClickRef, resizeSuppressRef],
+    [setSelectedPath, setDrillCursor, drillCursor, selectedPath, suppressNextClickRef, resizeSuppressRef, scene],
   )
 
   const handleDragOver = useCallback((e: React.DragEvent) => {
