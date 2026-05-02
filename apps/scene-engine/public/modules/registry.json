@@ -15,8 +15,16 @@
     "type": "component",
     "path": "/modules/components/procedural-sphere/procedural-sphere.js"
   },
+  "procedural-cylinder-strips-mask": {
+    "type": "component",
+    "path": "/modules/components/procedural-cylinder-strips/procedural-cylinder-strips-straight.js"
+  },
   "procedural-cylinder": {
     "type": "component",
     "path": "/modules/components/procedural-cylinder/procedural-cylinder.js"
+  },
+  "arc-letterbox": {
+    "type": "component",
+    "path": "/modules/components/arc-letterbox/arc-letterbox.js"
   }
 }

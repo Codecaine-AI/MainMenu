@@ -7,6 +7,52 @@
   },
   "objects": [
     {
+      "id": "base-barber-cylinder",
+      "name": "Base Barber Cylinder",
+      "type": "component",
+      "asset": "procedural-cylinder-strips-mask",
+      "transform": {
+        "mode": "fill"
+      },
+      "appearance": {
+        "opacity": 0.38,
+        "blend": "screen"
+      },
+      "properties": {
+        "animate": true,
+        "color-start": "#2030ff",
+        "color-mid": "#3f2dff",
+        "color-end": "#ff2f75",
+        "color-cycle": -3.1,
+        "color-offset": 1.71,
+        "color-speed": 0.238,
+        "color-bias": 0.9,
+        "texture-angle": -18,
+        "texture-speed": 0,
+        "texture-scale": 1.25,
+        "texture-resolution": 0.4,
+        "strip-count": 33,
+        "strip-width": 0.86,
+        "curve-steps": 8,
+        "opacity": 0.72,
+        "minimum-open": 0.085,
+        "rotation-offset": 0,
+        "open-speed": 0.088,
+        "visible-width": 0.52,
+        "feather": 0.2,
+        "pulse-offset": 0.37,
+        "center-x": 0.5,
+        "center-y": 0.5,
+        "radius": 1.56,
+        "inner-radius": 0.04,
+        "outer-radius": 1.8,
+        "depth-curve": 1.18,
+        "target-fps": 24,
+        "dpr-cap": 1
+      },
+      "visible": true
+    },
+    {
       "id": "procedural-sphere",
       "type": "component",
       "asset": "procedural-sphere",
@@ -28,16 +74,17 @@
         "sphere-x": 0.26,
         "sphere-y": 0,
         "sphere-z": -0.54,
-        "line-width": 2.5,
+        "line-width": 3.5,
         "pole-radius": 0.03,
         "rotate-x": 0,
         "rotate-y": -16,
         "rotate-z": -2,
-        "grid": "#636669",
+        "grid": "#c2c2c2",
         "vignette": "rgba(0, 0, 0, 0.84)",
         "pole-gap": 0.035
       },
-      "name": "Background Sphere"
+      "name": "Background Sphere",
+      "visible": true
     },
     {
       "id": "procedural-cylinder",
@@ -52,12 +99,25 @@
         "blend": "screen"
       },
       "properties": {
-        "animate": true,
-        "cylinder-color": "#319662",
+        "disable-animation": false,
+        "animation-one": false,
+        "animation-two": false,
+        "cylinder-color": "#e8dfa6",
         "rotation-speed": 0.25,
-        "pulse-speed": 0.084,
+        "pulse-speed": 0.15,
         "pulse-width": 0.06,
         "pulse-trail": 0.05,
+        "sequence-dot-cycles": 2,
+        "sequence-fade-duration": 0.7,
+        "dot-speed": 0.22,
+        "dot-size": 3.2,
+        "segment-width": 0.032,
+        "dot-density": 4,
+        "line-segment-density": 4,
+        "ring-segment-density": 1,
+        "dot-trail": 0.04,
+        "dot-alpha": 0.73,
+        "intersection-glow": 0.74,
         "pulse-offset": 0,
         "lines": 32,
         "rings": 40,
@@ -77,8 +137,10 @@
         "camera-distance": 590,
         "near-clip": 1,
         "max-perspective": 20,
-        "radius": 1
-      }
+        "radius": 1,
+        "animation-three": true
+      },
+      "visible": true
     },
     {
       "id": "codecaine-rounded-chrome-logo",
@@ -86,7 +148,7 @@
       "asset": "codecaine-rounded-chrome-logo",
       "transform": {
         "x": "center",
-        "y": 33,
+        "y": 30,
         "width": 80.5,
         "height": "auto",
         "anchor": "center"
@@ -123,8 +185,8 @@
       "name": "Premium Lines",
       "type": "text",
       "transform": {
-        "x": 50,
-        "y": 50,
+        "x": "center",
+        "y": "center",
         "width": "auto",
         "height": "auto",
         "anchor": "center"
@@ -151,7 +213,7 @@
       "asset": "orbit-press-start",
       "transform": {
         "x": "center",
-        "y": 79,
+        "y": 74,
         "width": 46,
         "height": 16,
         "anchor": "center"
@@ -200,6 +262,30 @@
         }
       ],
       "name": "Start Button"
+    },
+    {
+      "id": "smash-style-letterbox",
+      "name": "Smash Style Letterbox",
+      "type": "component",
+      "asset": "arc-letterbox",
+      "transform": {
+        "mode": "fill"
+      },
+      "appearance": {
+        "opacity": 0.55,
+        "blend": "normal"
+      },
+      "properties": {
+        "top-height": 8,
+        "bottom-height": 16.5,
+        "top-curve": 13.5,
+        "bottom-curve": 77,
+        "contour": 25,
+        "color": "#000000",
+        "opacity": 1,
+        "edge-feather": 0
+      },
+      "visible": true
     },
     {
       "id": "crt",
