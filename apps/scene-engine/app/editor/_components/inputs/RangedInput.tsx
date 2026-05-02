@@ -83,7 +83,7 @@ export function RangedInput({ value, min, max, step, onChange }: Props) {
         step={step}
         defaultValue={value}
         onChange={handleNum}
-        className="w-13 shrink-0 bg-[#222] border border-[#333] text-gray-300 text-[12px] font-mono px-1 py-[3px] rounded-sm focus:border-[#4a8fc2] focus:outline-none"
+        className="w-20 shrink-0 bg-[#222] border border-[#333] text-gray-300 text-[12px] font-mono px-1 py-[3px] rounded-sm focus:border-[#4a8fc2] focus:outline-none"
       />
     </span>
   )

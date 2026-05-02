@@ -84,12 +84,18 @@
     }
   },
   "docs": {
-    "status": "pending",
-    "started_at": null,
-    "completed_at": null,
-    "last_updated": null,
+    "status": "completed",
+    "started_at": "2026-05-02T18:00:00+00:00",
+    "completed_at": "2026-05-02T18:05:00+00:00",
+    "last_updated": "2026-05-02T18:05:00+00:00",
     "data": {
-      "updates": []
+      "updates": [
+        {
+          "type": "none",
+          "description": "No doc updates needed — pure schema-authoring across four component modules. Schema system, inspector behavior, and component-schema co-location are already documented in docs/scene-engine/10-system-design/16-property-schema.md and docs/scene-engine/20-implementation/20-editor/20-panels.md (prior session). No system, behavioral, or architectural changes.",
+          "created_at": "2026-05-02T18:05:00+00:00"
+        }
+      ]
     }
   },
   "git": {

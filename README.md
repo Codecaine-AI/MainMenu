@@ -1,6 +1,10 @@
-# MELEE
+# MELEE — Main Menu
 
-MELEE is an experiment in recreating the Super Smash Bros. Melee main menu in CSS and HTML. The project is a monorepo so the visual prototype, prompt templates, extraction pipeline, and asset-recreation agent can evolve independently.
+An editor and composition engine for building websites that feel like video game menus.
+
+Game menus have a specific aesthetic: one fixed viewport, no scrolling, layered composition, interactive navigation through selections and transitions, cinematic polish. There's no tool that targets this for the web — Figma is for documents and layouts, Unity is for games. Main Menu sits in the gap: compose assets into fixed-viewport screens, edit them visually or programmatically, build the result as a deployable web page.
+
+The project started as an attempt to recreate the Super Smash Bros. Melee home screen in CSS and HTML. The iteration needs kept growing — adjusting layers, colors, blend modes, animations — and it became clear the bottleneck wasn't making assets, it was composing them. The monorepo structure lets the visual editor, prompt templates, extraction pipeline, and asset-recreation agent evolve independently.
 
 ## Repository Layout
 
