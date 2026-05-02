@@ -15,12 +15,25 @@ interface FrameMetrics {
   height: number
 }
 
+function buildHitStack(path: string): string[] {
+  const parts = path.split('.children.')
+  const stack: string[] = []
+  let acc = ''
+  for (let i = 0; i < parts.length; i++) {
+    acc = i === 0 ? parts[0] : `${acc}.children.${parts[i]}`
+    stack.push(acc)
+  }
+  return stack
+}
+
 export function CanvasPanel() {
   const scene = useEditorStore((s) => s.scene)
   const selectedPath = useEditorStore((s) => s.selectedPath)
   const registry = useEditorStore((s) => s.registry)
   const addObjectAt = useEditorStore((s) => s.addObjectAt)
   const setSelectedPath = useEditorStore((s) => s.setSelectedPath)
+  const drillCursor = useEditorStore((s) => s.drillCursor)
+  const setDrillCursor = useEditorStore((s) => s.setDrillCursor)
   const stageRef = useRef<HTMLDivElement>(null)
   const panelRef = useRef<HTMLDivElement>(null)
   const [frame, setFrame] = useState<FrameMetrics | null>(null)
@@ -77,10 +90,24 @@ export function CanvasPanel() {
 
   const handleStageClick = useCallback(
     (e: React.MouseEvent<HTMLDivElement>) => {
-      const path = pickScenePathAt(e, { topLevelOnly: true })
-      if (path) setSelectedPath(path)
+      const cmd = e.metaKey || e.ctrlKey
+      const path = pickScenePathAt(e, { cmd, stageEl: stageRef.current ?? undefined })
+      if (!path) {
+        setSelectedPath(null)
+        setDrillCursor(null)
+        return
+      }
+      const stack = buildHitStack(path)
+      const sameSpot =
+        drillCursor != null &&
+        Math.abs(e.clientX - drillCursor.x) <= 3 &&
+        Math.abs(e.clientY - drillCursor.y) <= 3
+      const idx = sameSpot && selectedPath ? stack.indexOf(selectedPath) : -1
+      const depth = idx >= 0 ? Math.min(idx + 1, stack.length - 1) : 0
+      setSelectedPath(stack[depth])
+      setDrillCursor({ x: e.clientX, y: e.clientY })
     },
-    [setSelectedPath],
+    [setSelectedPath, setDrillCursor, drillCursor, selectedPath],
   )
 
   const handleDragOver = useCallback((e: React.DragEvent) => {

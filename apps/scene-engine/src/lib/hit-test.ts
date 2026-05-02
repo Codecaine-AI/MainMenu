@@ -1,28 +1,42 @@
+import { isBackgroundLikeEl } from './background-detect'
+
 /**
  * Resolve a pointer event to a `data-scene-path` string.
  *
- * The returned string matches the editor-store path format used by
- * `parsePath` / `resolveObject`, e.g. `"0"` (top-level layer 0) or
- * `"0.children.1.children.2"` (nested child).
+ * Returns the DEEPEST tagged path under the cursor (matches the
+ * editor-store path format used by `parsePath` / `resolveObject`,
+ * e.g. `"0"` or `"0.children.1.children.2"`).
  *
- * `topLevelOnly` defaults to true: the path is sliced to its first
- * segment so callers in CP1 always select the top-level layer. CP2
- * passes `false` to enable drill-in.
+ * When `stageEl` is provided and `cmd` is falsy, fullscreen
+ * background-like ancestors are skipped — plain clicks fall through
+ * a covering background to the next tagged ancestor (or null if the
+ * click hit only background). Pass `cmd: true` to bypass the filter
+ * and allow background selection.
+ *
+ * Hidden layers (`visible:false`) aren't in the DOM (top-level) or
+ * have `display:none` (glyph-group sub-layers), so `elementFromPoint`
+ * skips them without needing an explicit filter here.
  */
 
-export type PickOptions = { topLevelOnly?: boolean }
+export type PickOptions = { cmd?: boolean; stageEl?: HTMLElement }
 
 export function pickScenePathAt(
   event: { clientX: number; clientY: number },
   options?: PickOptions,
 ): string | null {
   if (typeof document === 'undefined') return null
-  const el = document.elementFromPoint(event.clientX, event.clientY)
+  const initial = document.elementFromPoint(event.clientX, event.clientY)
+  let el: HTMLElement | null = (initial as Element | null)?.closest<HTMLElement>('[data-scene-path]') ?? null
   if (!el) return null
-  const tagged = (el as Element).closest<HTMLElement>('[data-scene-path]')
-  if (!tagged) return null
-  const path = tagged.dataset.scenePath
+
+  if (options?.stageEl && !options.cmd) {
+    while (el && isBackgroundLikeEl(el, options.stageEl)) {
+      el = el.parentElement?.closest<HTMLElement>('[data-scene-path]') ?? null
+    }
+  }
+
+  if (!el) return null
+  const path = el.dataset.scenePath
   if (path == null || path === '') return null
-  if (options?.topLevelOnly === false) return path
-  return path.split('.children.')[0]
+  return path
 }

@@ -83,15 +83,19 @@ function applyObjectStyles(el, obj, entry) {
 }
 
 function updateGlyphGroup(wrapper, layer) {
+  const parentPath = wrapper.dataset.scenePath ?? '';
   const svg = wrapper.querySelector('svg');
   if (!svg) return;
 
   const scope = 'melee3';
-  for (const child of (layer.children ?? [])) {
+  const childList = layer.children ?? [];
+  for (let i = 0; i < childList.length; i++) {
+    const child = childList[i];
     if (child.layer) {
       const matched = svg.querySelector(`[data-layer="${child.layer}"]`);
       if (!matched) continue;
       matched.style.display = child.visible === false ? 'none' : '';
+      matched.dataset.scenePath = `${parentPath}.children.${i}`;
       const props = child.properties || {};
       if (typeof props.opacity === 'number') {
         matched.style.opacity = String(props.opacity);
@@ -107,7 +111,10 @@ function updateGlyphGroup(wrapper, layer) {
           const inner = f.querySelector('[data-layer-id]');
           return inner?.dataset.layerId === child.id;
         });
-      if (fo) updateForeignChild(fo, child);
+      if (fo) {
+        fo.dataset.scenePath = `${parentPath}.children.${i}`;
+        updateForeignChild(fo, child);
+      }
     }
   }
 
