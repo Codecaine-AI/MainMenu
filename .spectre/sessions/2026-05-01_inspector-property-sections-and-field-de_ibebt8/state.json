@@ -52,15 +52,15 @@
     "last_updated": "2026-05-02T02:44:42+00:00"
   },
   "build": {
-    "status": "pending",
-    "started_at": null,
+    "status": "in_progress",
+    "started_at": "2026-05-01T00:00:00+00:00",
     "completed_at": null,
-    "last_updated": null,
+    "last_updated": "2026-05-01T00:00:00+00:00",
     "data": {
-      "current_checkpoint": null,
+      "current_checkpoint": 2,
       "current_task_group": null,
       "current_task": null,
-      "checkpoints_completed": []
+      "checkpoints_completed": [1]
     }
   },
   "docs": {
@@ -76,6 +76,13 @@
     "branch": "main",
     "worktree": null,
     "base_branch": null,
-    "commits": []
+    "commits": [
+      {
+        "checkpoint_id": 1,
+        "sha": "ddbe665",
+        "message": "checkpoint-1: schema-driven media inspector with description popovers",
+        "created_at": "2026-05-01T00:00:00+00:00"
+      }
+    ]
   }
 }

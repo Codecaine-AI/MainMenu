@@ -15,7 +15,9 @@ import { ManifestPropertyField } from './inputs/ManifestPropertyField'
 import { SlotsSection } from './SlotsSection'
 import { TextSection } from './TextSection'
 import { InspectorHeader, InspectorSection, FieldRow, ReadonlyValue } from './inputs/InspectorSection'
-import type { Registry, Transform, Appearance, EventBinding, Slot, AssetContainer, ModuleEntry } from '@/types/scene'
+import { PropertySection } from './PropertySection'
+import { getBuiltinPropertySchema } from '@/lib/builtin-property-schemas'
+import type { Registry, Transform, Appearance, EventBinding, Slot, AssetContainer, ModuleEntry, SceneObjectType } from '@/types/scene'
 
 interface Props {
   layer: Record<string, unknown>
@@ -450,59 +452,32 @@ export function LayerForm({ layer, path }: Props) {
         )}
       </InspectorSection>
 
-      {isMedia && (
-        <InspectorSection title="Media">
-          <FieldRow label="Repeat X">
-            <RangedInput
-              value={(props.repeat_x as number | undefined) ?? MEDIA_PROPERTY_DEFAULTS.repeat_x}
-              {...NUMERIC_PROPERTY_STEPS.repeat_x}
-              onChange={(v) => commit('properties.repeat_x', Math.round(v))}
-            />
-          </FieldRow>
-          <FieldRow label="Repeat Y">
-            <RangedInput
-              value={(props.repeat_y as number | undefined) ?? MEDIA_PROPERTY_DEFAULTS.repeat_y}
-              {...NUMERIC_PROPERTY_STEPS.repeat_y}
-              onChange={(v) => commit('properties.repeat_y', Math.round(v))}
-            />
-          </FieldRow>
-          <FieldRow label="Position X">
-            <RangedInput
-              value={(props.position_x as number | undefined) ?? MEDIA_PROPERTY_DEFAULTS.position_x}
-              {...NUMERIC_PROPERTY_STEPS.position_x}
-              onChange={(v) => commit('properties.position_x', v)}
-            />
-          </FieldRow>
-          <FieldRow label="Position Y">
-            <RangedInput
-              value={(props.position_y as number | undefined) ?? MEDIA_PROPERTY_DEFAULTS.position_y}
-              {...NUMERIC_PROPERTY_STEPS.position_y}
-              onChange={(v) => commit('properties.position_y', v)}
-            />
-          </FieldRow>
-          <FieldRow label="Scale">
-            <RangedInput
-              value={(props.scale as number | undefined) ?? MEDIA_PROPERTY_DEFAULTS.scale}
-              {...NUMERIC_PROPERTY_STEPS.scale}
-              onChange={(v) => commit('properties.scale', v)}
-            />
-          </FieldRow>
-          <FieldRow label="Rotation">
-            <RangedInput
-              value={(props.rotation as number | undefined) ?? MEDIA_PROPERTY_DEFAULTS.rotation}
-              {...NUMERIC_PROPERTY_STEPS.rotation}
-              onChange={(v) => commit('properties.rotation', v)}
-            />
-          </FieldRow>
-          <FieldRow label="Speed">
-            <RangedInput
-              value={(props.speed as number | undefined) ?? MEDIA_PROPERTY_DEFAULTS.speed}
-              {...NUMERIC_PROPERTY_STEPS.speed}
-              onChange={(v) => commit('properties.speed', v)}
-            />
-          </FieldRow>
-        </InspectorSection>
-      )}
+      {isMedia && (() => {
+        const mediaSchema = getBuiltinPropertySchema(layerType as SceneObjectType | undefined)
+        const mediaSection = mediaSchema?.sections[0]
+        if (!mediaSection) return null
+        const mediaValues = {
+          repeat_x: (props.repeat_x as number | undefined) ?? MEDIA_PROPERTY_DEFAULTS.repeat_x,
+          repeat_y: (props.repeat_y as number | undefined) ?? MEDIA_PROPERTY_DEFAULTS.repeat_y,
+          position_x: (props.position_x as number | undefined) ?? MEDIA_PROPERTY_DEFAULTS.position_x,
+          position_y: (props.position_y as number | undefined) ?? MEDIA_PROPERTY_DEFAULTS.position_y,
+          scale: (props.scale as number | undefined) ?? MEDIA_PROPERTY_DEFAULTS.scale,
+          rotation: (props.rotation as number | undefined) ?? MEDIA_PROPERTY_DEFAULTS.rotation,
+          speed: (props.speed as number | undefined) ?? MEDIA_PROPERTY_DEFAULTS.speed,
+        }
+        return (
+          <PropertySection
+            section={mediaSection}
+            values={mediaValues}
+            onChange={(key, value) =>
+              commit(
+                `properties.${key}`,
+                key === 'repeat_x' || key === 'repeat_y' ? Math.round(value as number) : value,
+              )
+            }
+          />
+        )
+      })()}
 
       {isText && (
         <TextSection
