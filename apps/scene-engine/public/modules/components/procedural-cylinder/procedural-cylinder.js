@@ -841,7 +841,7 @@ export const properties = {
       description: 'CSS color string for the cylinder grid. Plain string in v1.',
       properties: {
         'cylinder-color': {
-          type: 'string',
+          type: 'color',
           label: 'Cylinder Color',
           description: 'CSS color (hex, rgba, named) for grid lines and glow.',
         },

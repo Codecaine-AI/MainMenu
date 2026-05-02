@@ -1,7 +1,7 @@
 ---
-covers: The editor's React components — Toolbar, Canvas, Hierarchy, Inspector. Always-present sections, manifest-driven property fields, slot/event editing, project export.
-concepts: [toolbar, canvas, hierarchy, inspector, layer-form, manifest-property-field, slots-section, events-section, drag-drop]
-design_refs: [10-system-design/40-authoring-surfaces.md]
+covers: The editor's React components — Toolbar, Canvas, Hierarchy, Inspector. Always-present sections, schema-driven property fields with sections and description popovers, slot/event editing, project export.
+concepts: [toolbar, canvas, hierarchy, inspector, layer-form, property-section, property-field, description-popover, manifest-property-field, slots-section, events-section, drag-drop]
+design_refs: [10-system-design/40-authoring-surfaces.md, 10-system-design/16-property-schema.md]
 ---
 
 # Editor Panels
@@ -69,13 +69,25 @@ Property editor for the object at `selectedPath`. The shell `InspectorPanel` is 
 |--------------|---------------------------------------------------------------------------------------|
 | Header       | Always — name, type chip, visibility toggle, delete.                                  |
 | Asset        | When `layer.asset` is set. Read-only id; `AssetSwapDropdown` for swappable container types (`audio`, `image`, `video`, `glyph`). |
-| Transform    | Always. Fill toggle. Fill mode → rotation + scale. Explicit → x, y, width, height, anchor, rotation, scale. |
-| Appearance   | Always — opacity, blend, hue. Adds `fit` for media types (`video`, `image`).          |
-| Properties   | When the asset has a manifest with at least one property — one `ManifestPropertyField` per descriptor. |
+| Transform    | Always (skipped for sub-layer overrides). Fill toggle. Fill mode → rotation + scale. Explicit → x, y, width, height, anchor, rotation, scale. |
+| Appearance   | Always (skipped for sub-layer overrides) — opacity, blend, hue. Adds `fit` for media types (`video`, `image`). |
+| Properties (schema) | For components and built-in layer types — one `PropertySection` per section in the resolved schema. Each section renders `PropertyField` entries with clickable label → `DescriptionPopover`. Orphan properties (saved but not in schema) render under an auto-generated "General" section with inferred inputs + console warning. |
+| Properties (effect) | For effects only — one `ManifestPropertyField` per manifest descriptor, under a single "Properties" heading. |
 | Slots        | Glyph-groups only — `SlotsSection` for adding/editing exposed sub-surface fills.      |
 | Events       | Always — `EventsSection` lists `events[]` with add/remove and `(trigger, action, target)` selects. |
 
 Each field's onChange dispatches `mutateObjectAt(path, patchFromDottedKey('transform.x', 50))` or similar — the dotted-key helper builds the nested patch object that `deepMerge` then merges into the canonical shape.
+
+### Schema Resolution in `LayerForm`
+
+`LayerForm` resolves the property schema for the selected layer:
+
+1. **Built-in schema** — `getBuiltinPropertySchema(layerType)` returns a `PropertySchema` for `video`, `image`, `glyph-group`, or `audio`. Returns `undefined` for other types.
+2. **Component schema** — if the layer type is `component`, look up `componentSchemas[assetId]` from the Zustand store (populated by the loader at scene open).
+3. **Merge** — `layerSchema = builtinSchema ?? componentSchema`. Built-in wins if both somehow exist.
+4. **Orphan detection** — `extractSchemaPropertyKeys(schema)` collects all declared keys; saved keys not in that set are orphans. `buildGeneralSection(orphans)` creates a General section with inferred `PropertyDef` entries. A `console.warn` names each orphan.
+
+When no schema exists (e.g., a component whose module hasn't loaded yet), all properties render under General.
 
 ### `toggleFill(nextFill)`
 
@@ -86,6 +98,14 @@ Switching transform mode is a single store mutation:
 
 The "fields set to undefined" trick relies on `deepMerge` treating `undefined` as a key-clear, which is what keeps the saved JSON tidy.
 
+### Schema-driven Components
+
+| Component               | Renders                                                                  |
+|-------------------------|--------------------------------------------------------------------------|
+| `PropertySection`       | A schema section: header label (clickable if section has a description), nested `PropertyField` entries, recursive child `PropertySection` entries. Expanded by default. |
+| `PropertyField`         | One property row: clickable label + input dispatched by the `PropertyDef.type`. Maps `number` → `RangedInput`, `string` → text input, `boolean` → checkbox, `select` → dropdown, `blend` → `BlendSelect`, `fit` → `FitSelect`, `clip` → `ClipSelect`, `anchor` → `AnchorSelect`. |
+| `DescriptionPopover`    | Floating popover anchored next to the clicked label. Shows the property's full label and plain-text description. Dismisses on click-outside or Escape. Used by both property labels and section labels. |
+
 ### Inputs (`inputs/`)
 
 | Component               | Renders                                                                  |
@@ -93,9 +113,10 @@ The "fields set to undefined" trick relies on `deepMerge` treating `undefined` a
 | `RangedInput`           | Slider + numeric input synced, debounced commit.                         |
 | `BlendSelect`           | Blend-mode dropdown (canonical CSS blend modes from `inspector-config`). |
 | `FitSelect`             | Object-fit dropdown.                                                     |
+| `ClipSelect`            | Clip-path dropdown.                                                      |
 | `AnchorSelect`          | 9-position anchor selector (3×3 grid of buttons).                        |
 | `EventsSection`         | Add / remove / edit `EventBinding` rows.                                 |
-| `ManifestPropertyField` | Single property field; reads the manifest descriptor and dispatches to number/string/boolean/enum sub-inputs. |
+| `ManifestPropertyField` | Single property field for effects; reads the manifest descriptor and dispatches to number/string/boolean/enum sub-inputs. |
 | `InspectorSection`      | Visual shell — `InspectorHeader`, `InspectorSection`, `FieldRow`, `ReadonlyValue`. |
 
 ### `SlotsSection.tsx`
@@ -119,6 +140,12 @@ Custom hook that fetches the scene + merged registry on mount, calls `setScene` 
 - `apps/scene-engine/app/editor/_components/HierarchyRow.tsx`
 - `apps/scene-engine/app/editor/_components/InspectorPanel.tsx`
 - `apps/scene-engine/app/editor/_components/LayerForm.tsx`
+- `apps/scene-engine/app/editor/_components/PropertySection.tsx`
+- `apps/scene-engine/app/editor/_components/PropertyField.tsx`
+- `apps/scene-engine/app/editor/_components/DescriptionPopover.tsx`
 - `apps/scene-engine/app/editor/_components/SlotsSection.tsx`
 - `apps/scene-engine/app/editor/_components/AssetSwapDropdown.tsx`
 - `apps/scene-engine/app/editor/_components/inputs/`
+- `apps/scene-engine/src/types/property-schema.ts`
+- `apps/scene-engine/src/lib/builtin-property-schemas.ts`
+- `apps/scene-engine/src/lib/component-schema-loader.ts`

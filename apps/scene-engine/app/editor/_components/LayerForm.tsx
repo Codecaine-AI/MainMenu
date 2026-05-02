@@ -492,33 +492,37 @@ export function LayerForm({ layer, path }: Props) {
       </InspectorSection>
       )}
 
-      {layerSchema && (() => {
-        const schemaValues: Record<string, unknown> = isMedia
-          ? { ...MEDIA_PROPERTY_DEFAULTS, ...props }
-          : props
-        return layerSchema.sections.map((section) => (
-          <PropertySection
-            key={section.id}
-            section={section}
-            values={schemaValues}
-            onChange={(key, value) =>
-              commit(
-                `properties.${key}`,
-                key === 'repeat_x' || key === 'repeat_y'
-                  ? Math.round(value as number)
-                  : value,
-              )
-            }
-          />
-        ))
-      })()}
+      {(layerSchema || (layerType !== 'effect' && orphans.length > 0)) && (
+        <InspectorSection title="Properties">
+          {layerSchema && (() => {
+            const schemaValues: Record<string, unknown> = isMedia
+              ? { ...MEDIA_PROPERTY_DEFAULTS, ...props }
+              : props
+            return layerSchema.sections.map((section) => (
+              <PropertySection
+                key={section.id}
+                section={section}
+                values={schemaValues}
+                onChange={(key, value) =>
+                  commit(
+                    `properties.${key}`,
+                    key === 'repeat_x' || key === 'repeat_y'
+                      ? Math.round(value as number)
+                      : value,
+                  )
+                }
+              />
+            ))
+          })()}
 
-      {layerType !== 'effect' && orphans.length > 0 && (
-        <PropertySection
-          section={buildGeneralSection(orphans)}
-          values={Object.fromEntries(orphans)}
-          onChange={(key, value) => commit(`properties.${key}`, value)}
-        />
+          {layerType !== 'effect' && orphans.length > 0 && (
+            <PropertySection
+              section={buildGeneralSection(orphans)}
+              values={Object.fromEntries(orphans)}
+              onChange={(key, value) => commit(`properties.${key}`, value)}
+            />
+          )}
+        </InspectorSection>
       )}
 
       {isText && (

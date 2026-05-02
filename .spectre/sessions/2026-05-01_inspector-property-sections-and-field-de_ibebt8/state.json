@@ -69,12 +69,55 @@
     }
   },
   "docs": {
-    "status": "pending",
-    "started_at": null,
-    "completed_at": null,
-    "last_updated": null,
+    "status": "completed",
+    "started_at": "2026-05-02T05:00:00+00:00",
+    "completed_at": "2026-05-02T05:10:00+00:00",
+    "last_updated": "2026-05-02T05:10:00+00:00",
     "data": {
-      "updates": []
+      "updates": [
+        {
+          "type": "design",
+          "path": "docs/scene-engine/10-system-design/16-property-schema.md",
+          "description": "New design doc: sectioned property schema convention — type taxonomy, schema sources, General fallback, description popovers, sub-layer participation",
+          "created_at": "2026-05-02T05:10:00+00:00"
+        },
+        {
+          "type": "design",
+          "path": "docs/scene-engine/10-system-design/15-component-manifest.md",
+          "description": "Scoped to manifest.json metadata + effect property descriptors; component properties now reference property-schema doc",
+          "created_at": "2026-05-02T05:10:00+00:00"
+        },
+        {
+          "type": "design",
+          "path": "docs/scene-engine/10-system-design/40-authoring-surfaces.md",
+          "description": "Updated inspector Properties section: manifest-driven → schema-driven with sections and description popovers",
+          "created_at": "2026-05-02T05:10:00+00:00"
+        },
+        {
+          "type": "design",
+          "path": "docs/scene-engine/10-system-design/00-overview.md",
+          "description": "Added 16-property-schema.md to file tree, contents index, and key concepts table",
+          "created_at": "2026-05-02T05:10:00+00:00"
+        },
+        {
+          "type": "implementation",
+          "path": "docs/scene-engine/20-implementation/20-editor/20-panels.md",
+          "description": "Rewrote Inspector section: schema resolution flow, PropertySection/PropertyField/DescriptionPopover, orphan handling, effect-only ManifestPropertyField branch",
+          "created_at": "2026-05-02T05:10:00+00:00"
+        },
+        {
+          "type": "implementation",
+          "path": "docs/scene-engine/20-implementation/20-editor/00-overview.md",
+          "description": "Extended file tree with new editor components and src/ files; added schema-driven property field concept",
+          "created_at": "2026-05-02T05:10:00+00:00"
+        },
+        {
+          "type": "implementation",
+          "path": "docs/scene-engine/20-implementation/20-editor/30-loader.md",
+          "description": "Added Component Schema Preload section: dynamic-import flow, Blob URL shim, store cache, async fallback",
+          "created_at": "2026-05-02T05:10:00+00:00"
+        }
+      ]
     }
   },
   "git": {
@@ -98,6 +141,12 @@
         "checkpoint_id": 3,
         "sha": "10deda8",
         "message": "checkpoint-3: dynamic component schema discovery + press-start authored schema",
+        "created_at": "2026-05-01T00:00:00+00:00"
+      },
+      {
+        "checkpoint_id": 4,
+        "sha": "54aeb34",
+        "message": "checkpoint-4: sub-layer override + procedural-sphere/cylinder schemas",
         "created_at": "2026-05-01T00:00:00+00:00"
       }
     ]

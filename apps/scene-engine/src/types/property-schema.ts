@@ -2,6 +2,7 @@ export type PropertyType =
   | 'number'
   | 'string'
   | 'boolean'
+  | 'color'
   | 'select'
   | 'blend'
   | 'fit'
@@ -27,6 +28,12 @@ export interface StringPropertyDef {
 
 export interface BooleanPropertyDef {
   type: 'boolean'
+  label: string
+  description?: string
+}
+
+export interface ColorPropertyDef {
+  type: 'color'
   label: string
   description?: string
 }
@@ -66,6 +73,7 @@ export type PropertyDef =
   | NumberPropertyDef
   | StringPropertyDef
   | BooleanPropertyDef
+  | ColorPropertyDef
   | SelectPropertyDef
   | BlendPropertyDef
   | FitPropertyDef

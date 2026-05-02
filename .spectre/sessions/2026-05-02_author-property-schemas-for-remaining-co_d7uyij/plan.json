@@ -1,0 +1,1075 @@
+{
+  "$schema": "Plan schema for session checkpoint-based planning (v2)",
+  "session_id": "2026-05-02_author-property-schemas-for-remaining-co_d7uyij",
+  "spec_reference": "./spec.md",
+  "created_at": "2026-05-02T15:30:00+00:00",
+  "updated_at": "2026-05-02T16:30:00+00:00",
+  "status": "complete",
+  "checkpoints": [
+    {
+      "id": 1,
+      "title": "arc-letterbox — sectioned property schema",
+      "goal": "Add a sectioned `properties` export to `arc-letterbox.js` so every field has a Title-Case label, a sentence-case description, and is grouped by intent (Top Bar / Bottom Bar / Curvature / Appearance). The `arc-letterbox` layer opens cleanly in the inspector with no `General` orphan fallback and no orphan-warning, and renders identically in the canvas.",
+      "prerequisites": [],
+      "status": "pending",
+      "testing_strategy": "Manual: `npm run dev` in `apps/scene-engine`, open http://localhost:3000/editor?scene=title (or any scene with an `arc-letterbox` layer; if the title scene lacks one, drag in or temporarily add one). Verify: (1) the inspector shows the new sections (e.g. `Top Bar`, `Bottom Bar`, `Curvature`, `Appearance`) instead of a single `General` block; (2) every field has a label and clicking the label opens the description popover with the authored text; (3) editing each field still mutates the underlying property and the canvas updates immediately; (4) no orphan-warning chip appears for any property; (5) selecting another component (e.g. `press-start`) and returning still works — no inspector regressions. Type check: `npm run build` from `apps/scene-engine` passes.",
+      "task_groups": [
+        {
+          "id": 1,
+          "title": "Author arc-letterbox property schema",
+          "objective": "Append a sectioned `properties` export to `arc-letterbox.js` covering all 8 properties the renderer reads, grouped into Top Bar / Bottom Bar / Curvature / Appearance, with min/max/step pulled from the renderer's existing `pct`/`clamp` ranges and labels/descriptions in the v1 voice.",
+          "status": "pending",
+          "task_seeds": [],
+          "tasks": [
+            {
+              "id": 1,
+              "title": "Add sectioned `properties` export to arc-letterbox.js",
+              "description": "Append an `export const properties = { sections: [...] }` block to the bottom of `apps/scene-engine/public/modules/components/arc-letterbox/arc-letterbox.js` (after the existing default-export render function). The schema must cover every key the renderer reads in lines 30–39 (`top-height`, `bottom-height`, `top-curve`, `bottom-curve`, `contour`, `color`, `opacity`, `edge-feather`) — no more, no less. Group into four sections: (1) `top-bar` / `Top Bar` → `top-height`, `top-curve`; (2) `bottom-bar` / `Bottom Bar` → `bottom-height`, `bottom-curve`; (3) `curvature` / `Curvature` → `contour`; (4) `appearance` / `Appearance` → `color`, `opacity`, `edge-feather`. Use `type: 'number'` for every numeric property with `min`/`max`/`step` matching the existing renderer clamp ranges (e.g. `top-height` is `pct(..., 0, 50)` so `min: 0, max: 50, step: 0.5`; `bottom-curve` is `pct(..., 50, 100)` so `min: 50, max: 100, step: 0.5`; `contour` is `pct(..., 0, 50)` so `min: 0, max: 50, step: 0.5`; `opacity` is `clamp(..., 0, 1)` so `min: 0, max: 1, step: 0.01`; `edge-feather` is `pct(..., 0, 8)` so `min: 0, max: 8, step: 0.1`). Use `type: 'string'` for `color`. Each property gets a Title-Case `label` and a sentence-case `description` (1–2 sentences, editor-facing, no implementation jargon — match the voice in `press-start.js` / `procedural-sphere.js`). Each section may carry its own short `description` summarizing the group. Add a single-line comment `// Inspector schema for editor use only — runtime ignores it.` immediately above the `export const properties = ...` line, matching the comment in `press-start.js`. Do NOT modify the render function, the `DEFAULTS` constant, or any other code in the file. Do NOT add `default` fields to any PropertyDef (per session decision: defaults stay as render-time fallbacks).",
+              "status": "pending",
+              "context": {
+                "read_before": [
+                  {
+                    "file": "apps/scene-engine/public/modules/components/arc-letterbox/arc-letterbox.js",
+                    "lines": "1-72",
+                    "purpose": "Read the entire file. Lines 1-10 = `DEFAULTS` constant (use as the source of truth for which keys exist and their default values). Lines 30-39 = the property reads inside the render function — these are the ONLY keys the schema must cover. The `pct(value, fallback, min, max)` calls on those lines establish the min/max ranges to surface in the schema."
+                  },
+                  {
+                    "file": "apps/scene-engine/public/modules/components/press-start/press-start.js",
+                    "lines": "10-40",
+                    "purpose": "Reference: shape of the `export const properties = { sections: [...] }` block, the editor-only-comment one-liner, and v1 voice for labels/descriptions."
+                  },
+                  {
+                    "file": "apps/scene-engine/public/modules/components/procedural-sphere/procedural-sphere.js",
+                    "lines": "363-440",
+                    "purpose": "Reference: how multi-section schemas are structured, including section-level `description` strings and number-property min/max/step formatting."
+                  },
+                  {
+                    "file": ".spectre/sessions/2026-05-02_author-property-schemas-for-remaining-co_d7uyij/spec.md",
+                    "lines": "72-122",
+                    "purpose": "Schema shape (locked) and key decisions: defaults stay in render fallbacks, kebab-case section IDs, Title-Case labels, sentence-case descriptions matching v1 voice."
+                  }
+                ],
+                "related_files": [
+                  "apps/scene-engine/src/types/property-schema.ts",
+                  "apps/scene-engine/src/lib/builtin-property-schemas.ts"
+                ]
+              },
+              "depends_on": [],
+              "file_context": {
+                "beginning": {
+                  "files": [
+                    {
+                      "path": "apps/scene-engine/public/modules/components/arc-letterbox/arc-letterbox.js",
+                      "status": "exists",
+                      "description": "72 lines. Contains `DEFAULTS` constant, helper functions (`numberValue`, `clamp`, `pct`), and a default-exported render function. NO `properties` export — falls back to General orphan render in the inspector."
+                    }
+                  ],
+                  "tree": null
+                },
+                "ending": {
+                  "files": [
+                    {
+                      "path": "apps/scene-engine/public/modules/components/arc-letterbox/arc-letterbox.js",
+                      "status": "modified",
+                      "description": "Same file as before, plus a single-line `// Inspector schema for editor use only — runtime ignores it.` comment and an `export const properties = { sections: [...] }` block appended at the bottom. Four sections (top-bar, bottom-bar, curvature, appearance) covering all 8 keys the renderer reads. No changes to `DEFAULTS`, helpers, or the render function."
+                    }
+                  ],
+                  "tree": null
+                }
+              },
+              "actions": [
+                {
+                  "id": 1,
+                  "command": "APPEND BLANK LINE AFTER default export (line 72) IN apps/scene-engine/public/modules/components/arc-letterbox/arc-letterbox.js",
+                  "file": "apps/scene-engine/public/modules/components/arc-letterbox/arc-letterbox.js",
+                  "status": "pending"
+                },
+                {
+                  "id": 2,
+                  "command": "APPEND COMMENT `// Inspector schema for editor use only — runtime ignores it.` AFTER the blank line",
+                  "file": "apps/scene-engine/public/modules/components/arc-letterbox/arc-letterbox.js",
+                  "status": "pending"
+                },
+                {
+                  "id": 3,
+                  "command": "APPEND `export const properties = { sections: [...] }` AFTER the comment, with 4 sections: `top-bar` (Top Bar) → `top-height`, `top-curve`; `bottom-bar` (Bottom Bar) → `bottom-height`, `bottom-curve`; `curvature` (Curvature) → `contour`; `appearance` (Appearance) → `color`, `opacity`, `edge-feather`",
+                  "file": "apps/scene-engine/public/modules/components/arc-letterbox/arc-letterbox.js",
+                  "status": "pending"
+                },
+                {
+                  "id": 4,
+                  "command": "ADD PropertyDef FOR `top-height` (type=number, label='Top Height', description='Height of the top letterbox bar as a percentage of layer height. 0 hides the top bar.', min=0, max=50, step=0.5) UNDER section `top-bar`",
+                  "file": "apps/scene-engine/public/modules/components/arc-letterbox/arc-letterbox.js",
+                  "status": "pending"
+                },
+                {
+                  "id": 5,
+                  "command": "ADD PropertyDef FOR `top-curve` (type=number, label='Top Curve', description='Vertical position of the top bar's inner curve control point. Lower values make the curve sweep upward more aggressively.', min=0, max=50, step=0.5) UNDER section `top-bar`",
+                  "file": "apps/scene-engine/public/modules/components/arc-letterbox/arc-letterbox.js",
+                  "status": "pending"
+                },
+                {
+                  "id": 6,
+                  "command": "ADD PropertyDef FOR `bottom-height` (type=number, label='Bottom Height', description='Height of the bottom letterbox bar as a percentage of layer height. 0 hides the bottom bar.', min=0, max=50, step=0.5) UNDER section `bottom-bar`",
+                  "file": "apps/scene-engine/public/modules/components/arc-letterbox/arc-letterbox.js",
+                  "status": "pending"
+                },
+                {
+                  "id": 7,
+                  "command": "ADD PropertyDef FOR `bottom-curve` (type=number, label='Bottom Curve', description='Vertical position of the bottom bar's inner curve control point. Higher values make the curve sweep downward more aggressively.', min=50, max=100, step=0.5) UNDER section `bottom-bar`",
+                  "file": "apps/scene-engine/public/modules/components/arc-letterbox/arc-letterbox.js",
+                  "status": "pending"
+                },
+                {
+                  "id": 8,
+                  "command": "ADD PropertyDef FOR `contour` (type=number, label='Contour', description='Horizontal inset of the curve control points from the layer edges. Lower values pull the bezier handles toward the center, narrowing the arc; higher values flatten it.', min=0, max=50, step=0.5) UNDER section `curvature`",
+                  "file": "apps/scene-engine/public/modules/components/arc-letterbox/arc-letterbox.js",
+                  "status": "pending"
+                },
+                {
+                  "id": 9,
+                  "command": "ADD section-level description FOR section `curvature` SUMMARIZING that the contour value sets the bezier control inset shared by both bars.",
+                  "file": "apps/scene-engine/public/modules/components/arc-letterbox/arc-letterbox.js",
+                  "status": "pending"
+                },
+                {
+                  "id": 10,
+                  "command": "ADD PropertyDef FOR `color` (type=string, label='Color', description='Fill color of both letterbox bars. CSS color string (hex, rgba, named).') UNDER section `appearance`",
+                  "file": "apps/scene-engine/public/modules/components/arc-letterbox/arc-letterbox.js",
+                  "status": "pending"
+                },
+                {
+                  "id": 11,
+                  "command": "ADD PropertyDef FOR `opacity` (type=number, label='Opacity', description='Per-bar opacity, 0–1. Applied to both bars uniformly.', min=0, max=1, step=0.01) UNDER section `appearance`",
+                  "file": "apps/scene-engine/public/modules/components/arc-letterbox/arc-letterbox.js",
+                  "status": "pending"
+                },
+                {
+                  "id": 12,
+                  "command": "ADD PropertyDef FOR `edge-feather` (type=number, label='Edge Feather', description='Gaussian blur applied to both bar edges, 0–8. 0 leaves edges crisp; higher values soften the silhouette.', min=0, max=8, step=0.1) UNDER section `appearance`",
+                  "file": "apps/scene-engine/public/modules/components/arc-letterbox/arc-letterbox.js",
+                  "status": "pending"
+                },
+                {
+                  "id": 13,
+                  "command": "VERIFY by re-reading the full file: render function unchanged, `DEFAULTS` unchanged, `properties` export covers exactly the 8 keys read by the renderer (no extras, no missing), section IDs are kebab-case, labels Title-Case, descriptions sentence-case",
+                  "file": "apps/scene-engine/public/modules/components/arc-letterbox/arc-letterbox.js",
+                  "status": "pending"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "title": "orbit-press-start — sectioned property schema",
+      "goal": "Add a sectioned `properties` export to `orbit-press-start.js` covering the full property set the renderer reads (text, animation, tilt/rotation, position, orbit geometry, letter cells, back markers, center hub, colors, camera, viewport padding). Legacy fallbacks (`tilt`, `repeat`, `offset-x/y`, `panel-height`, `panel-radius`) are surfaced as labeled fields under a `(legacy)` suffix so existing scenes do not orphan.",
+      "prerequisites": [1],
+      "status": "pending",
+      "testing_strategy": "Manual: `npm run dev`, open the editor on a scene that uses `orbit-press-start` (the title scene does). Verify: (1) the inspector renders the authored sections instead of `General`; (2) every property the renderer reads appears with a labeled, described field; (3) any saved property currently in `scene.json` for that layer (including legacy keys like `tilt`, `repeat`, `offset-x/y`, `panel-height`) renders without an orphan-warning; (4) editing a representative field per section (e.g. `rotation-speed`, `text`, `letter-cell-width`, `text-color`) still mutates the layer and updates the canvas; (5) the layer continues to render visually identically with its existing saved values — no rotation/position/sizing regressions. Type check passes.",
+      "task_groups": [
+        {
+          "id": 1,
+          "title": "Author orbit-press-start property schema",
+          "objective": "Append a sectioned `properties` export to `orbit-press-start.js` covering every key the renderer reads (active + legacy), grouped into 10 conceptual sections: Text, Animation, Tilt, Position, Orbit, Letter Cells, Back Markers, Center Hub, Colors, Camera. Legacy keys (`tilt`, `repeat`, `offset-x`, `offset-y`, `panel-height`, `panel-radius`) appear in the section that owns their replacement key with a `(legacy)` label suffix and a description noting the new key. Min/max/step come from the renderer's existing clamp/fallback ranges; labels Title-Case, descriptions sentence-case in the v1 voice.",
+          "status": "pending",
+          "task_seeds": [],
+          "tasks": [
+            {
+              "id": 1,
+              "title": "Add sectioned `properties` export to orbit-press-start.js",
+              "description": "Append an `export const properties = { sections: [...] }` block to the bottom of `apps/scene-engine/public/modules/components/orbit-press-start/orbit-press-start.js` (after the existing default-export render function, line 299). The schema must cover every key the renderer reads: in `tiltDegrees` (lines 21-28) → `tilt`, `tilt-x`, `tilt-y`, `tilt-z`; in `drawCenter` (lines 56-82) → `center-fill`, `center-rim`, `center-highlight`; in `drawFrame` (lines 160-247) → `text`, `copies`, `repeat`, `rotation-speed`, `direction`, `phase`, `font-size`, `letter-cell-width`, `letter-cell-height`, `panel-height`, `back-marker-margin`, `center-radius`, `orbit-radius-x`, `edge-scale`, `letter-angle-spacing`, `back-marker-color`, `text-color`, `panel-color`, `glow-color`, `font-family`, `font-weight`, `position-x`, `position-y`, `position-z`, `offset-x`, `offset-y`, `camera-distance`; in `drawLetter` (line 236) → `letter-radius`, `panel-radius`; in `render` (line 272) → `viewport-padding`. Group into 10 sections in this order: (1) `text` / `Text` → `text`, `font-family`, `font-weight`, `font-size`; (2) `animation` / `Animation` → `rotation-speed`, `direction`, `phase`; (3) `tilt` / `Tilt` → `tilt-x`, `tilt-y`, `tilt-z`, `tilt`; (4) `position` / `Position` → `position-x`, `position-y`, `position-z`, `offset-x`, `offset-y`; (5) `orbit` / `Orbit` → `copies`, `orbit-radius-x`, `letter-angle-spacing`, `edge-scale`, `repeat`; (6) `letter-cells` / `Letter Cells` → `letter-cell-width`, `letter-cell-height`, `letter-radius`, `panel-height`, `panel-radius`; (7) `back-markers` / `Back Markers` → `back-marker-margin`, `back-marker-color`; (8) `center-hub` / `Center Hub` → `center-radius`, `center-fill`, `center-rim`, `center-highlight`; (9) `colors` / `Colors` → `text-color`, `panel-color`, `glow-color`; (10) `camera` / `Camera` → `camera-distance`, `viewport-padding`. For legacy keys (`tilt`, `repeat`, `offset-x`, `offset-y`, `panel-height`, `panel-radius`), append ` (legacy)` to the label and start the description with `Legacy fallback for \\`<new-key>\\`. ` followed by what it does. Use `type: 'number'` with `min`/`max`/`step` matching renderer ranges where bounded (e.g. `edge-scale` is `clamp(..., 0.01, 1)` so `min: 0.01, max: 1, step: 0.01`; `back-marker-margin` is `Math.max(0, ...)` so `min: 0` only, `step: 0.5`; `camera-distance` is `Math.max(1, ...)` so `min: 1`; `copies` is `Math.max(1, Math.round(...))` so `min: 1, step: 1`). Use `type: 'string'` for `text`, `font-family`, `font-weight`, all color keys, and `direction` (the renderer treats it as a numeric sign — but no tighter type fits; use `number` with `step: 1`). Each property gets a Title-Case `label` and a sentence-case `description` (1–2 sentences, editor-facing, no implementation jargon — match `press-start.js` / `procedural-sphere.js` voice). Add the single-line comment `// Inspector schema for editor use only — runtime ignores it.` immediately above the `export const properties = ...` line. Do NOT modify the render function, helpers, or any other code in the file. Do NOT add `default` fields to any PropertyDef.",
+              "status": "pending",
+              "context": {
+                "read_before": [
+                  {
+                    "file": "apps/scene-engine/public/modules/components/orbit-press-start/orbit-press-start.js",
+                    "lines": "1-299",
+                    "purpose": "Read the entire file. `tiltDegrees` (21-28), `drawCenter` (56-82), `drawFrame` (160-247), `drawLetter` (96-126), and `render` (262-282) collectively name every property key in scope. Each `numberProp(properties, '<key>', <fallback>)` and `stringProp(properties, '<key>', <fallback>)` call establishes which keys exist; `Math.max` / `Math.min` clamps establish min/max for the schema."
+                  },
+                  {
+                    "file": "apps/scene-engine/public/modules/components/press-start/press-start.js",
+                    "lines": "1-41",
+                    "purpose": "Reference: shape of the `export const properties = { sections: [...] }` block, the `// Inspector schema for editor use only — runtime ignores it.` comment, and v1 voice for labels/descriptions (e.g. 'Duration in seconds for one full blink cycle. Lower values blink faster.')."
+                  },
+                  {
+                    "file": "apps/scene-engine/public/modules/components/procedural-sphere/procedural-sphere.js",
+                    "lines": "363-440",
+                    "purpose": "Reference: how multi-section schemas are structured, including section-level `description` strings and number-property min/max/step formatting."
+                  },
+                  {
+                    "file": ".spectre/sessions/2026-05-02_author-property-schemas-for-remaining-co_d7uyij/spec.md",
+                    "lines": "72-122",
+                    "purpose": "Schema shape (locked) and key decisions: defaults stay in render fallbacks, kebab-case section IDs, Title-Case labels, sentence-case descriptions matching v1 voice."
+                  }
+                ],
+                "related_files": [
+                  "apps/scene-engine/src/types/property-schema.ts",
+                  "apps/scene-engine/src/lib/builtin-property-schemas.ts",
+                  "apps/scene-engine/scenes/title/scene.json"
+                ]
+              },
+              "depends_on": [],
+              "file_context": {
+                "beginning": {
+                  "files": [
+                    {
+                      "path": "apps/scene-engine/public/modules/components/orbit-press-start/orbit-press-start.js",
+                      "status": "exists",
+                      "description": "299 lines. Contains helpers (`numberProp`, `stringProp`, `setupCanvas`, `tiltDegrees`, `degreesToRadians`, `projectPoint`, `roundedRect`, `drawCenter`, `drawBackMarker`, `drawLetter`, `orbitProjection`, `orbitPoint`, `drawFrame`) and a default-exported render function. NO `properties` export — falls back to General orphan render in the inspector."
+                    }
+                  ],
+                  "tree": null
+                },
+                "ending": {
+                  "files": [
+                    {
+                      "path": "apps/scene-engine/public/modules/components/orbit-press-start/orbit-press-start.js",
+                      "status": "modified",
+                      "description": "Same file as before, plus a single-line `// Inspector schema for editor use only — runtime ignores it.` comment and an `export const properties = { sections: [...] }` block appended at the bottom. Ten sections (text, animation, tilt, position, orbit, letter-cells, back-markers, center-hub, colors, camera) covering all active and legacy keys the renderer reads. Legacy keys carry a ' (legacy)' label suffix. No changes to helpers or the render function."
+                    }
+                  ],
+                  "tree": null
+                }
+              },
+              "actions": [
+                {
+                  "id": 1,
+                  "command": "APPEND BLANK LINE AFTER default export (line 299) IN apps/scene-engine/public/modules/components/orbit-press-start/orbit-press-start.js",
+                  "file": "apps/scene-engine/public/modules/components/orbit-press-start/orbit-press-start.js",
+                  "status": "pending"
+                },
+                {
+                  "id": 2,
+                  "command": "APPEND COMMENT `// Inspector schema for editor use only — runtime ignores it.` AFTER the blank line",
+                  "file": "apps/scene-engine/public/modules/components/orbit-press-start/orbit-press-start.js",
+                  "status": "pending"
+                },
+                {
+                  "id": 3,
+                  "command": "APPEND `export const properties = { sections: [...] }` AFTER the comment, with 10 sections in order: `text` (Text), `animation` (Animation), `tilt` (Tilt), `position` (Position), `orbit` (Orbit), `letter-cells` (Letter Cells), `back-markers` (Back Markers), `center-hub` (Center Hub), `colors` (Colors), `camera` (Camera)",
+                  "file": "apps/scene-engine/public/modules/components/orbit-press-start/orbit-press-start.js",
+                  "status": "pending"
+                },
+                {
+                  "id": 4,
+                  "command": "ADD PropertyDef FOR `text` (type=string, label='Display Text', description='The orbiting marquee text. Two consecutive spaces render as a wider gap (e.g. \"PRESS  START\"); single spaces are skipped entirely so each visible character gets its own letter cell.') UNDER section `text`",
+                  "file": "apps/scene-engine/public/modules/components/orbit-press-start/orbit-press-start.js",
+                  "status": "pending"
+                },
+                {
+                  "id": 5,
+                  "command": "ADD PropertyDef FOR `font-family` (type=string, label='Font Family', description='CSS font-family stack used for every letter. Falls back through the list if the primary face fails to load.') UNDER section `text`",
+                  "file": "apps/scene-engine/public/modules/components/orbit-press-start/orbit-press-start.js",
+                  "status": "pending"
+                },
+                {
+                  "id": 6,
+                  "command": "ADD PropertyDef FOR `font-weight` (type=string, label='Font Weight', description='CSS font-weight applied to every letter (e.g. \"400\", \"700\", \"900\").') UNDER section `text`",
+                  "file": "apps/scene-engine/public/modules/components/orbit-press-start/orbit-press-start.js",
+                  "status": "pending"
+                },
+                {
+                  "id": 7,
+                  "command": "ADD PropertyDef FOR `font-size` (type=number, label='Font Size', description='Glyph height in pixels at the front of the orbit. Letters at the back of the orbit appear smaller after perspective scaling.', min=1, step=1) UNDER section `text`",
+                  "file": "apps/scene-engine/public/modules/components/orbit-press-start/orbit-press-start.js",
+                  "status": "pending"
+                },
+                {
+                  "id": 8,
+                  "command": "ADD section-level description FOR section `animation` SUMMARIZING that this group controls how the marquee spins around the central hub.",
+                  "file": "apps/scene-engine/public/modules/components/orbit-press-start/orbit-press-start.js",
+                  "status": "pending"
+                },
+                {
+                  "id": 9,
+                  "command": "ADD PropertyDef FOR `rotation-speed` (type=number, label='Rotation Speed', description='Angular velocity of the orbit in radians per second. Higher values spin the marquee faster; 0 freezes it.', min=0, step=0.01) UNDER section `animation`",
+                  "file": "apps/scene-engine/public/modules/components/orbit-press-start/orbit-press-start.js",
+                  "status": "pending"
+                },
+                {
+                  "id": 10,
+                  "command": "ADD PropertyDef FOR `direction` (type=number, label='Direction', description='Spin direction. Positive values rotate one way; negative values reverse it. Sign is the only thing that matters.', min=-1, max=1, step=1) UNDER section `animation`",
+                  "file": "apps/scene-engine/public/modules/components/orbit-press-start/orbit-press-start.js",
+                  "status": "pending"
+                },
+                {
+                  "id": 11,
+                  "command": "ADD PropertyDef FOR `phase` (type=number, label='Phase Offset', description='Starting rotation in degrees. Use to dial in which letter is at the front when the scene loads.', min=0, max=360, step=1) UNDER section `animation`",
+                  "file": "apps/scene-engine/public/modules/components/orbit-press-start/orbit-press-start.js",
+                  "status": "pending"
+                },
+                {
+                  "id": 12,
+                  "command": "ADD section-level description FOR section `tilt` SUMMARIZING that the three axes set the camera-relative orientation of the orbit ring; the legacy `tilt` key seeded only the Z axis.",
+                  "file": "apps/scene-engine/public/modules/components/orbit-press-start/orbit-press-start.js",
+                  "status": "pending"
+                },
+                {
+                  "id": 13,
+                  "command": "ADD PropertyDef FOR `tilt-x` (type=number, label='Tilt X', description='Pitch of the orbit ring in degrees. Positive values tip the front of the ring downward.', step=0.5) UNDER section `tilt`",
+                  "file": "apps/scene-engine/public/modules/components/orbit-press-start/orbit-press-start.js",
+                  "status": "pending"
+                },
+                {
+                  "id": 14,
+                  "command": "ADD PropertyDef FOR `tilt-y` (type=number, label='Tilt Y', description='Yaw of the orbit ring in degrees. Positive values rotate the ring around the vertical axis.', step=0.5) UNDER section `tilt`",
+                  "file": "apps/scene-engine/public/modules/components/orbit-press-start/orbit-press-start.js",
+                  "status": "pending"
+                },
+                {
+                  "id": 15,
+                  "command": "ADD PropertyDef FOR `tilt-z` (type=number, label='Tilt Z', description='Roll of the entire layer in degrees. Rotates the canvas around the layer center after the orbit is projected.', step=0.5) UNDER section `tilt`",
+                  "file": "apps/scene-engine/public/modules/components/orbit-press-start/orbit-press-start.js",
+                  "status": "pending"
+                },
+                {
+                  "id": 16,
+                  "command": "ADD PropertyDef FOR `tilt` (type=number, label='Tilt (legacy)', description='Legacy fallback for `tilt-z`. Older scenes set this single key to control roll; new scenes should use `tilt-z` directly.', step=0.5) UNDER section `tilt`",
+                  "file": "apps/scene-engine/public/modules/components/orbit-press-start/orbit-press-start.js",
+                  "status": "pending"
+                },
+                {
+                  "id": 17,
+                  "command": "ADD section-level description FOR section `position` SUMMARIZING that these offsets translate the projected orbit relative to the layer center; legacy `offset-x` / `offset-y` keys feed the same values.",
+                  "file": "apps/scene-engine/public/modules/components/orbit-press-start/orbit-press-start.js",
+                  "status": "pending"
+                },
+                {
+                  "id": 18,
+                  "command": "ADD PropertyDef FOR `position-x` (type=number, label='Position X', description='Horizontal offset of the orbit center in pixels, relative to the layer center.', step=1) UNDER section `position`",
+                  "file": "apps/scene-engine/public/modules/components/orbit-press-start/orbit-press-start.js",
+                  "status": "pending"
+                },
+                {
+                  "id": 19,
+                  "command": "ADD PropertyDef FOR `position-y` (type=number, label='Position Y', description='Vertical offset of the orbit center in pixels, relative to the layer center.', step=1) UNDER section `position`",
+                  "file": "apps/scene-engine/public/modules/components/orbit-press-start/orbit-press-start.js",
+                  "status": "pending"
+                },
+                {
+                  "id": 20,
+                  "command": "ADD PropertyDef FOR `position-z` (type=number, label='Position Z', description='Depth offset of the orbit center, in the same units as the camera distance. Negative values push the orbit away from the camera; positive values pull it closer.', step=1) UNDER section `position`",
+                  "file": "apps/scene-engine/public/modules/components/orbit-press-start/orbit-press-start.js",
+                  "status": "pending"
+                },
+                {
+                  "id": 21,
+                  "command": "ADD PropertyDef FOR `offset-x` (type=number, label='Offset X (legacy)', description='Legacy fallback for `position-x`. Older scenes set this key to translate the orbit horizontally; new scenes should use `position-x`.', step=1) UNDER section `position`",
+                  "file": "apps/scene-engine/public/modules/components/orbit-press-start/orbit-press-start.js",
+                  "status": "pending"
+                },
+                {
+                  "id": 22,
+                  "command": "ADD PropertyDef FOR `offset-y` (type=number, label='Offset Y (legacy)', description='Legacy fallback for `position-y`. Older scenes set this key to translate the orbit vertically; new scenes should use `position-y`.', step=1) UNDER section `position`",
+                  "file": "apps/scene-engine/public/modules/components/orbit-press-start/orbit-press-start.js",
+                  "status": "pending"
+                },
+                {
+                  "id": 23,
+                  "command": "ADD section-level description FOR section `orbit` SUMMARIZING that these knobs shape the ring itself — how many copies of the text travel around it, how wide the ring is, and how the letters are spaced.",
+                  "file": "apps/scene-engine/public/modules/components/orbit-press-start/orbit-press-start.js",
+                  "status": "pending"
+                },
+                {
+                  "id": 24,
+                  "command": "ADD PropertyDef FOR `copies` (type=number, label='Copies', description='How many evenly-spaced copies of the text travel around the orbit. 1 puts a single string on the ring; higher values stagger duplicates around it.', min=1, step=1) UNDER section `orbit`",
+                  "file": "apps/scene-engine/public/modules/components/orbit-press-start/orbit-press-start.js",
+                  "status": "pending"
+                },
+                {
+                  "id": 25,
+                  "command": "ADD PropertyDef FOR `orbit-radius-x` (type=number, label='Orbit Radius', description='Horizontal radius of the orbit in pixels, measured before perspective is applied.', min=0, step=1) UNDER section `orbit`",
+                  "file": "apps/scene-engine/public/modules/components/orbit-press-start/orbit-press-start.js",
+                  "status": "pending"
+                },
+                {
+                  "id": 26,
+                  "command": "ADD PropertyDef FOR `letter-angle-spacing` (type=number, label='Letter Angle Spacing', description='Angular gap between consecutive letters in degrees. Larger values spread the letters further around the ring.', min=0, max=90, step=0.1) UNDER section `orbit`",
+                  "file": "apps/scene-engine/public/modules/components/orbit-press-start/orbit-press-start.js",
+                  "status": "pending"
+                },
+                {
+                  "id": 27,
+                  "command": "ADD PropertyDef FOR `edge-scale` (type=number, label='Edge Scale', description='Minimum horizontal scale applied to letters at the side of the ring (90° from camera). Lower values flatten side letters more aggressively, selling the 3D illusion.', min=0.01, max=1, step=0.01) UNDER section `orbit`",
+                  "file": "apps/scene-engine/public/modules/components/orbit-press-start/orbit-press-start.js",
+                  "status": "pending"
+                },
+                {
+                  "id": 28,
+                  "command": "ADD PropertyDef FOR `repeat` (type=number, label='Repeat (legacy)', description='Legacy fallback for `copies`. Older scenes set this key to control how many copies of the text orbit; new scenes should use `copies`.', min=1, step=1) UNDER section `orbit`",
+                  "file": "apps/scene-engine/public/modules/components/orbit-press-start/orbit-press-start.js",
+                  "status": "pending"
+                },
+                {
+                  "id": 29,
+                  "command": "ADD section-level description FOR section `letter-cells` SUMMARIZING that each visible character gets a rounded panel cell behind it; these knobs size the cell and round its corners.",
+                  "file": "apps/scene-engine/public/modules/components/orbit-press-start/orbit-press-start.js",
+                  "status": "pending"
+                },
+                {
+                  "id": 30,
+                  "command": "ADD PropertyDef FOR `letter-cell-width` (type=number, label='Cell Width', description='Width of each letter panel in pixels, measured at the front of the orbit.', min=1, step=1) UNDER section `letter-cells`",
+                  "file": "apps/scene-engine/public/modules/components/orbit-press-start/orbit-press-start.js",
+                  "status": "pending"
+                },
+                {
+                  "id": 31,
+                  "command": "ADD PropertyDef FOR `letter-cell-height` (type=number, label='Cell Height', description='Height of each letter panel in pixels, measured at the front of the orbit.', min=1, step=1) UNDER section `letter-cells`",
+                  "file": "apps/scene-engine/public/modules/components/orbit-press-start/orbit-press-start.js",
+                  "status": "pending"
+                },
+                {
+                  "id": 32,
+                  "command": "ADD PropertyDef FOR `letter-radius` (type=number, label='Cell Corner Radius', description='Corner radius of each letter panel in pixels. 0 gives sharp rectangles.', min=0, step=0.5) UNDER section `letter-cells`",
+                  "file": "apps/scene-engine/public/modules/components/orbit-press-start/orbit-press-start.js",
+                  "status": "pending"
+                },
+                {
+                  "id": 33,
+                  "command": "ADD PropertyDef FOR `panel-height` (type=number, label='Panel Height (legacy)', description='Legacy fallback for `letter-cell-height`. Older scenes set this key to size the panel; new scenes should use `letter-cell-height`.', min=1, step=1) UNDER section `letter-cells`",
+                  "file": "apps/scene-engine/public/modules/components/orbit-press-start/orbit-press-start.js",
+                  "status": "pending"
+                },
+                {
+                  "id": 34,
+                  "command": "ADD PropertyDef FOR `panel-radius` (type=number, label='Panel Radius (legacy)', description='Legacy fallback for `letter-radius`. Older scenes set this key to round panel corners; new scenes should use `letter-radius`.', min=0, step=0.5) UNDER section `letter-cells`",
+                  "file": "apps/scene-engine/public/modules/components/orbit-press-start/orbit-press-start.js",
+                  "status": "pending"
+                },
+                {
+                  "id": 35,
+                  "command": "ADD section-level description FOR section `back-markers` SUMMARIZING that letters on the back half of the orbit are replaced by simpler rounded markers so the front-facing text stays readable.",
+                  "file": "apps/scene-engine/public/modules/components/orbit-press-start/orbit-press-start.js",
+                  "status": "pending"
+                },
+                {
+                  "id": 36,
+                  "command": "ADD PropertyDef FOR `back-marker-margin` (type=number, label='Back Marker Margin', description='Inset in pixels applied to each back marker, shrinking it relative to the letter cell. Higher values produce smaller, more recessed markers.', min=0, step=0.5) UNDER section `back-markers`",
+                  "file": "apps/scene-engine/public/modules/components/orbit-press-start/orbit-press-start.js",
+                  "status": "pending"
+                },
+                {
+                  "id": 37,
+                  "command": "ADD PropertyDef FOR `back-marker-color` (type=string, label='Back Marker Color', description='Fill color of the rounded markers shown on the back half of the orbit. CSS color string.') UNDER section `back-markers`",
+                  "file": "apps/scene-engine/public/modules/components/orbit-press-start/orbit-press-start.js",
+                  "status": "pending"
+                },
+                {
+                  "id": 38,
+                  "command": "ADD section-level description FOR section `center-hub` SUMMARIZING that the hub is the radial-gradient disc at the orbit center; size and the three gradient stops are tuned independently.",
+                  "file": "apps/scene-engine/public/modules/components/orbit-press-start/orbit-press-start.js",
+                  "status": "pending"
+                },
+                {
+                  "id": 39,
+                  "command": "ADD PropertyDef FOR `center-radius` (type=number, label='Hub Radius', description='Radius of the central hub in pixels, measured before perspective is applied.', min=0, step=1) UNDER section `center-hub`",
+                  "file": "apps/scene-engine/public/modules/components/orbit-press-start/orbit-press-start.js",
+                  "status": "pending"
+                },
+                {
+                  "id": 40,
+                  "command": "ADD PropertyDef FOR `center-fill` (type=string, label='Hub Fill', description='Mid-stop color of the hub radial gradient. Sets the dominant body color of the disc. CSS color string.') UNDER section `center-hub`",
+                  "file": "apps/scene-engine/public/modules/components/orbit-press-start/orbit-press-start.js",
+                  "status": "pending"
+                },
+                {
+                  "id": 41,
+                  "command": "ADD PropertyDef FOR `center-rim` (type=string, label='Hub Rim', description='Stroke color drawn around the outside of the hub. CSS color string.') UNDER section `center-hub`",
+                  "file": "apps/scene-engine/public/modules/components/orbit-press-start/orbit-press-start.js",
+                  "status": "pending"
+                },
+                {
+                  "id": 42,
+                  "command": "ADD PropertyDef FOR `center-highlight` (type=string, label='Hub Highlight', description='Inner-stop color of the hub radial gradient — typically a translucent white that creates the specular sheen near the upper-left.') UNDER section `center-hub`",
+                  "file": "apps/scene-engine/public/modules/components/orbit-press-start/orbit-press-start.js",
+                  "status": "pending"
+                },
+                {
+                  "id": 43,
+                  "command": "ADD section-level description FOR section `colors` SUMMARIZING that these are the per-letter colors — the glyph fill, the panel background behind the glyph, and the glow shadow under the glyph.",
+                  "file": "apps/scene-engine/public/modules/components/orbit-press-start/orbit-press-start.js",
+                  "status": "pending"
+                },
+                {
+                  "id": 44,
+                  "command": "ADD PropertyDef FOR `text-color` (type=string, label='Text Color', description='Glyph fill color. CSS color string.') UNDER section `colors`",
+                  "file": "apps/scene-engine/public/modules/components/orbit-press-start/orbit-press-start.js",
+                  "status": "pending"
+                },
+                {
+                  "id": 45,
+                  "command": "ADD PropertyDef FOR `panel-color` (type=string, label='Panel Color', description='Background color of the rounded letter panel sitting behind each glyph. CSS color string.') UNDER section `colors`",
+                  "file": "apps/scene-engine/public/modules/components/orbit-press-start/orbit-press-start.js",
+                  "status": "pending"
+                },
+                {
+                  "id": 46,
+                  "command": "ADD PropertyDef FOR `glow-color` (type=string, label='Glow Color', description='Shadow color used for the soft glow under each glyph. CSS color string (typically a translucent variant of the text color).') UNDER section `colors`",
+                  "file": "apps/scene-engine/public/modules/components/orbit-press-start/orbit-press-start.js",
+                  "status": "pending"
+                },
+                {
+                  "id": 47,
+                  "command": "ADD section-level description FOR section `camera` SUMMARIZING that camera distance controls perspective foreshortening and viewport padding extends the canvas beyond the layer bounds so out-of-bounds letters are not clipped.",
+                  "file": "apps/scene-engine/public/modules/components/orbit-press-start/orbit-press-start.js",
+                  "status": "pending"
+                },
+                {
+                  "id": 48,
+                  "command": "ADD PropertyDef FOR `camera-distance` (type=number, label='Camera Distance', description='Distance from the camera to the orbit center, in the same units as `position-z`. Larger values flatten the perspective; smaller values exaggerate it.', min=1, step=10) UNDER section `camera`",
+                  "file": "apps/scene-engine/public/modules/components/orbit-press-start/orbit-press-start.js",
+                  "status": "pending"
+                },
+                {
+                  "id": 49,
+                  "command": "ADD PropertyDef FOR `viewport-padding` (type=number, label='Viewport Padding', description='Extra pixels of canvas added on every side of the layer bounds. Increase if letters get clipped at the edges of the layer.', min=0, step=10) UNDER section `camera`",
+                  "file": "apps/scene-engine/public/modules/components/orbit-press-start/orbit-press-start.js",
+                  "status": "pending"
+                },
+                {
+                  "id": 50,
+                  "command": "VERIFY by re-reading the full file: render function unchanged, helpers unchanged, `properties` export covers exactly the 36 keys read by the renderer (30 active + 6 legacy: text, font-family, font-weight, font-size, rotation-speed, direction, phase, tilt-x, tilt-y, tilt-z, tilt, position-x, position-y, position-z, offset-x, offset-y, copies, orbit-radius-x, letter-angle-spacing, edge-scale, repeat, letter-cell-width, letter-cell-height, letter-radius, panel-height, panel-radius, back-marker-margin, back-marker-color, center-radius, center-fill, center-rim, center-highlight, text-color, panel-color, glow-color, camera-distance, viewport-padding) — no extras, no missing. Section IDs kebab-case, labels Title-Case, descriptions sentence-case, legacy keys carry ' (legacy)' label suffix.",
+                  "file": "apps/scene-engine/public/modules/components/orbit-press-start/orbit-press-start.js",
+                  "status": "pending"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "title": "procedural-cylinder-strips-mask — sectioned property schema",
+      "goal": "Add a sectioned `properties` export to `procedural-cylinder-strips-mask.js` covering the full property set (animation toggle, geometry, position, strip layout, gate timing, palette mode + per-mode color knobs, texture, performance). The schema is the source of truth for the strips component going forward; the `straight` variant will mirror it in the next checkpoint.",
+      "prerequisites": [2],
+      "status": "pending",
+      "testing_strategy": "Manual: `npm run dev`, open the editor on a scene that uses a `procedural-cylinder-strips-mask` layer (the title scene does). Verify: (1) the inspector renders the authored sections instead of `General`; (2) every property the renderer reads has a labeled, described field, including palette-mode-specific knobs (e.g. wheel-* fields, melee-spectrum colors); (3) switching `palette-mode` between `melee-spectrum`, `hue-wheel`, and `tri-color` still works and rerenders correctly; (4) editing a representative field per section (e.g. `strip-count`, `transition-seconds`, `color-start`, `texture-resolution`) still mutates the layer and updates the canvas; (5) no orphan-warning chip appears; (6) the layer continues to render visually identically with its existing saved values. Type check passes.",
+      "task_groups": [
+        {
+          "id": 1,
+          "title": "Author procedural-cylinder-strips-mask property schema",
+          "objective": "Append a sectioned `properties` export to `procedural-cylinder-strips-mask.js` covering every key the renderer reads (40 total: 39 active + 1 legacy `radius-x`), grouped into 11 sections: Animation, Position, Geometry, Strips, Appearance, Gate Timing, Palette, Melee Spectrum Colors, Hue Wheel Colors, Texture, Performance. Min/max/step ranges come directly from the `clamp` and `Math.max` calls in `drawCylinderStrips` and `render`; labels Title-Case, descriptions sentence-case in the v1 voice. Legacy key `radius-x` carries a ` (legacy)` label suffix.",
+          "status": "pending",
+          "task_seeds": [],
+          "tasks": [
+            {
+              "id": 1,
+              "title": "Add sectioned `properties` export to procedural-cylinder-strips-mask.js",
+              "description": "Append an `export const properties = { sections: [...] }` block to the bottom of `apps/scene-engine/public/modules/components/procedural-cylinder-strips/procedural-cylinder-strips-mask.js` (after the existing default-export render function, line 490). The schema must cover every key the renderer reads, drawn from `drawCylinderStrips` (lines 333–434) and `render` (lines 452–471). Group into 11 sections in this order: (1) `animation` / `Animation` → `animate`; (2) `position` / `Position` → `center-x`, `center-y`; (3) `geometry` / `Geometry` → `radius`, `inner-radius`, `outer-radius`, `depth-curve`, `radius-x`; (4) `strips` / `Strips` → `strip-count`, `strip-width`, `curve-steps`, `rotation-offset`, `minimum-open`; (5) `appearance` / `Appearance` → `opacity`, `composite`; (6) `gate-timing` / `Gate Timing` → `closed-hold-seconds`, `transition-seconds`, `open-hold-seconds`, `gate-offset-seconds`; (7) `palette` / `Palette` → `palette-mode`, `color-cycle`, `color-offset`, `color-speed`, `color-bias`; (8) `melee-spectrum` / `Melee Spectrum Colors` → `color-start`, `color-mid`, `color-end`, `color-magenta`; (9) `hue-wheel` / `Hue Wheel Colors` → `wheel-hue-shift`, `wheel-saturation`, `wheel-lightness`, `wheel-mint-lift`, `wheel-softness`, `wheel-contrast`; (10) `texture` / `Texture` → `texture-angle`, `texture-speed`, `texture-scale`, `texture-resolution`; (11) `performance` / `Performance` → `target-fps`, `dpr-cap`. For `radius-x` (the legacy fallback for `radius` on line 337), append ` (legacy)` to the label and start the description with `Legacy fallback for \\`radius\\`. `. Use `type: 'number'` for all numeric properties with `min`/`max`/`step` matching the renderer's clamp ranges (e.g. `inner-radius` is `clamp(..., 0, 1)` so `min: 0, max: 1, step: 0.01`; `outer-radius` is `clamp(..., 0.05, 3)` so `min: 0.05, max: 3, step: 0.01`; `depth-curve` is `clamp(..., 0.2, 4)` so `min: 0.2, max: 4, step: 0.01`; `strip-count` is `Math.max(4, Math.round(...))` so `min: 4, step: 1`; `strip-width` is `clamp(..., 0.05, 1.5)` so `min: 0.05, max: 1.5, step: 0.01`; `curve-steps` is `Math.max(3, Math.round(...))` so `min: 3, step: 1`; `opacity` is `clamp(..., 0, 1)` so `min: 0, max: 1, step: 0.01`; `minimum-open` is `clamp(..., 0, 1)` so `min: 0, max: 1, step: 0.01`; `closed-hold-seconds` / `open-hold-seconds` are `clamp(..., 0, 10)` so `min: 0, max: 10, step: 0.01`; `transition-seconds` is `clamp(..., 0.02, 10)` so `min: 0.02, max: 10, step: 0.01`; `wheel-saturation` is `clamp(..., 0, 1.2)` so `min: 0, max: 1.2, step: 0.01`; `wheel-lightness` is `clamp(..., 0.08, 0.86)` so `min: 0.08, max: 0.86, step: 0.01`; `wheel-mint-lift` is `clamp(..., -0.2, 0.35)` so `min: -0.2, max: 0.35, step: 0.01`; `wheel-softness` is `clamp(..., 0, 1)` so `min: 0, max: 1, step: 0.01`; `wheel-contrast` is `clamp(..., 0, 1.5)` so `min: 0, max: 1.5, step: 0.01`; `texture-scale` is `clamp(..., 0.2, 4)` so `min: 0.2, max: 4, step: 0.01`; `texture-resolution` is `clamp(..., 0.2, 1)` so `min: 0.2, max: 1, step: 0.01`; `target-fps` is `clamp(..., 1, 60)` so `min: 1, max: 60, step: 1`; `dpr-cap` is `clamp(..., 1, 2)` so `min: 1, max: 2, step: 0.1`; `rotation-offset` and `texture-angle` are degree values with no clamp so `step: 1`; `wheel-hue-shift` is also a degree value so `min: 0, max: 360, step: 1`). Use `type: 'boolean'` for `animate`. Use `type: 'select'` for `palette-mode` with options `['melee-spectrum', 'hue-wheel', 'tri-color']`. Use `type: 'string'` for `color-start`, `color-mid`, `color-end`, `color-magenta`, and `composite`. Each property gets a Title-Case `label` and a sentence-case `description` (1–2 sentences, editor-facing, v1 voice). Each section gets its own short `description` summarizing the group. Add the single-line comment `// Inspector schema for editor use only — runtime ignores it.` immediately above the `export const properties = ...` line. Do NOT modify the render function, helpers, or any other code in the file. Do NOT add `default` fields to any PropertyDef.",
+              "status": "pending",
+              "context": {
+                "read_before": [
+                  {
+                    "file": "apps/scene-engine/public/modules/components/procedural-cylinder-strips/procedural-cylinder-strips-mask.js",
+                    "lines": "1-490",
+                    "purpose": "Read the entire file. `drawCylinderStrips` (333-434) names every property key the renderer consumes for geometry, strips, gate timing, palette, and texture; `render` (452-471) adds `target-fps` and `dpr-cap`. Each `numberProp` / `colorProp` / `booleanProp` call establishes the key; `clamp` and `Math.max` calls establish min/max for the schema."
+                  },
+                  {
+                    "file": "apps/scene-engine/public/modules/components/press-start/press-start.js",
+                    "lines": "1-41",
+                    "purpose": "Reference: shape of the `export const properties = { sections: [...] }` block, the `// Inspector schema for editor use only — runtime ignores it.` comment, and v1 voice for labels/descriptions."
+                  },
+                  {
+                    "file": "apps/scene-engine/public/modules/components/procedural-sphere/procedural-sphere.js",
+                    "lines": "363-440",
+                    "purpose": "Reference: how multi-section schemas are structured, including section-level `description` strings, select-type properties (palette-mode equivalent), and number-property min/max/step formatting."
+                  },
+                  {
+                    "file": ".spectre/sessions/2026-05-02_author-property-schemas-for-remaining-co_d7uyij/spec.md",
+                    "lines": "72-122",
+                    "purpose": "Schema shape (locked) and key decisions: defaults stay in render fallbacks, kebab-case section IDs, Title-Case labels, sentence-case descriptions matching v1 voice."
+                  }
+                ],
+                "related_files": [
+                  "apps/scene-engine/src/types/property-schema.ts",
+                  "apps/scene-engine/src/lib/builtin-property-schemas.ts",
+                  "apps/scene-engine/scenes/title/scene.json",
+                  "apps/scene-engine/public/modules/components/procedural-cylinder-strips/procedural-cylinder-strips-straight.js"
+                ]
+              },
+              "depends_on": [],
+              "file_context": {
+                "beginning": {
+                  "files": [
+                    {
+                      "path": "apps/scene-engine/public/modules/components/procedural-cylinder-strips/procedural-cylinder-strips-mask.js",
+                      "status": "exists",
+                      "description": "490 lines. Contains math helpers (`clamp`, `wrapUnit`, `smoothstep`, `pulseWindow`, `oscillateWindow`, `timedGate`), color helpers (`parseHexColor`, `mixColor`, `hslToRgb`, `applyColorContrast`, `colorAt`, `colorAtHueWheel`, `colorAtMeleeSpectrum`, `paletteColorAt`, `rgba`), texture helpers (`resizeTexture`, `paintTexture`), tunnel helpers (`projectTunnelPoint`, `addSlatPath`), the main `drawCylinderStrips` function (333-434), and a default-exported render factory (436-490). NO `properties` export — falls back to General orphan render in the inspector."
+                    }
+                  ],
+                  "tree": null
+                },
+                "ending": {
+                  "files": [
+                    {
+                      "path": "apps/scene-engine/public/modules/components/procedural-cylinder-strips/procedural-cylinder-strips-mask.js",
+                      "status": "modified",
+                      "description": "Same file as before, plus a single-line `// Inspector schema for editor use only — runtime ignores it.` comment and an `export const properties = { sections: [...] }` block appended at the bottom. Eleven sections (animation, position, geometry, strips, appearance, gate-timing, palette, melee-spectrum, hue-wheel, texture, performance) covering all 40 keys the renderer reads. Legacy key `radius-x` carries a ' (legacy)' label suffix. No changes to helpers or the render function."
+                    }
+                  ],
+                  "tree": null
+                }
+              },
+              "actions": [
+                {
+                  "id": 1,
+                  "command": "APPEND BLANK LINE AFTER default export (line 490) IN apps/scene-engine/public/modules/components/procedural-cylinder-strips/procedural-cylinder-strips-mask.js",
+                  "file": "apps/scene-engine/public/modules/components/procedural-cylinder-strips/procedural-cylinder-strips-mask.js",
+                  "status": "pending"
+                },
+                {
+                  "id": 2,
+                  "command": "APPEND COMMENT `// Inspector schema for editor use only — runtime ignores it.` AFTER the blank line",
+                  "file": "apps/scene-engine/public/modules/components/procedural-cylinder-strips/procedural-cylinder-strips-mask.js",
+                  "status": "pending"
+                },
+                {
+                  "id": 3,
+                  "command": "APPEND `export const properties = { sections: [...] }` AFTER the comment, with 11 sections in order: `animation` (Animation), `position` (Position), `geometry` (Geometry), `strips` (Strips), `appearance` (Appearance), `gate-timing` (Gate Timing), `palette` (Palette), `melee-spectrum` (Melee Spectrum Colors), `hue-wheel` (Hue Wheel Colors), `texture` (Texture), `performance` (Performance)",
+                  "file": "apps/scene-engine/public/modules/components/procedural-cylinder-strips/procedural-cylinder-strips-mask.js",
+                  "status": "pending"
+                },
+                {
+                  "id": 4,
+                  "command": "ADD section-level description FOR section `animation` SUMMARIZING that this toggle freezes or runs the gate-open animation and the color/texture phase scrolling.",
+                  "file": "apps/scene-engine/public/modules/components/procedural-cylinder-strips/procedural-cylinder-strips-mask.js",
+                  "status": "pending"
+                },
+                {
+                  "id": 5,
+                  "command": "ADD PropertyDef FOR `animate` (type=boolean, label='Animate', description='Whether the gate-open animation and palette/texture phase scrolling advance over time. Disable to render a still frame at t=0.') UNDER section `animation`",
+                  "file": "apps/scene-engine/public/modules/components/procedural-cylinder-strips/procedural-cylinder-strips-mask.js",
+                  "status": "pending"
+                },
+                {
+                  "id": 6,
+                  "command": "ADD section-level description FOR section `position` SUMMARIZING that these are the normalized 0–1 coordinates of the tunnel center within the layer; 0.5,0.5 is dead center.",
+                  "file": "apps/scene-engine/public/modules/components/procedural-cylinder-strips/procedural-cylinder-strips-mask.js",
+                  "status": "pending"
+                },
+                {
+                  "id": 7,
+                  "command": "ADD PropertyDef FOR `center-x` (type=number, label='Center X', description='Horizontal position of the tunnel center, expressed as a fraction of layer width. 0 is the left edge, 1 is the right edge.', min=0, max=1, step=0.01) UNDER section `position`",
+                  "file": "apps/scene-engine/public/modules/components/procedural-cylinder-strips/procedural-cylinder-strips-mask.js",
+                  "status": "pending"
+                },
+                {
+                  "id": 8,
+                  "command": "ADD PropertyDef FOR `center-y` (type=number, label='Center Y', description='Vertical position of the tunnel center, expressed as a fraction of layer height. 0 is the top edge, 1 is the bottom edge.', min=0, max=1, step=0.01) UNDER section `position`",
+                  "file": "apps/scene-engine/public/modules/components/procedural-cylinder-strips/procedural-cylinder-strips-mask.js",
+                  "status": "pending"
+                },
+                {
+                  "id": 9,
+                  "command": "ADD section-level description FOR section `geometry` SUMMARIZING that these knobs shape the tunnel itself — overall scale, the inner ring radius, the outer ring radius, and how the depth between them is eased.",
+                  "file": "apps/scene-engine/public/modules/components/procedural-cylinder-strips/procedural-cylinder-strips-mask.js",
+                  "status": "pending"
+                },
+                {
+                  "id": 10,
+                  "command": "ADD PropertyDef FOR `radius` (type=number, label='Radius', description='Overall tunnel radius as a fraction of layer width and height. Values above 1 push the outer ring beyond the layer edges.', min=0, step=0.01) UNDER section `geometry`",
+                  "file": "apps/scene-engine/public/modules/components/procedural-cylinder-strips/procedural-cylinder-strips-mask.js",
+                  "status": "pending"
+                },
+                {
+                  "id": 11,
+                  "command": "ADD PropertyDef FOR `inner-radius` (type=number, label='Inner Radius', description='Where each strip starts at the back of the tunnel, as a fraction of `radius`. 0 collapses the strips to a point at the center.', min=0, max=1, step=0.01) UNDER section `geometry`",
+                  "file": "apps/scene-engine/public/modules/components/procedural-cylinder-strips/procedural-cylinder-strips-mask.js",
+                  "status": "pending"
+                },
+                {
+                  "id": 12,
+                  "command": "ADD PropertyDef FOR `outer-radius` (type=number, label='Outer Radius', description='Where each strip ends at the front of the tunnel, as a fraction of `radius`. Values above 1 extend the strips past the nominal radius.', min=0.05, max=3, step=0.01) UNDER section `geometry`",
+                  "file": "apps/scene-engine/public/modules/components/procedural-cylinder-strips/procedural-cylinder-strips-mask.js",
+                  "status": "pending"
+                },
+                {
+                  "id": 13,
+                  "command": "ADD PropertyDef FOR `depth-curve` (type=number, label='Depth Curve', description='Easing exponent applied between inner and outer radius. 1 is linear; higher values bunch strips toward the front, lower values bunch them toward the back.', min=0.2, max=4, step=0.01) UNDER section `geometry`",
+                  "file": "apps/scene-engine/public/modules/components/procedural-cylinder-strips/procedural-cylinder-strips-mask.js",
+                  "status": "pending"
+                },
+                {
+                  "id": 14,
+                  "command": "ADD PropertyDef FOR `radius-x` (type=number, label='Radius X (legacy)', description='Legacy fallback for `radius`. Older scenes set this key to size the tunnel; new scenes should use `radius`.', min=0, step=0.01) UNDER section `geometry`",
+                  "file": "apps/scene-engine/public/modules/components/procedural-cylinder-strips/procedural-cylinder-strips-mask.js",
+                  "status": "pending"
+                },
+                {
+                  "id": 15,
+                  "command": "ADD section-level description FOR section `strips` SUMMARIZING that these knobs control how many radial slats divide the tunnel, how wide each slat is, and how its curve is tessellated.",
+                  "file": "apps/scene-engine/public/modules/components/procedural-cylinder-strips/procedural-cylinder-strips-mask.js",
+                  "status": "pending"
+                },
+                {
+                  "id": 16,
+                  "command": "ADD PropertyDef FOR `strip-count` (type=number, label='Strip Count', description='Number of radial slats around the tunnel. Higher values produce a finer grille at the cost of fill rate.', min=4, step=1) UNDER section `strips`",
+                  "file": "apps/scene-engine/public/modules/components/procedural-cylinder-strips/procedural-cylinder-strips-mask.js",
+                  "status": "pending"
+                },
+                {
+                  "id": 17,
+                  "command": "ADD PropertyDef FOR `strip-width` (type=number, label='Strip Width', description='Fraction of each strip slot occupied by the slat itself. 1 fills the slot edge-to-edge; lower values leave gaps between adjacent slats even when fully open.', min=0.05, max=1.5, step=0.01) UNDER section `strips`",
+                  "file": "apps/scene-engine/public/modules/components/procedural-cylinder-strips/procedural-cylinder-strips-mask.js",
+                  "status": "pending"
+                },
+                {
+                  "id": 18,
+                  "command": "ADD PropertyDef FOR `curve-steps` (type=number, label='Curve Steps', description='Number of line segments used to tessellate each slat from inner to outer radius. Higher values produce smoother curves; lower values produce a faceted look.', min=3, step=1) UNDER section `strips`",
+                  "file": "apps/scene-engine/public/modules/components/procedural-cylinder-strips/procedural-cylinder-strips-mask.js",
+                  "status": "pending"
+                },
+                {
+                  "id": 19,
+                  "command": "ADD PropertyDef FOR `rotation-offset` (type=number, label='Rotation Offset', description='Static rotation applied to the entire strip ring, in degrees. Use to align the gap between strips with other on-stage elements.', min=0, max=360, step=1) UNDER section `strips`",
+                  "file": "apps/scene-engine/public/modules/components/procedural-cylinder-strips/procedural-cylinder-strips-mask.js",
+                  "status": "pending"
+                },
+                {
+                  "id": 20,
+                  "command": "ADD PropertyDef FOR `minimum-open` (type=number, label='Minimum Open', description='Floor on the gate-open amount, 0–1. 0 lets the strips fully close; higher values keep them at least this far open even at the bottom of the cycle.', min=0, max=1, step=0.01) UNDER section `strips`",
+                  "file": "apps/scene-engine/public/modules/components/procedural-cylinder-strips/procedural-cylinder-strips-mask.js",
+                  "status": "pending"
+                },
+                {
+                  "id": 21,
+                  "command": "ADD section-level description FOR section `appearance` SUMMARIZING that opacity dims the textured strips uniformly and composite controls how the strips blend onto the canvas underneath.",
+                  "file": "apps/scene-engine/public/modules/components/procedural-cylinder-strips/procedural-cylinder-strips-mask.js",
+                  "status": "pending"
+                },
+                {
+                  "id": 22,
+                  "command": "ADD PropertyDef FOR `opacity` (type=number, label='Opacity', description='Overall opacity of the strip mask, 0–1. Applied uniformly after the texture is masked through the strips.', min=0, max=1, step=0.01) UNDER section `appearance`",
+                  "file": "apps/scene-engine/public/modules/components/procedural-cylinder-strips/procedural-cylinder-strips-mask.js",
+                  "status": "pending"
+                },
+                {
+                  "id": 23,
+                  "command": "ADD PropertyDef FOR `composite` (type=string, label='Composite Mode', description='Canvas global composite operation used when drawing the masked texture (e.g. `source-over`, `screen`, `lighter`). Defaults to `source-over`.') UNDER section `appearance`",
+                  "file": "apps/scene-engine/public/modules/components/procedural-cylinder-strips/procedural-cylinder-strips-mask.js",
+                  "status": "pending"
+                },
+                {
+                  "id": 24,
+                  "command": "ADD section-level description FOR section `gate-timing` SUMMARIZING that the strips animate as a four-phase gate — closed hold, opening transition, open hold, closing transition — and these knobs set the duration of each phase plus a phase offset.",
+                  "file": "apps/scene-engine/public/modules/components/procedural-cylinder-strips/procedural-cylinder-strips-mask.js",
+                  "status": "pending"
+                },
+                {
+                  "id": 25,
+                  "command": "ADD PropertyDef FOR `closed-hold-seconds` (type=number, label='Closed Hold', description='Seconds spent fully closed at the bottom of the gate cycle before opening.', min=0, max=10, step=0.01) UNDER section `gate-timing`",
+                  "file": "apps/scene-engine/public/modules/components/procedural-cylinder-strips/procedural-cylinder-strips-mask.js",
+                  "status": "pending"
+                },
+                {
+                  "id": 26,
+                  "command": "ADD PropertyDef FOR `transition-seconds` (type=number, label='Transition', description='Seconds spent ramping between closed and open. Used for both the opening and closing transitions.', min=0.02, max=10, step=0.01) UNDER section `gate-timing`",
+                  "file": "apps/scene-engine/public/modules/components/procedural-cylinder-strips/procedural-cylinder-strips-mask.js",
+                  "status": "pending"
+                },
+                {
+                  "id": 27,
+                  "command": "ADD PropertyDef FOR `open-hold-seconds` (type=number, label='Open Hold', description='Seconds spent fully open at the top of the gate cycle before closing.', min=0, max=10, step=0.01) UNDER section `gate-timing`",
+                  "file": "apps/scene-engine/public/modules/components/procedural-cylinder-strips/procedural-cylinder-strips-mask.js",
+                  "status": "pending"
+                },
+                {
+                  "id": 28,
+                  "command": "ADD PropertyDef FOR `gate-offset-seconds` (type=number, label='Gate Offset', description='Phase offset added to the gate clock, in seconds. Use to desynchronize multiple strip layers so they open at different times.', step=0.01) UNDER section `gate-timing`",
+                  "file": "apps/scene-engine/public/modules/components/procedural-cylinder-strips/procedural-cylinder-strips-mask.js",
+                  "status": "pending"
+                },
+                {
+                  "id": 29,
+                  "command": "ADD section-level description FOR section `palette` SUMMARIZING that these knobs choose the palette mode and shape how the chosen palette is sampled across the texture — how many cycles fit, where it starts, how fast it scrolls, and how the gradient is biased.",
+                  "file": "apps/scene-engine/public/modules/components/procedural-cylinder-strips/procedural-cylinder-strips-mask.js",
+                  "status": "pending"
+                },
+                {
+                  "id": 30,
+                  "command": "ADD PropertyDef FOR `palette-mode` (type=select, label='Palette Mode', description='Which color algorithm fills the texture. `melee-spectrum` is the canonical Melee gradient, `hue-wheel` walks the full HSL hue circle, and `tri-color` interpolates the three custom colors below.', options=['melee-spectrum', 'hue-wheel', 'tri-color']) UNDER section `palette`",
+                  "file": "apps/scene-engine/public/modules/components/procedural-cylinder-strips/procedural-cylinder-strips-mask.js",
+                  "status": "pending"
+                },
+                {
+                  "id": 31,
+                  "command": "ADD PropertyDef FOR `color-cycle` (type=number, label='Color Cycle', description='How many full palette cycles span one texture sweep. Higher values pack more bands into the same area.', step=0.01) UNDER section `palette`",
+                  "file": "apps/scene-engine/public/modules/components/procedural-cylinder-strips/procedural-cylinder-strips-mask.js",
+                  "status": "pending"
+                },
+                {
+                  "id": 32,
+                  "command": "ADD PropertyDef FOR `color-offset` (type=number, label='Color Offset', description='Static phase offset applied to the palette sample position, 0–1 wraps. Use to dial in which color sits at the front of the texture at t=0.', step=0.01) UNDER section `palette`",
+                  "file": "apps/scene-engine/public/modules/components/procedural-cylinder-strips/procedural-cylinder-strips-mask.js",
+                  "status": "pending"
+                },
+                {
+                  "id": 33,
+                  "command": "ADD PropertyDef FOR `color-speed` (type=number, label='Color Speed', description='Rate at which the palette scrolls through the texture per second. 0 freezes the palette in place; negative values reverse the scroll.', step=0.01) UNDER section `palette`",
+                  "file": "apps/scene-engine/public/modules/components/procedural-cylinder-strips/procedural-cylinder-strips-mask.js",
+                  "status": "pending"
+                },
+                {
+                  "id": 34,
+                  "command": "ADD PropertyDef FOR `color-bias` (type=number, label='Color Bias', description='Exponent applied to the palette sample position before lookup. 1 is linear; higher values bias toward the start of the palette, lower values bias toward the end.', min=0.1, step=0.01) UNDER section `palette`",
+                  "file": "apps/scene-engine/public/modules/components/procedural-cylinder-strips/procedural-cylinder-strips-mask.js",
+                  "status": "pending"
+                },
+                {
+                  "id": 35,
+                  "command": "ADD section-level description FOR section `melee-spectrum` SUMMARIZING that these four colors define the canonical Melee gradient stops; they feed `melee-spectrum` mode directly and `tri-color` mode minus the magenta.",
+                  "file": "apps/scene-engine/public/modules/components/procedural-cylinder-strips/procedural-cylinder-strips-mask.js",
+                  "status": "pending"
+                },
+                {
+                  "id": 36,
+                  "command": "ADD PropertyDef FOR `color-start` (type=string, label='Start Color', description='First gradient stop. The blue end of the canonical Melee spectrum. Hex string (e.g. `#2030ff`).') UNDER section `melee-spectrum`",
+                  "file": "apps/scene-engine/public/modules/components/procedural-cylinder-strips/procedural-cylinder-strips-mask.js",
+                  "status": "pending"
+                },
+                {
+                  "id": 37,
+                  "command": "ADD PropertyDef FOR `color-mid` (type=string, label='Mid Color', description='Middle gradient stop. The violet bridge between blue and red. Hex string (e.g. `#3f2dff`).') UNDER section `melee-spectrum`",
+                  "file": "apps/scene-engine/public/modules/components/procedural-cylinder-strips/procedural-cylinder-strips-mask.js",
+                  "status": "pending"
+                },
+                {
+                  "id": 38,
+                  "command": "ADD PropertyDef FOR `color-end` (type=string, label='End Color', description='Last gradient stop. The red/pink end of the canonical Melee spectrum. Hex string (e.g. `#ff2f75`).') UNDER section `melee-spectrum`",
+                  "file": "apps/scene-engine/public/modules/components/procedural-cylinder-strips/procedural-cylinder-strips-mask.js",
+                  "status": "pending"
+                },
+                {
+                  "id": 39,
+                  "command": "ADD PropertyDef FOR `color-magenta` (type=string, label='Magenta Accent', description='Optional magenta accent woven between the violet and red stops in `melee-spectrum` mode. Hex string (e.g. `#ac2ba0`); falls back to a midpoint of mid+end when unset.') UNDER section `melee-spectrum`",
+                  "file": "apps/scene-engine/public/modules/components/procedural-cylinder-strips/procedural-cylinder-strips-mask.js",
+                  "status": "pending"
+                },
+                {
+                  "id": 40,
+                  "command": "ADD section-level description FOR section `hue-wheel` SUMMARIZING that these knobs only apply when palette mode is `hue-wheel` — they shape how the HSL hue circle is sampled, weighted, and contrast-adjusted before being painted across the texture.",
+                  "file": "apps/scene-engine/public/modules/components/procedural-cylinder-strips/procedural-cylinder-strips-mask.js",
+                  "status": "pending"
+                },
+                {
+                  "id": 41,
+                  "command": "ADD PropertyDef FOR `wheel-hue-shift` (type=number, label='Hue Shift', description='Starting hue of the wheel, in degrees. Rotates the entire palette around the HSL hue circle.', min=0, max=360, step=1) UNDER section `hue-wheel`",
+                  "file": "apps/scene-engine/public/modules/components/procedural-cylinder-strips/procedural-cylinder-strips-mask.js",
+                  "status": "pending"
+                },
+                {
+                  "id": 42,
+                  "command": "ADD PropertyDef FOR `wheel-saturation` (type=number, label='Saturation', description='Base saturation applied to every hue, 0–1.2. The renderer can pull saturation lower in the mint band; it never pushes it higher than this floor.', min=0, max=1.2, step=0.01) UNDER section `hue-wheel`",
+                  "file": "apps/scene-engine/public/modules/components/procedural-cylinder-strips/procedural-cylinder-strips-mask.js",
+                  "status": "pending"
+                },
+                {
+                  "id": 43,
+                  "command": "ADD PropertyDef FOR `wheel-lightness` (type=number, label='Lightness', description='Base lightness applied to every hue. Per-band lifts and dips are added on top of this baseline.', min=0.08, max=0.86, step=0.01) UNDER section `hue-wheel`",
+                  "file": "apps/scene-engine/public/modules/components/procedural-cylinder-strips/procedural-cylinder-strips-mask.js",
+                  "status": "pending"
+                },
+                {
+                  "id": 44,
+                  "command": "ADD PropertyDef FOR `wheel-mint-lift` (type=number, label='Mint Lift', description='Extra lightness added to the green/mint band. Positive values brighten greens; negative values push them into shadow.', min=-0.2, max=0.35, step=0.01) UNDER section `hue-wheel`",
+                  "file": "apps/scene-engine/public/modules/components/procedural-cylinder-strips/procedural-cylinder-strips-mask.js",
+                  "status": "pending"
+                },
+                {
+                  "id": 45,
+                  "command": "ADD PropertyDef FOR `wheel-softness` (type=number, label='Softness', description='How wide the per-hue band weighting falls off. Higher values blur the bands together for a smoother wheel; lower values keep each band tight.', min=0, max=1, step=0.01) UNDER section `hue-wheel`",
+                  "file": "apps/scene-engine/public/modules/components/procedural-cylinder-strips/procedural-cylinder-strips-mask.js",
+                  "status": "pending"
+                },
+                {
+                  "id": 46,
+                  "command": "ADD PropertyDef FOR `wheel-contrast` (type=number, label='Contrast', description='Final RGB contrast multiplier applied around the 128 midpoint. 1 leaves colors untouched; values below 1 wash them out; values above 1 deepen them.', min=0, max=1.5, step=0.01) UNDER section `hue-wheel`",
+                  "file": "apps/scene-engine/public/modules/components/procedural-cylinder-strips/procedural-cylinder-strips-mask.js",
+                  "status": "pending"
+                },
+                {
+                  "id": 47,
+                  "command": "ADD section-level description FOR section `texture` SUMMARIZING that the palette is painted onto an offscreen texture which is then masked by the strips; these knobs orient that texture, scroll it over time, and trade resolution for performance.",
+                  "file": "apps/scene-engine/public/modules/components/procedural-cylinder-strips/procedural-cylinder-strips-mask.js",
+                  "status": "pending"
+                },
+                {
+                  "id": 48,
+                  "command": "ADD PropertyDef FOR `texture-angle` (type=number, label='Texture Angle', description='Rotation of the gradient bands across the texture, in degrees. 0 runs the bands horizontally; 90 runs them vertically.', min=-180, max=180, step=1) UNDER section `texture`",
+                  "file": "apps/scene-engine/public/modules/components/procedural-cylinder-strips/procedural-cylinder-strips-mask.js",
+                  "status": "pending"
+                },
+                {
+                  "id": 49,
+                  "command": "ADD PropertyDef FOR `texture-speed` (type=number, label='Texture Speed', description='Additional scroll rate added to the palette phase per second. Stacks on top of `color-speed`.', step=0.01) UNDER section `texture`",
+                  "file": "apps/scene-engine/public/modules/components/procedural-cylinder-strips/procedural-cylinder-strips-mask.js",
+                  "status": "pending"
+                },
+                {
+                  "id": 50,
+                  "command": "ADD PropertyDef FOR `texture-scale` (type=number, label='Texture Scale', description='Multiplier on band density and gradient extent. Higher values pack more bands into the same texture; the band count adapts automatically for hue-wheel and melee-spectrum modes.', min=0.2, max=4, step=0.01) UNDER section `texture`",
+                  "file": "apps/scene-engine/public/modules/components/procedural-cylinder-strips/procedural-cylinder-strips-mask.js",
+                  "status": "pending"
+                },
+                {
+                  "id": 51,
+                  "command": "ADD PropertyDef FOR `texture-resolution` (type=number, label='Texture Resolution', description='Offscreen texture resolution as a fraction of layer size, 0.2–1. Lower values are cheaper to redraw; 1 matches the layer pixel-for-pixel.', min=0.2, max=1, step=0.01) UNDER section `texture`",
+                  "file": "apps/scene-engine/public/modules/components/procedural-cylinder-strips/procedural-cylinder-strips-mask.js",
+                  "status": "pending"
+                },
+                {
+                  "id": 52,
+                  "command": "ADD section-level description FOR section `performance` SUMMARIZING that these caps trade visual fidelity for cost — they bound the redraw rate and the pixel ratio used when sizing the canvas.",
+                  "file": "apps/scene-engine/public/modules/components/procedural-cylinder-strips/procedural-cylinder-strips-mask.js",
+                  "status": "pending"
+                },
+                {
+                  "id": 53,
+                  "command": "ADD PropertyDef FOR `target-fps` (type=number, label='Target FPS', description='Maximum redraw rate, capped at 60. Lower values reduce GPU/CPU load at the cost of choppier motion.', min=1, max=60, step=1) UNDER section `performance`",
+                  "file": "apps/scene-engine/public/modules/components/procedural-cylinder-strips/procedural-cylinder-strips-mask.js",
+                  "status": "pending"
+                },
+                {
+                  "id": 54,
+                  "command": "ADD PropertyDef FOR `dpr-cap` (type=number, label='DPR Cap', description='Upper bound on the device pixel ratio used when sizing the canvas. 1 forces logical-pixel rendering; 2 allows up to retina sharpness.', min=1, max=2, step=0.1) UNDER section `performance`",
+                  "file": "apps/scene-engine/public/modules/components/procedural-cylinder-strips/procedural-cylinder-strips-mask.js",
+                  "status": "pending"
+                },
+                {
+                  "id": 55,
+                  "command": "VERIFY by re-reading the full file: render function unchanged, helpers unchanged, `properties` export covers exactly the 40 keys read by the renderer (39 active + 1 legacy: animate, center-x, center-y, radius, radius-x, inner-radius, outer-radius, depth-curve, strip-count, strip-width, curve-steps, rotation-offset, minimum-open, opacity, composite, closed-hold-seconds, transition-seconds, open-hold-seconds, gate-offset-seconds, palette-mode, color-cycle, color-offset, color-speed, color-bias, color-start, color-mid, color-end, color-magenta, wheel-hue-shift, wheel-saturation, wheel-lightness, wheel-mint-lift, wheel-softness, wheel-contrast, texture-angle, texture-speed, texture-scale, texture-resolution, target-fps, dpr-cap) — no extras, no missing. Section IDs kebab-case, labels Title-Case, descriptions sentence-case, legacy `radius-x` carries ' (legacy)' label suffix.",
+                  "file": "apps/scene-engine/public/modules/components/procedural-cylinder-strips/procedural-cylinder-strips-mask.js",
+                  "status": "pending"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "title": "procedural-cylinder-strips-straight — sectioned property schema (mirror of mask)",
+      "goal": "Add a sectioned `properties` export to `procedural-cylinder-strips-straight.js` that mirrors the schema authored for `procedural-cylinder-strips-mask.js` in CP3. The two files share an identical property set today, so the schemas are intentionally identical; the goal is consistency, not divergence.",
+      "prerequisites": [3],
+      "status": "pending",
+      "testing_strategy": "Manual: `npm run dev`, open the editor on a scene that uses a `procedural-cylinder-strips-straight` layer (the title scene does). Verify: (1) the inspector renders the same sections as the mask variant; (2) every property the renderer reads appears with a labeled, described field; (3) editing a representative field per section still mutates the layer and updates the canvas; (4) no orphan-warning chip appears; (5) the layer continues to render visually identically with its existing saved values. Type check passes. Cross-check: both strips schemas are character-identical except for any intentional documented divergence (none expected).",
+      "task_groups": [
+        {
+          "id": 1,
+          "title": "Mirror procedural-cylinder-strips-mask schema into straight variant",
+          "objective": "Append a sectioned `properties` export to `procedural-cylinder-strips-straight.js` that is character-identical to the schema authored on `procedural-cylinder-strips-mask.js` in CP3. The straight variant reads the exact same 40 property keys (39 active + 1 legacy `radius-x`) with the exact same fallback values and clamp ranges, so the schema is copied verbatim — no divergence in section IDs, labels, descriptions, types, options, or min/max/step.",
+          "status": "pending",
+          "task_seeds": [],
+          "tasks": [
+            {
+              "id": 1,
+              "title": "Copy properties export from procedural-cylinder-strips-mask.js to procedural-cylinder-strips-straight.js",
+              "description": "After CP3 lands, the mask file has a `// Inspector schema for editor use only — runtime ignores it.` comment followed by an `export const properties = { sections: [...] }` block at the bottom. Copy that comment + export block verbatim from `apps/scene-engine/public/modules/components/procedural-cylinder-strips/procedural-cylinder-strips-mask.js` and append it to the bottom of `apps/scene-engine/public/modules/components/procedural-cylinder-strips/procedural-cylinder-strips-straight.js` (after its existing default-export render function, line 490). The two files have an identical property set: same 40 keys, same fallbacks, same clamp ranges (verified by diffing `numberProp` / `colorProp` / `booleanProp` / `clamp` calls in `drawCylinderStrips` 333–434 and `render` 452–471). Therefore the schema must be an exact, character-identical copy — no edits to section IDs, labels, descriptions, types, options, min/max/step, or section-level descriptions. Do NOT modify the render function, helpers, or any other code in the file. Do NOT add `default` fields to any PropertyDef. After copying, the only diff between mask.js and straight.js inside the new schema block must be zero — the bytes should match exactly. The two files will continue to differ above the schema block (different render bodies); the difference must end where the schema begins.",
+              "status": "pending",
+              "context": {
+                "read_before": [
+                  {
+                    "file": "apps/scene-engine/public/modules/components/procedural-cylinder-strips/procedural-cylinder-strips-mask.js",
+                    "lines": "490-end",
+                    "purpose": "Source of truth: read the comment + `export const properties = { sections: [...] }` block authored in CP3. This is the verbatim content to copy."
+                  },
+                  {
+                    "file": "apps/scene-engine/public/modules/components/procedural-cylinder-strips/procedural-cylinder-strips-straight.js",
+                    "lines": "1-490",
+                    "purpose": "Target file. Read in full to confirm (a) line 490 is the closing brace of the default-exported render factory and (b) no `properties` export already exists. The 40 property reads in `drawCylinderStrips` (333-434) and `render` (452-471) match the mask file exactly — confirm before copying."
+                  },
+                  {
+                    "file": ".spectre/sessions/2026-05-02_author-property-schemas-for-remaining-co_d7uyij/spec.md",
+                    "lines": "72-122",
+                    "purpose": "Schema shape (locked) and key decisions: defaults stay in render fallbacks, kebab-case section IDs, Title-Case labels, sentence-case descriptions matching v1 voice."
+                  },
+                  {
+                    "file": ".spectre/sessions/2026-05-02_author-property-schemas-for-remaining-co_d7uyij/plan.json",
+                    "lines": "550-950",
+                    "purpose": "CP3 plan: lists every section, every PropertyDef, every section description. Use as a checklist when verifying the copy."
+                  }
+                ],
+                "related_files": [
+                  "apps/scene-engine/src/types/property-schema.ts",
+                  "apps/scene-engine/src/lib/builtin-property-schemas.ts",
+                  "apps/scene-engine/scenes/title/scene.json"
+                ]
+              },
+              "depends_on": [],
+              "file_context": {
+                "beginning": {
+                  "files": [
+                    {
+                      "path": "apps/scene-engine/public/modules/components/procedural-cylinder-strips/procedural-cylinder-strips-straight.js",
+                      "status": "exists",
+                      "description": "490 lines. Same shape as the mask file: math/color/texture/tunnel helpers, a `drawCylinderStrips` function (333-434) reading 39 active + 1 legacy property keys, and a default-exported render factory (436-490). NO `properties` export yet — falls back to General orphan render in the inspector."
+                    },
+                    {
+                      "path": "apps/scene-engine/public/modules/components/procedural-cylinder-strips/procedural-cylinder-strips-mask.js",
+                      "status": "exists",
+                      "description": "After CP3: same as straight.js plus a `// Inspector schema for editor use only — runtime ignores it.` comment and an 11-section `export const properties = { sections: [...] }` block appended at the bottom."
+                    }
+                  ],
+                  "tree": null
+                },
+                "ending": {
+                  "files": [
+                    {
+                      "path": "apps/scene-engine/public/modules/components/procedural-cylinder-strips/procedural-cylinder-strips-straight.js",
+                      "status": "modified",
+                      "description": "Same file as before, plus a single-line `// Inspector schema for editor use only — runtime ignores it.` comment and an `export const properties = { sections: [...] }` block appended at the bottom — character-identical to the schema block in mask.js. Eleven sections (animation, position, geometry, strips, appearance, gate-timing, palette, melee-spectrum, hue-wheel, texture, performance) covering all 40 keys. No changes to helpers or the render function."
+                    }
+                  ],
+                  "tree": null
+                }
+              },
+              "actions": [
+                {
+                  "id": 1,
+                  "command": "VERIFY pre-condition: re-read `apps/scene-engine/public/modules/components/procedural-cylinder-strips/procedural-cylinder-strips-straight.js` lines 333-471. Confirm every `numberProp(properties, '<key>', ...)`, `colorProp(properties, '<key>', ...)`, and `booleanProp(properties, '<key>', ...)` call uses the same 40 keys with the same fallbacks and clamp ranges as the mask variant. If any key, fallback, or clamp differs, STOP and surface the divergence — do not proceed with a verbatim copy.",
+                  "file": "apps/scene-engine/public/modules/components/procedural-cylinder-strips/procedural-cylinder-strips-straight.js",
+                  "status": "pending"
+                },
+                {
+                  "id": 2,
+                  "command": "READ FROM apps/scene-engine/public/modules/components/procedural-cylinder-strips/procedural-cylinder-strips-mask.js: extract the trailing `// Inspector schema for editor use only — runtime ignores it.` comment AND the full `export const properties = { sections: [...] }` block (everything after the closing `}` of the default-exported render factory through end-of-file)",
+                  "file": "apps/scene-engine/public/modules/components/procedural-cylinder-strips/procedural-cylinder-strips-mask.js",
+                  "status": "pending"
+                },
+                {
+                  "id": 3,
+                  "command": "APPEND BLANK LINE AFTER default export (line 490) IN apps/scene-engine/public/modules/components/procedural-cylinder-strips/procedural-cylinder-strips-straight.js",
+                  "file": "apps/scene-engine/public/modules/components/procedural-cylinder-strips/procedural-cylinder-strips-straight.js",
+                  "status": "pending"
+                },
+                {
+                  "id": 4,
+                  "command": "APPEND the extracted comment + `export const properties = { ... }` block VERBATIM AFTER the blank line. Do NOT edit any character — same section IDs, labels, descriptions, types, options, min/max/step values as mask.js.",
+                  "file": "apps/scene-engine/public/modules/components/procedural-cylinder-strips/procedural-cylinder-strips-straight.js",
+                  "status": "pending"
+                },
+                {
+                  "id": 5,
+                  "command": "VERIFY by diff: extract the `export const properties = { ... }` block from both files (mask.js and straight.js) and confirm they are byte-identical. Any non-zero diff inside the schema block is a failure — re-do the copy.",
+                  "file": "apps/scene-engine/public/modules/components/procedural-cylinder-strips/procedural-cylinder-strips-straight.js",
+                  "status": "pending"
+                },
+                {
+                  "id": 6,
+                  "command": "VERIFY by re-reading the full straight.js file: render function unchanged, helpers unchanged, `properties` export covers exactly the 40 keys read by the renderer (39 active + 1 legacy: animate, center-x, center-y, radius, radius-x, inner-radius, outer-radius, depth-curve, strip-count, strip-width, curve-steps, rotation-offset, minimum-open, opacity, composite, closed-hold-seconds, transition-seconds, open-hold-seconds, gate-offset-seconds, palette-mode, color-cycle, color-offset, color-speed, color-bias, color-start, color-mid, color-end, color-magenta, wheel-hue-shift, wheel-saturation, wheel-lightness, wheel-mint-lift, wheel-softness, wheel-contrast, texture-angle, texture-speed, texture-scale, texture-resolution, target-fps, dpr-cap) — no extras, no missing. Section IDs kebab-case, labels Title-Case, descriptions sentence-case, legacy `radius-x` carries ' (legacy)' label suffix.",
+                  "file": "apps/scene-engine/public/modules/components/procedural-cylinder-strips/procedural-cylinder-strips-straight.js",
+                  "status": "pending"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

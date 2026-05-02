@@ -48,6 +48,31 @@ function renderInput(def: PropertyDef, value: unknown, onChange: (next: unknown)
     )
   }
 
+  if (def.type === 'color') {
+    const raw = String(value ?? '').trim()
+    const hex = /^#[0-9a-fA-F]{6}$/.test(raw)
+      ? raw
+      : /^#[0-9a-fA-F]{3}$/.test(raw)
+        ? `#${raw[1]}${raw[1]}${raw[2]}${raw[2]}${raw[3]}${raw[3]}`
+        : '#4e5f6c'
+    return (
+      <div className="flex items-center gap-2 min-w-0">
+        <input
+          type="color"
+          value={hex}
+          onChange={(e) => onChange(e.target.value)}
+          className="h-6 w-8 shrink-0 bg-transparent border border-[#333] rounded-sm cursor-pointer"
+        />
+        <input
+          type="text"
+          value={String(value ?? hex)}
+          onChange={(e) => onChange(e.target.value)}
+          className="min-w-0 flex-1 bg-[#222] border border-[#333] text-gray-300 text-[11px] font-mono px-1 py-[3px] rounded-sm focus:border-[#4a8fc2] focus:outline-none"
+        />
+      </div>
+    )
+  }
+
   if (def.type === 'boolean') {
     return (
       <input

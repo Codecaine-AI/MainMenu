@@ -1,6 +1,6 @@
 ---
-covers: src/hooks/useSceneLoader.ts — the React hook that fetches the scene + merged registry and seeds the Zustand store.
-concepts: [loader, hook, scene-fetch, registry-merge, race-guard]
+covers: src/hooks/useSceneLoader.ts — the React hook that fetches the scene + merged registry, seeds the Zustand store, and preloads component property schemas.
+concepts: [loader, hook, scene-fetch, registry-merge, race-guard, component-schema, schema-preload]
 ---
 
 # Editor Loader
@@ -20,6 +20,14 @@ concepts: [loader, hook, scene-fetch, registry-merge, race-guard]
 
 A `loadCount` ref tracks the active load. If `sceneId` changes mid-fetch, the in-flight callback compares `thisLoad === loadCount.current` before writing to the store, so a stale response can't overwrite a fresher one.
 
+## Component Schema Preload
+
+After the scene and registry are loaded, `useSceneLoader` scans the scene for `component`-type layers, resolves each component's module path from the registry, and calls `loadComponentSchema(modulePath)`. This function (in `src/lib/component-schema-loader.ts`) fetches the component's `.js` file, imports it via a Blob URL shim, reads the module's `properties` export, validates its shape (`{ sections: [...] }`), and caches the result. The resolved schemas are written into the Zustand store's `componentSchemas` map keyed by asset ID.
+
+Schema loading is asynchronous. Until a component's schema arrives, the inspector renders that component's properties under the General fallback section. In practice the loading window is short — the editor already waits for the scene + registry fetch, and component modules are small.
+
+The Blob URL import trick mirrors what the production renderer already does for component modules, so there is no new import mechanism.
+
 ## Why Registry First
 
 The asset browser and the inspector both need the registry to render meaningful UI (asset names, manifest fields, swap dropdowns). Loading the registry before the scene means the very first paint can render a populated inspector when the scene also arrives, instead of flashing through an "asset unknown" state.
@@ -33,5 +41,6 @@ This is also the handoff path from agent edits: after the agent edits `scene.jso
 ## Source
 
 - `apps/scene-engine/src/hooks/useSceneLoader.ts`
+- `apps/scene-engine/src/lib/component-schema-loader.ts` — `loadComponentSchema`, Blob URL import, cache.
 - `apps/scene-engine/src/renderer/asset-registry.js` — `loadRegistry`, `getRegistry`, `updateEntry`.
 - `apps/scene-engine/app/api/scenes/[id]/route.ts` — `GET` reads `scenes/<id>/scene.json` from disk.

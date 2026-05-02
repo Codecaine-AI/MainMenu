@@ -569,35 +569,35 @@ export const properties = {
       id: 'colors',
       label: 'Colors',
       description:
-        'CSS color strings (rgba(), hex, named). Plain strings in v1; a dedicated color-picker type may arrive later.',
+        'CSS color strings (rgba(), hex, named).',
       properties: {
         fill: {
-          type: 'string',
+          type: 'color',
           label: 'Fill (standard)',
           description: 'Sphere body fill color. CSS color string.',
         },
         highlight: {
-          type: 'string',
+          type: 'color',
           label: 'Highlight (standard)',
           description: 'Specular highlight color. CSS color string.',
         },
         grid: {
-          type: 'string',
+          type: 'color',
           label: 'Grid',
           description: 'Meridian/parallel line color. CSS color string. Used by both modes.',
         },
         rim: {
-          type: 'string',
+          type: 'color',
           label: 'Rim (standard)',
           description: 'Outline color around the sphere silhouette. CSS color string.',
         },
         scan: {
-          type: 'string',
+          type: 'color',
           label: 'Scan (standard)',
           description: 'Color of the two horizontal scan lines drawn over the sphere. CSS color string.',
         },
         vignette: {
-          type: 'string',
+          type: 'color',
           label: 'Vignette (interior)',
           description: 'Outer gradient color for the interior view. CSS color string.',
         },

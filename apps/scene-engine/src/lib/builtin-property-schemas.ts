@@ -130,6 +130,15 @@ export function extractSchemaPropertyKeys(schema: PropertySchema): Set<string> {
   return keys
 }
 
+const COLOR_RE = new RegExp('^(#[0-9a-fA-F]{3,8}|rgba?\\(|hsla?\\()')
+
+function looksLikeColor(key: string, value: unknown): boolean {
+  if (typeof value !== 'string') return false
+  if (COLOR_RE.test(value.trim())) return true
+  if (/color/i.test(key)) return true
+  return false
+}
+
 export function inferPropertyDef(key: string, value: unknown): PropertyDef {
   if (typeof value === 'number') {
     const steps = NUMERIC_PROPERTY_STEPS[key]
@@ -140,6 +149,9 @@ export function inferPropertyDef(key: string, value: unknown): PropertyDef {
   }
   if (typeof value === 'boolean') {
     return { type: 'boolean', label: key }
+  }
+  if (looksLikeColor(key, value)) {
+    return { type: 'color', label: key }
   }
   return { type: 'string', label: key }
 }
