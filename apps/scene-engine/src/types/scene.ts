@@ -111,6 +111,7 @@ export interface SceneObject {
   type: SceneObjectType
   asset?: string
   visible?: boolean
+  locked?: boolean
   transform: Transform
   appearance?: Appearance
   properties?: Record<string, unknown>

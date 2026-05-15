@@ -44,6 +44,7 @@ export function HierarchyPanel({ sceneId }: Props) {
   const setSelectedPath = useEditorStore((s) => s.setSelectedPath)
   const addObjectAt = useEditorStore((s) => s.addObjectAt)
   const moveObject = useEditorStore((s) => s.moveObject)
+  const mutateObjectAt = useEditorStore((s) => s.mutateObjectAt)
   const [collapsed, setCollapsed] = useState<Set<string>>(new Set())
   const [dropIndicator, setDropIndicator] = useState<{ path: string; region: string } | null>(null)
   const [addTarget, setAddTarget] = useState<{ parentPath: string; insertIndex: number } | null>(null)
@@ -87,6 +88,16 @@ export function HierarchyPanel({ sceneId }: Props) {
       setAddTarget(null)
     },
     [addObjectAt, setSelectedPath],
+  )
+
+  const handleToggleLock = useCallback(
+    (path: string) => {
+      if (!scene) return
+      const layer = resolveObject(scene as SceneJson, path)
+      const next = layer?.locked === true ? false : true
+      mutateObjectAt(path, { locked: next })
+    },
+    [scene, mutateObjectAt],
   )
 
   const handleDragOver = useCallback(
@@ -164,6 +175,7 @@ export function HierarchyPanel({ sceneId }: Props) {
               onSelect={setSelectedPath}
               onToggle={handleToggle}
               onAddChild={openChildAdd}
+              onToggleLock={handleToggleLock}
               collapsedSet={collapsed}
               selectedPath={selectedPath}
               onDragStart={handleDragStart}

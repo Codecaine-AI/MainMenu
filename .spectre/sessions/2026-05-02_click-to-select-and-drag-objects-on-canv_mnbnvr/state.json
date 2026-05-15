@@ -7,16 +7,23 @@
   "prior_sessions": [],
   "session_type": "full",
   "created_at": "2026-05-02T15:39:00+00:00",
-  "updated_at": "2026-05-02T17:30:00+00:00",
-  "current_phase": "plan",
+  "updated_at": "2026-05-02T21:30:00+00:00",
+  "current_phase": "build",
   "status": "active",
   "plan_state": {
     "status": "finalized",
     "checkpoints_total": 5,
     "checkpoints_detailed": 5,
-    "current_checkpoint": 5,
-    "checkpoints_completed": [],
-    "last_updated": "2026-05-02T17:30:00+00:00"
+    "current_checkpoint": null,
+    "checkpoints_completed": [
+      1,
+      2,
+      3,
+      4,
+      5
+    ],
+    "last_updated": "2026-05-02T21:30:00+00:00",
+    "summary": "All 5 checkpoints complete: path-tagged DOM, drill-in selection, drag-to-reposition, React SelectionOverlay + 8-handle resize, arrow-key nudge + locked-layer canvas-skip."
   },
   "intake": {
     "status": "completed",
@@ -40,15 +47,15 @@
     "data": {
       "open_questions": [
         "[DECIDED] Selection model = top-level first, drill in on re-click",
-        "How are non-visual layers (audio, some effects) selected \u2014 hierarchy-only or placeholder gizmo?",
+        "How are non-visual layers (audio, some effects) selected — hierarchy-only or placeholder gizmo?",
         "Drag write-back units: preserve center/% semantics or always convert to px?",
         "Does empty-stage click deselect?",
-        "Multi-select / marquee \u2014 in scope or future?",
-        "Keyboard nudging, snap-to-center, snap-to-grid \u2014 in or out?",
-        "Locked / hidden layers \u2014 selectable from canvas?",
+        "Multi-select / marquee — in scope or future?",
+        "Keyboard nudging, snap-to-center, snap-to-grid — in or out?",
+        "Locked / hidden layers — selectable from canvas?",
         "When child selected and user drags inside its bounds: silent parent drag, or re-select parent on drag-start?",
         "Background detection heuristic: full-stage bounds, fit:cover, or first-in-array?",
-        "Empty-area click (no bg layer hit) \u2014 deselect or no-op?",
+        "Empty-area click (no bg layer hit) — deselect or no-op?",
         "[SCOPE-IN] Arrow-key nudge (1% / shift=larger)",
         "[SCOPE-IN] Locked-layer toggle in hierarchy",
         "Resize: shift-drag = aspect-ratio lock?",
@@ -128,15 +135,21 @@
     }
   },
   "build": {
-    "status": "pending",
-    "started_at": null,
-    "completed_at": null,
-    "last_updated": null,
+    "status": "completed",
+    "started_at": "2026-05-02T18:00:00+00:00",
+    "completed_at": "2026-05-02T21:30:00+00:00",
+    "last_updated": "2026-05-02T21:30:00+00:00",
     "data": {
       "current_checkpoint": null,
       "current_task_group": null,
       "current_task": null,
-      "checkpoints_completed": []
+      "checkpoints_completed": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ]
     }
   },
   "docs": {
@@ -149,9 +162,40 @@
     }
   },
   "git": {
-    "branch": "relayer-sidebar",
+    "branch": "interactive-view",
     "worktree": null,
     "base_branch": null,
-    "commits": []
+    "commits": [
+      {
+        "checkpoint_id": 1,
+        "sha": "bfafaf1899056be4c0812ea4487a3290fa1fcd42",
+        "message": "checkpoint-1: path-tagged DOM + click-to-select top-level layer",
+        "created_at": "2026-05-02T18:05:00+00:00"
+      },
+      {
+        "checkpoint_id": 2,
+        "sha": "2ffd770718131e4a52cd87d80a54cbfc0fc828bb",
+        "message": "checkpoint-2: drill-in selection + cmd-click backgrounds + deselect",
+        "created_at": "2026-05-02T18:30:00+00:00"
+      },
+      {
+        "checkpoint_id": 3,
+        "sha": "2c63a19c9ac0f725d7aa9432f741254520a45bdc",
+        "message": "checkpoint-3: drag-to-reposition with percentage write-back",
+        "created_at": "2026-05-02T19:15:00+00:00"
+      },
+      {
+        "checkpoint_id": 4,
+        "sha": "e5eff787edf6363df6adc3e0725c7a36d548303e",
+        "message": "checkpoint-4: React selection overlay + 8-handle resize",
+        "created_at": "2026-05-02T20:00:00+00:00"
+      },
+      {
+        "checkpoint_id": 5,
+        "sha": "04bebc40fe73e8b6b55b54e1a52db18de6f756f0",
+        "message": "checkpoint-5: arrow-key nudge + locked-layer canvas-skip",
+        "created_at": "2026-05-02T21:30:00+00:00"
+      }
+    ]
   }
 }

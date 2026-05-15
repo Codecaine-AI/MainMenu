@@ -83,15 +83,19 @@ function applyObjectStyles(el, obj, entry) {
 }
 
 function updateGlyphGroup(wrapper, layer) {
+  const parentPath = wrapper.dataset.scenePath ?? '';
   const svg = wrapper.querySelector('svg');
   if (!svg) return;
 
   const scope = 'melee3';
-  for (const child of (layer.children ?? [])) {
+  const childList = layer.children ?? [];
+  for (let i = 0; i < childList.length; i++) {
+    const child = childList[i];
     if (child.layer) {
       const matched = svg.querySelector(`[data-layer="${child.layer}"]`);
       if (!matched) continue;
       matched.style.display = child.visible === false ? 'none' : '';
+      matched.dataset.scenePath = `${parentPath}.children.${i}`;
       const props = child.properties || {};
       if (typeof props.opacity === 'number') {
         matched.style.opacity = String(props.opacity);
@@ -107,7 +111,10 @@ function updateGlyphGroup(wrapper, layer) {
           const inner = f.querySelector('[data-layer-id]');
           return inner?.dataset.layerId === child.id;
         });
-      if (fo) updateForeignChild(fo, child);
+      if (fo) {
+        fo.dataset.scenePath = `${parentPath}.children.${i}`;
+        updateForeignChild(fo, child);
+      }
     }
   }
 
@@ -168,7 +175,7 @@ function updateForeignChild(fo, child) {
   }
 }
 
-async function mountObject(parent, obj, beforeEl = null) {
+async function mountObject(parent, obj, beforeEl = null, path = '') {
   const entry = resolveObjectEntry(obj);
   if (!entry && !isAssetlessObject(obj)) {
     console.warn(`[scene-renderer] Skipping object ${obj.id}: unknown asset ${obj.asset}`);
@@ -178,6 +185,7 @@ async function mountObject(parent, obj, beforeEl = null) {
 
   const wrapper = await getRenderer(obj.type)(obj, entry);
   wrapper.dataset.layerId = obj.id;
+  wrapper.dataset.scenePath = path;
   wrapper.dataset.layerType = obj.type;
   if (obj.asset) wrapper.dataset.layerAsset = obj.asset;
   wrapper.dataset.renderSignature = renderSignature(obj);
@@ -187,22 +195,22 @@ async function mountObject(parent, obj, beforeEl = null) {
 
   if (obj.type !== 'glyph-group' && Array.isArray(obj.children) && obj.children.length > 0) {
     wrapper.style.position = wrapper.style.position || 'absolute';
-    for (const child of obj.children) {
-      await mountObject(wrapper, child);
+    for (let i = 0; i < obj.children.length; i++) {
+      await mountObject(wrapper, obj.children[i], null, `${path}.children.${i}`);
     }
-    reorderChildren(wrapper, obj.children);
+    reorderChildren(wrapper, obj.children, path);
   }
 
   return wrapper;
 }
 
-async function remountObject(parent, oldEl, obj) {
-  const nextEl = await mountObject(parent, obj, oldEl);
+async function remountObject(parent, oldEl, obj, path = '') {
+  const nextEl = await mountObject(parent, obj, oldEl, path);
   oldEl.remove();
   return nextEl;
 }
 
-async function updateChildren(parentEl, childArray) {
+async function updateChildren(parentEl, childArray, parentPath = '') {
   const existing = new Map();
   for (const el of parentEl.children) {
     const id = el.dataset?.layerId;
@@ -217,25 +225,28 @@ async function updateChildren(parentEl, childArray) {
     }
   }
 
-  for (const child of childArray) {
+  for (let i = 0; i < childArray.length; i++) {
+    const child = childArray[i];
+    const childPath = parentPath === '' ? String(i) : `${parentPath}.children.${i}`;
     const el = existing.get(child.id);
     const entry = resolveObjectEntry(child);
     if (!entry && !isAssetlessObject(child)) continue;
     if (el) {
       if (shouldRemountObject(el, child)) {
-        await remountObject(parentEl, el, child);
+        await remountObject(parentEl, el, child, childPath);
         continue;
       }
+      el.dataset.scenePath = childPath;
       applyObjectStyles(el, child, entry);
       if (child.type !== 'glyph-group' && Array.isArray(child.children) && child.children.length > 0) {
-        await updateChildren(el, child.children);
+        await updateChildren(el, child.children, childPath);
       }
     } else {
-      await mountObject(parentEl, child);
+      await mountObject(parentEl, child, null, childPath);
     }
   }
 
-  reorderChildren(parentEl, childArray);
+  reorderChildren(parentEl, childArray, parentPath);
 }
 
 export async function renderScene(scene, root) {
@@ -253,18 +264,18 @@ export async function renderScene(scene, root) {
   }
 
   if (existingTopLevel.size > 0) {
-    await updateChildren(root, scene.objects);
+    await updateChildren(root, scene.objects, '');
     return;
   }
 
   root.innerHTML = '';
-  for (const obj of scene.objects) {
-    await mountObject(root, obj);
+  for (let i = 0; i < scene.objects.length; i++) {
+    await mountObject(root, scene.objects[i], null, String(i));
   }
-  reorderChildren(root, scene.objects);
+  reorderChildren(root, scene.objects, '');
 }
 
-function reorderChildren(parentEl, childArray) {
+function reorderChildren(parentEl, childArray, parentPath = '') {
   const order = childArray.map(c => c.id);
   const children = [...parentEl.children];
   let needsReorder = false;
@@ -274,10 +285,17 @@ function reorderChildren(parentEl, childArray) {
       break;
     }
   }
-  if (!needsReorder) return;
   const byId = new Map(children.map(c => [c.dataset?.layerId, c]));
-  for (const id of order) {
-    const el = byId.get(id);
-    if (el) parentEl.appendChild(el);
+  if (needsReorder) {
+    for (const id of order) {
+      const el = byId.get(id);
+      if (el) parentEl.appendChild(el);
+    }
+  }
+  for (let i = 0; i < order.length; i++) {
+    const el = byId.get(order[i]);
+    if (el) {
+      el.dataset.scenePath = parentPath === '' ? String(i) : `${parentPath}.children.${i}`;
+    }
   }
 }

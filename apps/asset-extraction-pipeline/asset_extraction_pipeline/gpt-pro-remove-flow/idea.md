@@ -1,0 +1,5 @@
+The idea here is that, instead of just removing, saying "extract it from the image", we can take a piece out, remove it, then we have the initial image. We can break things down like this, and I think that would likely result in a lot better UX and extraction.
+For this main menu image, the next thing would be:
+1. Take the gold menu out.
+2. Render just the gold menu.
+From that, it would be: "Okay, break out the singular gold menu item, the highlighted gold menu item." From the highlighted one, we would break that out into the highlighted menu item that doesn't have the gold shiny thing on it (target) and the gold shiny thing. You can break it down and have each asset kind of isolated so that you can work on it much more easily. If we are going to then generate, say, an SVG for that, it gives us a lot easier ability to do so.

@@ -3,7 +3,7 @@
   "session_id": "2026-05-02_click-to-select-and-drag-objects-on-canv_mnbnvr",
   "spec_reference": "./spec.md",
   "created_at": "2026-05-02T16:05:00+00:00",
-  "updated_at": "2026-05-02T17:30:00+00:00",
+  "updated_at": "2026-05-02T18:30:00+00:00",
   "status": "complete",
   "checkpoints": [
     {
@@ -11,21 +11,21 @@
       "title": "Foundation — path-tagged DOM + click-to-select top-level layer",
       "goal": "End-to-end tracer: every rendered scene element carries a `data-scene-path` attribute, and clicking the canvas sets `selectedPath` to the topmost top-level layer at that point. No drill-in, no drag, no chrome changes — the existing `is-canvas-selected` outline still applies. Establishes the click → selectedPath pipeline that later checkpoints extend.",
       "prerequisites": [],
-      "status": "pending",
+      "status": "completed",
       "testing_strategy": "Manual: open http://localhost:3000/editor?scene=title. Click on the codecaine logo → hierarchy + inspector switch to that layer (existing `is-canvas-selected` outline appears). Click on bg-video → selects bg-video. Click on the same logo again → still selects the top-level logo (no drill yet). Inspect element: every rendered layer wrapper should carry `data-scene-path=\"<index>\"` and nested children carry the `.children.<i>...` extension. Type check: `npm run build` passes.",
       "task_groups": [
         {
           "id": 1,
           "title": "Renderer path tagging",
           "objective": "Thread a `path` string through the imperative scene-renderer mount/update paths so every wrapper element ends up with `wrapper.dataset.scenePath` set. Top-level wrappers get `\"0\"`, `\"1\"`, …; nested children mounted via the regular `children` array get `\"<parent>.children.<i>\"`. Glyph-group sub-layers/foreign-media children are out of scope here — CP2 extends tagging into them. The path must remain accurate after reorders and re-renders, so set it on every code path that produces or reuses a wrapper (`mountObject`, `updateChildren`, `reorderChildren`).",
-          "status": "pending",
+          "status": "completed",
           "task_seeds": [],
           "tasks": [
             {
               "id": 1,
               "title": "Thread `path` through scene-renderer mount + update + reorder paths",
               "description": "Modify `apps/scene-engine/src/renderer/scene-renderer.js` so every wrapper element produced or reused during render carries `wrapper.dataset.scenePath` that matches the same `<i>.children.<j>...` notation used by `editor-store.parsePath` and `lib/path.ts:resolveObject`. Concretely: (1) Add a `path` parameter to `mountObject(parent, obj, beforeEl, path)` and set `wrapper.dataset.scenePath = path` immediately after the existing `wrapper.dataset.layerId = obj.id` block. (2) In the regular-children mount loop (current line ~190), pass `${path}.children.${i}` per child. (3) Add a `path` param to `updateChildren(parentEl, childArray, path)` and to `remountObject(parent, oldEl, obj, path)`. For each child, the per-child path is `${path}.children.${i}` (or just `${i}` when called from `renderScene` with parent path `\"\"`). When a child is reused (the `applyObjectStyles(el, child, entry)` branch), still set `el.dataset.scenePath = childPath` so reorders update the path. (4) In the recursive `updateChildren(el, child.children)` call, pass `${childPath}` as the parent path argument. (5) In `renderScene`, the top-level for-loop calls `mountObject(root, obj, null, String(i))` and `updateChildren(root, scene.objects, '')` (parent path empty so children get `\"0\"`, `\"1\"`, …). (6) Update `reorderChildren(parentEl, childArray, parentPath)` to also re-stamp `dataset.scenePath` on each child as it walks `order`, so a reorder fixes paths even when no other mutation occurred. Glyph-group internals (sub-layers, foreignObjects) are NOT tagged here; they remain untagged for CP1.",
-              "status": "pending",
+              "status": "completed",
               "context": {
                 "read_before": [
                   {
@@ -76,91 +76,91 @@
                   "id": 1,
                   "command": "UPDATE FUNCTION mountObject — ADD parameter `path` (string), set `wrapper.dataset.scenePath = path` AFTER `wrapper.dataset.layerId = obj.id`",
                   "file": "apps/scene-engine/src/renderer/scene-renderer.js",
-                  "status": "pending"
+                  "status": "completed"
                 },
                 {
                   "id": 2,
                   "command": "UPDATE FUNCTION mountObject — INSIDE the `obj.type !== 'glyph-group'` children loop, USE indexed loop and REPLACE `await mountObject(wrapper, child)` WITH `await mountObject(wrapper, obj.children[i], null, `${path}.children.${i}`)`",
                   "file": "apps/scene-engine/src/renderer/scene-renderer.js",
-                  "status": "pending"
+                  "status": "completed"
                 },
                 {
                   "id": 3,
                   "command": "UPDATE FUNCTION mountObject — REPLACE `reorderChildren(wrapper, obj.children)` WITH `reorderChildren(wrapper, obj.children, path)`",
                   "file": "apps/scene-engine/src/renderer/scene-renderer.js",
-                  "status": "pending"
+                  "status": "completed"
                 },
                 {
                   "id": 4,
                   "command": "UPDATE FUNCTION remountObject — ADD parameter `path`, REPLACE `mountObject(parent, obj, oldEl)` WITH `mountObject(parent, obj, oldEl, path)`",
                   "file": "apps/scene-engine/src/renderer/scene-renderer.js",
-                  "status": "pending"
+                  "status": "completed"
                 },
                 {
                   "id": 5,
                   "command": "UPDATE FUNCTION updateChildren — ADD parameter `parentPath` (string)",
                   "file": "apps/scene-engine/src/renderer/scene-renderer.js",
-                  "status": "pending"
+                  "status": "completed"
                 },
                 {
                   "id": 6,
                   "command": "UPDATE FUNCTION updateChildren — REFACTOR `for (const child of childArray)` INTO indexed loop, COMPUTE `const childPath = parentPath === '' ? String(i) : `${parentPath}.children.${i}``",
                   "file": "apps/scene-engine/src/renderer/scene-renderer.js",
-                  "status": "pending"
+                  "status": "completed"
                 },
                 {
                   "id": 7,
                   "command": "UPDATE FUNCTION updateChildren — IN reuse branch (`if (el)`), INSERT `el.dataset.scenePath = childPath` BEFORE `applyObjectStyles(el, child, entry)`",
                   "file": "apps/scene-engine/src/renderer/scene-renderer.js",
-                  "status": "pending"
+                  "status": "completed"
                 },
                 {
                   "id": 8,
                   "command": "UPDATE FUNCTION updateChildren — IN remount branch, REPLACE `await remountObject(parentEl, el, child)` WITH `await remountObject(parentEl, el, child, childPath)`",
                   "file": "apps/scene-engine/src/renderer/scene-renderer.js",
-                  "status": "pending"
+                  "status": "completed"
                 },
                 {
                   "id": 9,
                   "command": "UPDATE FUNCTION updateChildren — IN recursive call, REPLACE `await updateChildren(el, child.children)` WITH `await updateChildren(el, child.children, childPath)`",
                   "file": "apps/scene-engine/src/renderer/scene-renderer.js",
-                  "status": "pending"
+                  "status": "completed"
                 },
                 {
                   "id": 10,
                   "command": "UPDATE FUNCTION updateChildren — IN new-mount branch, REPLACE `await mountObject(parentEl, child)` WITH `await mountObject(parentEl, child, null, childPath)`",
                   "file": "apps/scene-engine/src/renderer/scene-renderer.js",
-                  "status": "pending"
+                  "status": "completed"
                 },
                 {
                   "id": 11,
                   "command": "UPDATE FUNCTION updateChildren — REPLACE final `reorderChildren(parentEl, childArray)` WITH `reorderChildren(parentEl, childArray, parentPath)`",
                   "file": "apps/scene-engine/src/renderer/scene-renderer.js",
-                  "status": "pending"
+                  "status": "completed"
                 },
                 {
                   "id": 12,
                   "command": "UPDATE FUNCTION renderScene — REPLACE `await updateChildren(root, scene.objects)` WITH `await updateChildren(root, scene.objects, '')`",
                   "file": "apps/scene-engine/src/renderer/scene-renderer.js",
-                  "status": "pending"
+                  "status": "completed"
                 },
                 {
                   "id": 13,
                   "command": "UPDATE FUNCTION renderScene — REFACTOR initial-mount `for (const obj of scene.objects)` INTO indexed loop calling `await mountObject(root, scene.objects[i], null, String(i))`",
                   "file": "apps/scene-engine/src/renderer/scene-renderer.js",
-                  "status": "pending"
+                  "status": "completed"
                 },
                 {
                   "id": 14,
                   "command": "UPDATE FUNCTION renderScene — REPLACE final `reorderChildren(root, scene.objects)` WITH `reorderChildren(root, scene.objects, '')`",
                   "file": "apps/scene-engine/src/renderer/scene-renderer.js",
-                  "status": "pending"
+                  "status": "completed"
                 },
                 {
                   "id": 15,
                   "command": "UPDATE FUNCTION reorderChildren — ADD parameter `parentPath` (string), AFTER walking `order` SET each child `el.dataset.scenePath = parentPath === '' ? String(idx) : `${parentPath}.children.${idx}`` using its loop index",
                   "file": "apps/scene-engine/src/renderer/scene-renderer.js",
-                  "status": "pending"
+                  "status": "completed"
                 }
               ]
             }
@@ -170,14 +170,14 @@
           "id": 2,
           "title": "Stage click → selectedPath wiring",
           "objective": "Translate a pointer event on the stage into a top-level `selectedPath` mutation. Add a small hit-test helper that, given a `MouseEvent`, returns the closest ancestor element's `data-scene-path` (sliced to its top-level segment for CP1). Wire it into `CanvasPanel` as an onClick handler on the stage div; clicking a layer calls `setSelectedPath`, clicking outside any tagged element is a no-op for CP1 (CP2 will turn it into a deselect). Drop-from-asset-browser and existing `is-canvas-selected` styling must keep working unchanged.",
-          "status": "pending",
+          "status": "completed",
           "task_seeds": [],
           "tasks": [
             {
               "id": 1,
               "title": "Create hit-test utility (`pickScenePathAt`)",
               "description": "Create `apps/scene-engine/src/lib/hit-test.ts` exporting `pickScenePathAt(event: MouseEvent | React.MouseEvent, options?: { topLevelOnly?: boolean }): string | null`. Implementation: use `document.elementFromPoint(event.clientX, event.clientY)` to get the deepest element under the pointer, then `el.closest<HTMLElement>('[data-scene-path]')` to walk up to the nearest tagged wrapper. Return `null` if nothing found. If `options.topLevelOnly` (default `true` for CP1; CP2 will pass `false`), slice the returned path string to its first segment by splitting on `'.children.'` and taking `parts[0]`. Pure utility — no imports from React, scene types, or store. Add a small JSDoc comment at the top noting that this returns the editor-store path format (`\"<i>.children.<j>...\"`).",
-              "status": "pending",
+              "status": "completed",
               "context": {
                 "read_before": [
                   {
@@ -218,31 +218,31 @@
                   "id": 1,
                   "command": "CREATE apps/scene-engine/src/lib/hit-test.ts",
                   "file": "apps/scene-engine/src/lib/hit-test.ts",
-                  "status": "pending"
+                  "status": "completed"
                 },
                 {
                   "id": 2,
                   "command": "ADD TYPE PickOptions = { topLevelOnly?: boolean }",
                   "file": "apps/scene-engine/src/lib/hit-test.ts",
-                  "status": "pending"
+                  "status": "completed"
                 },
                 {
                   "id": 3,
                   "command": "ADD FUNCTION pickScenePathAt(event: { clientX: number; clientY: number }, options?: PickOptions): string | null — call document.elementFromPoint(event.clientX, event.clientY); el?.closest<HTMLElement>('[data-scene-path]'); return null if absent",
                   "file": "apps/scene-engine/src/lib/hit-test.ts",
-                  "status": "pending"
+                  "status": "completed"
                 },
                 {
                   "id": 4,
                   "command": "ADD inside pickScenePathAt — IF options?.topLevelOnly !== false, RETURN path.split('.children.')[0]; ELSE return raw path",
                   "file": "apps/scene-engine/src/lib/hit-test.ts",
-                  "status": "pending"
+                  "status": "completed"
                 },
                 {
                   "id": 5,
                   "command": "DOCSTRING pickScenePathAt — note returned string matches the editor-store path format `\"<i>.children.<j>...\"`; topLevelOnly defaults to true",
                   "file": "apps/scene-engine/src/lib/hit-test.ts",
-                  "status": "pending"
+                  "status": "completed"
                 }
               ]
             },
@@ -250,7 +250,7 @@
               "id": 2,
               "title": "Wire stage click → setSelectedPath in CanvasPanel",
               "description": "Modify `apps/scene-engine/app/editor/_components/CanvasPanel.tsx` to call `setSelectedPath(path)` when the user clicks a tagged layer on the stage. Add `setSelectedPath` to the existing `useEditorStore` selectors at the top of the component. Add an `onClick` handler `handleStageClick` (wrapped in `useCallback`) that takes the `React.MouseEvent<HTMLDivElement>`, calls `pickScenePathAt(e, { topLevelOnly: true })` from `@/lib/hit-test`, and if the result is non-null calls `setSelectedPath(result)`. If the result is null, no-op for CP1 (CP2 will turn this into `setSelectedPath(null)` for empty-stage deselect). Attach `onClick={handleStageClick}` to the existing stage `<div ref={stageRef} ...>` (the inner 1440x1080 div, NOT the outer panel `<section>`) so the existing drag-over/drop handlers on the section continue to work without interference. Keep all other behavior (drop-target handling, the `is-canvas-selected` toggle in `useLayoutEffect`, fitStage, etc.) unchanged. Verify the new `onClick` does not trigger during the drop flow (drop fires `onDrop` on the section, not click on the stage).",
-              "status": "pending",
+              "status": "completed",
               "context": {
                 "read_before": [
                   {
@@ -268,7 +268,9 @@
                   "apps/scene-engine/src/lib/hit-test.ts"
                 ]
               },
-              "depends_on": [1],
+              "depends_on": [
+                1
+              ],
               "file_context": {
                 "beginning": {
                   "files": [
@@ -296,25 +298,25 @@
                   "id": 1,
                   "command": "ADD import — `import { pickScenePathAt } from '@/lib/hit-test'` AFTER the existing `import { resolveObjectEl } from '@/lib/path'`",
                   "file": "apps/scene-engine/app/editor/_components/CanvasPanel.tsx",
-                  "status": "pending"
+                  "status": "completed"
                 },
                 {
                   "id": 2,
                   "command": "ADD store selector — `const setSelectedPath = useEditorStore((s) => s.setSelectedPath)` AFTER the existing `addObjectAt` selector",
                   "file": "apps/scene-engine/app/editor/_components/CanvasPanel.tsx",
-                  "status": "pending"
+                  "status": "completed"
                 },
                 {
                   "id": 3,
                   "command": "ADD FUNCTION handleStageClick — wrap in useCallback over [setSelectedPath]; signature `(e: React.MouseEvent<HTMLDivElement>) => void`; body calls `pickScenePathAt(e, { topLevelOnly: true })` and `if (path) setSelectedPath(path)`",
                   "file": "apps/scene-engine/app/editor/_components/CanvasPanel.tsx",
-                  "status": "pending"
+                  "status": "completed"
                 },
                 {
                   "id": 4,
                   "command": "ADD attribute `onClick={handleStageClick}` ON the inner stage `<div ref={stageRef} ...>` (NOT the outer <section>)",
                   "file": "apps/scene-engine/app/editor/_components/CanvasPanel.tsx",
-                  "status": "pending"
+                  "status": "completed"
                 }
               ]
             }
@@ -326,22 +328,24 @@
       "id": 2,
       "title": "Drill-in selection on re-click + cmd-click for backgrounds + filtering",
       "goal": "Make the selection model match the spec: re-click in the same spot drills into the deepest enclosing child (Figma-style); plain clicks fall through fullscreen background-like layers; cmd-click selects backgrounds; hidden (`visible:false`) layers are skipped; empty-stage click deselects.",
-      "prerequisites": [1],
-      "status": "pending",
+      "prerequisites": [
+        1
+      ],
+      "status": "completed",
       "testing_strategy": "Manual: select the codecaine logo → click again on the same point → selectedPath drills into the inner SVG sub-layer or foreign-media child (verify in the hierarchy panel highlight). Click on a different layer → resets to top-level on that layer. Plain-click on a screen area covered only by `bg-video` → nothing selected (deselects). Cmd-click in that same area → selects bg-video. Toggle a layer's `visible:false` in JSON → it cannot be selected by canvas click. Click on truly empty stage (transparent area, no bg) → selectedPath becomes null.",
       "task_groups": [
         {
           "id": 1,
           "title": "Renderer — extend path tagging into glyph-group internals",
           "objective": "CP1 only stamped `data-scene-path` on top-level wrappers and generic `obj.children` wrappers. Drill-in needs the same path format reaching into glyph-group internals so the deepest enclosing element under the cursor resolves to a real `selectedPath`. Extend `updateGlyphGroup` to compute `${parentPath}.children.${i}` for each glyph-group child and stamp it on the matched SVG sub-layer element (when `child.layer`) or on the matched `<foreignObject>` (when `child.type`). Slots are not part of the editor-store path namespace and are intentionally not tagged.",
-          "status": "pending",
+          "status": "completed",
           "task_seeds": [],
           "tasks": [
             {
               "id": 1,
               "title": "Stamp `data-scene-path` on glyph-group sub-layers and foreign children",
               "description": "Modify `apps/scene-engine/src/renderer/scene-renderer.js`'s `updateGlyphGroup(wrapper, layer)` so that, after CP1's wrapper-level path tagging, each glyph-group child element also carries its full `${parentPath}.children.${i}` `dataset.scenePath`. (1) Read `parentPath = wrapper.dataset.scenePath ?? ''` once at the top of the function (wrapper was tagged by CP1's `mountObject`). (2) Convert the existing `for (const child of (layer.children ?? []))` loop to an indexed loop so we have `i` for each child. (3) For the `child.layer` branch, after the existing `matched.style.display = ...` block, set `matched.dataset.scenePath = `${parentPath}.children.${i}``. (4) For the `child.type` branch, after locating `fo` (the `foreignObject`), set `fo.dataset.scenePath = `${parentPath}.children.${i}``. (5) Leave the `slots` loop alone — slots are not part of the editor-store path namespace. Do not touch `updateForeignChild` (it operates on the inner content, not the foreignObject wrapper). The function must remain a no-op if `wrapper.dataset.scenePath` is missing (defensive, but in practice CP1 guarantees it).",
-              "status": "pending",
+              "status": "completed",
               "context": {
                 "read_before": [
                   {
@@ -392,25 +396,25 @@
                   "id": 1,
                   "command": "UPDATE FUNCTION updateGlyphGroup — INSERT `const parentPath = wrapper.dataset.scenePath ?? ''` BEFORE the `const svg = wrapper.querySelector('svg')` line",
                   "file": "apps/scene-engine/src/renderer/scene-renderer.js",
-                  "status": "pending"
+                  "status": "completed"
                 },
                 {
                   "id": 2,
                   "command": "UPDATE FUNCTION updateGlyphGroup — REFACTOR `for (const child of (layer.children ?? []))` INTO `const childList = layer.children ?? []; for (let i = 0; i < childList.length; i++) { const child = childList[i]; ... }`",
                   "file": "apps/scene-engine/src/renderer/scene-renderer.js",
-                  "status": "pending"
+                  "status": "completed"
                 },
                 {
                   "id": 3,
                   "command": "UPDATE FUNCTION updateGlyphGroup — INSIDE the `child.layer` branch, AFTER the `matched.style.display = ...` line, INSERT `matched.dataset.scenePath = `${parentPath}.children.${i}``",
                   "file": "apps/scene-engine/src/renderer/scene-renderer.js",
-                  "status": "pending"
+                  "status": "completed"
                 },
                 {
                   "id": 4,
                   "command": "UPDATE FUNCTION updateGlyphGroup — INSIDE the `child.type` branch, AFTER `if (fo) updateForeignChild(fo, child)` ADD a sibling `if (fo) fo.dataset.scenePath = `${parentPath}.children.${i}`` (or fold into a single `if (fo) { fo.dataset.scenePath = ...; updateForeignChild(fo, child); }` block)",
                   "file": "apps/scene-engine/src/renderer/scene-renderer.js",
-                  "status": "pending"
+                  "status": "completed"
                 }
               ]
             }
@@ -420,14 +424,14 @@
           "id": 2,
           "title": "Hit-test depth + filters + drill cursor state",
           "objective": "Generalize `pickScenePathAt` to return the deepest enclosing tagged path (no top-level slicing), filter background-like layers behind a `cmd` flag, and accept the stage element for stage-relative bbox detection. Add a small `isBackgroundLikeEl` helper. Add a `drillCursor` field + setter to the editor store so the click handler in CP2 can compare same-spot re-clicks across renders without smuggling state through refs.",
-          "status": "pending",
+          "status": "completed",
           "task_seeds": [],
           "tasks": [
             {
               "id": 1,
               "title": "Create `isBackgroundLikeEl` helper",
               "description": "Create `apps/scene-engine/src/lib/background-detect.ts` exporting `isBackgroundLikeEl(el: Element, stageEl: HTMLElement, threshold?: number): boolean`. Implementation: read `el.getBoundingClientRect()` and `stageEl.getBoundingClientRect()`. Compute `coverage = (elRect.width * elRect.height) / (stageRect.width * stageRect.height)`. Return `coverage >= (threshold ?? 0.95)`. The function uses screen-space rects, so the existing CSS scale on the stage cancels out (both rects are in the same coordinate space). Pure utility — no imports from React, scene types, or store. Add a JSDoc note explaining the 0.95 default and that the comparison is in screen space.",
-              "status": "pending",
+              "status": "completed",
               "context": {
                 "read_before": [
                   {
@@ -466,19 +470,19 @@
                   "id": 1,
                   "command": "CREATE apps/scene-engine/src/lib/background-detect.ts",
                   "file": "apps/scene-engine/src/lib/background-detect.ts",
-                  "status": "pending"
+                  "status": "completed"
                 },
                 {
                   "id": 2,
                   "command": "ADD FUNCTION isBackgroundLikeEl(el: Element, stageEl: HTMLElement, threshold?: number): boolean — read both `getBoundingClientRect()`, compute `coverage = (elRect.width * elRect.height) / Math.max(stageRect.width * stageRect.height, 1)`, return `coverage >= (threshold ?? 0.95)`",
                   "file": "apps/scene-engine/src/lib/background-detect.ts",
-                  "status": "pending"
+                  "status": "completed"
                 },
                 {
                   "id": 3,
                   "command": "DOCSTRING isBackgroundLikeEl — note coverage is computed in screen-space (CSS scale on the stage cancels out); default threshold 0.95 matches the spec's full-stage heuristic",
                   "file": "apps/scene-engine/src/lib/background-detect.ts",
-                  "status": "pending"
+                  "status": "completed"
                 }
               ]
             },
@@ -486,7 +490,7 @@
               "id": 2,
               "title": "Generalize `pickScenePathAt` for deep hits + cmd-gated background filter",
               "description": "Update `apps/scene-engine/src/lib/hit-test.ts` (created in CP1). Change the signature from `pickScenePathAt(event, options?: { topLevelOnly?: boolean })` to `pickScenePathAt(event, options?: { cmd?: boolean; stageEl?: HTMLElement })`. Behavior: (1) `document.elementFromPoint(event.clientX, event.clientY)` then walk up via `closest('[data-scene-path]')` to get the deepest tagged element. Return `null` if none. (2) If `options.stageEl` is provided AND the resolved element is background-like (delegate to `isBackgroundLikeEl(el, stageEl)` from `./background-detect`), and `options.cmd` is NOT true, walk further up the ancestor chain looking for the next tagged ancestor that is NOT background-like; if none found, return `null` (the click hit only background, plain click should miss). (3) When `options.cmd` IS true, do not apply the background filter — the deepest tagged element wins (which is what the user wanted to grab the background). (4) Return the deepest non-filtered element's `dataset.scenePath` verbatim — no top-level slicing. Drop the old `topLevelOnly` parameter entirely; CP1's CanvasPanel call site is being rewritten in TG3 of this checkpoint, so no other callers exist. Hidden layers (`visible:false`) are not in the DOM (top-level skipped by `mountObject`) or have `display:none` (glyph-group sub-layers via `applyObjectStyles`) — `elementFromPoint` skips both, so no explicit filter is needed.",
-              "status": "pending",
+              "status": "completed",
               "context": {
                 "read_before": [
                   {
@@ -509,7 +513,9 @@
                   "apps/scene-engine/src/lib/background-detect.ts"
                 ]
               },
-              "depends_on": [1],
+              "depends_on": [
+                1
+              ],
               "file_context": {
                 "beginning": {
                   "files": [
@@ -537,37 +543,37 @@
                   "id": 1,
                   "command": "ADD import — `import { isBackgroundLikeEl } from './background-detect'` AT TOP of file",
                   "file": "apps/scene-engine/src/lib/hit-test.ts",
-                  "status": "pending"
+                  "status": "completed"
                 },
                 {
                   "id": 2,
                   "command": "REPLACE TYPE PickOptions — `type PickOptions = { cmd?: boolean; stageEl?: HTMLElement }` (REMOVE old `topLevelOnly`)",
                   "file": "apps/scene-engine/src/lib/hit-test.ts",
-                  "status": "pending"
+                  "status": "completed"
                 },
                 {
                   "id": 3,
                   "command": "REFACTOR FUNCTION pickScenePathAt — REPLACE body with: `const initial = document.elementFromPoint(event.clientX, event.clientY); let el = initial?.closest<HTMLElement>('[data-scene-path]') ?? null; if (!el) return null;`",
                   "file": "apps/scene-engine/src/lib/hit-test.ts",
-                  "status": "pending"
+                  "status": "completed"
                 },
                 {
                   "id": 4,
                   "command": "ADD inside pickScenePathAt — IF `options?.stageEl` AND NOT `options.cmd`, WHILE `el && isBackgroundLikeEl(el, options.stageEl)` REASSIGN `el = el.parentElement?.closest<HTMLElement>('[data-scene-path]') ?? null`",
                   "file": "apps/scene-engine/src/lib/hit-test.ts",
-                  "status": "pending"
+                  "status": "completed"
                 },
                 {
                   "id": 5,
                   "command": "ADD inside pickScenePathAt — RETURN `el ? el.dataset.scenePath ?? null : null` (no top-level slicing)",
                   "file": "apps/scene-engine/src/lib/hit-test.ts",
-                  "status": "pending"
+                  "status": "completed"
                 },
                 {
                   "id": 6,
                   "command": "UPDATE DOCSTRING pickScenePathAt — note returns DEEPEST tagged path; cmd=true bypasses the background-like skip; stageEl required to enable the background filter",
                   "file": "apps/scene-engine/src/lib/hit-test.ts",
-                  "status": "pending"
+                  "status": "completed"
                 }
               ]
             },
@@ -575,7 +581,7 @@
               "id": 3,
               "title": "Add `drillCursor` state + setter to the editor store",
               "description": "Update `apps/scene-engine/src/store/editor-store.ts` to track the last canvas-click position so the CanvasPanel handler can detect same-spot re-clicks across React renders. (1) Add an exported interface `DrillCursor = { x: number; y: number }` (screen-space coordinates from the click event). (2) Add `drillCursor: DrillCursor | null` to the `EditorStore` interface (alongside `selectedPath`). (3) Add `setDrillCursor: (cursor: DrillCursor | null) => void` to the interface. (4) In the `create<EditorStore>` body, initialize `drillCursor: null` and implement `setDrillCursor: (cursor) => set({ drillCursor: cursor })`. Do not couple to `setSelectedPath` — the click handler will call both explicitly. No other call sites need to change in this task; TG3 wires it up.",
-              "status": "pending",
+              "status": "completed",
               "context": {
                 "read_before": [
                   {
@@ -619,31 +625,31 @@
                   "id": 1,
                   "command": "ADD TYPE — `export interface DrillCursor { x: number; y: number }` AFTER the existing imports BEFORE `export interface EditorStore`",
                   "file": "apps/scene-engine/src/store/editor-store.ts",
-                  "status": "pending"
+                  "status": "completed"
                 },
                 {
                   "id": 2,
                   "command": "ADD field — `drillCursor: DrillCursor | null` INSIDE EditorStore interface AFTER `selectedPath: string | null`",
                   "file": "apps/scene-engine/src/store/editor-store.ts",
-                  "status": "pending"
+                  "status": "completed"
                 },
                 {
                   "id": 3,
                   "command": "ADD method — `setDrillCursor: (cursor: DrillCursor | null) => void` INSIDE EditorStore interface AFTER `setSelectedPath`",
                   "file": "apps/scene-engine/src/store/editor-store.ts",
-                  "status": "pending"
+                  "status": "completed"
                 },
                 {
                   "id": 4,
                   "command": "ADD default — `drillCursor: null,` IN the create<EditorStore>(...) initializer AFTER `selectedPath: null,`",
                   "file": "apps/scene-engine/src/store/editor-store.ts",
-                  "status": "pending"
+                  "status": "completed"
                 },
                 {
                   "id": 5,
                   "command": "ADD setter — `setDrillCursor: (cursor) => set({ drillCursor: cursor }),` AFTER the existing `setSelectedPath` implementation",
                   "file": "apps/scene-engine/src/store/editor-store.ts",
-                  "status": "pending"
+                  "status": "completed"
                 }
               ]
             }
@@ -653,14 +659,14 @@
           "id": 3,
           "title": "CanvasPanel — drill-in click handler with cmd + deselect",
           "objective": "Replace the CP1 `handleStageClick` (which only set the top-level path) with a handler that: (a) reads `e.metaKey`/`e.ctrlKey` for cmd-click, (b) calls the generalized `pickScenePathAt` with `cmd` and `stageEl`, (c) on null result clears `selectedPath` and `drillCursor` (empty-stage deselect), (d) on a real result splits the path into a hit-stack and uses the existing `drillCursor` + current `selectedPath` to choose how deep to land (top-level on a fresh point, one step deeper on a same-spot re-click, capped at the deepest segment).",
-          "status": "pending",
+          "status": "completed",
           "task_seeds": [],
           "tasks": [
             {
               "id": 1,
               "title": "Rewrite `handleStageClick` for drill-in + cmd + deselect",
               "description": "Update `apps/scene-engine/app/editor/_components/CanvasPanel.tsx` to replace the CP1 `handleStageClick` (which read top-level only and never deselected). (1) Replace the CP1 `pickScenePathAt(e, { topLevelOnly: true })` import call with the new signature: `pickScenePathAt(e, { cmd, stageEl: stageRef.current ?? undefined })`, where `cmd = e.metaKey || e.ctrlKey`. (2) Add store selectors for `selectedPath` (already present higher up — reuse it; no new selector needed) and the new `drillCursor` + `setDrillCursor` from CP2/TG2. (3) Define a small inline helper inside the handler (or above it as a module-level function): `function buildHitStack(path: string): string[]` that returns `[\"0\", \"0.children.1\", \"0.children.1.children.0\", ...]` by progressively building from the split-on-`.children.` parts. (4) Drill cursor logic in the handler body, after `const path = pickScenePathAt(...)`: if `path === null`, call `setSelectedPath(null)` and `setDrillCursor(null)` and return. Otherwise build `stack = buildHitStack(path)`. Determine `depth`: if `drillCursor` exists and `Math.abs(e.clientX - drillCursor.x) <= 3 && Math.abs(e.clientY - drillCursor.y) <= 3` and `selectedPath != null` and `stack.includes(selectedPath)`, then `depth = Math.min(stack.indexOf(selectedPath) + 1, stack.length - 1)`. Otherwise `depth = 0`. Call `setSelectedPath(stack[depth])` and `setDrillCursor({ x: e.clientX, y: e.clientY })`. (5) Update the `useCallback` deps to `[setSelectedPath, setDrillCursor, drillCursor, selectedPath]`. (6) Leave `onClick={handleStageClick}` attached on the inner stage `<div ref={stageRef}>` from CP1 — no JSX change needed beyond what CP1 already wired. Do not touch the drag-over/drop handlers or the `useLayoutEffect` that toggles `is-canvas-selected`.",
-              "status": "pending",
+              "status": "completed",
               "context": {
                 "read_before": [
                   {
@@ -709,31 +715,31 @@
                   "id": 1,
                   "command": "ADD store selectors — `const drillCursor = useEditorStore((s) => s.drillCursor)` and `const setDrillCursor = useEditorStore((s) => s.setDrillCursor)` AFTER the existing `setSelectedPath` selector",
                   "file": "apps/scene-engine/app/editor/_components/CanvasPanel.tsx",
-                  "status": "pending"
+                  "status": "completed"
                 },
                 {
                   "id": 2,
                   "command": "ADD FUNCTION buildHitStack(path: string): string[] — module-level helper ABOVE the CanvasPanel component; splits on `.children.`, progressively rebuilds with `.children.` joiner so `\"0.children.1.children.2\"` → `[\"0\", \"0.children.1\", \"0.children.1.children.2\"]`",
                   "file": "apps/scene-engine/app/editor/_components/CanvasPanel.tsx",
-                  "status": "pending"
+                  "status": "completed"
                 },
                 {
                   "id": 3,
                   "command": "REPLACE FUNCTION handleStageClick — body reads `const cmd = e.metaKey || e.ctrlKey`; calls `const path = pickScenePathAt(e, { cmd, stageEl: stageRef.current ?? undefined })`; IF `!path` → `setSelectedPath(null); setDrillCursor(null); return`",
                   "file": "apps/scene-engine/app/editor/_components/CanvasPanel.tsx",
-                  "status": "pending"
+                  "status": "completed"
                 },
                 {
                   "id": 4,
                   "command": "ADD inside handleStageClick AFTER the null-path return — `const stack = buildHitStack(path); const sameSpot = drillCursor && Math.abs(e.clientX - drillCursor.x) <= 3 && Math.abs(e.clientY - drillCursor.y) <= 3; const idx = sameSpot && selectedPath ? stack.indexOf(selectedPath) : -1; const depth = idx >= 0 ? Math.min(idx + 1, stack.length - 1) : 0; setSelectedPath(stack[depth]); setDrillCursor({ x: e.clientX, y: e.clientY })`",
                   "file": "apps/scene-engine/app/editor/_components/CanvasPanel.tsx",
-                  "status": "pending"
+                  "status": "completed"
                 },
                 {
                   "id": 5,
                   "command": "UPDATE useCallback deps for handleStageClick — `[setSelectedPath, setDrillCursor, drillCursor, selectedPath]`",
                   "file": "apps/scene-engine/app/editor/_components/CanvasPanel.tsx",
-                  "status": "pending"
+                  "status": "completed"
                 }
               ]
             }
@@ -745,22 +751,24 @@
       "id": 3,
       "title": "Drag-to-reposition with percentage write-back (two-tier rule)",
       "goal": "Mousedown-drag on a selected (or about-to-be-selected) layer rewrites `transform.x` / `transform.y` as percent numbers. Two-tier rule enforced: mousedown anywhere inside a `glyph-group` (including drilled-in children) drags the enclosing glyph-group; mousedown on a child of a generic `group` moves only that child within its parent. Named anchors (`\"center\"`, `\"left\"`, etc.) are preserved on any axis that did not actually move. Layers with `transform.mode === 'fill'` are not draggable. Drop-from-asset-browser already writes percent transforms (verified — `defaultPosition` in `create-scene-object.ts` converts dropPos px → percent), so no change is needed there.",
-      "prerequisites": [2],
-      "status": "pending",
+      "prerequisites": [
+        2
+      ],
+      "status": "completed",
       "testing_strategy": "Manual on http://localhost:3000/editor?scene=title: (1) Select codecaine logo, mousedown on it and drag across the stage → canvas updates live during drag, mouseup writes new `transform.x` / `y` as numeric percent (e.g. `42.18`) with 2-decimal precision; named anchors on the *axis that did not move* stay as strings (drag purely vertical → `x` stays `\"center\"`). (2) Drill into a glyph-group child (re-click), mousedown anywhere inside the group → the whole parent glyph-group moves (atomic). (3) Mousedown-drag on `bg-video` (cmd-click to select first; transform.mode=='fill') → no drag occurs, no JSON write. (4) Single click without movement still selects (drag does not eat the click). (5) Drag-from-asset-browser drop still works and the new layer's `transform.x` / `y` are already percent (pre-existing behavior, regression check). Type check: `npm run build` passes.",
       "task_groups": [
         {
           "id": 1,
           "title": "Drag-target resolver + percent-delta transform utility",
           "objective": "Two pure utility modules under `apps/scene-engine/src/lib/`. (a) `drag-target.ts` resolves the path that should actually move when a click lands on a (possibly drilled-in) hit path, enforcing the two-tier rule by walking ancestors for a `glyph-group`. (b) `transform-units.ts` applies a screen-pixel delta to a transform's x/y axes, converting via the stage rect to a 2-decimal percent and preserving named-anchor strings on axes that did not actually move. Both are framework-agnostic — no React, no store, no DOM access beyond what the caller hands in.",
-          "status": "pending",
+          "status": "completed",
           "task_seeds": [],
           "tasks": [
             {
               "id": 1,
               "title": "Create `resolveDragTarget` (two-tier rule)",
               "description": "Create `apps/scene-engine/src/lib/drag-target.ts` exporting `resolveDragTarget(scene: SceneJson, hitPath: string): { path: string; object: SceneObject } | null`. Behavior: (1) Split `hitPath` on `.children.` into integer index parts (mirror the editor-store `parsePath`). (2) Walk from the deepest prefix (the hit itself) back to the top-level prefix; at each prefix call the existing `resolveObject(scene, prefixPath)` from `@/lib/path`. The loop yields `{ prefixPath, object }` pairs from deepest to shallowest. (3) The first ancestor (including the hit itself) whose `object.type === 'glyph-group'` wins — return `{ path: prefixPath, object }`. (4) If no glyph-group ancestor is found, return `{ path: hitPath, object: hitObject }` — i.e. the hit itself, which is the natural drag target for top-level layers and for children of generic `group` containers. (5) If `resolveObject(scene, hitPath)` returns null at the start, return null. (6) Additionally, after picking the target object, if `target.transform.mode === 'fill'` (the `TransformFill` variant — no per-axis x/y) return null — fill-mode layers are not draggable. Pure function. Imports: `resolveObject` from `./path`, types `SceneJson` and `SceneObject` from `@/types/scene`. JSDoc one-liner explaining the two-tier rule and the fill-mode bail.",
-              "status": "pending",
+              "status": "completed",
               "context": {
                 "read_before": [
                   {
@@ -814,43 +822,43 @@
                   "id": 1,
                   "command": "CREATE apps/scene-engine/src/lib/drag-target.ts",
                   "file": "apps/scene-engine/src/lib/drag-target.ts",
-                  "status": "pending"
+                  "status": "completed"
                 },
                 {
                   "id": 2,
                   "command": "ADD imports — `import { resolveObject } from './path'` and `import type { SceneJson, SceneObject } from '@/types/scene'`",
                   "file": "apps/scene-engine/src/lib/drag-target.ts",
-                  "status": "pending"
+                  "status": "completed"
                 },
                 {
                   "id": 3,
                   "command": "ADD TYPE `export interface DragTarget { path: string; object: SceneObject }`",
                   "file": "apps/scene-engine/src/lib/drag-target.ts",
-                  "status": "pending"
+                  "status": "completed"
                 },
                 {
                   "id": 4,
                   "command": "ADD FUNCTION resolveDragTarget(scene: SceneJson, hitPath: string): DragTarget | null — split hitPath on `.children.` into integer parts; iterate prefix lengths from full down to 1 (deepest → shallowest), reconstruct prefixPath via parts.slice(0, n).join('.children.'), call resolveObject(scene, prefixPath); return the FIRST {path, object} where object.type === 'glyph-group'",
                   "file": "apps/scene-engine/src/lib/drag-target.ts",
-                  "status": "pending"
+                  "status": "completed"
                 },
                 {
                   "id": 5,
                   "command": "ADD inside resolveDragTarget — IF no glyph-group ancestor found, fall back to `const hit = resolveObject(scene, hitPath)`; return null IF !hit",
                   "file": "apps/scene-engine/src/lib/drag-target.ts",
-                  "status": "pending"
+                  "status": "completed"
                 },
                 {
                   "id": 6,
                   "command": "ADD inside resolveDragTarget — BEFORE returning, IF `(target.object as SceneObject).transform && (target.object as SceneObject).transform.mode === 'fill'` RETURN null (fill-mode layers are not draggable)",
                   "file": "apps/scene-engine/src/lib/drag-target.ts",
-                  "status": "pending"
+                  "status": "completed"
                 },
                 {
                   "id": 7,
                   "command": "DOCSTRING resolveDragTarget — note the two-tier rule (closest glyph-group ancestor wins; else hit itself; fill-mode bails to null)",
                   "file": "apps/scene-engine/src/lib/drag-target.ts",
-                  "status": "pending"
+                  "status": "completed"
                 }
               ]
             },
@@ -858,7 +866,7 @@
               "id": 2,
               "title": "Create `applyDragDelta` percent-delta transform helper",
               "description": "Create `apps/scene-engine/src/lib/transform-units.ts` exporting `applyDragDelta(transform: TransformExplicit, deltaPxX: number, deltaPxY: number, stageRectWidth: number, stageRectHeight: number): { x: TransformX; y: TransformY }`. Constants: stage logical size is 1440×1080, but the rect width/height passed in are screen-space (post-scale), so compute `deltaPctX = (deltaPxX / stageRectWidth) * 100` and `deltaPctY = (deltaPxY / stageRectHeight) * 100`. For each axis: (a) define a small `NAMED_X = { left: 0, center: 50, right: 100 }` and `NAMED_Y = { top: 0, center: 50, middle: 50, bottom: 100 }`. (b) If the original axis value is a number, base = that number. If it's a string in the named map, base = mapped percent. Otherwise base = 0. (c) `MOVED_THRESHOLD = 0.01` percent. If `Math.abs(deltaPctAxis) < MOVED_THRESHOLD` AND the original axis value is a string, **preserve the original string** (axis didn't actually move). Otherwise newValue = `Number((base + deltaPctAxis).toFixed(2))`. Returns `{ x, y }` only — caller spreads into the existing transform. Pure function — no DOM, no store. Imports: types `TransformExplicit`, `TransformX`, `TransformY` from `@/types/scene`. JSDoc note explaining: percentages are stage-relative, named anchors persist when the axis is untouched, and 2-decimal rounding matches `defaultPosition` in `create-scene-object.ts`.",
-              "status": "pending",
+              "status": "completed",
               "context": {
                 "read_before": [
                   {
@@ -907,55 +915,55 @@
                   "id": 1,
                   "command": "CREATE apps/scene-engine/src/lib/transform-units.ts",
                   "file": "apps/scene-engine/src/lib/transform-units.ts",
-                  "status": "pending"
+                  "status": "completed"
                 },
                 {
                   "id": 2,
                   "command": "ADD import — `import type { TransformExplicit, TransformX, TransformY } from '@/types/scene'`",
                   "file": "apps/scene-engine/src/lib/transform-units.ts",
-                  "status": "pending"
+                  "status": "completed"
                 },
                 {
                   "id": 3,
                   "command": "ADD constants — `const NAMED_X: Record<string, number> = { left: 0, center: 50, right: 100 }` and `const NAMED_Y: Record<string, number> = { top: 0, center: 50, middle: 50, bottom: 100 }` and `const MOVED_THRESHOLD = 0.01`",
                   "file": "apps/scene-engine/src/lib/transform-units.ts",
-                  "status": "pending"
+                  "status": "completed"
                 },
                 {
                   "id": 4,
                   "command": "ADD FUNCTION resolveAxis<T extends string>(value: number | T, named: Record<string, number>): number — return value if typeof number; ELSE return named[value] ?? 0",
                   "file": "apps/scene-engine/src/lib/transform-units.ts",
-                  "status": "pending"
+                  "status": "completed"
                 },
                 {
                   "id": 5,
                   "command": "ADD FUNCTION applyDragDelta(transform: TransformExplicit, deltaPxX: number, deltaPxY: number, stageRectWidth: number, stageRectHeight: number): { x: TransformX; y: TransformY } — compute `deltaPctX = (deltaPxX / Math.max(stageRectWidth, 1)) * 100` and same for Y",
                   "file": "apps/scene-engine/src/lib/transform-units.ts",
-                  "status": "pending"
+                  "status": "completed"
                 },
                 {
                   "id": 6,
                   "command": "ADD inside applyDragDelta — `const x: TransformX = (typeof transform.x === 'string' && Math.abs(deltaPctX) < MOVED_THRESHOLD) ? transform.x : Number((resolveAxis(transform.x, NAMED_X) + deltaPctX).toFixed(2))`",
                   "file": "apps/scene-engine/src/lib/transform-units.ts",
-                  "status": "pending"
+                  "status": "completed"
                 },
                 {
                   "id": 7,
                   "command": "ADD inside applyDragDelta — `const y: TransformY = (typeof transform.y === 'string' && Math.abs(deltaPctY) < MOVED_THRESHOLD) ? transform.y : Number((resolveAxis(transform.y, NAMED_Y) + deltaPctY).toFixed(2))`",
                   "file": "apps/scene-engine/src/lib/transform-units.ts",
-                  "status": "pending"
+                  "status": "completed"
                 },
                 {
                   "id": 8,
                   "command": "ADD inside applyDragDelta — `return { x, y }`",
                   "file": "apps/scene-engine/src/lib/transform-units.ts",
-                  "status": "pending"
+                  "status": "completed"
                 },
                 {
                   "id": 9,
                   "command": "DOCSTRING applyDragDelta — note 2-decimal precision matches `defaultPosition` in create-scene-object.ts; named-anchor strings persist on axes that did not actually move (delta < 0.01%)",
                   "file": "apps/scene-engine/src/lib/transform-units.ts",
-                  "status": "pending"
+                  "status": "completed"
                 }
               ]
             }
@@ -965,14 +973,14 @@
           "id": 2,
           "title": "Drag hook (`useCanvasDrag`)",
           "objective": "A React hook in `apps/scene-engine/app/editor/_components/canvas/useCanvasDrag.ts` that owns mousedown/mousemove/mouseup lifecycle on the stage. On mousedown it hit-tests via `pickScenePathAt`, resolves the drag target via `resolveDragTarget`, snapshots the starting transform + pointer, and attaches window listeners. On mousemove it computes the delta in stage-pixels (using the stage `getBoundingClientRect()`), feeds it through `applyDragDelta`, and live-updates via `mutateObjectAt`. On mouseup it detaches listeners and, if any real movement occurred, sets a click-suppression ref so the immediately-following click event doesn't re-trigger selection. Hook is self-contained — caller passes the stage ref and gets back `onMouseDown` + `suppressNextClickRef`.",
-          "status": "pending",
+          "status": "completed",
           "task_seeds": [],
           "tasks": [
             {
               "id": 1,
               "title": "Implement `useCanvasDrag` hook",
               "description": "Create `apps/scene-engine/app/editor/_components/canvas/useCanvasDrag.ts` — first file under a new `canvas/` subdirectory. Export a default hook `useCanvasDrag({ stageRef }: { stageRef: React.RefObject<HTMLDivElement | null> }): { onMouseDown: (e: React.MouseEvent<HTMLDivElement>) => void; suppressNextClickRef: React.MutableRefObject<boolean> }`. Internals: (1) Read `scene` and `mutateObjectAt` from `useEditorStore` via individual selectors. (2) Two refs: `dragStateRef = useRef<{ targetPath: string; startTransform: TransformExplicit; startClientX: number; startClientY: number; rectWidth: number; rectHeight: number; moved: boolean } | null>(null)` and `suppressNextClickRef = useRef(false)`. (3) `MOVE_THRESHOLD = 3` (screen pixels) — until exceeded, treat as click not drag. (4) Define `onMouseDown(e)` wrapped in `useCallback`. Body: only handle left button (`e.button !== 0` → return). Resolve `hitPath = pickScenePathAt(e, { cmd: e.metaKey || e.ctrlKey, stageEl: stageRef.current ?? undefined })` from `@/lib/hit-test`. If `!hitPath || !scene` return. Resolve `target = resolveDragTarget(scene, hitPath)` from `@/lib/drag-target`. If `!target` return (e.g. fill-mode). Get `rect = stageRef.current.getBoundingClientRect()`. Initialize `dragStateRef.current = { targetPath: target.path, startTransform: target.object.transform as TransformExplicit, startClientX: e.clientX, startClientY: e.clientY, rectWidth: rect.width, rectHeight: rect.height, moved: false }`. Attach `window.addEventListener('mousemove', onWinMove)` and `window.addEventListener('mouseup', onWinUp, { once: true })`. (5) `onWinMove(ev: MouseEvent)`: if no `dragStateRef.current` return. Compute `dx = ev.clientX - state.startClientX`, `dy = ev.clientY - state.startClientY`. If not state.moved and `Math.hypot(dx, dy) < MOVE_THRESHOLD` return (still a click). Set `state.moved = true`. Compute `next = applyDragDelta(state.startTransform, dx, dy, state.rectWidth, state.rectHeight)`. Call `mutateObjectAt(state.targetPath, { transform: { x: next.x, y: next.y } })`. (6) `onWinUp()`: detach mousemove. If `dragStateRef.current?.moved` set `suppressNextClickRef.current = true`. Clear `dragStateRef.current = null`. Note: mousemove + mouseup are stable functions defined via `useRef` containers OR via `useCallback` with stable deps; simplest is to define them inside `onMouseDown` so they close over the live state — that's fine because they detach themselves on mouseup. (7) `useEffect` cleanup: on hook unmount, if `dragStateRef.current` is set, remove any lingering window listeners (defensive — store the move/up handlers on the ref so cleanup can call removeEventListener with the same references). Return `{ onMouseDown, suppressNextClickRef }`. Imports: React (`useCallback`, `useEffect`, `useRef`), `useEditorStore`, `pickScenePathAt`, `resolveDragTarget`, `applyDragDelta`, type `TransformExplicit`. Do not import any selection-cursor state — drag is independent of `selectedPath` (mousedown anywhere on a draggable layer initiates a drag without requiring prior selection).",
-              "status": "pending",
+              "status": "completed",
               "context": {
                 "read_before": [
                   {
@@ -1029,97 +1037,97 @@
                   "id": 1,
                   "command": "CREATE apps/scene-engine/app/editor/_components/canvas/useCanvasDrag.ts",
                   "file": "apps/scene-engine/app/editor/_components/canvas/useCanvasDrag.ts",
-                  "status": "pending"
+                  "status": "completed"
                 },
                 {
                   "id": 2,
                   "command": "ADD imports — `import { useCallback, useEffect, useRef } from 'react'`; `import { useEditorStore } from '@/store/editor-store'`; `import { pickScenePathAt } from '@/lib/hit-test'`; `import { resolveDragTarget } from '@/lib/drag-target'`; `import { applyDragDelta } from '@/lib/transform-units'`; `import type { TransformExplicit } from '@/types/scene'`",
                   "file": "apps/scene-engine/app/editor/_components/canvas/useCanvasDrag.ts",
-                  "status": "pending"
+                  "status": "completed"
                 },
                 {
                   "id": 3,
                   "command": "ADD TYPE `interface DragState { targetPath: string; startTransform: TransformExplicit; startClientX: number; startClientY: number; rectWidth: number; rectHeight: number; moved: boolean; onMove: (ev: MouseEvent) => void; onUp: () => void }`",
                   "file": "apps/scene-engine/app/editor/_components/canvas/useCanvasDrag.ts",
-                  "status": "pending"
+                  "status": "completed"
                 },
                 {
                   "id": 4,
                   "command": "ADD constant `const MOVE_THRESHOLD = 3` (screen pixels)",
                   "file": "apps/scene-engine/app/editor/_components/canvas/useCanvasDrag.ts",
-                  "status": "pending"
+                  "status": "completed"
                 },
                 {
                   "id": 5,
                   "command": "ADD FUNCTION default-export useCanvasDrag({ stageRef }: { stageRef: React.RefObject<HTMLDivElement | null> }) — read `scene = useEditorStore(s => s.scene)` and `mutateObjectAt = useEditorStore(s => s.mutateObjectAt)`",
                   "file": "apps/scene-engine/app/editor/_components/canvas/useCanvasDrag.ts",
-                  "status": "pending"
+                  "status": "completed"
                 },
                 {
                   "id": 6,
                   "command": "ADD inside useCanvasDrag — `const dragStateRef = useRef<DragState | null>(null)` and `const suppressNextClickRef = useRef(false)`",
                   "file": "apps/scene-engine/app/editor/_components/canvas/useCanvasDrag.ts",
-                  "status": "pending"
+                  "status": "completed"
                 },
                 {
                   "id": 7,
                   "command": "ADD inside useCanvasDrag — `const onMouseDown = useCallback((e: React.MouseEvent<HTMLDivElement>) => { ... }, [scene, mutateObjectAt, stageRef])` body: IF e.button !== 0 RETURN; IF !scene OR !stageRef.current RETURN",
                   "file": "apps/scene-engine/app/editor/_components/canvas/useCanvasDrag.ts",
-                  "status": "pending"
+                  "status": "completed"
                 },
                 {
                   "id": 8,
                   "command": "ADD inside onMouseDown — `const cmd = e.metaKey || e.ctrlKey; const hitPath = pickScenePathAt(e, { cmd, stageEl: stageRef.current ?? undefined }); if (!hitPath) return`",
                   "file": "apps/scene-engine/app/editor/_components/canvas/useCanvasDrag.ts",
-                  "status": "pending"
+                  "status": "completed"
                 },
                 {
                   "id": 9,
                   "command": "ADD inside onMouseDown — `const target = resolveDragTarget(scene, hitPath); if (!target) return`; treat target.object.transform as TransformExplicit (the resolver already filtered out fill-mode)",
                   "file": "apps/scene-engine/app/editor/_components/canvas/useCanvasDrag.ts",
-                  "status": "pending"
+                  "status": "completed"
                 },
                 {
                   "id": 10,
                   "command": "ADD inside onMouseDown — `const rect = stageRef.current.getBoundingClientRect()`; INITIALIZE state object (without onMove/onUp yet) with all snapshot fields and `moved: false`",
                   "file": "apps/scene-engine/app/editor/_components/canvas/useCanvasDrag.ts",
-                  "status": "pending"
+                  "status": "completed"
                 },
                 {
                   "id": 11,
                   "command": "ADD inside onMouseDown — DEFINE `const onMove = (ev: MouseEvent) => { const st = dragStateRef.current; if (!st) return; const dx = ev.clientX - st.startClientX; const dy = ev.clientY - st.startClientY; if (!st.moved && Math.hypot(dx, dy) < MOVE_THRESHOLD) return; st.moved = true; const next = applyDragDelta(st.startTransform, dx, dy, st.rectWidth, st.rectHeight); mutateObjectAt(st.targetPath, { transform: { x: next.x, y: next.y } }) }`",
                   "file": "apps/scene-engine/app/editor/_components/canvas/useCanvasDrag.ts",
-                  "status": "pending"
+                  "status": "completed"
                 },
                 {
                   "id": 12,
                   "command": "ADD inside onMouseDown — DEFINE `const onUp = () => { const st = dragStateRef.current; window.removeEventListener('mousemove', onMove); if (st?.moved) suppressNextClickRef.current = true; dragStateRef.current = null }`",
                   "file": "apps/scene-engine/app/editor/_components/canvas/useCanvasDrag.ts",
-                  "status": "pending"
+                  "status": "completed"
                 },
                 {
                   "id": 13,
                   "command": "ADD inside onMouseDown — ASSIGN `dragStateRef.current = { targetPath: target.path, startTransform: target.object.transform as TransformExplicit, startClientX: e.clientX, startClientY: e.clientY, rectWidth: rect.width, rectHeight: rect.height, moved: false, onMove, onUp }`",
                   "file": "apps/scene-engine/app/editor/_components/canvas/useCanvasDrag.ts",
-                  "status": "pending"
+                  "status": "completed"
                 },
                 {
                   "id": 14,
                   "command": "ADD inside onMouseDown — `window.addEventListener('mousemove', onMove); window.addEventListener('mouseup', onUp, { once: true })`",
                   "file": "apps/scene-engine/app/editor/_components/canvas/useCanvasDrag.ts",
-                  "status": "pending"
+                  "status": "completed"
                 },
                 {
                   "id": 15,
                   "command": "ADD inside useCanvasDrag — `useEffect(() => () => { const st = dragStateRef.current; if (st) { window.removeEventListener('mousemove', st.onMove); window.removeEventListener('mouseup', st.onUp); dragStateRef.current = null } }, [])` (defensive unmount cleanup)",
                   "file": "apps/scene-engine/app/editor/_components/canvas/useCanvasDrag.ts",
-                  "status": "pending"
+                  "status": "completed"
                 },
                 {
                   "id": 16,
                   "command": "ADD inside useCanvasDrag — `return { onMouseDown, suppressNextClickRef }`",
                   "file": "apps/scene-engine/app/editor/_components/canvas/useCanvasDrag.ts",
-                  "status": "pending"
+                  "status": "completed"
                 }
               ]
             }
@@ -1129,14 +1137,14 @@
           "id": 3,
           "title": "CanvasPanel wiring + click suppression",
           "objective": "Wire `useCanvasDrag` into `CanvasPanel.tsx`. Attach the hook's `onMouseDown` to the inner stage div (alongside the existing CP2 `onClick`). Add a guard at the top of `handleStageClick` that consumes the hook's `suppressNextClickRef` so a click synthesized at the end of a drag does not fall through to selection logic. No other behavior in CanvasPanel changes — drop, fitStage, the selection-outline `useLayoutEffect` from CP1, and the CP2/3 drill-cursor click handler are untouched.",
-          "status": "pending",
+          "status": "completed",
           "task_seeds": [],
           "tasks": [
             {
               "id": 1,
               "title": "Mount `useCanvasDrag` in `CanvasPanel` and gate clicks on suppression",
               "description": "Modify `apps/scene-engine/app/editor/_components/CanvasPanel.tsx`. (1) Add import: `import useCanvasDrag from '@/app/editor/_components/canvas/useCanvasDrag'` (or the relative path `./canvas/useCanvasDrag` — match the existing import style in this file, which is the `@/` alias for `src/` paths but uses relative `./` for sibling components; since `canvas/` is a sibling subdir, use `'./canvas/useCanvasDrag'`). (2) Inside the component, after the existing store selector block and before the existing `useEffect` that mounts the renderer, call `const { onMouseDown: handleStageMouseDown, suppressNextClickRef } = useCanvasDrag({ stageRef })`. (3) Modify the existing CP3-from-CP2 `handleStageClick` callback (the drill-in click handler): at the very top of its body, add `if (suppressNextClickRef.current) { suppressNextClickRef.current = false; return }`. This consumes one suppressed click without affecting subsequent clicks. (4) Add `suppressNextClickRef` to the `useCallback` deps of `handleStageClick` (the ref identity is stable, so this is just to satisfy the linter — including it does not cause re-creation). (5) On the inner `<div ref={stageRef} ... onClick={handleStageClick}>`, add `onMouseDown={handleStageMouseDown}` as a sibling attribute. (6) Do not modify the outer `<section>`'s drag/drop handlers, the `useLayoutEffect` outline toggle, `fitStage`, or any other code in the file.",
-              "status": "pending",
+              "status": "completed",
               "context": {
                 "read_before": [
                   {
@@ -1182,31 +1190,31 @@
                   "id": 1,
                   "command": "ADD import — `import useCanvasDrag from './canvas/useCanvasDrag'` AFTER the existing `import { pickScenePathAt } from '@/lib/hit-test'` (or wherever CP1 placed that import in CanvasPanel.tsx)",
                   "file": "apps/scene-engine/app/editor/_components/CanvasPanel.tsx",
-                  "status": "pending"
+                  "status": "completed"
                 },
                 {
                   "id": 2,
                   "command": "ADD hook call — `const { onMouseDown: handleStageMouseDown, suppressNextClickRef } = useCanvasDrag({ stageRef })` AFTER the store-selector block and BEFORE the existing `useEffect` that mounts the renderer",
                   "file": "apps/scene-engine/app/editor/_components/CanvasPanel.tsx",
-                  "status": "pending"
+                  "status": "completed"
                 },
                 {
                   "id": 3,
                   "command": "INSERT inside handleStageClick (the CP2/CP3 drill-in handler) — at the very top of the body: `if (suppressNextClickRef.current) { suppressNextClickRef.current = false; return }`",
                   "file": "apps/scene-engine/app/editor/_components/CanvasPanel.tsx",
-                  "status": "pending"
+                  "status": "completed"
                 },
                 {
                   "id": 4,
                   "command": "UPDATE useCallback deps for handleStageClick — APPEND `suppressNextClickRef` to the existing dep array",
                   "file": "apps/scene-engine/app/editor/_components/CanvasPanel.tsx",
-                  "status": "pending"
+                  "status": "completed"
                 },
                 {
                   "id": 5,
                   "command": "ADD attribute `onMouseDown={handleStageMouseDown}` ON the inner stage `<div ref={stageRef} ...>` (the same div that already has `onClick={handleStageClick}` from CP1)",
                   "file": "apps/scene-engine/app/editor/_components/CanvasPanel.tsx",
-                  "status": "pending"
+                  "status": "completed"
                 }
               ]
             }
@@ -1218,8 +1226,10 @@
       "id": 4,
       "title": "Selection chrome — React overlay + 8-handle resize with anchor-fixed math",
       "goal": "Replace the imperative `is-canvas-selected` CSS class with a dedicated React `SelectionOverlay` component layered above the stage. The overlay draws an outline plus 8 resize handles (4 corners + 4 edges) over the selected layer's bounding box. Dragging an edge does single-axis resize (opposite edge fixed); dragging a corner does free-aspect resize (opposite corner fixed); shift-drag on a corner locks aspect ratio. New width/height/x/y are written back as percentages, with `\"auto\"` widths converting to a concrete percent measured at resize-start.",
-      "prerequisites": [3],
-      "status": "pending",
+      "prerequisites": [
+        3
+      ],
+      "status": "completed",
       "testing_strategy": "Manual: select any layer → 8 handles appear (corners + edges), outline aligns with the layer's rendered bounding box. Drag right edge → layer widens to the right, left edge stays put, `transform.width` is a percent number. Drag bottom-right corner → width and height grow freely. Hold shift while dragging the corner → aspect ratio stays locked. Resize a layer with `width:\"auto\"` → width converts to a percent on first drag. Underneath the overlay, the rendered video keeps playing during drag (overlay is `pointer-events:none` except handles). Resize updates are written back as numeric percent.",
       "task_groups": [
         {
@@ -1473,7 +1483,9 @@
                   "apps/scene-engine/app/editor/_components/canvas/useSelectionBox.ts"
                 ]
               },
-              "depends_on": [1],
+              "depends_on": [
+                1
+              ],
               "file_context": {
                 "beginning": {
                   "files": [
@@ -1640,7 +1652,9 @@
                   "apps/scene-engine/src/lib/path.ts"
                 ]
               },
-              "depends_on": [1],
+              "depends_on": [
+                1
+              ],
               "file_context": {
                 "beginning": {
                   "files": [
@@ -1792,7 +1806,9 @@
                   "apps/scene-engine/app/editor/_components/canvas/useSelectionBox.ts"
                 ]
               },
-              "depends_on": [2],
+              "depends_on": [
+                2
+              ],
               "file_context": {
                 "beginning": {
                   "files": [
@@ -1889,7 +1905,9 @@
                   "apps/scene-engine/app/editor/_components/canvas/SelectionOverlay.tsx"
                 ]
               },
-              "depends_on": [3],
+              "depends_on": [
+                3
+              ],
               "file_context": {
                 "beginning": {
                   "files": [
@@ -1929,7 +1947,9 @@
       "id": 5,
       "title": "Arrow-key nudge + locked-layer toggle (canvas-skip)",
       "goal": "Polish layer of the spec: arrow keys move the selected layer by 1% per press (shift-arrow = 5%); a per-layer locked flag, toggleable from `HierarchyRow` (faded row + lock icon), opts that layer out of canvas hit-testing entirely — even cmd-click skips it. Locked layers remain editable from the hierarchy/inspector.",
-      "prerequisites": [4],
+      "prerequisites": [
+        4
+      ],
       "status": "pending",
       "testing_strategy": "Manual: select a layer → press right-arrow 5 times → `transform.x` increases by 5% (1% per press). Hold shift + right-arrow → 5% per press. Click the lock icon on a hierarchy row → row fades, lock icon stays lit. Click that locked layer on canvas → nothing selects (the click falls through to the next-deeper unlocked layer). Cmd-click in the same spot → still skips the locked layer. Click the lock icon again → row un-fades, canvas selection works again. Arrow keys with no selection → no-op. Arrow keys while typing in the inspector → no nudge (page-scroll suppression must not run when an input is focused). Arrow keys with a fill-mode layer selected → no-op.",
       "task_groups": [
@@ -2025,7 +2045,9 @@
                   "apps/scene-engine/src/lib/path.ts"
                 ]
               },
-              "depends_on": [1],
+              "depends_on": [
+                1
+              ],
               "file_context": {
                 "beginning": {
                   "files": [
@@ -2336,7 +2358,9 @@
                   "apps/scene-engine/app/editor/_components/HierarchyRow.tsx"
                 ]
               },
-              "depends_on": [1],
+              "depends_on": [
+                1
+              ],
               "file_context": {
                 "beginning": {
                   "files": [
@@ -2524,7 +2548,9 @@
                   "apps/scene-engine/app/editor/_components/canvas/useCanvasKeyboardNudge.ts"
                 ]
               },
-              "depends_on": [1],
+              "depends_on": [
+                1
+              ],
               "file_context": {
                 "beginning": {
                   "files": [

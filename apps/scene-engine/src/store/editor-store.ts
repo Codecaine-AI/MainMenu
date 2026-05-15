@@ -2,17 +2,24 @@ import { create } from 'zustand'
 import type { SceneJson, Registry } from '@/types/scene'
 import type { PropertySchema } from '@/types/property-schema'
 
+export interface DrillCursor {
+  x: number
+  y: number
+}
+
 export interface EditorStore {
   scene: SceneJson | null
   registry: Registry | null
   componentSchemas: Record<string, PropertySchema | null>
   selectedPath: string | null
+  drillCursor: DrillCursor | null
   dirty: boolean
 
   setScene: (scene: SceneJson) => void
   setRegistry: (registry: Registry) => void
   setComponentSchema: (componentId: string, schema: PropertySchema | null) => void
   setSelectedPath: (path: string | null) => void
+  setDrillCursor: (cursor: DrillCursor | null) => void
   markDirty: () => void
   markClean: () => void
   mutateScene: (patch: Partial<SceneJson>) => void
@@ -98,6 +105,7 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
   registry: null,
   componentSchemas: {},
   selectedPath: null,
+  drillCursor: null,
   dirty: false,
 
   setScene: (scene) => set({ scene }),
@@ -107,6 +115,7 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
       componentSchemas: { ...state.componentSchemas, [componentId]: schema },
     })),
   setSelectedPath: (path) => set({ selectedPath: path }),
+  setDrillCursor: (cursor) => set({ drillCursor: cursor }),
   markDirty: () => set({ dirty: true }),
   markClean: () => set({ dirty: false }),
 

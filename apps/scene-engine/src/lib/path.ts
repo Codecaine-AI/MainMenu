@@ -16,6 +16,11 @@ export function resolveObject(
   return current
 }
 
+export function isPathLocked(scene: SceneJson, path: string): boolean {
+  const obj = resolveObject(scene, path)
+  return obj?.locked === true
+}
+
 export function resolveObjectEl(
   scene: SceneJson,
   path: string,
