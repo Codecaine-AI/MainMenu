@@ -2,10 +2,10 @@ SHELL := /bin/bash
 
 FRONTEND_DIR ?= apps/scene-engine
 PIPELINE_DIR ?= apps/asset-extraction-pipeline
-FONT_STUDIO_WEB_DIR ?= apps/font-creation/font-studio/web
-FONT_STUDIO_RENDERER_DIR ?= apps/font-creation/font-studio/renderer
-FONT_STUDIO_PROJECT_DIR ?= apps/font-creation/font-studio/projects/melee
-FONT_STUDIO_PORT ?= 4177
+FONT_EFFECTS_WEB_DIR ?= apps/font-creation/font-effects/web
+FONT_EFFECTS_RENDERER_DIR ?= apps/font-creation/font-effects/renderer
+FONT_EFFECTS_OUTPUTS_DIR ?= apps/font-creation/font-effects/outputs
+FONT_EFFECTS_PORT ?= 4177
 RUNS_DIR ?= runs
 IMAGE ?= assets/Super-Smash-Bros-Melee07292023-112856-24048_thumb.jpg
 RUN_ID ?= first-pass
@@ -13,7 +13,7 @@ RUN_DIR ?= $(RUNS_DIR)/$(RUN_ID)
 MAX_WORKERS ?= 4
 
 .PHONY: help frontend dev build preview clean install \
-       font-studio-install font-studio-app font-studio-build font-studio-generate font-studio-generate-quick font-studio-bake \
+       font-effects-install font-effects-app font-effects-build font-effects-generate font-effects-generate-quick font-effects-bake \
        pipeline-help init dry-run run catalog extract extract-dry-run validate compile clean-runs
 
 help:
@@ -27,13 +27,13 @@ help:
 	@printf '%s\n' '  make install    Install npm dependencies'
 	@printf '%s\n' '  make clean      Delete dist/ and node_modules/'
 	@printf '%s\n' ''
-	@printf '%s\n' '── Font Studio (apps/font-creation/font-studio) ───────────────'
-	@printf '%s\n' '  make font-studio-install        Install Vite app dependencies'
-	@printf '%s\n' '  make font-studio-app            Start font studio app at http://localhost:$(FONT_STUDIO_PORT)'
-	@printf '%s\n' '  make font-studio-build          Build font studio app'
-	@printf '%s\n' '  make font-studio-generate       Regenerate ALL glyph SVGs from the recipe'
-	@printf '%s\n' '  make font-studio-generate-quick Regenerate dev subset (@,A,R,F,K,*) + word only'
-	@printf '%s\n' '  make font-studio-bake           Bake current word SVG to PNGs (requires dev server running)'
+	@printf '%s\n' '── Font Effects (apps/font-creation/font-effects) ─────────────'
+	@printf '%s\n' '  make font-effects-install        Install Vite app dependencies'
+	@printf '%s\n' '  make font-effects-app            Start font effects app at http://localhost:$(FONT_EFFECTS_PORT)'
+	@printf '%s\n' '  make font-effects-build          Build font effects app'
+	@printf '%s\n' '  make font-effects-generate       Regenerate ALL glyph SVGs from the recipe'
+	@printf '%s\n' '  make font-effects-generate-quick Regenerate dev subset (@,A,R,F,K,*) + word only'
+	@printf '%s\n' '  make font-effects-bake           Bake current word SVG to PNGs (requires dev server running)'
 	@printf '%s\n' ''
 	@printf '%s\n' '── Pipeline (apps/asset-extraction-pipeline) ──'
 	@printf '%s\n' '  make dry-run IMAGE=assets/source.jpg RUN_ID=test'
@@ -55,7 +55,7 @@ help:
 	@printf '%s\n' '  RUN_ID=$(RUN_ID)'
 	@printf '%s\n' '  RUN_DIR=$(RUN_DIR)'
 	@printf '%s\n' '  MAX_WORKERS=$(MAX_WORKERS)'
-	@printf '%s\n' '  FONT_STUDIO_PORT=$(FONT_STUDIO_PORT)'
+	@printf '%s\n' '  FONT_EFFECTS_PORT=$(FONT_EFFECTS_PORT)'
 
 # ── Frontend ────────────────────────────────────────────────
 install:
@@ -75,24 +75,24 @@ preview: build
 clean:
 	rm -rf $(FRONTEND_DIR)/dist $(FRONTEND_DIR)/node_modules
 
-# ── Font Studio ──────────────────────────────────────────────
-font-studio-install:
-	cd $(FONT_STUDIO_WEB_DIR) && npm install
+# ── Font Effects ─────────────────────────────────────────────
+font-effects-install:
+	cd $(FONT_EFFECTS_WEB_DIR) && npm install
 
-font-studio-app:
-	cd $(FONT_STUDIO_WEB_DIR) && FONT_STUDIO_APP_PORT=$(FONT_STUDIO_PORT) npm run dev
+font-effects-app:
+	cd $(FONT_EFFECTS_WEB_DIR) && FONT_EFFECTS_APP_PORT=$(FONT_EFFECTS_PORT) npm run dev
 
-font-studio-build:
-	cd $(FONT_STUDIO_WEB_DIR) && npm run build
+font-effects-build:
+	cd $(FONT_EFFECTS_WEB_DIR) && npm run build
 
-font-studio-generate:
-	cd $(FONT_STUDIO_RENDERER_DIR) && python3 -m scripts.render_recipe
+font-effects-generate:
+	cd $(FONT_EFFECTS_RENDERER_DIR) && python3 -m scripts.render_recipe
 
-font-studio-generate-quick:
-	cd $(FONT_STUDIO_RENDERER_DIR) && python3 -m scripts.render_recipe --glyphs dev
+font-effects-generate-quick:
+	cd $(FONT_EFFECTS_RENDERER_DIR) && python3 -m scripts.render_recipe --glyphs dev
 
-font-studio-bake:
-	cd $(FONT_STUDIO_WEB_DIR) && node scripts/bake-svg.mjs "$(CURDIR)/$(FONT_STUDIO_PROJECT_DIR)/outputs/generated/word/CODECAINE.css-layers.svg" $(FONT_STUDIO_PORT)
+font-effects-bake:
+	cd $(FONT_EFFECTS_WEB_DIR) && node scripts/bake-svg.mjs "$(CURDIR)/$(FONT_EFFECTS_OUTPUTS_DIR)/generated/melee-3/layer-recipe/word/CODECAINE.css-layers.svg" $(FONT_EFFECTS_PORT)
 
 # ── Pipeline ─────────────────────────────────────────────────
 pipeline-help:

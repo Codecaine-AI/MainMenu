@@ -1,0 +1,1 @@
+Remove the grid background energy field and all that stuff from this image. Leave everything else the same, i.e., the selection menu, the main menu, and then the kind of rotated cards on the right. 
