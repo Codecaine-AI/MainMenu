@@ -157,7 +157,7 @@ function orbitPoint(angle, options) {
   };
 }
 
-function drawFrame(ctx, width, height, properties, elapsed) {
+function drawFrame(ctx, width, height, properties, elapsed, layer = 'all') {
   const text = stringProp(properties, 'text', 'PRESS  START');
   const copies = Math.max(1, Math.round(numberProp(properties, 'copies', numberProp(properties, 'repeat', 2))));
   const speed = numberProp(properties, 'rotation-speed', 0.46);
@@ -174,6 +174,7 @@ function drawFrame(ctx, width, height, properties, elapsed) {
   const backMarkerWidth = Math.max(1, cellWidth - backMarkerMargin * 2);
   const backMarkerHeight = Math.max(1, cellHeight - backMarkerMargin * 2);
   const centerRadius = numberProp(properties, 'center-radius', 42);
+  const centerVisible = properties['center-visible'] !== false;
   const radiusX = numberProp(properties, 'orbit-radius-x', 164);
   const edgeScale = Math.max(0.01, Math.min(1, numberProp(properties, 'edge-scale', 0.3)));
   const angleSpacing = numberProp(properties, 'letter-angle-spacing', 10.5) * Math.PI / 180;
@@ -216,31 +217,40 @@ function drawFrame(ctx, width, height, properties, elapsed) {
     }
   }
 
-  for (const item of drawItems.filter((item) => item.point.faceDepth < 0).sort((a, b) => a.point.z - b.point.z)) {
-    drawBackMarker(ctx, item.point, {
-      width: backMarkerWidth,
-      height: backMarkerHeight,
-      color: markerColor,
-      alpha: 0.3 + Math.abs(item.point.faceDepth) * 0.34,
-      scale: item.point.perspective,
-      scaleX: item.point.faceScaleX,
-    });
+  const shouldDrawBack = layer === 'all' || layer === 'back';
+  const shouldDrawFront = layer === 'all' || layer === 'front';
+
+  if (shouldDrawBack) {
+    for (const item of drawItems.filter((item) => item.point.faceDepth < 0).sort((a, b) => a.point.z - b.point.z)) {
+      drawBackMarker(ctx, item.point, {
+        width: backMarkerWidth,
+        height: backMarkerHeight,
+        color: markerColor,
+        alpha: 0.3 + Math.abs(item.point.faceDepth) * 0.34,
+        scale: item.point.perspective,
+        scaleX: item.point.faceScaleX,
+      });
+    }
   }
 
-  drawCenter(ctx, centerPoint.x, centerPoint.y, centerRadius * centerPoint.perspective, properties);
+  if (shouldDrawFront) {
+    if (centerVisible && centerRadius > 0) {
+      drawCenter(ctx, centerPoint.x, centerPoint.y, centerRadius * centerPoint.perspective, properties);
+    }
 
-  for (const item of drawItems.filter((item) => item.point.faceDepth >= 0).sort((a, b) => a.point.z - b.point.z)) {
-    drawLetter(ctx, item.point, item.character, {
-      cellWidth,
-      cellHeight,
-      radius: numberProp(properties, 'letter-radius', numberProp(properties, 'panel-radius', 3)),
-      textColor,
-      panelColor,
-      shadowColor,
-      font,
-      scale: (0.74 + item.point.faceDepth * 0.26) * item.point.perspective,
-      scaleX: item.point.faceScaleX,
-    });
+    for (const item of drawItems.filter((item) => item.point.faceDepth >= 0).sort((a, b) => a.point.z - b.point.z)) {
+      drawLetter(ctx, item.point, item.character, {
+        cellWidth,
+        cellHeight,
+        radius: numberProp(properties, 'letter-radius', numberProp(properties, 'panel-radius', 3)),
+        textColor,
+        panelColor,
+        shadowColor,
+        font,
+        scale: (0.74 + item.point.faceDepth * 0.26) * item.point.perspective,
+        scaleX: item.point.faceScaleX,
+      });
+    }
   }
 
   ctx.restore();
@@ -251,13 +261,28 @@ export default function ({ properties = {}, layerId } = {}) {
   wrap.className = 'orbit-press-start';
   if (layerId) wrap.dataset.layerId = layerId;
 
-  const canvas = document.createElement('canvas');
-  canvas.setAttribute('aria-hidden', 'true');
-  wrap.appendChild(canvas);
+  const backCanvas = document.createElement('canvas');
+  backCanvas.className = 'orbit-press-start__canvas orbit-press-start__canvas--back';
+  backCanvas.setAttribute('aria-hidden', 'true');
 
-  const ctx = canvas.getContext('2d');
+  const frontCanvas = document.createElement('canvas');
+  frontCanvas.className = 'orbit-press-start__canvas orbit-press-start__canvas--front';
+  frontCanvas.setAttribute('aria-hidden', 'true');
+
+  wrap.append(backCanvas, frontCanvas);
+
+  const backCtx = backCanvas.getContext('2d');
+  const frontCtx = frontCanvas.getContext('2d');
   let raf = 0;
   let start = performance.now();
+
+  const sizeCanvas = (canvas, ctx, width, height, padding) => {
+    canvas.style.left = `${-padding}px`;
+    canvas.style.top = `${-padding}px`;
+    canvas.style.width = `${width}px`;
+    canvas.style.height = `${height}px`;
+    setupCanvas(canvas, ctx, width, height);
+  };
 
   const render = (now) => {
     if (!wrap.isConnected) {
@@ -272,12 +297,11 @@ export default function ({ properties = {}, layerId } = {}) {
     const padding = Math.max(0, numberProp(properties, 'viewport-padding', 180));
     const width = Math.max(1, baseWidth + padding * 2);
     const height = Math.max(1, baseHeight + padding * 2);
-    canvas.style.left = `${-padding}px`;
-    canvas.style.top = `${-padding}px`;
-    canvas.style.width = `${width}px`;
-    canvas.style.height = `${height}px`;
-    setupCanvas(canvas, ctx, width, height);
-    drawFrame(ctx, width, height, properties, (now - start) / 1000);
+    const elapsed = (now - start) / 1000;
+    sizeCanvas(backCanvas, backCtx, width, height, padding);
+    sizeCanvas(frontCanvas, frontCtx, width, height, padding);
+    drawFrame(backCtx, width, height, properties, elapsed, 'back');
+    drawFrame(frontCtx, width, height, properties, elapsed, 'front');
     raf = requestAnimationFrame(render);
   };
 
@@ -324,7 +348,8 @@ export const properties = {
           type: 'number',
           label: 'Font Size',
           description: 'Glyph height in pixels at the front of the orbit. Letters at the back of the orbit appear smaller after perspective scaling.',
-          min: 1,
+          min: 8,
+          max: 96,
           step: 1,
         },
       },
@@ -338,7 +363,8 @@ export const properties = {
           type: 'number',
           label: 'Rotation Speed',
           description: 'Angular velocity of the orbit in radians per second. Higher values spin the marquee faster; 0 freezes it.',
-          min: 0,
+          min: -3,
+          max: 3,
           step: 0.01,
         },
         direction: {
@@ -368,24 +394,32 @@ export const properties = {
           type: 'number',
           label: 'Tilt X',
           description: 'Pitch of the orbit ring in degrees. Positive values tip the front of the ring downward.',
+          min: -75,
+          max: 75,
           step: 0.5,
         },
         'tilt-y': {
           type: 'number',
           label: 'Tilt Y',
           description: 'Yaw of the orbit ring in degrees. Positive values rotate the ring around the vertical axis.',
+          min: -75,
+          max: 75,
           step: 0.5,
         },
         'tilt-z': {
           type: 'number',
           label: 'Tilt Z',
           description: 'Roll of the entire layer in degrees. Rotates the canvas around the layer center after the orbit is projected.',
+          min: -75,
+          max: 75,
           step: 0.5,
         },
         tilt: {
           type: 'number',
           label: 'Tilt (legacy)',
           description: 'Legacy fallback for `tilt-z`. Older scenes set this single key to control roll; new scenes should use `tilt-z` directly.',
+          min: -75,
+          max: 75,
           step: 0.5,
         },
       },
@@ -398,32 +432,42 @@ export const properties = {
         'position-x': {
           type: 'number',
           label: 'Position X',
-          description: 'Horizontal offset of the orbit center in pixels, relative to the layer center.',
-          step: 1,
+          description: 'Fine horizontal offset of the orbit center in pixels, relative to the layer center.',
+          min: -100,
+          max: 100,
+          step: 0.25,
         },
         'position-y': {
           type: 'number',
           label: 'Position Y',
-          description: 'Vertical offset of the orbit center in pixels, relative to the layer center.',
-          step: 1,
+          description: 'Fine vertical offset of the orbit center in pixels, relative to the layer center.',
+          min: -100,
+          max: 100,
+          step: 0.25,
         },
         'position-z': {
           type: 'number',
           label: 'Position Z',
           description: 'Depth offset of the orbit center, in the same units as the camera distance. Negative values push the orbit away from the camera; positive values pull it closer.',
+          min: -800,
+          max: 800,
           step: 1,
         },
         'offset-x': {
           type: 'number',
           label: 'Offset X (legacy)',
           description: 'Legacy fallback for `position-x`. Older scenes set this key to translate the orbit horizontally; new scenes should use `position-x`.',
-          step: 1,
+          min: -100,
+          max: 100,
+          step: 0.25,
         },
         'offset-y': {
           type: 'number',
           label: 'Offset Y (legacy)',
           description: 'Legacy fallback for `position-y`. Older scenes set this key to translate the orbit vertically; new scenes should use `position-y`.',
-          step: 1,
+          min: -100,
+          max: 100,
+          step: 0.25,
         },
       },
     },
@@ -437,13 +481,15 @@ export const properties = {
           label: 'Copies',
           description: 'How many evenly-spaced copies of the text travel around the orbit. 1 puts a single string on the ring; higher values stagger duplicates around it.',
           min: 1,
+          max: 4,
           step: 1,
         },
         'orbit-radius-x': {
           type: 'number',
           label: 'Orbit Radius',
           description: 'Horizontal radius of the orbit in pixels, measured before perspective is applied.',
-          min: 0,
+          min: 20,
+          max: 500,
           step: 1,
         },
         'letter-angle-spacing': {
@@ -467,6 +513,7 @@ export const properties = {
           label: 'Repeat (legacy)',
           description: 'Legacy fallback for `copies`. Older scenes set this key to control how many copies of the text orbit; new scenes should use `copies`.',
           min: 1,
+          max: 4,
           step: 1,
         },
       },
@@ -480,14 +527,16 @@ export const properties = {
           type: 'number',
           label: 'Cell Width',
           description: 'Width of each letter panel in pixels, measured at the front of the orbit.',
-          min: 1,
+          min: 8,
+          max: 120,
           step: 1,
         },
         'letter-cell-height': {
           type: 'number',
           label: 'Cell Height',
           description: 'Height of each letter panel in pixels, measured at the front of the orbit.',
-          min: 1,
+          min: 8,
+          max: 120,
           step: 1,
         },
         'letter-radius': {
@@ -495,13 +544,15 @@ export const properties = {
           label: 'Cell Corner Radius',
           description: 'Corner radius of each letter panel in pixels. 0 gives sharp rectangles.',
           min: 0,
+          max: 60,
           step: 0.5,
         },
         'panel-height': {
           type: 'number',
           label: 'Panel Height (legacy)',
           description: 'Legacy fallback for `letter-cell-height`. Older scenes set this key to size the panel; new scenes should use `letter-cell-height`.',
-          min: 1,
+          min: 8,
+          max: 120,
           step: 1,
         },
         'panel-radius': {
@@ -509,6 +560,7 @@ export const properties = {
           label: 'Panel Radius (legacy)',
           description: 'Legacy fallback for `letter-radius`. Older scenes set this key to round panel corners; new scenes should use `letter-radius`.',
           min: 0,
+          max: 60,
           step: 0.5,
         },
       },
@@ -523,10 +575,11 @@ export const properties = {
           label: 'Back Marker Margin',
           description: 'Inset in pixels applied to each back marker, shrinking it relative to the letter cell. Higher values produce smaller, more recessed markers.',
           min: 0,
+          max: 40,
           step: 0.5,
         },
         'back-marker-color': {
-          type: 'string',
+          type: 'color',
           label: 'Back Marker Color',
           description: 'Fill color of the rounded markers shown on the back half of the orbit. CSS color string.',
         },
@@ -542,20 +595,26 @@ export const properties = {
           label: 'Hub Radius',
           description: 'Radius of the central hub in pixels, measured before perspective is applied.',
           min: 0,
+          max: 160,
           step: 1,
         },
+        'center-visible': {
+          type: 'boolean',
+          label: 'Show Hub',
+          description: 'Draw the radial center hub. Disable this when another component is used as the press target.',
+        },
         'center-fill': {
-          type: 'string',
+          type: 'color',
           label: 'Hub Fill',
           description: 'Mid-stop color of the hub radial gradient. Sets the dominant body color of the disc. CSS color string.',
         },
         'center-rim': {
-          type: 'string',
+          type: 'color',
           label: 'Hub Rim',
           description: 'Stroke color drawn around the outside of the hub. CSS color string.',
         },
         'center-highlight': {
-          type: 'string',
+          type: 'color',
           label: 'Hub Highlight',
           description: 'Inner-stop color of the hub radial gradient — typically a translucent white that creates the specular sheen near the upper-left.',
         },
@@ -567,17 +626,17 @@ export const properties = {
       description: 'Per-letter colors — the glyph fill, the panel background behind the glyph, and the glow shadow under the glyph.',
       properties: {
         'text-color': {
-          type: 'string',
+          type: 'color',
           label: 'Text Color',
           description: 'Glyph fill color. CSS color string.',
         },
         'panel-color': {
-          type: 'string',
+          type: 'color',
           label: 'Panel Color',
           description: 'Background color of the rounded letter panel sitting behind each glyph. CSS color string.',
         },
         'glow-color': {
-          type: 'string',
+          type: 'color',
           label: 'Glow Color',
           description: 'Shadow color used for the soft glow under each glyph. CSS color string (typically a translucent variant of the text color).',
         },
@@ -592,7 +651,8 @@ export const properties = {
           type: 'number',
           label: 'Camera Distance',
           description: 'Distance from the camera to the orbit center, in the same units as `position-z`. Larger values flatten the perspective; smaller values exaggerate it.',
-          min: 1,
+          min: 100,
+          max: 3000,
           step: 10,
         },
         'viewport-padding': {
@@ -600,6 +660,7 @@ export const properties = {
           label: 'Viewport Padding',
           description: 'Extra pixels of canvas added on every side of the layer bounds. Increase if letters get clipped at the edges of the layer.',
           min: 0,
+          max: 600,
           step: 10,
         },
       },

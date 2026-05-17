@@ -7,6 +7,20 @@
   },
   "objects": [
     {
+      "id": "main-menu-background",
+      "name": "Main Menu Background",
+      "type": "video",
+      "asset": "main-menu-bg-purple",
+      "transform": {
+        "mode": "fill"
+      },
+      "appearance": {
+        "fit": "cover",
+        "blend": "normal",
+        "opacity": 1
+      }
+    },
+    {
       "id": "menu-title",
       "name": "Menu Title",
       "type": "text",

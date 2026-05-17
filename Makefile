@@ -2,6 +2,7 @@ SHELL := /bin/bash
 
 FRONTEND_DIR ?= apps/scene-engine
 PIPELINE_DIR ?= apps/asset-extraction-pipeline
+PIPELINE_UI_PORT ?= 3010
 FONT_EFFECTS_WEB_DIR ?= apps/font-creation/font-effects/web
 FONT_EFFECTS_RENDERER_DIR ?= apps/font-creation/font-effects/renderer
 FONT_EFFECTS_OUTPUTS_DIR ?= apps/font-creation/font-effects/outputs
@@ -14,7 +15,7 @@ MAX_WORKERS ?= 4
 
 .PHONY: help frontend dev build preview clean install \
        font-effects-install font-effects-app font-effects-build font-effects-generate font-effects-generate-quick font-effects-bake \
-       pipeline-help init dry-run run catalog extract extract-dry-run validate compile clean-runs
+       pipeline-ui pipeline-ui-install pipeline-help init dry-run run catalog extract extract-dry-run validate compile clean-runs
 
 help:
 	@printf '%s\n' 'MELEE commands'
@@ -36,6 +37,8 @@ help:
 	@printf '%s\n' '  make font-effects-bake           Bake current word SVG to PNGs (requires dev server running)'
 	@printf '%s\n' ''
 	@printf '%s\n' '── Pipeline (apps/asset-extraction-pipeline) ──'
+	@printf '%s\n' '  make pipeline-ui                  Start extraction workspace UI'
+	@printf '%s\n' '  make pipeline-ui-install          Install extraction workspace UI dependencies'
 	@printf '%s\n' '  make dry-run IMAGE=assets/source.jpg RUN_ID=test'
 	@printf '%s\n' '  make run OPENAI_API_KEY=... ANTHROPIC_API_KEY=...'
 	@printf '%s\n' ''
@@ -55,6 +58,7 @@ help:
 	@printf '%s\n' '  RUN_ID=$(RUN_ID)'
 	@printf '%s\n' '  RUN_DIR=$(RUN_DIR)'
 	@printf '%s\n' '  MAX_WORKERS=$(MAX_WORKERS)'
+	@printf '%s\n' '  PIPELINE_UI_PORT=$(PIPELINE_UI_PORT)'
 	@printf '%s\n' '  FONT_EFFECTS_PORT=$(FONT_EFFECTS_PORT)'
 
 # ── Frontend ────────────────────────────────────────────────
@@ -95,6 +99,12 @@ font-effects-bake:
 	cd $(FONT_EFFECTS_WEB_DIR) && node scripts/bake-svg.mjs "$(CURDIR)/$(FONT_EFFECTS_OUTPUTS_DIR)/generated/melee-3/layer-recipe/word/CODECAINE.css-layers.svg" $(FONT_EFFECTS_PORT)
 
 # ── Pipeline ─────────────────────────────────────────────────
+pipeline-ui-install:
+	cd $(PIPELINE_DIR) && npm install
+
+pipeline-ui:
+	cd $(PIPELINE_DIR) && npm run dev -- --port $(PIPELINE_UI_PORT)
+
 pipeline-help:
 	@cd $(PIPELINE_DIR) && uv run extract-assets --help
 

@@ -224,45 +224,14 @@
     },
     {
       "id": "press-start",
-      "type": "component",
-      "asset": "orbit-press-start",
+      "name": "Start Control",
+      "type": "group",
       "transform": {
         "x": "center",
-        "y": 74,
+        "y": 71,
         "width": 46,
         "height": 16,
         "anchor": "center"
-      },
-      "properties": {
-        "text": "PRESS START",
-        "copies": 2,
-        "rotation-speed": -0.61,
-        "direction": 1,
-        "phase": 8,
-        "tilt-x": -5,
-        "tilt-y": 0,
-        "tilt-z": 0,
-        "position-x": 0,
-        "position-y": -30,
-        "position-z": 31,
-        "camera-distance": 750,
-        "viewport-padding": 180,
-        "font-size": 33,
-        "font-weight": "900",
-        "letter-angle-spacing": 11.5,
-        "letter-cell-width": 30,
-        "letter-cell-height": 52,
-        "orbit-radius-x": 169,
-        "orbit-radius-y": 0,
-        "copy-spacing": 0,
-        "center-radius": 30,
-        "back-marker-margin": 10.5,
-        "text-color": "#EFD42F",
-        "panel-color": "#000D10",
-        "center-fill": "#7b7d7c",
-        "center-rim": "#181917",
-        "back-marker-color": "#404040",
-        "glow-color": "rgba(255, 212, 42, 0.78)"
       },
       "events": [
         {
@@ -276,7 +245,81 @@
           "target": "start-cue"
         }
       ],
-      "name": "Start Button"
+      "children": [
+        {
+          "id": "press-start-keycap",
+          "name": "Pressable Keycap",
+          "type": "component",
+          "asset": "codecaine-keycap-start",
+          "transform": {
+            "mode": "fill",
+            "scale": 0.75
+          },
+          "properties": {
+            "label": "Press Start",
+            "aria-label": "Press start",
+            "image-src": "/assets/image/codecaine-start-keycap.png",
+            "normal-src": "/assets/image/codecaine-start-keycap-normal.png",
+            "key-width": 36,
+            "hover-press": 0.58,
+            "active-press": 1,
+            "press-depth": 18,
+            "press-glow-color": "#d7281f",
+            "press-glow-size": 54,
+            "press-glow-blur": 26,
+            "press-glow-opacity": 0.78,
+            "press-glow-y": 16,
+            "float-amount": 5,
+            "float-speed": 3.9,
+            "idle-tilt": 4
+          }
+        },
+        {
+          "id": "press-start-orbit-text",
+          "name": "Orbiting Press Start Text",
+          "type": "component",
+          "asset": "orbit-press-start",
+          "transform": {
+            "mode": "fill"
+          },
+          "properties": {
+            "text": "PRESS START",
+            "font-family": "FolkPro, Orbitron, sans-serif",
+            "font-weight": "900",
+            "font-size": 33,
+            "copies": 2,
+            "rotation-speed": -0.61,
+            "direction": 1,
+            "phase": 8,
+            "tilt-x": -7.5,
+            "tilt-y": 0,
+            "tilt-z": 0,
+            "position-x": 0,
+            "position-y": 53.75,
+            "position-z": 31,
+            "camera-distance": 750,
+            "viewport-padding": 180,
+            "letter-angle-spacing": 11.5,
+            "letter-cell-width": 30,
+            "letter-cell-height": 52,
+            "orbit-radius-x": 169,
+            "orbit-radius-y": 0,
+            "copy-spacing": 0,
+            "center-radius": 30,
+            "center-visible": false,
+            "back-marker-margin": 10.5,
+            "text-color": "#EFD42F",
+            "panel-color": "#000D10",
+            "center-fill": "#7b7d7c",
+            "center-rim": "#181917",
+            "back-marker-color": "#404040",
+            "glow-color": "rgba(255, 212, 42, 0.78)"
+          },
+          "appearance": {
+            "hue": 0
+          }
+        }
+      ]
     },
     {
       "id": "smash-style-letterbox",
@@ -292,9 +335,9 @@
       },
       "properties": {
         "top-height": 8,
-        "bottom-height": 16.5,
+        "bottom-height": 10.5,
         "top-curve": 13.5,
-        "bottom-curve": 77,
+        "bottom-curve": 83,
         "contour": 25,
         "color": "#000000",
         "opacity": 1,

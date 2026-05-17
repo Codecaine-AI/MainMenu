@@ -12,4 +12,13 @@
   display: block;
   max-width: none;
   max-height: none;
+  pointer-events: none;
+}
+
+.orbit-press-start__canvas--back {
+  z-index: 1;
+}
+
+.orbit-press-start__canvas--front {
+  z-index: 3;
 }

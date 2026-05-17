@@ -1,11 +1,31 @@
 {
   "bg-video": {
     "type": "video",
-    "file": "/assets/video/test-fire-2.mp4"
+    "file": "/assets/video/test-fire-3.mp4"
   },
   "in-text-fire": {
     "type": "video",
     "file": "/assets/video/test-fire.mp4"
+  },
+  "main-menu-bg-blue": {
+    "type": "video",
+    "file": "/assets/video/main-menu-backgrounds/blue.webm"
+  },
+  "main-menu-bg-green": {
+    "type": "video",
+    "file": "/assets/video/main-menu-backgrounds/green.webm"
+  },
+  "main-menu-bg-purple": {
+    "type": "video",
+    "file": "/assets/video/main-menu-backgrounds/purple.webm"
+  },
+  "main-menu-bg-red": {
+    "type": "video",
+    "file": "/assets/video/main-menu-backgrounds/red.webm"
+  },
+  "main-menu-bg-yellow": {
+    "type": "video",
+    "file": "/assets/video/main-menu-backgrounds/yellow.webm"
   },
   "codecaine-logo": {
     "type": "glyph",

@@ -11,8 +11,8 @@
     "tilt-x": { "type": "number", "default": 0, "min": -75, "max": 75, "step": 1 },
     "tilt-y": { "type": "number", "default": 0, "min": -75, "max": 75, "step": 1 },
     "tilt-z": { "type": "number", "default": -8, "min": -75, "max": 75, "step": 1 },
-    "position-x": { "type": "number", "default": 0, "min": -500, "max": 500, "step": 1 },
-    "position-y": { "type": "number", "default": 0, "min": -500, "max": 500, "step": 1 },
+    "position-x": { "type": "number", "default": 0, "min": -100, "max": 100, "step": 0.25 },
+    "position-y": { "type": "number", "default": 0, "min": -100, "max": 100, "step": 0.25 },
     "position-z": { "type": "number", "default": 0, "min": -800, "max": 800, "step": 1 },
     "camera-distance": { "type": "number", "default": 900, "min": 100, "max": 3000, "step": 10 },
     "viewport-padding": { "type": "number", "default": 180, "min": 0, "max": 600, "step": 1 },
@@ -25,9 +25,13 @@
     "orbit-radius-x": { "type": "number", "default": 164, "min": 20, "max": 500, "step": 1 },
     "copy-spacing": { "type": "number", "default": 0, "min": -120, "max": 120, "step": 1 },
     "center-radius": { "type": "number", "default": 42, "min": 0, "max": 160, "step": 1 },
+    "center-visible": { "type": "boolean", "default": true },
     "text-color": { "type": "color", "default": "#ffd52d" },
     "panel-color": { "type": "color", "default": "#090908" },
     "center-fill": { "type": "color", "default": "#7c7d7a" },
-    "back-marker-color": { "type": "color", "default": "#737476" }
+    "center-rim": { "type": "color", "default": "#1a1a18" },
+    "center-highlight": { "type": "color", "default": "#ffffff" },
+    "back-marker-color": { "type": "color", "default": "#737476" },
+    "glow-color": { "type": "color", "default": "#ffd52d" }
   }
 }
