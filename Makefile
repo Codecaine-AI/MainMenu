@@ -20,12 +20,12 @@ help:
 	@printf '%s\n' 'MELEE commands'
 	@printf '%s\n' ''
 	@printf '%s\n' '── Frontend (apps/scene-engine) ──────────────'
-	@printf '%s\n' '  make frontend   Start Vite dev server (hot reload)'
-	@printf '%s\n' '  make dev        Start Vite dev server (hot reload)'
-	@printf '%s\n' '  make build      Production build → apps/scene-engine/dist/'
-	@printf '%s\n' '  make preview    Serve the built dist/ locally'
+	@printf '%s\n' '  make frontend   Start Next.js dev server (hot reload)'
+	@printf '%s\n' '  make dev        Start Next.js dev server (hot reload)'
+	@printf '%s\n' '  make build      Production build → apps/scene-engine/.next/'
+	@printf '%s\n' '  make preview    Build and serve the Next.js app locally'
 	@printf '%s\n' '  make install    Install npm dependencies'
-	@printf '%s\n' '  make clean      Delete dist/ and node_modules/'
+	@printf '%s\n' '  make clean      Delete .next, dist, and node_modules/'
 	@printf '%s\n' ''
 	@printf '%s\n' '── Font Effects (apps/font-creation/font-effects) ─────────────'
 	@printf '%s\n' '  make font-effects-install        Install Vite app dependencies'
@@ -70,10 +70,10 @@ build:
 	cd $(FRONTEND_DIR) && npm run build
 
 preview: build
-	cd $(FRONTEND_DIR) && npm run preview
+	cd $(FRONTEND_DIR) && npm run start
 
 clean:
-	rm -rf $(FRONTEND_DIR)/dist $(FRONTEND_DIR)/node_modules
+	rm -rf $(FRONTEND_DIR)/.next $(FRONTEND_DIR)/dist $(FRONTEND_DIR)/node_modules
 
 # ── Font Effects ─────────────────────────────────────────────
 font-effects-install:

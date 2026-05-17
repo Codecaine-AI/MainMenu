@@ -1,12 +1,34 @@
 'use client'
 
-import { useEffect, useRef, useCallback } from 'react'
-import { useParams } from 'next/navigation'
+import { Suspense, useEffect, useRef, useCallback } from 'react'
+import { useParams, useRouter, useSearchParams } from 'next/navigation'
 
-export default function ScenePage() {
+function SceneContent() {
   const params = useParams<{ id: string }>()
+  const searchParams = useSearchParams()
+  const projectId = searchParams.get('project')
+  const returnTo = searchParams.get('returnTo')
+  const router = useRouter()
   const stageRef = useRef<HTMLDivElement>(null)
   const wrapRef = useRef<HTMLDivElement>(null)
+  const projectQuery = projectId ? `?project=${encodeURIComponent(projectId)}` : ''
+  const safeReturnTo = returnTo?.startsWith('/') && !returnTo.startsWith('//') ? returnTo : null
+  const sceneParams = new URLSearchParams()
+  if (projectId) sceneParams.set('project', projectId)
+  if (safeReturnTo) sceneParams.set('returnTo', safeReturnTo)
+  const sceneQuery = sceneParams.toString() ? `?${sceneParams.toString()}` : ''
+
+  const exitPreview = useCallback(() => {
+    if (safeReturnTo) {
+      router.push(safeReturnTo)
+      return
+    }
+    if (projectId) {
+      router.push(`/projects/${encodeURIComponent(projectId)}`)
+      return
+    }
+    router.push('/')
+  }, [projectId, safeReturnTo, router])
 
   useEffect(() => {
     let cancelled = false
@@ -16,16 +38,28 @@ export default function ScenePage() {
         import('@/renderer/asset-registry'),
       ])
       await loadRegistry()
-      const res = await fetch(`/api/scenes/${params.id}`)
+      const res = await fetch(`/api/scenes/${params.id}${projectQuery}`)
       if (!res.ok) return
       const scene = await res.json()
       if (!cancelled && stageRef.current) {
-        await renderScene(scene, stageRef.current)
+        await renderScene(scene, stageRef.current, {
+          runtime: {
+            navigate: (sceneId: string) => router.push(`/scenes/${sceneId}${sceneQuery}`),
+          },
+        })
       }
     }
     run().catch(console.error)
     return () => { cancelled = true }
-  }, [params.id])
+  }, [params.id, projectQuery, router, sceneQuery])
+
+  useEffect(() => {
+    function handleKeyDown(event: KeyboardEvent) {
+      if (event.key === 'Escape') exitPreview()
+    }
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [exitPreview])
 
   const fitStage = useCallback(() => {
     if (!wrapRef.current || !stageRef.current) return
@@ -45,8 +79,16 @@ export default function ScenePage() {
   return (
     <div
       ref={wrapRef}
-      className="fixed inset-0 bg-black grid place-items-center overflow-hidden"
+      className="fixed inset-0 bg-[#050505] grid place-items-center overflow-hidden"
     >
+      <button
+        type="button"
+        onClick={exitPreview}
+        className="fixed left-4 top-4 z-20 rounded-sm border border-white/15 bg-[#151515]/85 px-3 py-1.5 text-xs font-medium text-gray-200 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] backdrop-blur-md transition hover:bg-[#202020]/90 active:translate-y-px"
+        aria-label="Exit preview"
+      >
+        Exit Preview
+      </button>
       <div
         ref={stageRef}
         style={{
@@ -59,5 +101,13 @@ export default function ScenePage() {
         }}
       />
     </div>
+  )
+}
+
+export default function ScenePage() {
+  return (
+    <Suspense fallback={<div className="fixed inset-0 bg-black" />}>
+      <SceneContent />
+    </Suspense>
   )
 }

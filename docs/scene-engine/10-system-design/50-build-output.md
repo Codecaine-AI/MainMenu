@@ -5,7 +5,7 @@ concepts: [export, standalone-bundle, zip, project-export, no-build, path-rewrit
 
 # Export Pipeline
 
-The scene-engine exports a **fully bundled standalone copy** of the project: a zip the user downloads, unzips, and opens — `index.html` works directly from the filesystem or any static host. There is no compilation step, no framework runtime in the output, no dependency on the Next.js dev server. The zip contains the same renderer code, scene JSON, and assets that the editor uses, with paths rewritten to be relative.
+The scene-engine exports a **fully bundled standalone copy** of the project: a zip the user downloads, unzips, and opens — `index.html` works directly from the filesystem or any static host. There is no compilation step, no framework runtime in the output, no dependency on the Next.js dev server. The zip contains static pages, the same renderer code, scene JSON, and assets that the editor uses, with runtime paths resolved from the bundle root.
 
 ---
 
@@ -21,7 +21,7 @@ Trade-offs:
 
 ## Trigger and Endpoint
 
-`POST /api/export` is a Next route that returns `application/zip` with `Content-Disposition: attachment; filename="<project-id>.zip"`. The toolbar's Export button calls it, reads the blob, and triggers a browser download.
+`POST /api/export?project=<project-id>` is a Next route that returns `application/zip` with `Content-Disposition: attachment; filename="<project-id>.zip"`. The editor's scene controls call it with the active project, read the blob, and trigger a browser download.
 
 There is no streaming or progress reporting; the project is small enough that synchronous zip generation is fine.
 
@@ -29,11 +29,13 @@ There is no streaming or progress reporting; the project is small enough that sy
 
 ```
 <project-id>.zip
-├── index.html               minimal boot page (stage element + boot script)
+├── index.html               entry scene page
 ├── boot.js                  loads project.json, mounts renderer, exposes navigate()
 ├── project.json             copied as-is
+├── <scene-id>/index.html    one static page per scene, including the entry scene
+├── <scene-id>/scene.css     optional per-scene page CSS if scenes/<id>/page.css or scene.css exists
 ├── scenes/<id>/scene.json   one per scene listed in project.scenes
-├── renderer/                copied from src/renderer/, paths rewritten
+├── renderer/                copied from app/_engine/renderer/, paths rewritten
 │   ├── scene-renderer.js
 │   ├── asset-registry.js
 │   ├── positioning.js
@@ -53,18 +55,19 @@ There is no streaming or progress reporting; the project is small enough that sy
 
 ## How the Bundle Is Assembled
 
-1. **Read `project.json`** via `loadProject()`. If it's missing, fail with HTTP 400 — exports are project-scoped.
+1. **Read `projects/<project-id>/project.json`** via `loadProject(projectId)`. If it's missing, fail with HTTP 400 — exports are project-scoped.
 2. **Add `project.json`** to the zip as-is.
 3. **For each scene in `project.scenes`**: add `scenes/<id>/scene.json` from disk.
-4. **Copy `src/renderer/` into `renderer/`**: every file is read as text and absolute paths (`/assets/...`, `/modules/...`, `/fonts/...`) are rewritten to relative (`./assets/...`, etc.) so the bundle works without a server origin.
-5. **Add `index.html` and `boot.js`** from `src/export/`. These are the entry that boots the bundle.
-6. **Walk the assets registry**:
+4. **Copy `app/_engine/renderer/` into `renderer/`**: every file is read as text and absolute paths (`/assets/...`, `/modules/...`, `/fonts/...`) are rewritten to relative (`./assets/...`, etc.) so the bundle works without a server origin.
+5. **Generate static pages**: root `index.html` boots `project.entry`, and `<scene-id>/index.html` boots each listed scene. If `scenes/<id>/page.css` or `scenes/<id>/scene.css` exists, it is copied beside that page as `scene.css`.
+6. **Add `boot.js`** from `app/_engine/export/`. This is the shared runtime for every generated page.
+7. **Walk the assets registry**:
    - Rewrite leading-slash paths in `registry.json` to `./` form.
    - For each entry's `file` path: copy that file into the zip preserving its directory (`assets/<type>/<file>`).
    - For audio entries: copy the entire containing directory once (audio bundles often include sidecar JS or sprite metadata).
-7. **Walk the modules registry**: same idea, but copy the entire module directory (CSS/JS/manifest live together).
-8. **Copy `public/fonts/`** wholesale.
-9. **Generate** the zip buffer and stream it as the response body.
+8. **Walk the modules registry**: same idea, but copy the entire module directory (CSS/JS/manifest live together).
+9. **Copy `public/fonts/`** wholesale.
+10. **Generate** the zip buffer and stream it as the response body.
 
 The deduplication sets (`copiedAssetDirs`, `copiedModuleDirs`) avoid copying the same directory twice when multiple registry entries point into it.
 
@@ -77,20 +80,21 @@ Two rewrite passes at export time:
 - **Renderer code (text)**: simple regex `/(["'(])\/(assets|modules|fonts)\//g` → `$1./$2/`. The token-prefix capture (`"`, `'`, `(`) avoids touching things that aren't path-like (e.g. the `/` in a regex literal).
 - **Registry JSON**: parse, map every entry's `file` and `path` field from `/...` to `./...`, re-stringify with stable formatting.
 
-Once relative, `boot.js` (which uses `fetch('./project.json')`, etc.) and the renderer (which fetches assets/modules from registry paths) work from any base URL — file system, S3, GitHub Pages.
+Once relative, `boot.js` sets `window.MELEE_BUNDLE_ROOT` from `import.meta.url`, and renderer fetches resolve against that root. This matters because nested pages like `menu/index.html` must still load `assets/`, `modules/`, `fonts/`, and `scenes/` from the bundle root rather than from `menu/`.
 
 ## The Boot Page
 
-`src/export/index.html` is a minimal page with a stage container, FolkPro `@font-face` declarations, and a single `<script type="module" src="./boot.js">`.
+Each generated page is minimal: a stage container, FolkPro `@font-face` declarations with the correct relative prefix, optional `scene.css`, and a single boot script. Root `index.html` points to `./boot.js`; nested scene pages point to `../boot.js`.
 
-`src/export/boot.js`:
+`app/_engine/export/boot.js`:
 
-1. Fetches `./project.json`.
-2. Loads the merged asset/module registry.
-3. Defines `showScene(sceneId)` that fetches `./scenes/<id>/scene.json` and calls `renderScene(scene, stage)`.
-4. Exposes `window.MELEE_navigate(sceneId)` so click events with `action: "navigate"` can switch scenes without a router.
-5. Fits the stage to the viewport via uniform scale (preserves the 1440×1080 aspect).
-6. Boots the entry scene (`project.entry`).
+1. Sets the bundle root from `import.meta.url`.
+2. Fetches `project.json` from the bundle root.
+3. Loads the merged asset/module registry.
+4. Defines `showScene(sceneId)` that fetches `scenes/<id>/scene.json` and calls `renderScene(scene, stage)`.
+5. Exposes `window.MELEE_navigate(sceneId)` so click events with `action: "navigate"` move to `<scene-id>/index.html` in page-mode exports.
+6. Fits the stage to the viewport via uniform scale (preserves the 1440×1080 aspect).
+7. Boots `window.MELEE_INITIAL_SCENE`, falling back to `project.entry`.
 
 ## What's Excluded From the Bundle
 
@@ -112,7 +116,8 @@ No build step, no server, no dependencies.
 
 | Condition                                  | Response                                   |
 |--------------------------------------------|--------------------------------------------|
-| `project.json` missing                     | 400 `{ error: "project.json not found" }`. |
+| `project.json` missing for selected project | 400 `{ error: "project.json not found" }`. |
+| `project.entry` not listed in `project.scenes` | 400 with a manifest consistency error. |
 | Asset file referenced in registry but missing on disk | 500 with the underlying file-system error. |
 | Any other read/zip failure                 | 500 with `{ error: <message> }`.           |
 

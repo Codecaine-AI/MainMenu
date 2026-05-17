@@ -1,12 +1,12 @@
 ---
-covers: src/store/editor-store.ts — the Zustand store, object paths, mutations, and the deep-merge patching algorithm.
+covers: app/_engine/store/editor-store.ts — the Zustand store, object paths, mutations, and the deep-merge patching algorithm.
 concepts: [zustand-store, mutation, object-path, deep-merge, structured-clone, dirty]
 design_refs: [10-system-design/40-authoring-surfaces.md]
 ---
 
 # Editor State
 
-`apps/scene-engine/src/store/editor-store.ts` holds the editor's reactive state. It uses Zustand for subscription/selection, but the mutation algorithms — pathed navigation, structuredClone, deep-merge — would look the same in any store framework.
+`apps/scene-engine/app/_engine/store/editor-store.ts` holds the editor's reactive state. It uses Zustand for subscription/selection, but the mutation algorithms — pathed navigation, structuredClone, deep-merge — would look the same in any store framework.
 
 There is **one** store per page; selectors are component-local.
 
@@ -36,7 +36,7 @@ interface EditorStore {
 | `scene`        | `setScene` (loader, mutations)       | Canvas, Hierarchy, Inspector                     |
 | `registry`     | `setRegistry` (loader)               | Inspector (manifest, container swap), Hierarchy   |
 | `selectedPath` | `setSelectedPath` (hierarchy / canvas) | Inspector (which object), highlight overlay      |
-| `dirty`        | `markDirty` / `markClean`            | Toolbar (save button enabled, dirty indicator)   |
+| `dirty`        | `markDirty` / `markClean`            | SceneSection (save button enabled, dirty indicator) |
 
 ## Object Paths
 
@@ -108,13 +108,13 @@ Asset-swap: updates the registry entry's `file` pointer (in memory and via `asse
 
 ## What This File Does Not Do
 
-- Network I/O — the loader (`useSceneLoader`) and toolbar handle that.
+- Network I/O — the loader (`useSceneLoader`) and scene controls handle that.
 - DOM rendering — components handle that.
 - Validation — patches are trusted; malformed scenes are caught by the renderer's failure modes.
 - Undo / redo — not yet implemented.
 
 ## Source
 
-- `apps/scene-engine/src/store/editor-store.ts`
-- `apps/scene-engine/src/lib/path.ts` — `resolveObject` for read-side path lookups.
-- `apps/scene-engine/src/lib/patch.ts` — `patchFromDottedKey` helper.
+- `apps/scene-engine/app/_engine/store/editor-store.ts`
+- `apps/scene-engine/app/_engine/lib/path.ts` — `resolveObject` for read-side path lookups.
+- `apps/scene-engine/app/_engine/lib/patch.ts` — `patchFromDottedKey` helper.

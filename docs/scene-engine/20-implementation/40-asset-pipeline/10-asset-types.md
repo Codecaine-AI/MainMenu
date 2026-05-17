@@ -1,12 +1,12 @@
 ---
-covers: src/lib/asset-types.ts — the shared type list, allowlists, mime inference, slugifier, and the validation gate used by both the upload UI and the upload API route.
+covers: app/_engine/lib/asset-types.ts — the shared type list, allowlists, mime inference, slugifier, and the validation gate used by both the upload UI and the upload API route.
 concepts: [asset-type, mime, extension, slug, validate-upload]
 design_refs: [10-system-design/60-asset-uploads.md]
 ---
 
 # Asset Types Library
 
-`apps/scene-engine/src/lib/asset-types.ts` is the single source of truth for what counts as an asset, what file shapes are allowed for each type, and how a filename becomes a container ID. Importing it from both the client and the server keeps the upload form and the upload route in agreement without duplicating tables.
+`apps/scene-engine/app/_engine/lib/asset-types.ts` is the single source of truth for what counts as an asset, what file shapes are allowed for each type, and how a filename becomes a container ID. Importing it from both the client and the server keeps the upload form and the upload route in agreement without duplicating tables.
 
 ---
 
@@ -66,4 +66,4 @@ The split between client and server in Next.js makes it tempting to duplicate sm
 
 ## Source
 
-- `apps/scene-engine/src/lib/asset-types.ts`
+- `apps/scene-engine/app/_engine/lib/asset-types.ts`

@@ -5,20 +5,19 @@ concepts: [authoring, editor, agent, dual-surface, dirty-tracking, save, inspect
 
 # Authoring Surfaces
 
-Two surfaces author scenes: a **visual editor** in the browser and an **AI agent** writing files (or PUTting to the dev-server API). They are symmetric — neither is the source of truth, the `scene.json` file is. The contract between them is simple: edit the file, the other side picks up the change on its next load.
+Two surfaces author scenes: a **visual editor** in the browser and an **AI agent** writing files (or PUTting to the Next API routes). They are symmetric — neither is the source of truth, the `scene.json` file is. The contract between them is simple: edit the file, the other side picks up the change on its next load.
 
 ---
 
 ## Visual Editor (Human Surface)
 
-Four-panel layout in the browser:
+Three-panel layout in the browser:
 
 | Panel         | Role                                                                                |
 |---------------|-------------------------------------------------------------------------------------|
-| Toolbar       | Save, Export (zip), dirty indicator, scene name.                                    |
+| Hierarchy     | Scene globals, Save, Export, dirty indicator, scene metadata, object tree, drag-and-drop reorder, drag-into-group, and add-layer dialog. |
 | Canvas        | Live preview of the scene rendered by the same code path as production.             |
-| Hierarchy     | Tree of objects with collapsible groups, drag-and-drop reorder, drag-into-group. Add-object menu seeded with sensible defaults per type. |
-| Inspector     | Property editor for the selected object. Always renders Transform and Appearance; conditionally renders Properties (manifest-driven), Events, Slots, Asset swap. |
+| Inspector     | Property editor for the selected object. Always renders Transform and Appearance; conditionally renders Properties (manifest-driven), Events, Slots, Text, Asset swap. |
 
 State is held in a Zustand store with three pieces:
 
@@ -44,21 +43,21 @@ The "always-present" rule is the key change from older revisions: Transform and 
 
 ### Dirty Tracking and Save
 
-Edits set the dirty flag. The toolbar shows a dirty indicator. Save writes the current scene back to disk via the dev-server API (`PUT /api/scenes/<id>`). The post-save state is "clean" until the next mutation.
+Edits set the dirty flag. `SceneSection` shows a dirty indicator in the hierarchy panel. Save writes the current scene back to disk via the Next API route (`PUT /api/scenes/<id>?project=<project-id>`). The post-save state is "clean" until the next mutation.
 
 The dirty flag is **not persisted** — refreshing the editor discards any unsaved edits. This is the agreed semantic; it forces deliberate save and keeps the file as the source of truth.
 
 ### Export
 
-The toolbar's Export button is a separate one-shot action: `POST /api/export` returns a zip of the entire project (renderer + scenes + assets + modules + fonts + boot files). See [build output](50-build-output.md). Export is independent of save; the export reads what's on disk, not the in-memory scene.
+The hierarchy panel's Export button is a separate one-shot action: `POST /api/export?project=<project-id>` returns a zip of the selected project (renderer + scenes + assets + modules + fonts + boot files). See [build output](50-build-output.md). Export is independent of save; the export reads what's on disk, not the in-memory scene.
 
 ## Agent / File Surface
 
 The agent reads and writes the same `scene.json` directly:
 
-- **Read**: open `apps/scene-engine/scenes/{id}/scene.json`, or `GET` the file from the dev server.
+- **Read**: open `apps/scene-engine/projects/{project-id}/scenes/{id}/scene.json`, or `GET` the file from the Next dev server.
 - **Write (file)**: edit the file in place.
-- **Write (API)**: `PUT /api/scenes/{id}` with the full scene JSON as the body. The dev server validates the ID (kebab-case), parses the body, and writes it with stable 2-space formatting plus a trailing newline.
+- **Write (API)**: `PUT /api/scenes/{id}?project={project-id}` with the full scene JSON as the body. The dev server validates the ID (kebab-case), parses the body, and writes it with stable 2-space formatting plus a trailing newline.
 
 The agent does **not** subscribe to live updates. It edits, the human reloads the editor (or the page) to see the change. Symmetrically, after the human saves, the agent re-reads the file on its next pass.
 

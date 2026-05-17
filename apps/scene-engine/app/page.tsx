@@ -1,15 +1,14 @@
 import Link from 'next/link'
-import { discoverScenes, loadProject } from '@/lib/scenes'
+import { discoverProjects } from '@/lib/scenes'
 
 export default function DashboardPage() {
-  const project = loadProject()
-  const scenes = discoverScenes()
+  const projects = discoverProjects()
 
   return (
     <div className="min-h-screen bg-[#111] p-8">
       <div className="flex items-center justify-between mb-6 max-w-xl">
         <h1 className="text-lg font-semibold text-gray-300 tracking-wide">
-          {project?.name ?? 'Scene Engine'}
+          Scene Engine
         </h1>
         <Link
           href="/upload"
@@ -18,40 +17,34 @@ export default function DashboardPage() {
           Upload Asset
         </Link>
       </div>
-      {scenes.length === 0 ? (
+      {projects.length === 0 ? (
         <p className="text-gray-500 text-sm">
-          No scenes found. Create a scene under <code className="text-gray-400">scenes/</code> and register it in <code className="text-gray-400">project.json</code>.
+          No projects found. Create a project under <code className="text-gray-400">projects/&lt;id&gt;/project.json</code>.
         </p>
       ) : (
         <div className="grid gap-3 max-w-xl">
-          {scenes.map((scene) => (
+          {projects.map((project) => (
             <div
-              key={scene.id}
+              key={project.id}
               className="bg-[#1a1a1a] border border-[#2a2a2a] rounded px-4 py-3 flex items-center justify-between"
             >
               <div>
-                <p className="text-gray-300 text-sm font-medium">{scene.name}</p>
+                <p className="text-gray-300 text-sm font-medium">{project.name}</p>
                 <p className="text-gray-600 text-xs font-mono mt-0.5">
-                  {scene.id} &middot; {scene.objectCount} object{scene.objectCount !== 1 ? 's' : ''}
+                  {project.id} &middot; {project.sceneCount} scene{project.sceneCount !== 1 ? 's' : ''}
                 </p>
               </div>
               <div className="flex gap-2 items-center">
-                {scene.isEntry && (
+                {project.isLegacyRoot && (
                   <span className="bg-[#173247] border border-[#2a6da3] text-[#cfe6ff] rounded-sm px-2 py-0.5 text-[10px] tracking-wider uppercase">
-                    Entry
+                    Legacy
                   </span>
                 )}
                 <Link
-                  href={`/scenes/${scene.id}`}
+                  href={`/projects/${project.id}`}
                   className="text-xs px-2.5 py-1 rounded-sm bg-[#222] border border-[#333] text-gray-300 hover:bg-[#2a2a2a] no-underline"
                 >
-                  Preview
-                </Link>
-                <Link
-                  href={`/editor?scene=${scene.id}`}
-                  className="text-xs px-2.5 py-1 rounded-sm bg-[#173247] border border-[#2a6da3] text-[#cfe6ff] hover:bg-[#1d3d54] no-underline"
-                >
-                  Edit
+                  Open
                 </Link>
               </div>
             </div>

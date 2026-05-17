@@ -93,12 +93,12 @@ When the asset registry merges `public/modules/registry.json`, each module entry
 
 ## Source
 
-- `apps/scene-engine/src/renderer/asset-renderers/index.js`
-- `apps/scene-engine/src/renderer/asset-renderers/media.js`
-- `apps/scene-engine/src/renderer/asset-renderers/css-effect.js`
-- `apps/scene-engine/src/renderer/asset-renderers/glyph-group.js`
-- `apps/scene-engine/src/renderer/asset-renderers/component.js`
-- `apps/scene-engine/src/renderer/asset-renderers/audio.js`
-- `apps/scene-engine/src/renderer/asset-renderers/text.js`
-- `apps/scene-engine/src/renderer/asset-renderers/group.js`
-- `apps/scene-engine/src/renderer/asset-renderers/stylesheet.js`
+- `apps/scene-engine/app/_engine/renderer/asset-renderers/index.js`
+- `apps/scene-engine/app/_engine/renderer/asset-renderers/media.js`
+- `apps/scene-engine/app/_engine/renderer/asset-renderers/css-effect.js`
+- `apps/scene-engine/app/_engine/renderer/asset-renderers/glyph-group.js`
+- `apps/scene-engine/app/_engine/renderer/asset-renderers/component.js`
+- `apps/scene-engine/app/_engine/renderer/asset-renderers/audio.js`
+- `apps/scene-engine/app/_engine/renderer/asset-renderers/text.js`
+- `apps/scene-engine/app/_engine/renderer/asset-renderers/group.js`
+- `apps/scene-engine/app/_engine/renderer/asset-renderers/stylesheet.js`

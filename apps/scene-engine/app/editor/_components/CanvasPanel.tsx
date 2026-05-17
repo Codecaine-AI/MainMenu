@@ -4,13 +4,12 @@ import { useEffect, useRef, useCallback, useState, type CSSProperties } from 're
 import { useEditorStore } from '@/store/editor-store'
 import { pickScenePathAt } from '@/lib/hit-test'
 import { isPathLocked } from '@/lib/path'
-import { createObjectFromAsset } from '@/lib/create-scene-object'
 import useCanvasDrag from './canvas/useCanvasDrag'
 import useCanvasResize from './canvas/useCanvasResize'
 import useSelectionBox from './canvas/useSelectionBox'
 import useCanvasKeyboardNudge from './canvas/useCanvasKeyboardNudge'
 import SelectionOverlay from './canvas/SelectionOverlay'
-import type { SceneJson, Registry } from '@/types/scene'
+import type { SceneJson } from '@/types/scene'
 
 const STAGE_W = 1440
 const STAGE_H = 1080
@@ -35,7 +34,6 @@ export function CanvasPanel() {
   const scene = useEditorStore((s) => s.scene)
   const selectedPath = useEditorStore((s) => s.selectedPath)
   const registry = useEditorStore((s) => s.registry)
-  const addObjectAt = useEditorStore((s) => s.addObjectAt)
   const setSelectedPath = useEditorStore((s) => s.setSelectedPath)
   const drillCursor = useEditorStore((s) => s.drillCursor)
   const setDrillCursor = useEditorStore((s) => s.setDrillCursor)
@@ -43,7 +41,6 @@ export function CanvasPanel() {
   const panelRef = useRef<HTMLDivElement>(null)
   const frameRef = useRef<HTMLDivElement>(null)
   const [frame, setFrame] = useState<FrameMetrics | null>(null)
-  const [isDropTarget, setIsDropTarget] = useState(false)
   const { onMouseDown: handleStageMouseDown, suppressNextClickRef } = useCanvasDrag({ stageRef })
   const { onHandleMouseDown, suppressNextClickRef: resizeSuppressRef } = useCanvasResize({ stageRef })
   const selectionBox = useSelectionBox({ stageRef, frameRef, scene: scene as SceneJson | null, selectedPath })
@@ -54,7 +51,7 @@ export function CanvasPanel() {
     let cancelled = false
     import('@/renderer/scene-renderer').then(({ renderScene }) => {
       if (!cancelled && stageRef.current) {
-        renderScene(scene, stageRef.current)
+        renderScene(scene, stageRef.current, { events: false })
       }
     })
     return () => { cancelled = true }
@@ -115,42 +112,6 @@ export function CanvasPanel() {
     [setSelectedPath, setDrillCursor, drillCursor, selectedPath, suppressNextClickRef, resizeSuppressRef, scene],
   )
 
-  const handleDragOver = useCallback((e: React.DragEvent) => {
-    if (!e.dataTransfer.types.includes('application/x-asset-id')) return
-    e.preventDefault()
-    e.dataTransfer.dropEffect = 'copy'
-    setIsDropTarget(true)
-  }, [])
-
-  const handleDragLeave = useCallback((e: React.DragEvent) => {
-    const panel = panelRef.current
-    if (!panel) return
-    if (e.target === panel || !panel.contains(e.relatedTarget as Node)) {
-      setIsDropTarget(false)
-    }
-  }, [])
-
-  const handleDrop = useCallback(
-    (e: React.DragEvent) => {
-      setIsDropTarget(false)
-      const assetId = e.dataTransfer.getData('application/x-asset-id') || e.dataTransfer.getData('text/plain')
-      if (!assetId || !scene || !registry) return
-      const entry = (registry as Registry)[assetId]
-      if (!entry) return
-      e.preventDefault()
-      const stage = stageRef.current
-      if (!stage) return
-      const rect = stage.getBoundingClientRect()
-      const scaleX = rect.width === 0 ? 1 : rect.width / STAGE_W
-      const scaleY = rect.height === 0 ? 1 : rect.height / STAGE_H
-      const x = Math.max(0, Math.min(STAGE_W, Math.round((e.clientX - rect.left) / scaleX)))
-      const y = Math.max(0, Math.min(STAGE_H, Math.round((e.clientY - rect.top) / scaleY)))
-      const newLayer = createObjectFromAsset(assetId, entry, scene as SceneJson, { x, y })
-      addObjectAt('', scene.objects?.length ?? 0, newLayer)
-    },
-    [scene, registry, addObjectAt],
-  )
-
   const frameStyle: CSSProperties = frame
     ? {
         width: frame.width,
@@ -167,11 +128,8 @@ export function CanvasPanel() {
   return (
     <section
       ref={panelRef}
-      className={`bg-black relative overflow-hidden grid place-items-center ${isDropTarget ? 'after:content-[""] after:absolute after:inset-1 after:border-2 after:border-dashed after:border-[#ffd84d] after:pointer-events-none after:rounded' : ''}`}
+      className="bg-black relative overflow-hidden grid place-items-center"
       style={{ gridArea: 'canvas' }}
-      onDragOver={handleDragOver}
-      onDragLeave={handleDragLeave}
-      onDrop={handleDrop}
     >
       <div className="editor-stage-frame" ref={frameRef} style={frameStyle}>
         <div

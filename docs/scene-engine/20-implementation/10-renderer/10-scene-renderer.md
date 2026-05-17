@@ -1,12 +1,12 @@
 ---
-covers: The render loop in src/renderer/scene-renderer.js — mount, update reconciliation, transform/appearance application, recursive children.
+covers: The render loop in app/_engine/renderer/scene-renderer.js — mount, update reconciliation, transform/appearance application, recursive children.
 concepts: [scene-renderer, mount, update, reconciliation, transform, appearance]
 design_refs: [10-system-design/30-rendering-pipeline.md]
 ---
 
 # Scene Renderer
 
-`apps/scene-engine/src/renderer/scene-renderer.js` is the imperative entry point that turns a `SceneJson` into populated DOM. It exposes one function — `renderScene(scene, root)` — and is shared between the editor (called on every store change) and the standalone export (called once at boot, plus on scene navigation).
+`apps/scene-engine/app/_engine/renderer/scene-renderer.js` is the imperative entry point that turns a `SceneJson` into populated DOM. It exposes one function — `renderScene(scene, root, options?)` — and is shared between the editor (called on every store change), scene preview pages, and the standalone export.
 
 The renderer is plain JS modules with no framework. The Next.js editor wraps it via `useEffect` + `useRef`; the export bundle calls it from `boot.js`.
 
@@ -16,14 +16,20 @@ The renderer is plain JS modules with no framework. The Next.js editor wraps it 
 
 ```js
 import { renderScene } from './renderer/scene-renderer.js'
-await renderScene(scene, document.getElementById('stage'))
+await renderScene(scene, document.getElementById('stage'), {
+  runtime: {
+    navigate: (sceneId) => window.MELEE_navigate(sceneId),
+  },
+})
 ```
 
 Idempotent: calling it twice with the same scene reconciles instead of re-mounting. Calling it with a different scene reuses any objects whose `id` matches.
 
+`options.events === false` disables event binding. The editor uses this so canvas clicks select layers instead of following scene navigation events.
+
 ## The Loop
 
-`renderScene(scene, root)`:
+`renderScene(scene, root, options?)`:
 
 1. `await loadRegistry()` — populates the asset/module registry caches (idempotent).
 2. Set the stage size: `root.style.width = stage.width + 'px'`, same for height.
@@ -38,7 +44,7 @@ Idempotent: calling it twice with the same scene reconciles instead of re-mounti
 2. `obj.visible === false` → return `null` (object is not mounted at all on first render).
 3. `await getRenderer(obj.type)(obj, entry)` — type dispatch produces the wrapper.
 4. Tag with `wrapper.dataset.layerId = obj.id` and append to `parent`.
-5. `applyObjectStyles(wrapper, obj, entry)` — sets visibility, transform, appearance, media src and (for glyph-groups) updates slot-related child handling.
+5. `applyObjectStyles(wrapper, obj, entry, options)` — sets visibility, transform, appearance, media src, event bindings, and (for glyph-groups) updates slot-related child handling.
 6. If `obj.type !== 'glyph-group'` and `obj.children` is non-empty: ensure the wrapper has `position`, recurse `mountObject` for each child, then `reorderChildren`.
 
 Glyph-groups handle their slots inside their renderer (see [asset renderers](30-asset-renderers.md)), so the scene-renderer doesn't recurse into them.
@@ -52,6 +58,19 @@ Universal post-mount styling:
 - `applyAppearance(el, obj.appearance, { isMedia, mediaEl })` — for media types, the inner `<video>` / `<img>` is found via `findMediaEl` so `object-fit` lands on the right element.
 - For media: if `entry.file` doesn't match the existing media `src`, swap it. This is how registry container swaps propagate without re-mounting the wrapper.
 - `obj.type === 'glyph-group'` → `updateGlyphGroup(el, obj)` (legacy named-override / foreign-child handling for compatibility with older glyph-group children; new authoring uses [slots](30-asset-renderers.md#glyph-group)).
+- `bindObjectEvents(el, obj, options)` wires `click`, `hover`, and `load` events when events are enabled. Non-interactive wrappers get `pointer-events: none` in preview/export mode so click targets are not blocked by visual overlays.
+
+## Event Runtime
+
+`event-runtime.js` is renderer-level, not type-specific. Any object type can carry `events[]`; the binder maps triggers to DOM listeners and dispatches actions:
+
+| Action       | Behavior |
+|--------------|----------|
+| `navigate`   | Calls `options.runtime.navigate(target)` when provided, otherwise falls back to `window.MELEE_navigate(target)`. |
+| `play-audio` | Calls `options.runtime.playAudio(target)` when provided, otherwise resolves the audio asset and plays it through the audio renderer. |
+| `autoplay`   | Same audio path as `play-audio`, using `target` or the current layer's asset. |
+
+For a single trigger, non-navigation actions run before navigation. This lets a button play a cue and then navigate even if the JSON lists `navigate` first.
 
 ## `updateChildren(parentEl, childArray)`
 
@@ -102,12 +121,14 @@ Untagged children (anything without `dataset.layerId`) are left in place — cur
 
 - Does **not** import the renderer dispatch table — that comes via `getRenderer` from `asset-renderers/index.js`.
 - Does **not** load assets — the registry layer does (`asset-registry.js`).
-- Does **not** handle interactivity — `events` wiring lives in the per-type renderers and the export `boot.js`.
+- Does **not** implement project routing — it only dispatches `navigate` through the runtime callback or `window.MELEE_navigate`.
 - Does **not** implement save / dirty / selection — those are editor concerns ([editor state](../20-editor/10-state.md)).
 
 ## Source
 
-- `apps/scene-engine/src/renderer/scene-renderer.js` — the loop.
-- `apps/scene-engine/src/renderer/positioning.js` — `applyTransform`, `applyAppearance`.
-- `apps/scene-engine/src/renderer/asset-registry.js` — see [20-asset-registry.md](20-asset-registry.md).
-- `apps/scene-engine/src/renderer/asset-renderers/` — see [30-asset-renderers.md](30-asset-renderers.md).
+- `apps/scene-engine/app/_engine/renderer/scene-renderer.js` — the loop.
+- `apps/scene-engine/app/_engine/renderer/positioning.js` — `applyTransform`, `applyAppearance`.
+- `apps/scene-engine/app/_engine/renderer/asset-registry.js` — see [20-asset-registry.md](20-asset-registry.md).
+- `apps/scene-engine/app/_engine/renderer/event-runtime.js` — trigger/action binding.
+- `apps/scene-engine/app/_engine/renderer/runtime-url.js` — bundle-root URL resolution for nested static pages.
+- `apps/scene-engine/app/_engine/renderer/asset-renderers/` — see [30-asset-renderers.md](30-asset-renderers.md).

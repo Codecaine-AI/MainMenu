@@ -44,7 +44,7 @@ Z-order is array position. Last entry renders on top.
 The same scene data is edited by **two authoring surfaces**:
 
 1. **Visual editor (human)** — Canvas-based UI with drag-and-drop, layer hierarchy, property inspector, save button.
-2. **Agent / file API (AI)** — Claude Code reads and writes `scene.json` directly, or PUTs to the dev-server API. Heavy lifting tasks (figuring out layer ordering, normal maps, chrome tuning) belong here.
+2. **Agent / file API (AI)** — Claude Code reads and writes `scene.json` directly, or PUTs to the Next API route. Heavy lifting tasks (figuring out layer ordering, normal maps, chrome tuning) belong here.
 
 Neither surface is privileged. The pattern was proven at the glyph level by the font app's `layer-recipe.json`; the scene-engine generalizes it to whole-page compositions.
 

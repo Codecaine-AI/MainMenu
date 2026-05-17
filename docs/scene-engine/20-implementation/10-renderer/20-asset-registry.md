@@ -6,7 +6,7 @@ design_refs: [10-system-design/20-asset-registry.md, 10-system-design/60-asset-u
 
 # Asset Registry (Implementation)
 
-`apps/scene-engine/src/renderer/asset-registry.js` loads both `/assets/registry.json` and `/modules/registry.json` once, merges them into a single module-level map, and answers ID lookups synchronously after that. It deliberately does not throw on misses — see the rationale in [System Design / Rendering Pipeline / Failure Modes](../../10-system-design/30-rendering-pipeline.md#failure-modes).
+`apps/scene-engine/app/_engine/renderer/asset-registry.js` loads both `/assets/registry.json` and `/modules/registry.json` once, merges them into a single module-level map, and answers ID lookups synchronously after that. It deliberately does not throw on misses — see the rationale in [System Design / Rendering Pipeline / Failure Modes](../../10-system-design/30-rendering-pipeline.md#failure-modes).
 
 ---
 
@@ -16,7 +16,7 @@ design_refs: [10-system-design/20-asset-registry.md, 10-system-design/60-asset-u
 |-------------------------|-----------------------------------------------------------------------------------------------------------|
 | `loadRegistry()`        | Async. Fetches `/assets/registry.json` and `/modules/registry.json` in parallel, merges into one map, caches it module-wide. Idempotent — second call returns the cached map. Concurrent calls share one in-flight promise. |
 | `resolveAsset(id)`      | Sync. Returns the merged entry for `id`, or `null` (with warning) if `loadRegistry` hasn't completed or the ID is unknown. |
-| `getRegistry()`         | Sync. Returns the full merged map, or `null` if not loaded. Used by the editor's asset browser.           |
+| `getRegistry()`         | Sync. Returns the full merged map, or `null` if not loaded. Used by the editor's add-layer dialog and inspector. |
 | `updateEntry(id, partial)` | Sync. Shallow-merges `partial` into the entry for `id` in the in-memory map. Returns the new entry, or `null` if `id` doesn't exist. Used by the inspector swap dropdown to mirror server-side registry edits without reloading. |
 
 ## Merge Semantics
@@ -57,4 +57,4 @@ Without step 2, the next render would still draw the old file because the cache 
 
 ## Source
 
-- `apps/scene-engine/src/renderer/asset-registry.js`
+- `apps/scene-engine/app/_engine/renderer/asset-registry.js`

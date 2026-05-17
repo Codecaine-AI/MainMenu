@@ -16,9 +16,11 @@ The design rationale and failure semantics are in [System Design / Rendering Pip
 ## File Tree
 
 ```
-apps/scene-engine/src/renderer/
+apps/scene-engine/app/_engine/renderer/
 ├── scene-renderer.js               top-level loop: mount + update reconciliation
 ├── asset-registry.js               registry load/merge/lookup with caching
+├── event-runtime.js                trigger/action event binding
+├── runtime-url.js                  bundle-root URL resolution
 ├── positioning.js                  applyTransform, applyAppearance helpers
 └── asset-renderers/
     ├── index.js                    register/getRenderer; type → fn map

@@ -9,6 +9,7 @@ import { SceneSection } from './SceneSection'
 import { AddLayerDialog } from './AddLayerDialog'
 
 interface Props {
+  projectId: string | null
   sceneId: string
 }
 
@@ -37,7 +38,7 @@ function regionToToPath(targetPath: string, region: string, scene: SceneJson): s
   return parts.join('.children.')
 }
 
-export function HierarchyPanel({ sceneId }: Props) {
+export function HierarchyPanel({ projectId, sceneId }: Props) {
   const scene = useEditorStore((s) => s.scene)
   const registry = useEditorStore((s) => s.registry) as Registry | null
   const selectedPath = useEditorStore((s) => s.selectedPath)
@@ -138,7 +139,7 @@ export function HierarchyPanel({ sceneId }: Props) {
 
   if (!scene) {
     return (
-      <section className="bg-[#1a1a1a] overflow-auto p-2" style={{ gridArea: 'hierarchy' }}>
+      <section className="bg-[#1a1a1a] overflow-auto p-2 pt-12" style={{ gridArea: 'hierarchy' }}>
         <h3 className="text-[13px] uppercase tracking-wide text-gray-100 font-bold mb-2">Globals</h3>
         <p className="text-gray-600 text-xs italic mb-3">Loading...</p>
         <h3 className="text-[13px] uppercase tracking-wide text-gray-100 font-bold mb-2">Hierarchy</h3>
@@ -148,8 +149,8 @@ export function HierarchyPanel({ sceneId }: Props) {
   }
 
   return (
-    <section className="bg-[#1a1a1a] overflow-auto p-2" style={{ gridArea: 'hierarchy' }}>
-      <SceneSection sceneId={sceneId} />
+    <section className="bg-[#1a1a1a] overflow-auto p-2 pt-12" style={{ gridArea: 'hierarchy' }}>
+      <SceneSection projectId={projectId} sceneId={sceneId} />
       <div className="mb-2 flex items-center justify-between gap-2">
         <h3 className="m-0 text-[13px] uppercase tracking-wide text-gray-100 font-bold">Hierarchy</h3>
         <button

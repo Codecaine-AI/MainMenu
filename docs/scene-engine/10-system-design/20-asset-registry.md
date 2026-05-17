@@ -22,7 +22,7 @@ The split is conceptual, not just organizational. An **asset** is an external fi
 
 The test: *would it make sense to drag this onto an upload page?* If yes, it's an asset.
 
-This split shapes everything downstream. The upload UI, the asset browser, and the inspector swap dropdown are all scoped to assets only — modules are invisible to those surfaces.
+This split shapes everything downstream. The upload UI and inspector swap dropdown are scoped to file assets; the add-layer dialog uses the merged registry so it can add both file assets and authored modules.
 
 ## The Container Model
 
@@ -75,7 +75,7 @@ If scenes embedded paths directly:
 - Renaming or moving an asset would require rewriting every scene that uses it.
 - A file swap would mean editing every consuming scene by hand.
 - The registry would not exist, so there would be no inventory of "what's available."
-- The editor would have no way to enumerate assets for the asset browser.
+- The editor would have no way to enumerate available assets and modules for the add-layer dialog.
 - Type information would have to be repeated in every layer entry.
 
 Indirection turns the registry into the single inventory and the single point where file pointers can change.

@@ -48,18 +48,17 @@ apps/scene-engine/
       page.tsx               /upload — standalone asset upload form
 
     editor/
-      page.tsx               Editor shell (4-panel grid, useSceneLoader)
+      page.tsx               Editor shell (3-panel grid, useSceneLoader)
       _components/
         CanvasPanel.tsx      Stage renderer + drag-drop target
         HierarchyPanel.tsx   Layer tree (collapsible, drag reorder)
         HierarchyRow.tsx     Recursive tree row
         InspectorPanel.tsx   Property editor for selected layer
-        SubLayerForm.tsx     Named SVG sub-layer properties
-        MediaChildForm.tsx   Foreign media child properties (blend, fit, repeat)
         LayerForm.tsx        Generic top-level layer properties (mounts AssetSwapDropdown)
         AssetSwapDropdown.tsx  Per-container file swap menu (asset types only)
-        EditorToolbar.tsx    Save/Reload + dirty indicator
-        AssetBrowserPanel.tsx  Browse asset registry by type, drag onto canvas
+        SceneSection.tsx     Scene metadata, save, and export controls
+        SlotsSection.tsx     Slot property editing
+        TextSection.tsx      Text-specific property editing
         inputs/
           RangedInput.tsx    Slider + number synced, debounced commit
           BlendSelect.tsx    Blend mode dropdown
@@ -73,7 +72,7 @@ apps/scene-engine/
       assets/[type]/route.ts GET — list files in /assets/{type}/ (powers swap dropdown)
       registry/[id]/route.ts PATCH — update a container's file pointer
 
-  src/
+    _engine/                 Private non-route implementation code (@/* alias)
     store/
       editor-store.ts       Zustand store (scene, registry, selectedPath, mutations)
     hooks/
@@ -98,6 +97,9 @@ apps/scene-engine/
         component.js        Data-driven JS components
         audio.js            Web Audio assets
         stylesheet.js       Shared stylesheet loader
+    export/
+      index.html            Standalone exported bundle shell
+      boot.js               Standalone exported bundle boot script
 ```
 
 ## Scene data format
@@ -157,7 +159,8 @@ Layers reference container IDs only; swapping the file in a container updates ev
 
 ## Architecture notes
 
-- **Imperative renderer**: The `src/renderer/` code is vanilla JS, unchanged from the Vite era. React wraps it via `useEffect` + `useRef` — it's a black box that owns the stage DOM.
+- **Private engine code**: Shared implementation lives in `app/_engine/`, a private App Router folder targeted by the `@/*` TypeScript alias.
+- **Imperative renderer**: The `app/_engine/renderer/` code is vanilla JS. React wraps it via `useEffect` + `useRef` — it's a black box that owns the stage DOM.
 - **Zustand store** replaces the old `state.js` EventTarget pub/sub. Same shape and mutation algorithms, wrapped in `create()`.
 - **Inspector focus guard**: `InspectorPanel` subscribes only to `selectedPath`, not `scene`, so property edits via sliders don't re-render the form. `key={selectedPath}` resets forms on selection change.
 - **SSR safety**: All renderer imports happen inside `useEffect` (browser-only). `'use client'` directives on all components that touch DOM APIs.
@@ -165,7 +168,7 @@ Layers reference container IDs only; swapping the file in a container updates ev
 
 ## Conventions
 
-- React components in `app/`, shared logic in `src/`.
+- React components in `app/`, shared logic in `app/_engine/`.
 - Tailwind for styling; minimal custom CSS in `globals.css` for grid layout and font-face.
 - Asset renderer interface: each `asset-renderers/*.js` exports a `render(layer, registryEntry)` function returning a DOM element.
 - Scene IDs must match `^[a-z0-9]+(?:-[a-z0-9]+)*$`.
@@ -174,4 +177,3 @@ Layers reference container IDs only; swapping the file in a container updates ev
 ### Foreign media children + sectioned inspector
 
 Foreign media children — `{ type: "video" | "image", asset, properties: { ... } }` nested under a glyph-group's `children` — render through `LayerForm` identically to top-level media layers and pick up the shared `video`/`image` built-in schema, so sectioning + clickable-label descriptions apply automatically. Named SVG sub-layer overrides (`{ layer: "data-layer-id", visible, properties? }`) skip the Transform / Appearance / Asset chrome and fall through to the schema/General render path with orphan warnings for any unknown keys.
-

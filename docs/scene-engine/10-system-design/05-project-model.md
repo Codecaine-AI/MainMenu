@@ -13,18 +13,20 @@ A **project** is a collection of scenes (pages) that ship together as one site. 
 
 ```
 apps/scene-engine/
-├── project.json              ← project manifest
-├── scenes/
-│   ├── title/scene.json
-│   ├── menu/scene.json
-│   └── credits/scene.json
+├── projects/
+│   └── codecaine/
+│       ├── project.json      ← project manifest
+│       └── scenes/
+│           ├── title/scene.json
+│           ├── menu/scene.json
+│           └── credits/scene.json
 └── public/
     ├── assets/               ← shared across all scenes (audio, image, video, glyph)
     ├── modules/              ← shared modules (effects, components)
     └── fonts/
 ```
 
-A project owns all its scenes and shares all assets across them. Scenes don't have private asset directories.
+A project owns all its scenes. Assets/modules/fonts remain app-level shared libraries for now, so scenes don't have private asset directories.
 
 ## project.json
 
@@ -63,17 +65,18 @@ The manifest stays minimal so projects don't accumulate global config that some 
 
 Two modes:
 
-1. **Project-driven (preferred)**: if `project.json` exists, the dashboard and the export iterate `project.scenes` in declaration order. The `entry` scene is flagged.
-2. **Filesystem-driven (fallback)**: if there is no `project.json`, every directory under `scenes/` containing a `scene.json` is listed. No scene is marked as entry.
+1. **Project folder-driven (preferred)**: the dashboard scans `projects/<project-id>/project.json`, then the project page and export iterate that manifest's `scenes` in declaration order. The `entry` scene is flagged.
+2. **Legacy root fallback**: if an older root-level `project.json` exists, it is still discoverable so local work can migrate without a hard cutover.
+3. **Filesystem-driven fallback inside a resolved project**: if there is no manifest, every directory under that project's `scenes/` containing a `scene.json` can be listed. No scene is marked as entry.
 
-`src/lib/scenes.ts` exposes `loadProject()` and `discoverScenes()` for both the dashboard server component and the export route.
+`app/_engine/lib/scenes.ts` exposes `discoverProjects()`, `loadProject(projectId)`, `projectRoot(projectId)`, and `discoverScenes(projectId)` for the dashboard, project page, scene APIs, and export route.
 
 ## Navigation Between Scenes
 
-Inside a scene, an event with `action: "navigate"` and `target: "<scene-id>"` switches the current page to another scene in the project. In the export bundle, the renderer registers `window.MELEE_navigate(sceneId)` and the click handler calls it. There is no client-side router; the bundle keeps a single stage element and re-renders into it when the active scene changes.
+Inside a scene, an event with `action: "navigate"` and `target: "<scene-id>"` navigates to another scene in the project. In the export bundle, the renderer registers `window.MELEE_navigate(sceneId)` and the click handler calls it. Page-mode exports perform real static-page navigation to `<scene-id>/index.html`; runtime scene re-rendering remains available as a fallback for single-page previews.
 
-The dev environment (Next.js editor + previews) works the same way conceptually, but routing also goes through normal Next routes (`/scenes/[id]`) so each scene has a stable URL during authoring.
+The dev environment works the same way conceptually, but routing carries the active project in the query string: `/scenes/<scene-id>?project=<project-id>` for preview and `/editor?project=<project-id>&scene=<scene-id>` for editing. The editor still views one scene at a time and disables runtime events so clicks select layers instead of navigating.
 
 ## Export Surface
 
-The [export pipeline](50-build-output.md) reads `project.json` directly to decide which scenes go into the standalone bundle. Scenes not listed in `project.scenes` are excluded from the export even if they exist on disk. This makes `project.json` the authoritative inventory of what ships.
+The [export pipeline](50-build-output.md) reads `projects/<project-id>/project.json` directly to decide which scenes go into the standalone bundle. Scenes not listed in `project.scenes` are excluded from the export even if they exist on disk. This makes the selected project's `project.json` the authoritative inventory of what ships.

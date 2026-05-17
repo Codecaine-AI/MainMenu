@@ -8,10 +8,11 @@ import { RangedInput } from './inputs/RangedInput'
 import { InspectorSection, FieldRow } from './inputs/InspectorSection'
 
 interface Props {
+  projectId: string | null
   sceneId: string
 }
 
-export function SceneSection({ sceneId }: Props) {
+export function SceneSection({ projectId, sceneId }: Props) {
   const scene = useEditorStore((s) => s.scene) as SceneJson | null
   const dirty = useEditorStore((s) => s.dirty)
   const markClean = useEditorStore((s) => s.markClean)
@@ -29,7 +30,8 @@ export function SceneSection({ sceneId }: Props) {
   async function handleSave() {
     if (!scene) return
     try {
-      const res = await fetch(`/api/scenes/${sceneId}`, {
+      const projectQuery = projectId ? `?project=${encodeURIComponent(projectId)}` : ''
+      const res = await fetch(`/api/scenes/${sceneId}${projectQuery}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(scene),
@@ -44,7 +46,8 @@ export function SceneSection({ sceneId }: Props) {
   async function handleExport() {
     setExporting(true)
     try {
-      const res = await fetch('/api/export', { method: 'POST' })
+      const projectQuery = projectId ? `?project=${encodeURIComponent(projectId)}` : ''
+      const res = await fetch(`/api/export${projectQuery}`, { method: 'POST' })
       if (!res.ok) {
         const text = await res.text()
         throw new Error(`Export failed: ${res.status} ${text}`)

@@ -17,7 +17,7 @@ This section covers everything between "user picks a file" and "scene renders th
 
 ```
 apps/scene-engine/
-├── src/lib/asset-types.ts                    Validation + slug shared between client and server
+├── app/_engine/lib/asset-types.ts                    Validation + slug shared between client and server
 ├── app/upload/page.tsx                       /upload — standalone upload form
 ├── app/api/upload/route.ts                   POST — write file + register container
 ├── app/api/assets/[type]/route.ts            GET  — list files in a type folder (powers swap dropdown)

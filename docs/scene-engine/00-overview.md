@@ -5,7 +5,7 @@ type: overview
 
 # Documentation
 
-Three-layer documentation for the MELEE scene-engine — the Vite app under `apps/scene-engine/` that authors and renders video-game-screen landing pages as composed scenes.
+Three-layer documentation for the MELEE scene-engine — the Next.js app under `apps/scene-engine/` that authors and renders video-game-screen landing pages as composed scenes.
 
 Read in order. Each layer answers a different question.
 

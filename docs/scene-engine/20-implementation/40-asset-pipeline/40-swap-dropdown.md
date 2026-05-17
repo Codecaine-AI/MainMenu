@@ -43,7 +43,7 @@ This is the only place that distinguishes assets from modules in the inspector. 
 
 ## Cache mirror: `editor-store.updateContainerFile`
 
-`apps/scene-engine/src/store/editor-store.ts` exposes `updateContainerFile(id, file)` — async because it lazy-imports the renderer's `asset-registry.js`:
+`apps/scene-engine/app/_engine/store/editor-store.ts` exposes `updateContainerFile(id, file)` — async because it lazy-imports the renderer's `asset-registry.js`:
 
 ```ts
 const { updateEntry } = await import('@/renderer/asset-registry')
@@ -54,7 +54,7 @@ set({ registry: { ...registry, [id]: { ...registry[id], file } } })
 Two caches end up updated:
 
 - **Renderer cache** (`mergedRegistry` in `asset-registry.js`) — what the renderer reads on the next layer render.
-- **Zustand store** — what the inspector and asset browser read for UI state.
+- **Zustand store** — what the inspector and add-layer dialog read for UI state.
 
 Without both, the next render or the next inspector reload would still see the old pointer.
 
@@ -68,7 +68,7 @@ The flow looks redundant — server, renderer cache, store cache — but each ha
 |---------------------|-----------------------|-----------------------------------------------------------------------|
 | `assets/registry.json` | persistent          | Source of truth. Survives reload.                                    |
 | `mergedRegistry`    | page session          | Loaded once at scene boot; renderer reads it on every render.         |
-| Zustand `registry`  | editor lifecycle      | Drives inspector + asset browser UI; unrelated to render path.        |
+| Zustand `registry`  | editor lifecycle      | Drives inspector + add-layer dialog UI; unrelated to render path.     |
 
 Skipping any one of them produces a visible inconsistency: stale on disk, stale on canvas, or stale in the inspector.
 
@@ -76,4 +76,4 @@ Skipping any one of them produces a visible inconsistency: stale on disk, stale 
 
 - `apps/scene-engine/app/editor/_components/AssetSwapDropdown.tsx`
 - `apps/scene-engine/app/editor/_components/LayerForm.tsx`
-- `apps/scene-engine/src/store/editor-store.ts`
+- `apps/scene-engine/app/_engine/store/editor-store.ts`

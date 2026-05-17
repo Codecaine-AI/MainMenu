@@ -46,14 +46,15 @@ venv/
 runs/
 tmp/
 temp/
+test-results/
+playwright-report/
+blob-report/
 *.log
 logs/
 apps/font-creation/font-studio/projects/*/outputs/
 assets/
 !apps/font-creation/generation/melee-3/inputs/assets/
 !apps/font-creation/generation/melee-3/inputs/assets/**
-!apps/scene-engine/assets/
-!apps/scene-engine/assets/**
 !apps/scene-engine/public/assets/
 !apps/scene-engine/public/assets/**
 !apps/scene-engine/public/modules/

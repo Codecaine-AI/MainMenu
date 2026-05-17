@@ -1,5 +1,5 @@
 ---
-covers: Visual editor — Next.js client app, Zustand store, four panels, save/export toolbar, schema-driven property inspector.
+covers: Visual editor — Next.js client app, Zustand store, three panels, scene save/export controls, schema-driven property inspector.
 type: overview
 concepts: [editor, react, zustand, panels, mutations, schema-driven, property-schema]
 design_refs: [10-system-design/40-authoring-surfaces.md, 10-system-design/16-property-schema.md]
@@ -7,7 +7,7 @@ design_refs: [10-system-design/40-authoring-surfaces.md, 10-system-design/16-pro
 
 # Visual Editor
 
-A four-panel browser app for authoring scenes, built with Next.js + React + Tailwind + Zustand. The store holds the live scene tree, the merged registry, and selection state. Panels subscribe with selectors and re-render only on relevant changes. Mutations are immutable (`structuredClone` then patch) and mark the store dirty.
+A three-panel browser app for authoring scenes, built with Next.js + React + Tailwind + Zustand. The store holds the live scene tree, the merged registry, and selection state. Panels subscribe with selectors and re-render only on relevant changes. Mutations are immutable (`structuredClone` then patch) and mark the store dirty.
 
 The design rationale is in [System Design / Authoring Surfaces](../../10-system-design/40-authoring-surfaces.md). This section describes the code.
 
@@ -17,9 +17,8 @@ The design rationale is in [System Design / Authoring Surfaces](../../10-system-
 
 ```
 apps/scene-engine/app/editor/
-├── page.tsx                            shell — 4-panel grid, useSceneLoader
+├── page.tsx                            shell — 3-panel grid, useSceneLoader
 └── _components/
-    ├── EditorToolbar.tsx               Save, Export, dirty indicator
     ├── CanvasPanel.tsx                 live preview using the production renderer
     ├── HierarchyPanel.tsx              object tree, drag reorder, add menu
     ├── HierarchyRow.tsx                recursive tree row
@@ -30,7 +29,7 @@ apps/scene-engine/app/editor/
     ├── DescriptionPopover.tsx          floating popover (anchored, click-away/Esc dismiss)
     ├── SlotsSection.tsx                glyph-group slot editor
     ├── AssetSwapDropdown.tsx           per-container file swap
-    ├── SceneSection.tsx                scene-level header
+    ├── SceneSection.tsx                scene metadata, Save, Export, dirty indicator
     └── inputs/
         ├── RangedInput.tsx             slider + numeric, debounced
         ├── BlendSelect.tsx             blend-mode dropdown
@@ -41,7 +40,7 @@ apps/scene-engine/app/editor/
         ├── ManifestPropertyField.tsx   one field per manifest descriptor (effects only)
         └── InspectorSection.tsx        Header / Section / FieldRow / ReadonlyValue
 
-apps/scene-engine/src/
+apps/scene-engine/app/_engine/
 ├── store/editor-store.ts               Zustand store + mutations + componentSchemas cache
 ├── hooks/useSceneLoader.ts             fetch scene + registry, seed store, preload component schemas
 ├── types/
@@ -63,7 +62,7 @@ The Zustand store, object-path semantics, the deep-merge patch algorithm, and ea
 The React components — Toolbar, Canvas, Hierarchy, Inspector — including always-present sections, drag-and-drop reorder, manifest-driven property fields, slots, and events.
 
 ### [30-loader.md](30-loader.md)
-`useSceneLoader` — how the editor reads the scene ID from query/path, fetches the scene + registry, and seeds the store.
+`useSceneLoader` — how the editor reads the project + scene IDs from query params, fetches the scene + registry, and seeds the store.
 
 ## Key Concepts
 

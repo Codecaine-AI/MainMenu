@@ -1,6 +1,7 @@
 'use client'
 
 import { Suspense } from 'react'
+import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
 import { useSceneLoader } from '@/hooks/useSceneLoader'
 import { CanvasPanel } from './_components/CanvasPanel'
@@ -9,14 +10,23 @@ import { InspectorPanel } from './_components/InspectorPanel'
 
 function EditorContent() {
   const params = useSearchParams()
+  const projectId = params.get('project')
   const sceneId = params.get('scene') ?? 'title'
-  const { loading, error } = useSceneLoader(sceneId)
+  const { loading, error } = useSceneLoader(projectId, sceneId)
+  const scenesHref = projectId ? `/projects/${encodeURIComponent(projectId)}` : '/'
 
   return (
     <div className="editor-shell overflow-hidden bg-[#111] text-gray-300">
+      <Link
+        href={scenesHref}
+        className="fixed left-2 top-2 z-20 rounded-sm border border-white/15 bg-[#151515]/90 px-2.5 py-1.5 text-xs font-medium text-gray-200 no-underline shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] backdrop-blur-md transition hover:bg-[#202020]/95 active:translate-y-px"
+        aria-label="Back to scene selection"
+      >
+        Scenes
+      </Link>
       {loading ? (
         <>
-          <section className="bg-[#1a1a1a] overflow-auto p-2" style={{ gridArea: 'hierarchy' }}>
+          <section className="bg-[#1a1a1a] overflow-auto p-2 pt-12" style={{ gridArea: 'hierarchy' }}>
             <p className="text-gray-600 text-xs italic">Loading...</p>
           </section>
           <section className="bg-black grid place-items-center" style={{ gridArea: 'canvas' }}>
@@ -32,7 +42,7 @@ function EditorContent() {
         </section>
       ) : (
         <>
-          <HierarchyPanel sceneId={sceneId} />
+          <HierarchyPanel projectId={projectId} sceneId={sceneId} />
           <CanvasPanel />
           <InspectorPanel />
         </>

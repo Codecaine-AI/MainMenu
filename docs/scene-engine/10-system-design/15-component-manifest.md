@@ -50,7 +50,7 @@ public/modules/
 
 | Field        | Required | Notes                                                                                          |
 |--------------|----------|------------------------------------------------------------------------------------------------|
-| `name`       | yes      | Human-readable display name shown in the asset browser and inspector.                          |
+| `name`       | yes      | Human-readable display name shown in add-layer and inspector surfaces.                         |
 | `type`       | yes      | `effect` or `component`. Must agree with the registry entry's `type`.                          |
 | `sizing`     | no       | `fill` or `explicit`. Hints the default `transform` mode when this module is added to a scene. |
 | `properties` | yes      | Map of property key → property descriptor. May be empty for pure-CSS effects with no knobs.    |
@@ -141,9 +141,9 @@ No further coupling — components are responsible for their own DOM and lifecyc
 
 **Effects**: the inspector iterates the manifest's `properties` and renders one field per descriptor. The descriptor drives the input type, slider range, default, and tooltip.
 
-**Components**: the inspector ignores the manifest's `properties` (if present) and reads the component's [property schema](16-property-schema.md) instead — a sectioned structure exported from the component's code module that provides grouping, labels, descriptions, and a richer type taxonomy. The manifest is still used for `name` (display in the asset browser) and `sizing` (default transform hint).
+**Components**: the inspector ignores the manifest's `properties` (if present) and reads the component's [property schema](16-property-schema.md) instead — a sectioned structure exported from the component's code module that provides grouping, labels, descriptions, and a richer type taxonomy. The manifest is still used for `name` (display in add-layer surfaces) and `sizing` (default transform hint).
 
-When the asset browser lists modules, it groups by `type` (effect / component) and shows the manifest's `name`. Dragging a module onto the stage creates a new scene object whose `type` matches the module type, with the asset wired up and a transform seeded from the `sizing` hint.
+When the add-layer dialog lists modules, it groups by `type` (effect / component) and shows the manifest's `name`. Adding a module creates a new scene object whose `type` matches the module type, with the asset wired up and a transform seeded from the `sizing` hint.
 
 ## Adding a New Module
 

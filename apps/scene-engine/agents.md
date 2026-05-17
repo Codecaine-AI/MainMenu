@@ -104,7 +104,7 @@ apps/scene-engine/
     api/assets/[type]/route.ts
     api/registry/[id]/route.ts
 
-  src/
+    _engine/                 Private non-route implementation code (@/* alias)
     store/editor-store.ts    Zustand editor store
     hooks/useSceneLoader.ts  Fetches registry + scene
     lib/                     Shared scene, path, patch, asset utilities
@@ -201,7 +201,7 @@ Numeric `x`, `y`, `width`, and `height` values are percentages. Pin values like 
 
 ## Asset Registries
 
-There are two registries, merged at runtime by `src/renderer/asset-registry.js`.
+There are two registries, merged at runtime by `app/_engine/renderer/asset-registry.js`.
 
 `public/assets/registry.json` is for uploadable file containers:
 
@@ -274,7 +274,8 @@ Module manifests may live next to component/effect modules as `manifest.json`. T
 
 ## Architecture Notes
 
-- `src/renderer/` is an imperative vanilla JS renderer. React mounts it through `useEffect` and `useRef`.
+- `app/_engine/renderer/` is an imperative vanilla JS renderer. React mounts it through `useEffect` and `useRef`.
+- `app/_engine/` is a private App Router folder, so it can sit under `app/` without creating routes.
 - Zustand replaces the old EventTarget pub/sub editor state.
 - Renderer imports happen inside `useEffect` for SSR safety.
 - Dynamic imports from `public/` static files can produce expected benign webpack warnings.

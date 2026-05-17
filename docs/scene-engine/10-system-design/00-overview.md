@@ -5,7 +5,7 @@ type: overview
 
 # System Design
 
-How the scene-engine works *as a system*, independent of the JavaScript and Vite specifics that implement it. Read this layer to understand intended behavior before changing it.
+How the scene-engine works *as a system*, independent of the framework and JavaScript specifics that implement it. Read this layer to understand intended behavior before changing it.
 
 If a description here would still hold true if the engine were rewritten in a different stack, it belongs here. If it depends on a specific module, file path, or framework, it belongs in [Implementation](../20-implementation/00-overview.md).
 

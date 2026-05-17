@@ -1,6 +1,6 @@
 ---
-covers: The editor's React components — Toolbar, Canvas, Hierarchy, Inspector. Always-present sections, schema-driven property fields with sections and description popovers, slot/event editing, project export.
-concepts: [toolbar, canvas, hierarchy, inspector, layer-form, property-section, property-field, description-popover, manifest-property-field, slots-section, events-section, drag-drop]
+covers: The editor's React components — Scene controls, Canvas, Hierarchy, Inspector. Always-present sections, schema-driven property fields with sections and description popovers, slot/event editing, project export.
+concepts: [scene-section, canvas, hierarchy, inspector, layer-form, property-section, property-field, description-popover, manifest-property-field, slots-section, events-section, drag-drop]
 design_refs: [10-system-design/40-authoring-surfaces.md, 10-system-design/16-property-schema.md]
 ---
 
@@ -10,21 +10,19 @@ The editor lives under `apps/scene-engine/app/editor/` as a Next.js client app. 
 
 ---
 
-## Toolbar (`EditorToolbar.tsx`)
+## Scene Controls (`SceneSection.tsx`)
 
-Header strip with the scene name, dirty dot, **Export** button, and **Save** button.
+Scene-level control section above the hierarchy with the scene name, dirty dot, scene appearance fields, **Export** button, and **Save** button.
 
-- **Save**: `PUT /api/scenes/<id>` with the in-memory scene as the body. On success, `markClean()`. Disabled when `dirty === false`.
-- **Export**: `POST /api/export`, reads the response as a blob, parses the `Content-Disposition` filename, and triggers a download via a hidden anchor click. Independent of save — the export reads what's on disk, not the in-memory scene. A local `exporting` flag disables the button while the request is in flight.
+- **Save**: `PUT /api/scenes/<id>?project=<project-id>` with the in-memory scene as the body. On success, `markClean()`. Disabled when `dirty === false`.
+- **Export**: `POST /api/export?project=<project-id>`, reads the response as a blob, parses the `Content-Disposition` filename, and triggers a download via a hidden anchor click. Independent of save — the export reads what's on disk, not the in-memory scene. A local `exporting` flag disables the button while the request is in flight.
 - **Dirty indicator**: a small dot whose color toggles on `store.dirty`.
 
 ## Canvas (`CanvasPanel.tsx`)
 
-Renders the scene live using the **same renderer** the production page uses (`renderScene` from `src/renderer/scene-renderer.js`). On every store `scene` change, the canvas calls `renderScene(scene, container)`. Because the editor uses the production renderer, "what you see in the canvas" equals "what ships" by construction.
+Renders the scene live using the **same renderer** the production page uses (`renderScene` from `app/_engine/renderer/scene-renderer.js`). On every store `scene` change, the canvas calls `renderScene(scene, container)`. Because the editor uses the production renderer, "what you see in the canvas" equals "what ships" by construction.
 
 Selection: clicking inside the stage walks up to the nearest element with `dataset.layerId` and calls `setSelectedPath` with the computed path.
-
-Drop target: drops from the asset/module browser construct a minimal scene object (id, type, asset, default transform/appearance) and call `addObjectAt('', scene.objects.length, obj)`.
 
 ## Hierarchy (`HierarchyPanel.tsx` + `HierarchyRow.tsx`)
 
@@ -32,13 +30,9 @@ Tree view of `scene.objects`. Renders one row per object, indented by depth, wit
 
 ### Object types and add menu
 
-`OBJECT_TYPES` is the canonical menu of types the user can add: `group`, `video`, `image`, `glyph-group`, `text`, `effect`, `component`, `audio`. The `+` button opens an absolutely-positioned dropdown; selecting a type calls `createDefaultObject(type)`:
+`ADDABLE_OBJECT_TYPES` is the canonical menu of types the user can add: `group`, `text`, `video`, `image`, `glyph`, `effect`, `component`, `audio`. The `+` button opens `AddLayerDialog`; selecting `group` or `text` creates an assetless object, and selecting an asset-backed type lists compatible registry entries before creating the object.
 
-- `video`, `effect`, `audio` → `transform: { mode: "fill" }`.
-- `group` → `transform: { x: 0, y: 0, width: 100, height: 100, anchor: "top-left" }`.
-- Everything else → centered explicit transform (`x: 50, y: 50, width: 30, height: "auto", anchor: "center"`).
-
-Every default carries `appearance: { opacity: 1, blend: "normal", hue: 0 }`, empty `properties`, `events`, `children`, and `visible: true`. The new object is appended at the top level and selected.
+New objects are created through `createGroupObject`, `createTextObject`, or `createObjectFromAsset`, then inserted at the requested top-level or group-child position and selected.
 
 ### Click → select
 Sets `selectedPath` to the clicked row's path.
@@ -129,15 +123,16 @@ For container-typed assets (audio/image/video/glyph), shows a dropdown of files 
 
 ## Loader (`useSceneLoader.ts`)
 
-Custom hook that fetches the scene + merged registry on mount, calls `setScene` and `setRegistry`, and handles error/loading states. Lives in `src/hooks/useSceneLoader.ts`.
+Custom hook that fetches the scene + merged registry on mount, calls `setScene` and `setRegistry`, and handles error/loading states. Lives in `app/_engine/hooks/useSceneLoader.ts`.
 
 ## Source
 
-- `apps/scene-engine/app/editor/page.tsx` — editor shell (4-panel grid, `useSceneLoader`).
-- `apps/scene-engine/app/editor/_components/EditorToolbar.tsx`
+- `apps/scene-engine/app/editor/page.tsx` — editor shell (3-panel grid, `useSceneLoader`).
 - `apps/scene-engine/app/editor/_components/CanvasPanel.tsx`
 - `apps/scene-engine/app/editor/_components/HierarchyPanel.tsx`
 - `apps/scene-engine/app/editor/_components/HierarchyRow.tsx`
+- `apps/scene-engine/app/editor/_components/SceneSection.tsx`
+- `apps/scene-engine/app/editor/_components/AddLayerDialog.tsx`
 - `apps/scene-engine/app/editor/_components/InspectorPanel.tsx`
 - `apps/scene-engine/app/editor/_components/LayerForm.tsx`
 - `apps/scene-engine/app/editor/_components/PropertySection.tsx`
@@ -146,6 +141,6 @@ Custom hook that fetches the scene + merged registry on mount, calls `setScene` 
 - `apps/scene-engine/app/editor/_components/SlotsSection.tsx`
 - `apps/scene-engine/app/editor/_components/AssetSwapDropdown.tsx`
 - `apps/scene-engine/app/editor/_components/inputs/`
-- `apps/scene-engine/src/types/property-schema.ts`
-- `apps/scene-engine/src/lib/builtin-property-schemas.ts`
-- `apps/scene-engine/src/lib/component-schema-loader.ts`
+- `apps/scene-engine/app/_engine/types/property-schema.ts`
+- `apps/scene-engine/app/_engine/lib/builtin-property-schemas.ts`
+- `apps/scene-engine/app/_engine/lib/component-schema-loader.ts`

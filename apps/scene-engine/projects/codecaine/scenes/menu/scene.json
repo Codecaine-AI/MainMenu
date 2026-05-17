@@ -1,0 +1,68 @@
+{
+  "id": "menu",
+  "name": "Main Menu",
+  "stage": {
+    "width": 1440,
+    "height": 1080
+  },
+  "objects": [
+    {
+      "id": "menu-title",
+      "name": "Menu Title",
+      "type": "text",
+      "transform": {
+        "x": "center",
+        "y": 36,
+        "width": "auto",
+        "height": "auto",
+        "anchor": "center"
+      },
+      "properties": {
+        "text": "Main Menu",
+        "fontFamily": "Impact",
+        "fontSize": 96,
+        "fontWeight": 400,
+        "color": "#ffffff",
+        "lineHeight": 1,
+        "letterSpacing": 1,
+        "textAlign": "center",
+        "customCss": "text-shadow: 0 0 12px rgba(255,255,255,0.45), 0 6px 0 rgba(0,0,0,0.45);"
+      }
+    },
+    {
+      "id": "back-to-title",
+      "name": "Back To Title",
+      "type": "text",
+      "transform": {
+        "x": "center",
+        "y": 62,
+        "width": "auto",
+        "height": "auto",
+        "anchor": "center"
+      },
+      "properties": {
+        "text": "BACK TO TITLE",
+        "fontFamily": "Impact",
+        "fontSize": 42,
+        "fontWeight": 400,
+        "color": "#efd42f",
+        "lineHeight": 1,
+        "letterSpacing": 1,
+        "textAlign": "center",
+        "customCss": "text-shadow: 0 0 10px rgba(239,212,47,0.5);"
+      },
+      "events": [
+        {
+          "trigger": "click",
+          "action": "navigate",
+          "target": "title"
+        }
+      ]
+    }
+  ],
+  "appearance": {
+    "opacity": 1,
+    "hue": 0,
+    "saturation": 1
+  }
+}
