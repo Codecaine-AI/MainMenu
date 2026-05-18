@@ -76,7 +76,22 @@
             "item-5": "Data",
             "selected-index": 1,
             "marker-visible": true,
-            "marker-opacity": 0.82
+            "marker-opacity": 1,
+            "hot-gold-color": "#fdc903",
+            "y-offset": -21,
+            "x-offset": -49,
+            "width-scale": 0.825,
+            "text-auto-fit": true,
+            "text-min-font-size": 42,
+            "text-max-font-size": 60,
+            "text-fit-padding": 18,
+            "marker-pulse-contract-speed": 4.5,
+            "marker-pulse-cooldown": 0,
+            "marker-pulse-radius": 3.5,
+            "marker-pulse-opacity": 0.15,
+            "marker-pulse-thickness": 1,
+            "marker-pulse-feather-width": 4,
+            "marker-pulse-edge-opacity": 0.21
           }
         }
       ]
