@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { CreateScreenForm } from '../../_components/create-screen-form'
+import { ProjectSettingsForm } from '../../_components/project-settings-form'
 import { loadProject } from '../../_lib/store'
 
 export default async function ProjectPage({
@@ -45,31 +46,56 @@ export default async function ProjectPage({
             <div className="list">
               {project.screens.map((screen) => (
                 <Link
-                  className="list-item"
+                  className="list-item screen-list-item"
                   href={`/projects/${project.id}/screens/${screen.id}`}
                   key={screen.id}
                 >
-                  <div>
-                    <p className="surface-title">{screen.name}</p>
-                    <p className="meta">{screen.id}</p>
+                  <div className="screen-row-main">
+                    <div>
+                      <p className="surface-title">{screen.name}</p>
+                      <p className="meta">{screen.id}</p>
+                    </div>
                   </div>
-                  <span className="pill">Open</span>
+                  <div className="screen-thumb">
+                    <img
+                      src={screenThumbnailUrl(project.id, screen.id, screen.updatedAt)}
+                      alt={screen.name}
+                      loading="lazy"
+                      decoding="async"
+                    />
+                  </div>
                 </Link>
               ))}
             </div>
           )}
         </section>
 
-        <aside className="surface">
-          <div className="surface-header">
-            <div>
-              <h2 className="surface-title">Add Screen</h2>
-              <p className="surface-note">Use names like Title Screen or Main Menu 1.</p>
+        <aside className="project-side-stack">
+          <section className="surface">
+            <div className="surface-header">
+              <div>
+                <h2 className="surface-title">Project Settings</h2>
+                <p className="surface-note">Edit project metadata without moving screen files.</p>
+              </div>
             </div>
-          </div>
-          <CreateScreenForm projectId={project.id} />
+            <ProjectSettingsForm project={project} />
+          </section>
+
+          <section className="surface">
+            <div className="surface-header">
+              <div>
+                <h2 className="surface-title">Add Screen</h2>
+                <p className="surface-note">Use names like Title Screen or Main Menu 1.</p>
+              </div>
+            </div>
+            <CreateScreenForm projectId={project.id} />
+          </section>
         </aside>
       </div>
     </main>
   )
+}
+
+function screenThumbnailUrl(projectId: string, screenId: string, version: string) {
+  return `/api/projects/${projectId}/screens/${screenId}/nodes/root/image?v=${encodeURIComponent(version)}`
 }

@@ -72,7 +72,7 @@ function applyObjectStyles(el, obj, entry, options = {}) {
 
   if (isMedia && mediaEl && entry?.file) {
     const src = resolveRuntimeUrl(entry.file);
-    if (mediaEl.src && mediaEl.src !== src) mediaEl.src = src;
+    if (mediaEl.getAttribute('src') && mediaEl.getAttribute('src') !== src) mediaEl.src = src;
   }
 
   if (obj.type === 'glyph-group') {

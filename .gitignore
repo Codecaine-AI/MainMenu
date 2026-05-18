@@ -52,7 +52,6 @@ blob-report/
 *.log
 logs/
 apps/font-creation/font-studio/projects/*/outputs/
-apps/asset-extraction-pipeline/workspace/
 assets/
 !apps/font-creation/generation/melee-3/inputs/assets/
 !apps/font-creation/generation/melee-3/inputs/assets/**

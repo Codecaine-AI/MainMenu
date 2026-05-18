@@ -103,7 +103,7 @@ pipeline-ui-install:
 	cd $(PIPELINE_DIR) && npm install
 
 pipeline-ui:
-	cd $(PIPELINE_DIR) && npm run dev -- --port $(PIPELINE_UI_PORT)
+	set -a; . ./.env; set +a; cd $(PIPELINE_DIR) && npm run dev -- --port $(PIPELINE_UI_PORT)
 
 pipeline-help:
 	@cd $(PIPELINE_DIR) && uv run extract-assets --help

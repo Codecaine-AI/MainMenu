@@ -253,7 +253,7 @@
           "asset": "codecaine-keycap-start",
           "transform": {
             "mode": "fill",
-            "scale": 0.75
+            "scale": 0.7
           },
           "properties": {
             "label": "Press Start",

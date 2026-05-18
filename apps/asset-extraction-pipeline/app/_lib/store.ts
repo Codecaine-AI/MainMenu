@@ -4,11 +4,13 @@ import {
   mkdir,
   readFile,
   readdir,
+  rm,
   stat,
   writeFile,
 } from 'node:fs/promises'
 import path from 'node:path'
-import { assertSafeId, nowIso, slugify, splitInstructionLabel, uniqueId } from './ids'
+import { buildSplitPromptDraftPrompt } from '../_prompts/split-prompt-draft'
+import { assertSafeId, nowIso, splitInstructionLabel, uniqueId } from './ids'
 import type {
   CatalogSuggestion,
   ExtractionNode,
@@ -18,10 +20,10 @@ import type {
   ProjectScreenRef,
   ProjectSummary,
   ScreenWorkspaceData,
+  SplitPromptDraft,
 } from './types'
 
-const WORKSPACE_DIR = path.join(process.cwd(), 'workspace')
-const PROJECTS_DIR = path.join(WORKSPACE_DIR, 'projects')
+const PROJECTS_DIR = path.join(resolveWorkspaceDir(), 'projects')
 
 const IMAGE_EXTENSIONS: Record<string, string> = {
   'image/png': 'png',
@@ -33,6 +35,13 @@ export interface UploadedImageFile {
   name: string
   type: string
   arrayBuffer: () => Promise<ArrayBuffer>
+}
+
+function resolveWorkspaceDir() {
+  return (
+    process.env.ASSET_PIPELINE_WORKSPACE_DIR ??
+    path.resolve(process.cwd(), '..', '..', 'runs', 'asset-extraction-workspace')
+  )
 }
 
 function projectDir(projectId: string) {
@@ -74,6 +83,25 @@ async function readJson<T>(filePath: string): Promise<T> {
 async function writeJson(filePath: string, value: unknown) {
   await mkdir(path.dirname(filePath), { recursive: true })
   await writeFile(filePath, `${JSON.stringify(value, null, 2)}\n`, 'utf8')
+}
+
+async function loadSplitWithPrompts(
+  projectId: string,
+  screenId: string,
+  splitId: string,
+): Promise<ExtractionSplit> {
+  const split = await readJson<ExtractionSplit>(splitJsonPath(projectId, screenId, splitId))
+  const splitPath = splitDir(projectId, screenId, splitId)
+  const [targetPrompt, residualPrompt] = await Promise.all([
+    readFile(path.join(splitPath, 'target-prompt.txt'), 'utf8').catch(() => split.targetPrompt),
+    readFile(path.join(splitPath, 'residual-prompt.txt'), 'utf8').catch(() => split.residualPrompt),
+  ])
+
+  return {
+    ...split,
+    targetPrompt: targetPrompt?.trim(),
+    residualPrompt: residualPrompt?.trim(),
+  }
 }
 
 function nodeImageFile(projectId: string, screenId: string, node: ExtractionNode) {
@@ -149,7 +177,7 @@ export async function loadWorkspace(
     screen.nodeOrder.map(async (nodeId) => readJson<ExtractionNode>(nodeJsonPath(projectId, screenId, nodeId))),
   )
   const splits = await Promise.all(
-    screen.splitOrder.map(async (splitId) => readJson<ExtractionSplit>(splitJsonPath(projectId, screenId, splitId))),
+    screen.splitOrder.map(async (splitId) => loadSplitWithPrompts(projectId, screenId, splitId)),
   )
 
   return { project, screen, nodes, splits }
@@ -172,6 +200,25 @@ export async function createProject(name: string): Promise<ExtractionProject> {
   }
   await writeJson(projectJsonPath(id), project)
   return project
+}
+
+export async function updateProjectName(
+  projectId: string,
+  name: string,
+): Promise<ExtractionProject> {
+  const project = await loadProject(projectId)
+  if (!project) throw new Error(`Project not found: ${projectId}`)
+
+  const cleanedName = name.trim()
+  if (!cleanedName) throw new Error('Project name is required.')
+
+  const updated: ExtractionProject = {
+    ...project,
+    name: cleanedName,
+    updatedAt: nowIso(),
+  }
+  await writeJson(projectJsonPath(projectId), updated)
+  return updated
 }
 
 export async function createScreen(
@@ -248,6 +295,8 @@ export async function createSplit(input: {
   screenId: string
   parentNodeId: string
   instruction: string
+  targetPrompt: string
+  residualPrompt: string
 }): Promise<ScreenWorkspaceData> {
   const screen = await loadScreen(input.projectId, input.screenId)
   const project = await loadProject(input.projectId)
@@ -257,6 +306,16 @@ export async function createSplit(input: {
   const instruction = input.instruction.trim()
   if (!instruction) throw new Error('Split instruction is required.')
 
+  const existingSplits = await Promise.all(
+    screen.splitOrder.map(async (splitId) =>
+      readJson<ExtractionSplit>(splitJsonPath(input.projectId, input.screenId, splitId)),
+    ),
+  )
+  const existingChildSplit = existingSplits.find((split) => split.parentNodeId === parent.id)
+  if (existingChildSplit) {
+    throw new Error('This image already has a split. Select its target or residual child to continue decomposing.')
+  }
+
   const timestamp = nowIso()
   const nextNumber = screen.splitOrder.length + 1
   const splitId = uniqueId(`split-${String(nextNumber).padStart(3, '0')}`, (candidate) =>
@@ -265,9 +324,15 @@ export async function createSplit(input: {
   const baseLabel = splitInstructionLabel(instruction)
   const targetNodeId = `${splitId}-target`
   const residualNodeId = `${splitId}-residual`
+  const targetPrompt = input.targetPrompt?.trim()
+  const residualPrompt = input.residualPrompt?.trim()
+  if (!targetPrompt || !residualPrompt) {
+    throw new Error('Target and residual prompts are required. Draft prompts before confirming the split.')
+  }
 
   const parentImage = nodeImageFile(input.projectId, input.screenId, parent)
-  const ext = path.extname(parent.imagePath) || '.png'
+  const targetImagePath = path.join('nodes', targetNodeId, 'image.png')
+  const residualImagePath = path.join('nodes', residualNodeId, 'image.png')
 
   const targetNode: ExtractionNode = {
     id: targetNodeId,
@@ -277,9 +342,9 @@ export async function createSplit(input: {
     splitId,
     kind: 'target',
     label: `Target: ${baseLabel}`,
-    imagePath: path.join('nodes', targetNodeId, `image${ext}`),
+    imagePath: targetImagePath,
     depth: parent.depth + 1,
-    status: 'pending_model',
+    status: 'generated',
     instruction,
     createdAt: timestamp,
     updatedAt: timestamp,
@@ -292,9 +357,9 @@ export async function createSplit(input: {
     splitId,
     kind: 'residual',
     label: `Residual after: ${baseLabel}`,
-    imagePath: path.join('nodes', residualNodeId, `image${ext}`),
+    imagePath: residualImagePath,
     depth: parent.depth + 1,
-    status: 'pending_model',
+    status: 'generated',
     instruction,
     createdAt: timestamp,
     updatedAt: timestamp,
@@ -302,8 +367,22 @@ export async function createSplit(input: {
 
   await mkdir(nodeDir(input.projectId, input.screenId, targetNode.id), { recursive: true })
   await mkdir(nodeDir(input.projectId, input.screenId, residualNode.id), { recursive: true })
-  await copyFile(parentImage, nodeImageFile(input.projectId, input.screenId, targetNode))
-  await copyFile(parentImage, nodeImageFile(input.projectId, input.screenId, residualNode))
+  let imageEditMetadata: Awaited<ReturnType<typeof runSplitImageEdits>>
+  try {
+    imageEditMetadata = await runSplitImageEdits({
+      sourceImagePath: parentImage,
+      targetPrompt,
+      residualPrompt,
+      targetOutputPath: nodeImageFile(input.projectId, input.screenId, targetNode),
+      residualOutputPath: nodeImageFile(input.projectId, input.screenId, residualNode),
+    })
+  } catch (err) {
+    await Promise.all([
+      rm(nodeDir(input.projectId, input.screenId, targetNode.id), { recursive: true, force: true }),
+      rm(nodeDir(input.projectId, input.screenId, residualNode.id), { recursive: true, force: true }),
+    ])
+    throw err
+  }
   await writeJson(nodeJsonPath(input.projectId, input.screenId, targetNode.id), targetNode)
   await writeJson(nodeJsonPath(input.projectId, input.screenId, residualNode.id), residualNode)
 
@@ -315,7 +394,9 @@ export async function createSplit(input: {
     instruction,
     targetNodeId,
     residualNodeId,
-    status: 'pending_model',
+    status: 'generated',
+    targetPrompt,
+    residualPrompt,
     createdAt: timestamp,
     updatedAt: timestamp,
   }
@@ -331,9 +412,14 @@ export async function createSplit(input: {
       target_node_id: targetNode.id,
       residual_node_id: residualNode.id,
     },
+    prompts: {
+      target: targetPrompt,
+      residual: residualPrompt,
+    },
+    image_generation: imageEditMetadata,
   })
-  await writeFile(path.join(splitPath, 'target-prompt.txt'), buildTargetPrompt(instruction), 'utf8')
-  await writeFile(path.join(splitPath, 'residual-prompt.txt'), buildResidualPrompt(instruction), 'utf8')
+  await writeFile(path.join(splitPath, 'target-prompt.txt'), targetPrompt, 'utf8')
+  await writeFile(path.join(splitPath, 'residual-prompt.txt'), residualPrompt, 'utf8')
 
   const updatedScreen: ExtractionScreen = {
     ...screen,
@@ -346,6 +432,103 @@ export async function createSplit(input: {
 
   const workspace = await loadWorkspace(input.projectId, input.screenId)
   if (!workspace) throw new Error('Failed to reload workspace after split.')
+  return workspace
+}
+
+export async function draftSplitPrompts(input: {
+  projectId: string
+  screenId: string
+  parentNodeId: string
+  instruction: string
+}): Promise<SplitPromptDraft> {
+  const screen = await loadScreen(input.projectId, input.screenId)
+  const project = await loadProject(input.projectId)
+  const parent = await loadNode(input.projectId, input.screenId, input.parentNodeId)
+  if (!project || !screen || !parent) throw new Error('Project, screen, or parent node was not found.')
+
+  const instruction = input.instruction.trim()
+  if (!instruction) throw new Error('Split instruction is required.')
+
+  const splits = await Promise.all(
+    screen.splitOrder.map(async (splitId) =>
+      readJson<ExtractionSplit>(splitJsonPath(input.projectId, input.screenId, splitId)),
+    ),
+  )
+  if (splits.some((split) => split.parentNodeId === parent.id)) {
+    throw new Error('This image already has a split. Select its target or residual child to continue decomposing.')
+  }
+
+  return draftSplitPromptsWithModel({
+    projectId: input.projectId,
+    screenId: input.screenId,
+    parent,
+    instruction,
+  })
+}
+
+export async function generateNodeSplitImages(input: {
+  projectId: string
+  screenId: string
+  parentNodeId: string
+}): Promise<ScreenWorkspaceData> {
+  const screen = await loadScreen(input.projectId, input.screenId)
+  const project = await loadProject(input.projectId)
+  const parent = await loadNode(input.projectId, input.screenId, input.parentNodeId)
+  if (!project || !screen || !parent) throw new Error('Project, screen, or parent node was not found.')
+
+  const splits = await Promise.all(
+    screen.splitOrder.map(async (splitId) => loadSplitWithPrompts(input.projectId, input.screenId, splitId)),
+  )
+  const split = splits.find((candidate) => candidate.parentNodeId === parent.id)
+  if (!split) throw new Error('This image does not have a split to generate.')
+
+  const targetNode = await loadNode(input.projectId, input.screenId, split.targetNodeId)
+  const residualNode = await loadNode(input.projectId, input.screenId, split.residualNodeId)
+  if (!targetNode || !residualNode) throw new Error('Split target or residual node was not found.')
+
+  const splitPath = splitDir(input.projectId, input.screenId, split.id)
+  const targetPrompt = split.targetPrompt?.trim()
+  const residualPrompt = split.residualPrompt?.trim()
+  if (!targetPrompt || !residualPrompt) {
+    throw new Error('Split image generation requires the saved target and residual prompts.')
+  }
+
+  const timestamp = nowIso()
+  const updatedTargetNode: ExtractionNode = {
+    ...targetNode,
+    imagePath: path.join('nodes', targetNode.id, 'image.png'),
+    status: 'generated',
+    updatedAt: timestamp,
+  }
+  const updatedResidualNode: ExtractionNode = {
+    ...residualNode,
+    imagePath: path.join('nodes', residualNode.id, 'image.png'),
+    status: 'generated',
+    updatedAt: timestamp,
+  }
+
+  const imageEditMetadata = await runSplitImageEdits({
+    sourceImagePath: nodeImageFile(input.projectId, input.screenId, parent),
+    targetPrompt: targetPrompt.trim(),
+    residualPrompt: residualPrompt.trim(),
+    targetOutputPath: nodeImageFile(input.projectId, input.screenId, updatedTargetNode),
+    residualOutputPath: nodeImageFile(input.projectId, input.screenId, updatedResidualNode),
+  })
+
+  const updatedSplit: ExtractionSplit = {
+    ...split,
+    status: 'generated',
+    updatedAt: timestamp,
+  }
+
+  await writeJson(nodeJsonPath(input.projectId, input.screenId, updatedTargetNode.id), updatedTargetNode)
+  await writeJson(nodeJsonPath(input.projectId, input.screenId, updatedResidualNode.id), updatedResidualNode)
+  await writeJson(splitJsonPath(input.projectId, input.screenId, updatedSplit.id), updatedSplit)
+  await writeJson(path.join(splitPath, 'generation-result.json'), imageEditMetadata)
+  await touchProjectScreen(input.projectId, input.screenId, timestamp)
+
+  const workspace = await loadWorkspace(input.projectId, input.screenId)
+  if (!workspace) throw new Error('Failed to reload workspace after generating split images.')
   return workspace
 }
 
@@ -366,6 +549,78 @@ export async function setNodeFinal(input: {
   await writeJson(nodeJsonPath(input.projectId, input.screenId, input.nodeId), updated)
   await touchProjectScreen(input.projectId, input.screenId, timestamp)
   return updated
+}
+
+export async function deleteNodeSplit(input: {
+  projectId: string
+  screenId: string
+  parentNodeId: string
+}): Promise<ScreenWorkspaceData> {
+  const screen = await loadScreen(input.projectId, input.screenId)
+  const project = await loadProject(input.projectId)
+  const parent = await loadNode(input.projectId, input.screenId, input.parentNodeId)
+  if (!project || !screen || !parent) throw new Error('Project, screen, or parent node was not found.')
+
+  const splits = await Promise.all(
+    screen.splitOrder.map(async (splitId) =>
+      readJson<ExtractionSplit>(splitJsonPath(input.projectId, input.screenId, splitId)),
+    ),
+  )
+  const initialSplits = splits.filter((split) => split.parentNodeId === parent.id)
+  if (initialSplits.length === 0) {
+    throw new Error('This image does not have a split to delete.')
+  }
+
+  const splitsByParent = new Map<string, ExtractionSplit[]>()
+  for (const split of splits) {
+    const current = splitsByParent.get(split.parentNodeId) ?? []
+    current.push(split)
+    splitsByParent.set(split.parentNodeId, current)
+  }
+
+  const splitIdsToDelete = new Set<string>()
+  const nodeIdsToDelete = new Set<string>()
+
+  function markSplit(split: ExtractionSplit) {
+    if (splitIdsToDelete.has(split.id)) return
+    splitIdsToDelete.add(split.id)
+
+    for (const nodeId of [split.targetNodeId, split.residualNodeId]) {
+      nodeIdsToDelete.add(nodeId)
+      for (const childSplit of splitsByParent.get(nodeId) ?? []) {
+        markSplit(childSplit)
+      }
+    }
+  }
+
+  for (const split of initialSplits) {
+    markSplit(split)
+  }
+
+  const timestamp = nowIso()
+  const updatedScreen: ExtractionScreen = {
+    ...screen,
+    nodeOrder: screen.nodeOrder.filter((nodeId) => !nodeIdsToDelete.has(nodeId)),
+    splitOrder: screen.splitOrder.filter((splitId) => !splitIdsToDelete.has(splitId)),
+    updatedAt: timestamp,
+  }
+
+  await writeJson(screenJsonPath(input.projectId, input.screenId), updatedScreen)
+  await Promise.all(
+    [...splitIdsToDelete].map((splitId) =>
+      rm(splitDir(input.projectId, input.screenId, splitId), { recursive: true, force: true }),
+    ),
+  )
+  await Promise.all(
+    [...nodeIdsToDelete].map((nodeId) =>
+      rm(nodeDir(input.projectId, input.screenId, nodeId), { recursive: true, force: true }),
+    ),
+  )
+  await touchProjectScreen(input.projectId, input.screenId, timestamp)
+
+  const workspace = await loadWorkspace(input.projectId, input.screenId)
+  if (!workspace) throw new Error('Failed to reload workspace after deleting split.')
+  return workspace
 }
 
 export async function resolveNodeImage(
@@ -424,20 +679,255 @@ function defaultCatalogSuggestions(): CatalogSuggestion[] {
   ]
 }
 
-function buildTargetPrompt(instruction: string): string {
-  return [
-    'You are splitting one visual asset out of the attached parent image.',
-    `Target instruction: ${instruction}`,
-    '',
-    'Create the target output: preserve only the requested visual piece with high fidelity. Remove every unrelated element. Keep the extracted piece positioned and scaled consistently with the parent image unless the user later marks it for final tight export.',
-  ].join('\n')
+async function runSplitImageEdits(input: {
+  sourceImagePath: string
+  targetPrompt: string
+  residualPrompt: string
+  targetOutputPath: string
+  residualOutputPath: string
+}) {
+  if (process.env.ASSET_PIPELINE_IMAGE_MODE === 'placeholder') {
+    await Promise.all([
+      copyFile(input.sourceImagePath, input.targetOutputPath),
+      copyFile(input.sourceImagePath, input.residualOutputPath),
+    ])
+    return {
+      mode: 'placeholder',
+      model: null,
+      size: null,
+      quality: null,
+      output_format: null,
+    }
+  }
+
+  const model = process.env.ASSET_PIPELINE_IMAGE_MODEL ?? 'gpt-image-2'
+  const size = process.env.ASSET_PIPELINE_IMAGE_SIZE ?? 'auto'
+  const quality = process.env.ASSET_PIPELINE_IMAGE_QUALITY ?? 'high'
+  const outputFormat = 'png'
+
+  const [targetResult, residualResult] = await Promise.all([
+    editImageWithOpenAI({
+      sourceImagePath: input.sourceImagePath,
+      prompt: input.targetPrompt,
+      outputPath: input.targetOutputPath,
+      model,
+      size,
+      quality,
+      outputFormat,
+    }),
+    editImageWithOpenAI({
+      sourceImagePath: input.sourceImagePath,
+      prompt: input.residualPrompt,
+      outputPath: input.residualOutputPath,
+      model,
+      size,
+      quality,
+      outputFormat,
+    }),
+  ])
+
+  return {
+    mode: 'openai-image-edit',
+    model,
+    size,
+    quality,
+    output_format: outputFormat,
+    target: targetResult,
+    residual: residualResult,
+  }
 }
 
-function buildResidualPrompt(instruction: string): string {
-  return [
-    'You are splitting one visual asset out of the attached parent image.',
-    `Removed target instruction: ${instruction}`,
-    '',
-    'Create the residual output: preserve the parent image except remove the requested visual piece. Reconstruct the newly exposed surface from the surrounding visible context so the remaining scene reads as if the target piece was never present.',
-  ].join('\n')
+async function editImageWithOpenAI(input: {
+  sourceImagePath: string
+  prompt: string
+  outputPath: string
+  model: string
+  size: string
+  quality: string
+  outputFormat: 'png'
+}) {
+  const apiKey = process.env.OPENAI_API_KEY
+  if (!apiKey) {
+    throw new Error(
+      'OPENAI_API_KEY is required to generate split images. Set ASSET_PIPELINE_IMAGE_MODE=placeholder to create placeholder copies instead.',
+    )
+  }
+
+  const sourceBytes = await readFile(input.sourceImagePath)
+  const form = new FormData()
+  form.append('model', input.model)
+  form.append('prompt', input.prompt)
+  form.append(
+    'image',
+    new Blob([new Uint8Array(sourceBytes)], {
+      type: contentTypeForPath(input.sourceImagePath),
+    }),
+    path.basename(input.sourceImagePath),
+  )
+  if (input.size) form.append('size', input.size)
+  if (input.quality) form.append('quality', input.quality)
+  form.append('output_format', input.outputFormat)
+
+  const response = await fetch('https://api.openai.com/v1/images/edits', {
+    method: 'POST',
+    headers: {
+      authorization: `Bearer ${apiKey}`,
+    },
+    body: form,
+  })
+  const responseText = await response.text()
+  const payload = (responseText
+    ? safeJsonParse(responseText)
+    : {}) as {
+    data?: Array<{ b64_json?: string }>
+    error?: { message?: string }
+  }
+
+  if (!response.ok) {
+    throw new Error(
+      `Image edit failed: ${response.status}${payload.error?.message ? ` ${payload.error.message}` : ''}`,
+    )
+  }
+
+  const imageBase64 = payload.data?.[0]?.b64_json
+  if (!imageBase64) throw new Error('Image edit response did not include image data.')
+
+  await writeFile(input.outputPath, Buffer.from(imageBase64, 'base64'))
+  return {
+    bytes: Buffer.byteLength(imageBase64, 'base64'),
+  }
+}
+
+async function draftSplitPromptsWithModel(input: {
+  projectId: string
+  screenId: string
+  parent: ExtractionNode
+  instruction: string
+}): Promise<SplitPromptDraft> {
+  const apiKey = process.env.ANTHROPIC_API_KEY
+  if (!apiKey) {
+    throw new Error('ANTHROPIC_API_KEY is required to draft target and residual prompts.')
+  }
+
+  const model = process.env.ASSET_PIPELINE_PROMPT_MODEL ?? 'claude-opus-4-7'
+  const parentImagePath = nodeImageFile(input.projectId, input.screenId, input.parent)
+  const imageBytes = await readFile(parentImagePath)
+
+  const response = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: {
+      'x-api-key': apiKey,
+      'anthropic-version': '2023-06-01',
+      'content-type': 'application/json',
+    },
+    body: JSON.stringify({
+      model,
+      max_tokens: 2048,
+      messages: [
+        {
+          role: 'user',
+          content: [
+            {
+              type: 'image',
+              source: {
+                type: 'base64',
+                media_type: contentTypeForPath(parentImagePath),
+                data: imageBytes.toString('base64'),
+              },
+            },
+            { type: 'text', text: buildSplitPromptDraftPrompt(input.instruction) },
+          ],
+        },
+      ],
+    }),
+  })
+
+  if (!response.ok) {
+    const detail = await response.text().catch(() => '')
+    throw new Error(`Anthropic prompt draft call failed: ${response.status}${detail ? ` ${detail}` : ''}`)
+  }
+
+  const payload = (await response.json()) as unknown
+  const text = extractResponseText(payload)
+  const parsed = safeJsonParse(extractJsonObjectText(text)) as {
+    targetPrompt?: unknown
+    residualPrompt?: unknown
+  }
+  if (typeof parsed.targetPrompt !== 'string' || typeof parsed.residualPrompt !== 'string') {
+    throw new Error('Prompt draft model response did not include target and residual prompts.')
+  }
+
+  return {
+    parentNodeId: input.parent.id,
+    instruction: input.instruction,
+    targetPrompt: parsed.targetPrompt.trim(),
+    residualPrompt: parsed.residualPrompt.trim(),
+    source: 'model',
+    model,
+    createdAt: nowIso(),
+  }
+}
+
+function extractResponseText(payload: unknown): string {
+  if (typeof payload !== 'object' || payload === null) {
+    throw new Error('Prompt draft model returned an invalid response.')
+  }
+  const content = (payload as { content?: unknown }).content
+  if (Array.isArray(content)) {
+    const text = content
+      .map((part) =>
+        typeof part === 'object' && part !== null && typeof (part as { text?: unknown }).text === 'string'
+          ? (part as { text: string }).text
+          : '',
+      )
+      .join('')
+      .trim()
+    if (text) return text
+  }
+
+  const maybeOutputText = (payload as { output_text?: unknown }).output_text
+  if (typeof maybeOutputText === 'string') return maybeOutputText
+
+  const output = (payload as { output?: unknown }).output
+  if (!Array.isArray(output)) {
+    throw new Error('Prompt draft model response did not include output text.')
+  }
+
+  for (const item of output) {
+    if (typeof item !== 'object' || item === null) continue
+    const content = (item as { content?: unknown }).content
+    if (!Array.isArray(content)) continue
+    for (const part of content) {
+      if (typeof part !== 'object' || part === null) continue
+      const text = (part as { text?: unknown }).text
+      if (typeof text === 'string') return text
+    }
+  }
+
+  throw new Error('Prompt draft model response did not include output text.')
+}
+
+function extractJsonObjectText(text: string) {
+  const trimmed = text.trim()
+  const fenced = trimmed.match(/```(?:json)?\s*([\s\S]*?)\s*```/i)
+  const candidate = fenced?.[1]?.trim() ?? trimmed
+  const start = candidate.indexOf('{')
+  const end = candidate.lastIndexOf('}')
+  if (start === -1 || end === -1 || end <= start) return candidate
+  return candidate.slice(start, end + 1)
+}
+
+function safeJsonParse(text: string): unknown {
+  try {
+    return JSON.parse(text)
+  } catch {
+    return { error: { message: text } }
+  }
+}
+
+function contentTypeForPath(filePath: string) {
+  const ext = path.extname(filePath).toLowerCase()
+  if (ext === '.jpg' || ext === '.jpeg') return 'image/jpeg'
+  if (ext === '.webp') return 'image/webp'
+  return 'image/png'
 }

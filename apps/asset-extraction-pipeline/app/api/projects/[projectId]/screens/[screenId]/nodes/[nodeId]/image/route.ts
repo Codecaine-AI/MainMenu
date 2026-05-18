@@ -16,7 +16,7 @@ export async function GET(
     return new Response(new Uint8Array(bytes), {
       headers: {
         'content-type': resolved.contentType,
-        'cache-control': 'no-store',
+        'cache-control': 'public, max-age=31536000, immutable',
       },
     })
   } catch (err) {

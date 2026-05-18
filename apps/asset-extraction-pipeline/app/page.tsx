@@ -17,12 +17,12 @@ export default async function DashboardPage() {
         </div>
       </header>
 
-      <div className="dashboard-grid">
+      <div className="project-list-layout">
         <section className="surface">
           <div className="surface-header">
             <div>
-              <h2 className="surface-title">Project Index</h2>
-              <p className="surface-note">Open a project to add screens and split source images.</p>
+              <h2 className="surface-title">Project List</h2>
+              <p className="surface-note">Open a project to manage screens and extraction trees.</p>
             </div>
             <span className="pill">{projects.length} projects</span>
           </div>
@@ -48,7 +48,7 @@ export default async function DashboardPage() {
           )}
         </section>
 
-        <aside className="surface">
+        <section className="surface compact-create">
           <div className="surface-header">
             <div>
               <h2 className="surface-title">New Project</h2>
@@ -56,7 +56,7 @@ export default async function DashboardPage() {
             </div>
           </div>
           <CreateProjectForm />
-        </aside>
+        </section>
       </div>
     </main>
   )

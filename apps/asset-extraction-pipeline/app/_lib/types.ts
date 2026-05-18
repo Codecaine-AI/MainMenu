@@ -1,6 +1,6 @@
 export type NodeKind = 'source' | 'target' | 'residual'
-export type NodeStatus = 'active' | 'pending_model' | 'final'
-export type SplitStatus = 'pending_model' | 'generated' | 'approved'
+export type NodeStatus = 'active' | 'pending_model' | 'generated' | 'failed' | 'final'
+export type SplitStatus = 'pending_model' | 'generated' | 'failed' | 'approved'
 
 export interface ProjectScreenRef {
   id: string
@@ -62,8 +62,22 @@ export interface ExtractionSplit {
   targetNodeId: string
   residualNodeId: string
   status: SplitStatus
+  targetPrompt?: string
+  residualPrompt?: string
   createdAt: string
   updatedAt: string
+}
+
+export type SplitPromptDraftSource = 'model'
+
+export interface SplitPromptDraft {
+  parentNodeId: string
+  instruction: string
+  targetPrompt: string
+  residualPrompt: string
+  source: SplitPromptDraftSource
+  model: string
+  createdAt: string
 }
 
 export interface ProjectSummary {
