@@ -20,7 +20,7 @@ Snapshot of what's in the scene-engine right now. Update by re-reading `projects
 | ID    | Name         | Description                                                       |
 |-------|--------------|-------------------------------------------------------------------|
 | title | Title Screen | CODECAINE chrome logo, fire interleave, PRESS START, CRT, audio.  |
-| menu  | Main Menu    | Minimal navigation target for the title screen's start event.     |
+| menu  | Main Menu    | Main-menu background with the editable menu-shield component.      |
 
 Other pages from the retired `apps/frontend/` (projects, testimonials, links, about, guestbook) are planned migrations but not yet implemented as scenes.
 
@@ -42,6 +42,7 @@ Sources of truth: `apps/scene-engine/public/assets/registry.json` and `apps/scen
 | `procedural-cylinder` | component | `/modules/components/procedural-cylinder/procedural-cylinder.js` |
 | `procedural-cylinder-strips-mask` | component | `/modules/components/procedural-cylinder-strips/procedural-cylinder-strips-straight.js` |
 | `arc-letterbox` | component   | `/modules/components/arc-letterbox/arc-letterbox.js` |
+| `menu-shield` | component   | `/modules/components/menu-shield/menu-shield.js` |
 
 ## Title Scene Layer Stack
 

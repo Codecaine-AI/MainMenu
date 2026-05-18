@@ -21,55 +21,44 @@
       }
     },
     {
-      "id": "menu-title",
-      "name": "Menu Title",
-      "type": "text",
+      "id": "main-menu-shield-group",
+      "name": "Main Menu Shield Group",
+      "type": "group",
       "transform": {
-        "x": "center",
-        "y": 36,
-        "width": "auto",
-        "height": "auto",
-        "anchor": "center"
+        "mode": "fill"
       },
-      "properties": {
-        "text": "Main Menu",
-        "fontFamily": "Impact",
-        "fontSize": 96,
-        "fontWeight": 400,
-        "color": "#ffffff",
-        "lineHeight": 1,
-        "letterSpacing": 1,
-        "textAlign": "center",
-        "customCss": "text-shadow: 0 0 12px rgba(255,255,255,0.45), 0 6px 0 rgba(0,0,0,0.45);"
-      }
-    },
-    {
-      "id": "back-to-title",
-      "name": "Back To Title",
-      "type": "text",
-      "transform": {
-        "x": "center",
-        "y": 62,
-        "width": "auto",
-        "height": "auto",
-        "anchor": "center"
-      },
-      "properties": {
-        "text": "BACK TO TITLE",
-        "fontFamily": "Impact",
-        "fontSize": 42,
-        "fontWeight": 400,
-        "color": "#efd42f",
-        "lineHeight": 1,
-        "letterSpacing": 1,
-        "textAlign": "center",
-        "customCss": "text-shadow: 0 0 10px rgba(239,212,47,0.5);"
-      },
-      "events": [
+      "children": [
         {
-          "trigger": "click",
-          "action": "navigate",
-          "target": "title"
+          "id": "main-menu-shield",
+          "name": "Main Menu Shield",
+          "type": "component",
+          "asset": "menu-shield",
+          "transform": {
+            "mode": "fill"
+          },
+          "properties": {
+            "top-text": "Main Menu",
+            "bottom-text": "Solo Smash!",
+            "border-color": "#3158e8",
+            "border-opacity": 1,
+            "fill-opacity": 0.15,
+            "top-text-color": "#ededed",
+            "bottom-text-color": "#e4e7ff",
+            "button-border-color": "#eef1ff",
+            "button-fill-color": "#03040a",
+            "top-x": 179,
+            "top-y": 120,
+            "top-font-size": 47,
+            "bottom-x": 730,
+            "bottom-y": 950,
+            "bottom-font-size": 56,
+            "button-x": 344,
+            "button-y": 902,
+            "button-width": 762,
+            "button-height": 84,
+            "button-radius": 11,
+            "button-border-width": 7
+          }
         }
       ]
     }
