@@ -40,6 +40,25 @@
   fill-rule: evenodd;
 }
 
+.menu-item__notch-fill {
+  fill: var(--menu-items-hot-gold);
+  filter: none;
+}
+
+.menu-item__notch-gap {
+  fill: var(--menu-items-panel);
+  fill-rule: evenodd;
+}
+
+.menu-item__notch-lower-gap {
+  fill: var(--menu-items-panel);
+}
+
+.menu-item__notch-cut {
+  fill: var(--menu-items-panel);
+  fill-rule: evenodd;
+}
+
 .menu-item__marker {
   opacity: 0;
   transition: opacity 80ms linear;
@@ -103,6 +122,13 @@
 }
 
 .menu-items__row.is-selected .menu-item__internal-cut {
+  opacity: 0;
+}
+
+.menu-items__row.is-selected .menu-item__notch-fill,
+.menu-items__row.is-selected .menu-item__notch-gap,
+.menu-items__row.is-selected .menu-item__notch-lower-gap,
+.menu-items__row.is-selected .menu-item__notch-cut {
   opacity: 0;
 }
 

@@ -33,6 +33,25 @@
       fill-rule: evenodd;
     }
 
+    .menu-item__notch-fill {
+      fill: var(--menu-items-hot-gold);
+      filter: none;
+    }
+
+    .menu-item__notch-gap {
+      fill: var(--menu-items-panel);
+      fill-rule: evenodd;
+    }
+
+    .menu-item__notch-lower-gap {
+      fill: var(--menu-items-panel);
+    }
+
+    .menu-item__notch-cut {
+      fill: var(--menu-items-panel);
+      fill-rule: evenodd;
+    }
+
     .menu-item__marker {
       opacity: 0;
     }
@@ -80,8 +99,8 @@
     <path
       class="menu-item__edge-fill"
       d="M 49 8
-         H 692
-         A 56 56 0 0 1 692 120
+         H 683
+         A 56 56 0 0 1 683 120
          H 31
          L 8 78
          Z"
@@ -89,31 +108,50 @@
     <path
       class="menu-item__internal-cut"
       d="M 56.45 21
-         H 692
+         H 683
          V 107
          H 38.7
          L 22.94 78.22
          Z"
     />
     <path
-      class="menu-item__internal-cut"
-      d="M 735 64
-         A 43 43 0 1 1 649 64
-         A 43 43 0 1 1 735 64
+      class="menu-item__notch-gap"
+      d="M 726 64
+         A 43 43 0 1 1 640 64
+         A 43 43 0 1 1 726 64
          Z
-         M 722 64
-         A 30 30 0 1 0 662 64
-         A 30 30 0 1 0 722 64
+         M 705 64
+         A 22 22 0 1 0 661 64
+         A 22 22 0 1 0 705 64
          Z"
     />
-    <circle
-      class="menu-item__internal-cut"
-      cx="692"
-      cy="64"
-      r="17"
+    <path
+      class="menu-item__notch-fill"
+      d="M 678 42
+         H 683
+         A 22 22 0 0 1 683 86
+         H 685
+         V 120
+         H 678
+         Z"
+    />
+    <path
+      class="menu-item__notch-lower-gap"
+      d="M 685 86
+         H 690
+         V 120
+         H 685
+         Z"
+    />
+    <path
+      class="menu-item__notch-cut"
+      d="M 685 55
+         C 692 55 695 58.5 695 64
+         C 695 69.5 692 73 685 73
+         Z"
     />
 
-    <g class="menu-item__marker" transform="translate(692 64)">
+    <g class="menu-item__marker" transform="translate(683 64)">
       <circle class="menu-item__marker-glow" cx="0" cy="0" r="59" />
       <circle class="menu-item__marker-disc" cx="0" cy="0" r="49" />
       <circle class="menu-item__marker-ring" cx="0" cy="0" r="43" />
