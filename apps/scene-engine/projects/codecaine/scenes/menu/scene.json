@@ -55,9 +55,28 @@
             "button-x": 344,
             "button-y": 902,
             "button-width": 762,
-            "button-height": 84,
+            "button-height": 85,
             "button-radius": 11,
             "button-border-width": 7
+          }
+        },
+        {
+          "id": "main-menu-items",
+          "name": "Main Menu Items",
+          "type": "component",
+          "asset": "menu-items",
+          "transform": {
+            "mode": "fill"
+          },
+          "properties": {
+            "item-1": "1-P Mode",
+            "item-2": "VS. Mode",
+            "item-3": "Trophies",
+            "item-4": "Options",
+            "item-5": "Data",
+            "selected-index": 1,
+            "marker-visible": true,
+            "marker-opacity": 0.82
           }
         }
       ]

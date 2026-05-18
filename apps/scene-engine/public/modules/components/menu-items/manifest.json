@@ -1,0 +1,25 @@
+{
+  "name": "Menu Items",
+  "type": "component",
+  "sizing": "fill",
+  "properties": {
+    "items": { "type": "string", "default": "1-P Mode|VS. Mode|Trophies|Options|Data" },
+    "item-1": { "type": "string", "default": "1-P Mode" },
+    "item-2": { "type": "string", "default": "VS. Mode" },
+    "item-3": { "type": "string", "default": "Trophies" },
+    "item-4": { "type": "string", "default": "Options" },
+    "item-5": { "type": "string", "default": "Data" },
+    "selected-index": { "type": "number", "default": 1, "min": 1, "max": 5, "step": 1 },
+    "marker-visible": { "type": "boolean", "default": true },
+    "marker-opacity": { "type": "number", "default": 0.82, "min": 0, "max": 1, "step": 0.01 },
+    "x-offset": { "type": "number", "default": 0, "min": -400, "max": 400, "step": 1 },
+    "y-offset": { "type": "number", "default": 0, "min": -400, "max": 400, "step": 1 },
+    "scale": { "type": "number", "default": 1, "min": 0.25, "max": 2, "step": 0.01 },
+    "font-scale": { "type": "number", "default": 1, "min": 0.4, "max": 1.8, "step": 0.01 },
+    "gold-color": { "type": "color", "default": "#d5a02a" },
+    "hot-gold-color": { "type": "color", "default": "#ffd31d" },
+    "panel-color": { "type": "color", "default": "#050505" },
+    "selected-text-color": { "type": "color", "default": "#050505" },
+    "unselected-text-color": { "type": "color", "default": "#d8a33a" }
+  }
+}

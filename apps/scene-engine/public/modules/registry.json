@@ -34,5 +34,9 @@
   "menu-shield": {
     "type": "component",
     "path": "/modules/components/menu-shield/menu-shield.js"
+  },
+  "menu-items": {
+    "type": "component",
+    "path": "/modules/components/menu-items/menu-items.js"
   }
 }
