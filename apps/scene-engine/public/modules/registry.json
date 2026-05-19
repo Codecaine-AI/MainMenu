@@ -38,5 +38,21 @@
   "menu-items": {
     "type": "component",
     "path": "/modules/components/menu-items/menu-items.js"
+  },
+  "side-menu": {
+    "type": "component",
+    "path": "/modules/components/side-menu/side-menu.js"
+  },
+  "main-menu-system": {
+    "type": "component",
+    "path": "/modules/components/main-menu-system/main-menu-system.js"
+  },
+  "main-menu-rings": {
+    "type": "component",
+    "path": "/modules/components/main-menu-rings/main-menu-rings.js"
+  },
+  "background-pulse": {
+    "type": "component",
+    "path": "/modules/components/background-pulse/background-pulse.js"
   }
 }

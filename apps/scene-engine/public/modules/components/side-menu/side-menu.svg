@@ -1,0 +1,131 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 1080" aria-hidden="true">
+  <style>
+    :root {
+      --side-menu-panel: #07515b;
+      --side-menu-panel-edge: #157681;
+      --side-menu-frame: #b8bbc2;
+      --side-menu-frame-opacity: 0.78;
+      --side-menu-text: #dce0ee;
+      --side-menu-rail-text: #a9abb2;
+    }
+
+    svg {
+      background: #040506;
+    }
+
+    .side-menu__panel-shadow {
+      fill: #010707;
+      opacity: 0.72;
+    }
+
+    .side-menu__panel-fill {
+      fill: var(--side-menu-panel);
+      fill-opacity: 0.7;
+      stroke: none;
+    }
+
+    .side-menu__panel-edge {
+      fill: none;
+      stroke: var(--side-menu-panel-edge);
+      stroke-linejoin: round;
+      stroke-linecap: round;
+    }
+
+    .side-menu__panel-edge--outer {
+      stroke-width: 9;
+      stroke-opacity: 0.72;
+    }
+
+    .side-menu__frame-shadow,
+    .side-menu__frame-line {
+      fill: none;
+      stroke-linejoin: round;
+      stroke-linecap: square;
+    }
+
+    .side-menu__frame-shadow {
+      stroke: rgba(0, 0, 0, 0.72);
+      stroke-width: 14;
+    }
+
+    .side-menu__frame-line--outer {
+      stroke: var(--side-menu-frame);
+      stroke-width: 5.5;
+      stroke-opacity: var(--side-menu-frame-opacity);
+    }
+
+    .side-menu__frame-tab-fill {
+      fill: rgba(14, 15, 18, 0.36);
+      stroke: none;
+    }
+
+    .side-menu__sample-item,
+    .side-menu__sample-rail {
+      font-family: FolkPro, Impact, sans-serif;
+      font-style: italic;
+      font-weight: 900;
+      letter-spacing: 2px;
+      paint-order: stroke fill;
+    }
+
+    .side-menu__sample-item {
+      fill: var(--side-menu-text);
+      stroke: rgba(0, 0, 0, 0.56);
+      stroke-width: 3px;
+      font-size: 30px;
+    }
+
+    .side-menu__sample-rail {
+      fill: var(--side-menu-rail-text);
+      stroke: rgba(0, 0, 0, 0.64);
+      stroke-width: 2px;
+      font-size: 29px;
+      letter-spacing: 2px;
+    }
+  </style>
+
+  <g class="side-menu__geometry-panel">
+    <path
+      class="side-menu__panel-shadow"
+      d="M 970 328 L 1291 306 C 1314 306 1331 325 1333 349 L 1333 763 L 1007 731 C 985 729 970 708 970 680 L 970 328 Z"
+    />
+    <path
+      class="side-menu__panel-fill"
+      d="M 961 318 L 1284 296 C 1306 296 1321 315 1323 338 L 1323 751 L 997 719 C 976 717 961 697 961 668 L 961 318 Z"
+    />
+    <path
+      class="side-menu__panel-edge side-menu__panel-edge--outer"
+      d="M 961 318 L 1284 296 C 1306 296 1321 315 1323 338 L 1323 751 L 997 719 C 976 717 961 697 961 668 L 961 318 Z"
+    />
+  </g>
+
+  <g class="side-menu__geometry-frame">
+    <path
+      class="side-menu__frame-tab-fill"
+      d="M 870 244 L 879 266 L 943 356 L 943 742 L 878 839 L 878 864 L 928 868 L 928 824 L 965 751 L 965 349 L 896 263 L 879 244 Z"
+    />
+    <path
+      class="side-menu__frame-shadow"
+      d="M 879 244 L 1268 216 Q 1308 219 1308 259 L 1308 849 Q 1308 889 1268 891 L 878 864 L 878 839 L 943 742 L 943 356 L 879 266 Z"
+    />
+    <path
+      class="side-menu__frame-line side-menu__frame-line--outer"
+      d="M 879 244 L 1268 216 Q 1308 219 1308 259 L 1308 849 Q 1308 889 1268 891 L 878 864 L 878 839 L 943 742 L 943 356 L 879 266 Z"
+    />
+  </g>
+
+  <g class="side-menu__sample-content">
+    <text class="side-menu__sample-item" x="1027" y="414">Regular Match</text>
+    <text class="side-menu__sample-item" x="1027" y="484">Event Match</text>
+    <text class="side-menu__sample-item" x="1027" y="554">Stadium</text>
+    <text class="side-menu__sample-item" x="1027" y="624">Training</text>
+    <text
+      class="side-menu__sample-rail"
+      text-anchor="middle"
+      dominant-baseline="middle"
+      x="884"
+      y="565"
+      transform="rotate(-90 884 565)"
+    >START PAUSE</text>
+  </g>
+</svg>

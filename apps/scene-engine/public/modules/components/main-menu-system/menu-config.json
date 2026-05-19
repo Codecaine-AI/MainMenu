@@ -1,0 +1,402 @@
+{
+  "initial": "main",
+  "menus": {
+    "main": {
+      "title": "Main Menu",
+      "theme": "blue",
+      "layout": "main-stack",
+      "items": [
+        {
+          "id": "solo",
+          "label": "1-P Mode",
+          "description": "Solo Smash!",
+          "enter": "solo",
+          "preview": {
+            "type": "rows",
+            "rows": [
+              "Regular Match",
+              "Event Match",
+              "Stadium",
+              "Training"
+            ]
+          }
+        },
+        {
+          "id": "vs",
+          "label": "VS. Mode",
+          "description": "Multiplayer battles!",
+          "theme": "red",
+          "enter": "vs",
+          "preview": {
+            "type": "rows",
+            "rows": [
+              "Melee",
+              "Tournament Melee",
+              "Special Melee",
+              "Custom Rules",
+              "Name Entry"
+            ]
+          }
+        },
+        {
+          "id": "trophies",
+          "label": "Trophies",
+          "description": "View and arrange collected trophies.",
+          "theme": "green",
+          "preview": {
+            "type": "rows",
+            "rows": [
+              "Gallery",
+              "Lottery",
+              "Collection",
+              "Special"
+            ]
+          }
+        },
+        {
+          "id": "options",
+          "label": "Options",
+          "description": "Adjust settings.",
+          "theme": "yellow",
+          "enter": "options",
+          "preview": {
+            "type": "rows",
+            "rows": [
+              "Rumble",
+              "Sound",
+              "Screen Display",
+              "Language",
+              "Erase Data"
+            ]
+          }
+        },
+        {
+          "id": "data",
+          "label": "Data",
+          "description": "Records, trophies, and archives.",
+          "theme": "purple",
+          "enter": "data",
+          "preview": {
+            "type": "records-grid"
+          }
+        }
+      ]
+    },
+    "solo": {
+      "title": "1-P Mode",
+      "theme": "blue",
+      "layout": "left-stack-4",
+      "items": [
+        {
+          "id": "regular-match",
+          "label": "Regular Match",
+          "description": "Multiple levels of standard Smash.",
+          "preview": {
+            "type": "rows",
+            "rows": [
+              "Classic",
+              "Adventure"
+            ]
+          }
+        },
+        {
+          "id": "event-match",
+          "label": "Event Match",
+          "description": "Special battles with fixed objectives.",
+          "preview": {
+            "type": "rows",
+            "rows": [
+              "Event 1",
+              "Event 2",
+              "Event 3"
+            ]
+          }
+        },
+        {
+          "id": "stadium",
+          "label": "Stadium",
+          "description": "Target tests, home-run contests, and endurance challenges.",
+          "preview": {
+            "type": "rows",
+            "rows": [
+              "Target Test",
+              "Home-Run Contest",
+              "Multi-Man Melee"
+            ]
+          }
+        },
+        {
+          "id": "training",
+          "label": "Training",
+          "description": "Practice movement, attacks, and item behavior.",
+          "preview": {
+            "type": "rows",
+            "rows": [
+              "Training Mode",
+              "Item Switch",
+              "CPU Behavior"
+            ]
+          }
+        }
+      ]
+    },
+    "vs": {
+      "title": "VS. Mode",
+      "theme": "red",
+      "layout": "left-stack-5",
+      "items": [
+        {
+          "id": "melee",
+          "label": "Melee",
+          "description": "A standard Smash battle for 1 to 4 players.",
+          "preview": {
+            "type": "controller"
+          }
+        },
+        {
+          "id": "tournament-melee",
+          "label": "Tournament Melee",
+          "description": "Set up a tournament bracket.",
+          "preview": {
+            "type": "rows",
+            "rows": [
+              "Single Elimination",
+              "Bracket Setup",
+              "Entrants"
+            ]
+          }
+        },
+        {
+          "id": "special-melee",
+          "label": "Special Melee",
+          "description": "Battle with unusual rules and modifiers.",
+          "preview": {
+            "type": "rows",
+            "rows": [
+              "Giant",
+              "Tiny",
+              "Invisible",
+              "Lightning"
+            ]
+          }
+        },
+        {
+          "id": "custom-rules",
+          "label": "Custom Rules",
+          "description": "Change time, stock, items, and stage rules.",
+          "preview": {
+            "type": "rows",
+            "rows": [
+              "Time",
+              "Stock",
+              "Items",
+              "Stage Select"
+            ]
+          }
+        },
+        {
+          "id": "name-entry",
+          "label": "Name Entry",
+          "description": "Create and edit player tags.",
+          "preview": {
+            "type": "rows",
+            "rows": [
+              "Name Entry",
+              "Copy",
+              "Erase"
+            ]
+          }
+        }
+      ]
+    },
+    "options": {
+      "title": "Options",
+      "theme": "yellow",
+      "layout": "options-stack",
+      "items": [
+        {
+          "id": "rumble",
+          "label": "Rumble",
+          "description": "Turn the Rumble feature on or off.",
+          "preview": {
+            "type": "toggles",
+            "label": "Rumble",
+            "value": "ON"
+          }
+        },
+        {
+          "id": "sound",
+          "label": "Sound",
+          "description": "Adjust audio output and volume.",
+          "preview": {
+            "type": "rows",
+            "rows": [
+              "Stereo",
+              "Mono",
+              "Sound Test"
+            ]
+          }
+        },
+        {
+          "id": "screen-display",
+          "label": "Screen Display",
+          "description": "Adjust display softness and deflicker behavior.",
+          "caption": "Adjust display softness.",
+          "enter": "screen-display",
+          "preview": {
+            "type": "display-settings"
+          }
+        },
+        {
+          "id": "language",
+          "label": "Japanese",
+          "description": "Switch the display language.",
+          "preview": {
+            "type": "rows",
+            "rows": [
+              "English",
+              "Japanese"
+            ]
+          }
+        },
+        {
+          "id": "erase-data",
+          "label": "Erase Data",
+          "description": "Erase saved data.",
+          "preview": {
+            "type": "rows",
+            "rows": [
+              "Records",
+              "Names",
+              "All Data"
+            ]
+          }
+        }
+      ]
+    },
+    "screen-display": {
+      "title": "Options / Screen Display",
+      "theme": "yellow",
+      "layout": "detail-only",
+      "items": [
+        {
+          "id": "deflicker",
+          "label": "Deflicker",
+          "description": "ON: Display will be smoother and softer. OFF: Display will be sharper and harder.",
+          "caption": "Display will be smoother and softer.",
+          "preview": {
+            "type": "display-settings"
+          }
+        }
+      ]
+    },
+    "data": {
+      "title": "Data / Melee Records",
+      "theme": "purple",
+      "layout": "data-stack",
+      "items": [
+        {
+          "id": "vs-records",
+          "label": "VS. Records",
+          "description": "Records for VS. matches.",
+          "preview": {
+            "type": "records-grid"
+          }
+        },
+        {
+          "id": "bonus-records",
+          "label": "Bonus Records",
+          "description": "Records for bonus stages.",
+          "preview": {
+            "type": "records-grid"
+          }
+        },
+        {
+          "id": "misc-records",
+          "label": "Misc. Records",
+          "description": "Other records and play data.",
+          "preview": {
+            "type": "records-grid"
+          }
+        }
+      ]
+    }
+  },
+  "themes": {
+    "blue": {
+      "border": "#3158e8",
+      "borderSoft": "#617bff",
+      "sidePanel": "#07515b",
+      "sideEdge": "#167783",
+      "sideFrame": "#b8bbc2",
+      "sideText": "#dce0ee",
+      "railText": "#aaaeb6",
+      "wash": "rgba(39, 76, 222, 0.14)"
+    },
+    "red": {
+      "border": "#c24334",
+      "borderSoft": "#e47b65",
+      "sidePanel": "#563244",
+      "sideEdge": "#9b4b55",
+      "sideFrame": "#b7adb2",
+      "sideText": "#f1d7d6",
+      "railText": "#c8aeb1",
+      "wash": "rgba(188, 54, 42, 0.18)"
+    },
+    "yellow": {
+      "border": "#b4a64b",
+      "borderSoft": "#e2cf62",
+      "sidePanel": "#4d4a35",
+      "sideEdge": "#9a8740",
+      "sideFrame": "#c2bda6",
+      "sideText": "#f4efd3",
+      "railText": "#c8c0a2",
+      "wash": "rgba(188, 160, 42, 0.14)"
+    },
+    "green": {
+      "border": "#45a86b",
+      "borderSoft": "#7ee29b",
+      "sidePanel": "#254f3a",
+      "sideEdge": "#4c9d65",
+      "sideFrame": "#b8c9bc",
+      "sideText": "#e3f7e7",
+      "railText": "#b4cfba",
+      "wash": "rgba(50, 152, 88, 0.16)"
+    },
+    "purple": {
+      "border": "#7c32c8",
+      "borderSoft": "#b06aff",
+      "sidePanel": "#392c5d",
+      "sideEdge": "#7b48a6",
+      "sideFrame": "#bcb3ca",
+      "sideText": "#eadfff",
+      "railText": "#bdb0d2",
+      "wash": "rgba(111, 41, 186, 0.18)"
+    }
+  },
+  "menuTheming": {
+    "rowHot": "#fbba2d",
+    "rowPanel": "#050505",
+    "rowSelectedText": "#050505",
+    "rowText": "#fbba2d",
+    "markerPulseColor": "#dce0cd",
+    "markerContractSpeed": 2,
+    "markerCooldown": 0,
+    "markerSingleCooldown": 1.4,
+    "markerDoubleCooldown": 1.4,
+    "markerDoubleGap": 0.15,
+    "markerPulseRadius": 2.7,
+    "markerPulseTargetRadius": 0,
+    "markerPulseOpacity": 0.15,
+    "markerPulseThickness": 1,
+    "markerPulseFeatherWidth": 4,
+    "markerPulseEdgeOpacity": 0.21,
+    "markerRingGlowSize": 0.7,
+    "markerRingGlowOpacity": 0.07,
+    "markerInnerPulseColor": "#fff38a",
+    "markerInnerPulseRadius": 30,
+    "markerInnerPulseOpacity": 0.8,
+    "markerInnerPulseGlowSize": 24,
+    "markerInnerPulseSpeed": 4.2
+  }
+}

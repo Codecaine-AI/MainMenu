@@ -1,0 +1,12 @@
+.main-menu-rings {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.main-menu-rings canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}

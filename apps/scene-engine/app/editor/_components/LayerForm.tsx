@@ -12,6 +12,7 @@ import { AnchorSelect } from './inputs/AnchorSelect'
 import { AssetSwapDropdown } from './AssetSwapDropdown'
 import { EventsSection } from './inputs/EventsSection'
 import { ManifestPropertyField } from './inputs/ManifestPropertyField'
+import { MainMenuConfigEditor } from './MainMenuConfigEditor'
 import { SlotsSection } from './SlotsSection'
 import { TextSection } from './TextSection'
 import { InspectorHeader, InspectorSection, FieldRow, ReadonlyValue } from './inputs/InspectorSection'
@@ -205,6 +206,7 @@ export function LayerForm({ layer, path }: Props) {
   const isSubLayerOverride = typeof layer.layer === 'string' && typeof layer.type !== 'string'
 
   const assetId = layer.asset as string | undefined
+  const isMainMenuSystem = layerType === 'component' && assetId === 'main-menu-system'
   const containerEntry = assetId && registry ? registry[assetId] : undefined
   const containerType = containerEntry?.type
   const assetType = containerType && isAssetType(containerType) ? containerType : null
@@ -237,9 +239,12 @@ export function LayerForm({ layer, path }: Props) {
   const orphans = useMemo(
     () =>
       Object.entries(props).filter(
-        ([k]) => !declaredKeys.has(k) && !(isText && TEXT_PROPERTY_KEYS.has(k)),
+        ([k]) =>
+          !declaredKeys.has(k) &&
+          !(isText && TEXT_PROPERTY_KEYS.has(k)) &&
+          !(isMainMenuSystem && k === 'menu-config'),
       ),
-    [props, declaredKeys, isText],
+    [props, declaredKeys, isText, isMainMenuSystem],
   )
   const orphanKeySignature = orphans.map(([k]) => k).join(',')
 
@@ -490,6 +495,10 @@ export function LayerForm({ layer, path }: Props) {
           </FieldRow>
         )}
       </InspectorSection>
+      )}
+
+      {isMainMenuSystem && (
+        <MainMenuConfigEditor path={path} properties={props} />
       )}
 
       {(layerSchema || (layerType !== 'effect' && orphans.length > 0)) && (

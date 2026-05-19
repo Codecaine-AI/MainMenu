@@ -20,6 +20,7 @@ const DEFAULT_ROW_LAYOUT = [
 
 const DEFAULTS = {
   items: DEFAULT_ITEMS.join('|'),
+  'item-count': DEFAULT_ITEMS.length,
   'selected-index': 1,
   'marker-visible': true,
   'x-offset': 0,
@@ -37,14 +38,25 @@ const DEFAULTS = {
   'selected-text-color': '#050505',
   'unselected-text-color': '#d8a33a',
   'marker-opacity': 1,
+  'marker-ring-glow-size': 0.8,
+  'marker-ring-glow-opacity': 0.08,
+  'marker-inner-pulse-color': '#fff38a',
+  'marker-inner-pulse-radius': 15,
+  'marker-inner-pulse-opacity': 0.78,
+  'marker-inner-pulse-glow-size': 9,
+  'marker-inner-pulse-speed': 0.85,
   'marker-pulse-opacity': 1,
   'marker-pulse-edge-opacity': 0.2,
   'marker-pulse-color': '#e0e0d6',
   'marker-pulse-thickness': 4,
   'marker-pulse-feather-width': 18,
   'marker-pulse-radius': 2.1,
+  'marker-pulse-target-radius': 0,
   'marker-pulse-contract-speed': 2.4,
   'marker-pulse-cooldown': 1.2,
+  'marker-pulse-single-cooldown': 1.2,
+  'marker-pulse-double-cooldown': 1.2,
+  'marker-pulse-double-gap': 0.22,
 };
 
 function svgEl(tag, attrs = {}) {
@@ -85,63 +97,135 @@ function pulseTiming(properties) {
     0.4,
     8,
   );
-  const cooldown = clamp(numberProp(properties, 'marker-pulse-cooldown', DEFAULTS['marker-pulse-cooldown']), 0, 12);
+  const fallbackStartGap = clamp(
+    numberProp(properties, 'marker-pulse-cooldown', DEFAULTS['marker-pulse-cooldown']),
+    0,
+    12,
+  );
+  const singleStartGap = clamp(numberProp(properties, 'marker-pulse-single-cooldown', fallbackStartGap), 0, 12);
+  const doubleGap = clamp(numberProp(properties, 'marker-pulse-double-gap', DEFAULTS['marker-pulse-double-gap']), 0, 4);
+  const doubleStartGap = Math.max(
+    doubleGap,
+    clamp(numberProp(properties, 'marker-pulse-double-cooldown', fallbackStartGap), 0, 12),
+  );
+
+  const primaryStarts = [];
+  const secondaryStarts = [];
+  let cycle = 0;
+
+  const addSingleCadence = () => {
+    primaryStarts.push(cycle);
+    cycle += singleStartGap;
+  };
+
+  const addDoubleCadence = () => {
+    primaryStarts.push(cycle);
+    secondaryStarts.push(cycle + doubleGap);
+    cycle += doubleStartGap;
+  };
+
+  addSingleCadence();
+  addDoubleCadence();
+  addSingleCadence();
+  addDoubleCadence();
 
   return {
     contractSpeed,
-    cooldown,
-    cycle: contractSpeed + cooldown,
+    cooldown: fallbackStartGap,
+    singleCooldown: singleStartGap,
+    doubleCooldown: doubleStartGap,
+    doubleGap,
+    cycle: Math.max(cycle, 0.001),
+    primaryStarts,
+    secondaryStarts,
   };
 }
 
-function animationName(layerId) {
-  const suffix = String(layerId || 'default')
-    .replace(/[^a-zA-Z0-9_-]/g, '-')
-    .replace(/^-+|-+$/g, '') || 'default';
-
-  return `menu-item-marker-collapse-${suffix}`;
+function pulseStarts(timing) {
+  return [...timing.primaryStarts, ...timing.secondaryStarts]
+    .filter((start) => Number.isFinite(start) && start >= 0)
+    .sort((a, b) => a - b);
 }
 
-function appendPulseTimingStyle(root, properties, layerId) {
-  const { contractSpeed, cycle } = pulseTiming(properties);
-  const name = animationName(layerId);
-  const activeEnd = clamp((contractSpeed / cycle) * 100, 1, 100);
-  const fadeInEnd = activeEnd * 0.22;
-  const contractEnd = activeEnd * 0.75;
-  const precision = (value) => Number(value.toFixed(4));
+function startPulseSequence(marker, pulseTemplate, timing) {
+  if (typeof window === 'undefined' || typeof pulseTemplate.animate !== 'function') return;
+  if (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) return;
 
-  root.style.setProperty('--menu-items-marker-pulse-animation-name', name);
+  const starts = pulseStarts(timing);
+  if (starts.length === 0) return;
 
-  const style = document.createElement('style');
-  style.textContent = `
-@keyframes ${name} {
-  0% {
-    opacity: 0;
-    transform: scale(var(--menu-items-marker-pulse-radius));
-  }
+  const parent = pulseTemplate.parentNode;
+  if (!parent) return;
 
-  ${precision(fadeInEnd)}% {
-    opacity: 1;
-    transform: scale(var(--menu-items-marker-pulse-radius));
-  }
+  const markerRing = marker.querySelector('.menu-item__marker-ring');
+  const sourcePulse = pulseTemplate.cloneNode(true);
+  pulseTemplate.remove();
 
-  ${precision(contractEnd)}% {
-    opacity: 1;
-    transform: scale(0.8);
-  }
+  const cycleMs = Math.max(16, timing.cycle * 1000);
+  const durationMs = Math.max(16, timing.contractSpeed * 1000);
 
-  ${precision(activeEnd)}% {
-    opacity: 0;
-    transform: scale(0.68);
-  }
+  const firePulse = () => {
+    if (!marker.isConnected) return;
+    const row = marker.closest('.menu-items__row');
+    const root = marker.closest('.menu-items');
+    if (!row?.classList.contains('is-selected') || !root?.classList.contains('has-marker')) return;
 
-  100% {
-    opacity: 0;
-    transform: scale(0.68);
-  }
-}
-`;
-  root.appendChild(style);
+    const pulse = sourcePulse.cloneNode(true);
+    pulse.style.opacity = '0';
+    parent.insertBefore(pulse, markerRing);
+
+    const animation = pulse.animate(
+      [
+        {
+          opacity: 0,
+          transform: 'scale(var(--menu-items-marker-pulse-radius))',
+          offset: 0,
+          easing: 'ease-in',
+        },
+        {
+          opacity: 1,
+          transform: 'scale(var(--menu-items-marker-pulse-radius))',
+          offset: 0.18,
+          easing: 'ease-in-out',
+        },
+        {
+          opacity: 1,
+          transform: 'scale(var(--menu-items-marker-pulse-settle-radius))',
+          offset: 0.78,
+          easing: 'ease-out',
+        },
+        {
+          opacity: 0,
+          transform: 'scale(var(--menu-items-marker-pulse-target-radius))',
+          offset: 1,
+        },
+      ],
+      {
+        duration: durationMs,
+        fill: 'forwards',
+      },
+    );
+
+    animation.finished
+      .catch(() => {})
+      .finally(() => pulse.remove());
+  };
+
+  let hasConnected = false;
+  const scheduleCycle = () => {
+    if (marker.isConnected) {
+      hasConnected = true;
+    } else if (hasConnected) {
+      return;
+    }
+
+    starts.forEach((start) => {
+      window.setTimeout(firePulse, start * 1000);
+    });
+    window.setTimeout(scheduleCycle, cycleMs);
+  };
+
+  scheduleCycle();
 }
 
 function parseItems(properties) {
@@ -149,11 +233,17 @@ function parseItems(properties) {
     .split('|')
     .map((item) => item.trim())
     .filter(Boolean);
+  const count = clamp(
+    Math.round(numberProp(properties, 'item-count', fromList.length || DEFAULTS['item-count'])),
+    1,
+    DEFAULT_ROW_LAYOUT.length,
+  );
 
-  const items = DEFAULT_ITEMS.map((fallback, index) => {
+  const items = Array.from({ length: count }, (_, index) => {
     const key = `item-${index + 1}`;
-    return stringProp(properties, key, fromList[index] ?? fallback);
-  });
+    const fallback = fromList[index] ?? DEFAULT_ITEMS[index] ?? `Item ${index + 1}`;
+    return stringProp(properties, key, fallback).trim();
+  }).filter(Boolean);
 
   return items;
 }
@@ -303,16 +393,29 @@ function appendGeometrySlice(parent, template, x, width, viewBoxX, viewBoxWidth)
   parent.appendChild(slice);
 }
 
-function appendMarker(parent, template, markerX) {
+function appendMarker(parent, template, markerX, pulse) {
   const markerAsset = document.importNode(template.asset, true);
   const marker = markerAsset.querySelector('.menu-item__marker');
   if (!marker) return;
 
+  const primaryPulse = marker.querySelector('.menu-item__marker-collapse-ring');
+  const innerPulse = svgEl('circle', {
+    class: 'menu-item__marker-inner-pulse',
+    cx: 0,
+    cy: 0,
+    r: DEFAULTS['marker-inner-pulse-radius'],
+  });
+  marker.appendChild(innerPulse);
+
   marker.setAttribute('transform', `translate(${markerX.toFixed(3)} 64)`);
   parent.appendChild(marker);
+
+  if (primaryPulse) {
+    startPulseSequence(marker, primaryPulse, pulse);
+  }
 }
 
-function appendRow(svg, template, label, index, layout, selectedIndex, fontScale, fitSettings) {
+function appendRow(svg, template, label, index, layout, selectedIndex, fontScale, fitSettings, pulse) {
   const rowIndex = index + 1;
   const row = svgEl('g', {
     class: rowIndex === selectedIndex ? 'menu-items__row is-selected' : 'menu-items__row',
@@ -356,7 +459,7 @@ function appendRow(svg, template, label, index, layout, selectedIndex, fontScale
     rightWidth + ITEM_SLICE_OVERLAP,
   );
   geometry.appendChild(shell);
-  appendMarker(geometry, template, leftWidth + middleWidth + (683 - ITEM_RIGHT_SLICE_START));
+  appendMarker(geometry, template, leftWidth + middleWidth + (683 - ITEM_RIGHT_SLICE_START), pulse);
   row.appendChild(geometry);
 
   const textCenter = layout.x + layout.width * layout.textX;
@@ -402,6 +505,23 @@ function applyCssProperties(root, properties) {
     pulseThickness,
     80,
   );
+  const pulseRadius = clamp(numberProp(properties, 'marker-pulse-radius', DEFAULTS['marker-pulse-radius']), 1, 4);
+  const pulseTargetRadius = clamp(
+    numberProp(properties, 'marker-pulse-target-radius', DEFAULTS['marker-pulse-target-radius']),
+    0,
+    1,
+  );
+  const pulseSettleRadius = pulseTargetRadius + (pulseRadius - pulseTargetRadius) * 0.08;
+  const markerRingGlowSize = clamp(
+    numberProp(properties, 'marker-ring-glow-size', DEFAULTS['marker-ring-glow-size']),
+    0,
+    12,
+  );
+  const markerInnerPulseRadius = clamp(
+    numberProp(properties, 'marker-inner-pulse-radius', DEFAULTS['marker-inner-pulse-radius']),
+    8,
+    32,
+  );
 
   root.style.setProperty('--menu-items-gold', stringProp(properties, 'gold-color', DEFAULTS['gold-color']));
   root.style.setProperty('--menu-items-hot-gold', stringProp(properties, 'hot-gold-color', DEFAULTS['hot-gold-color']));
@@ -411,6 +531,38 @@ function applyCssProperties(root, properties) {
   root.style.setProperty(
     '--menu-items-marker-opacity',
     String(clamp(numberProp(properties, 'marker-opacity', DEFAULTS['marker-opacity']), 0, 1)),
+  );
+  root.style.setProperty(
+    '--menu-items-marker-ring-glow-size',
+    `${markerRingGlowSize}px`,
+  );
+  root.style.setProperty(
+    '--menu-items-marker-ring-glow-opacity',
+    String(clamp(numberProp(properties, 'marker-ring-glow-opacity', DEFAULTS['marker-ring-glow-opacity']), 0, 1)),
+  );
+  root.style.setProperty(
+    '--menu-items-marker-inner-pulse-color',
+    stringProp(properties, 'marker-inner-pulse-color', DEFAULTS['marker-inner-pulse-color']),
+  );
+  root.style.setProperty(
+    '--menu-items-marker-inner-pulse-radius',
+    `${markerInnerPulseRadius}px`,
+  );
+  root.style.setProperty(
+    '--menu-items-marker-inner-pulse-opacity',
+    String(clamp(numberProp(properties, 'marker-inner-pulse-opacity', DEFAULTS['marker-inner-pulse-opacity']), 0, 1)),
+  );
+  root.style.setProperty(
+    '--menu-items-marker-inner-pulse-glow-size',
+    `${clamp(
+      numberProp(properties, 'marker-inner-pulse-glow-size', DEFAULTS['marker-inner-pulse-glow-size']),
+      0,
+      24,
+    )}px`,
+  );
+  root.style.setProperty(
+    '--menu-items-marker-inner-pulse-speed',
+    `${clamp(numberProp(properties, 'marker-inner-pulse-speed', DEFAULTS['marker-inner-pulse-speed']), 0.1, 6)}s`,
   );
   root.style.setProperty(
     '--menu-items-marker-pulse-opacity',
@@ -442,7 +594,15 @@ function applyCssProperties(root, properties) {
   );
   root.style.setProperty(
     '--menu-items-marker-pulse-radius',
-    String(clamp(numberProp(properties, 'marker-pulse-radius', DEFAULTS['marker-pulse-radius']), 1, 4)),
+    String(pulseRadius),
+  );
+  root.style.setProperty(
+    '--menu-items-marker-pulse-target-radius',
+    String(pulseTargetRadius),
+  );
+  root.style.setProperty(
+    '--menu-items-marker-pulse-settle-radius',
+    String(pulseSettleRadius),
   );
   root.style.setProperty(
     '--menu-items-marker-pulse-contract-speed',
@@ -451,6 +611,18 @@ function applyCssProperties(root, properties) {
   root.style.setProperty(
     '--menu-items-marker-pulse-cooldown',
     `${pulse.cooldown}s`,
+  );
+  root.style.setProperty(
+    '--menu-items-marker-pulse-single-cooldown',
+    `${pulse.singleCooldown}s`,
+  );
+  root.style.setProperty(
+    '--menu-items-marker-pulse-double-cooldown',
+    `${pulse.doubleCooldown}s`,
+  );
+  root.style.setProperty(
+    '--menu-items-marker-pulse-double-gap',
+    `${pulse.doubleGap}s`,
   );
   root.style.setProperty(
     '--menu-items-marker-pulse-cycle',
@@ -466,7 +638,6 @@ export default async function ({ properties = {}, layerId } = {}) {
   }
   if (layerId) root.dataset.layerId = layerId;
   applyCssProperties(root, properties);
-  appendPulseTimingStyle(root, properties, layerId);
 
   const items = parseItems(properties);
   root.setAttribute('aria-label', `Main menu items: ${items.join(', ')}`);
@@ -485,6 +656,7 @@ export default async function ({ properties = {}, layerId } = {}) {
   const widthScale = clamp(numberProp(properties, 'width-scale', DEFAULTS['width-scale']), 0.4, 1.4);
   const fontScale = clamp(numberProp(properties, 'font-scale', DEFAULTS['font-scale']), 0.4, 1.8);
   const fitSettings = textFitSettings(properties);
+  const pulse = pulseTiming(properties);
 
   try {
     const template = await loadItemTemplate();
@@ -499,6 +671,7 @@ export default async function ({ properties = {}, layerId } = {}) {
         selectedIndex,
         fontScale,
         fitSettings,
+        pulse,
       );
     });
   } catch (err) {
@@ -522,6 +695,14 @@ export const properties = {
           type: 'number',
           label: 'Selected Index',
           description: 'The row shown as the active solid yellow item. Uses 1-5.',
+          min: 1,
+          max: 5,
+          step: 1,
+        },
+        'item-count': {
+          type: 'number',
+          label: 'Item Count',
+          description: 'Number of menu rows to draw. Uses item fields below, falling back to the pipe list.',
           min: 1,
           max: 5,
           step: 1,
@@ -680,6 +861,66 @@ export const properties = {
       },
       sections: [
         {
+          id: 'menu-items-target-ring',
+          label: 'Target Ring',
+          description: 'Static selected marker ring and the small interior glow pulse.',
+          properties: {
+            'marker-ring-glow-size': {
+              type: 'number',
+              label: 'Ring Glow Size',
+              description: 'Tiny optional glow around the gold target ring. Use 0 for no outward glow.',
+              min: 0,
+              max: 12,
+              step: 0.1,
+            },
+            'marker-ring-glow-opacity': {
+              type: 'number',
+              label: 'Ring Glow Opacity',
+              description: 'Opacity of the subtle backing glow behind the target ring.',
+              min: 0,
+              max: 1,
+              step: 0.01,
+            },
+            'marker-inner-pulse-color': {
+              type: 'color',
+              label: 'Inner Pulse Color',
+              description: 'Fill color of the glowing interior pulse circle.',
+            },
+            'marker-inner-pulse-radius': {
+              type: 'number',
+              label: 'Inner Pulse Radius',
+              description: 'Static radius of the interior pulse circle, in marker SVG pixels.',
+              min: 8,
+              max: 32,
+              step: 0.5,
+            },
+            'marker-inner-pulse-opacity': {
+              type: 'number',
+              label: 'Inner Pulse Opacity',
+              description: 'Peak opacity of the filled interior pulse circle.',
+              min: 0,
+              max: 1,
+              step: 0.01,
+            },
+            'marker-inner-pulse-glow-size': {
+              type: 'number',
+              label: 'Inner Pulse Glow',
+              description: 'Glow radius around the interior pulse circle.',
+              min: 0,
+              max: 24,
+              step: 0.5,
+            },
+            'marker-inner-pulse-speed': {
+              type: 'number',
+              label: 'Inner Pulse Speed',
+              description: 'Seconds per interior glow pulse cycle.',
+              min: 0.1,
+              max: 6,
+              step: 0.05,
+            },
+          },
+        },
+        {
           id: 'menu-items-marker-pulse',
           label: 'Pulse',
           description: 'Animated ring that contracts into the selected target marker.',
@@ -729,18 +970,50 @@ export const properties = {
               max: 4,
               step: 0.05,
             },
+            'marker-pulse-target-radius': {
+              type: 'number',
+              label: 'Pulse Target Radius',
+              description: 'Ending radius multiplier. Use 0 to collapse the pulse to the center point.',
+              min: 0,
+              max: 1,
+              step: 0.01,
+            },
             'marker-pulse-contract-speed': {
               type: 'number',
               label: 'Contract Speed',
-              description: 'Seconds the pulse spends contracting into the target before cooldown.',
+              description: 'Seconds each pulse spends contracting into the target. This no longer controls the rhythm spacing.',
               min: 0.4,
               max: 8,
               step: 0.1,
             },
+            'marker-pulse-double-gap': {
+              type: 'number',
+              label: 'Double Gap',
+              description: 'Seconds between the first and second ring starts in each double cadence.',
+              min: 0,
+              max: 4,
+              step: 0.01,
+            },
             'marker-pulse-cooldown': {
               type: 'number',
-              label: 'Cooldown',
-              description: 'Seconds to wait after each pulse before the next ring starts.',
+              label: 'Fallback Start Gap',
+              description: 'Fallback seconds from one cadence start to the next when cadence-specific gaps are unset.',
+              min: 0,
+              max: 12,
+              step: 0.1,
+            },
+            'marker-pulse-single-cooldown': {
+              type: 'number',
+              label: 'Single Start Gap',
+              description: 'Seconds from a single cadence start to the next cadence start. Use 0 for no start delay.',
+              min: 0,
+              max: 12,
+              step: 0.1,
+            },
+            'marker-pulse-double-cooldown': {
+              type: 'number',
+              label: 'Double Start Gap',
+              description: 'Seconds from a double cadence start to the next cadence start. Values below Double Gap are clamped to Double Gap so the second hit can occur.',
               min: 0,
               max: 12,
               step: 0.1,

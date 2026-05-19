@@ -14,15 +14,18 @@ interface Props {
 
 export function PropertySection({ section, values, onChange, depth = 0 }: Props) {
   const anchorRef = useRef<HTMLButtonElement>(null)
-  const [open, setOpen] = useState(false)
+  const [descriptionOpen, setDescriptionOpen] = useState(false)
+  const [collapsed, setCollapsed] = useState(depth > 0)
   const hasDescription = Boolean(section.description)
   const isTopLevel = depth === 0
+  const canCollapse = !isTopLevel
+  const isCollapsed = canCollapse && collapsed
 
   const headerButtonClass = isTopLevel
     ? 'text-[12px] font-semibold text-gray-200 truncate flex-1 text-left bg-transparent border-0 p-0'
     : 'text-[11px] font-semibold text-gray-300 truncate flex-1 text-left bg-transparent border-0 p-0'
 
-  const interactiveClass = hasDescription ? 'cursor-pointer hover:underline' : 'cursor-default'
+  const interactiveClass = canCollapse || hasDescription ? 'cursor-pointer hover:underline' : 'cursor-default'
 
   const indentStyle = !isTopLevel ? { marginLeft: depth * 8 } : undefined
 
@@ -42,40 +45,59 @@ export function PropertySection({ section, values, onChange, depth = 0 }: Props)
         <button
           type="button"
           ref={anchorRef}
-          onClick={hasDescription ? () => setOpen((o) => !o) : undefined}
-          disabled={!hasDescription}
+          onClick={
+            canCollapse
+              ? () => setCollapsed((next) => !next)
+              : hasDescription
+                ? () => setDescriptionOpen((next) => !next)
+                : undefined
+          }
+          disabled={!canCollapse && !hasDescription}
+          aria-expanded={canCollapse ? !isCollapsed : undefined}
           className={`${headerButtonClass} ${interactiveClass}`}
           title={section.label}
         >
-          {section.label}
+          {canCollapse ? `${isCollapsed ? '>' : 'v'} ${section.label}` : section.label}
         </button>
+        {canCollapse && hasDescription && (
+          <button
+            type="button"
+            onClick={() => setDescriptionOpen((next) => !next)}
+            className="h-4 w-4 shrink-0 rounded-sm border border-[#3a3a3a] bg-[#1d1d1d] text-[10px] leading-none text-gray-400 hover:text-gray-200"
+            aria-label={`${section.label} description`}
+          >
+            i
+          </button>
+        )}
       </div>
-      <div className={bodyClass}>
-        {Object.entries(section.properties ?? {}).map(([key, def]) => (
-          <PropertyField
-            key={key}
-            propertyKey={key}
-            def={def}
-            value={values[key]}
-            onChange={(v) => onChange(key, v)}
-          />
-        ))}
-        {(section.sections ?? []).map((child) => (
-          <PropertySection
-            key={child.id}
-            section={child}
-            values={values}
-            onChange={onChange}
-            depth={depth + 1}
-          />
-        ))}
-      </div>
+      {!isCollapsed && (
+        <div className={bodyClass}>
+          {Object.entries(section.properties ?? {}).map(([key, def]) => (
+            <PropertyField
+              key={key}
+              propertyKey={key}
+              def={def}
+              value={values[key]}
+              onChange={(v) => onChange(key, v)}
+            />
+          ))}
+          {(section.sections ?? []).map((child) => (
+            <PropertySection
+              key={child.id}
+              section={child}
+              values={values}
+              onChange={onChange}
+              depth={depth + 1}
+            />
+          ))}
+        </div>
+      )}
       <DescriptionPopover
         label={section.label}
         description={section.description}
         anchorEl={anchorRef.current}
-        open={open && hasDescription}
-        onClose={() => setOpen(false)}
+        open={descriptionOpen && hasDescription}
+        onClose={() => setDescriptionOpen(false)}
       />
     </div>
   )

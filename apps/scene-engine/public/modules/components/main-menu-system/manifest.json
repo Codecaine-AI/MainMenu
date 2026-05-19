@@ -1,0 +1,30 @@
+{
+  "name": "Main Menu System",
+  "type": "component",
+  "sizing": "fill",
+  "properties": {
+    "config": {
+      "type": "string",
+      "default": "/modules/components/main-menu-system/menu-config.json"
+    },
+    "initial-menu": {
+      "type": "string",
+      "default": "main"
+    },
+    "enable-keyboard": {
+      "type": "boolean",
+      "default": true
+    },
+    "enable-gamepad": {
+      "type": "boolean",
+      "default": true
+    },
+    "transition-ms": {
+      "type": "number",
+      "default": 300,
+      "min": 0,
+      "max": 1000,
+      "step": 10
+    }
+  }
+}

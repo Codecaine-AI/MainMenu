@@ -24,6 +24,7 @@ export interface EditorStore {
   markClean: () => void
   mutateScene: (patch: Partial<SceneJson>) => void
   mutateObjectAt: (path: string, patch: Record<string, unknown>) => void
+  setObjectPropertyAt: (path: string, dottedKey: string, value: unknown) => void
   addObjectAt: (parentPath: string, index: number, layer: Record<string, unknown>) => void
   removeObjectAt: (path: string) => Record<string, unknown> | null
   moveObject: (fromPath: string, toPath: string) => void
@@ -100,6 +101,23 @@ function deepMerge(target: unknown, patch: unknown): unknown {
   return out
 }
 
+function setDottedValue(target: Record<string, unknown>, dottedKey: string, value: unknown) {
+  const keys = dottedKey.split('.').filter(Boolean)
+  if (keys.length === 0) return
+  let cursor = target
+  for (let i = 0; i < keys.length - 1; i++) {
+    const key = keys[i]
+    const next = cursor[key]
+    if (!next || typeof next !== 'object' || Array.isArray(next)) {
+      cursor[key] = {}
+    }
+    cursor = cursor[key] as Record<string, unknown>
+  }
+  const last = keys[keys.length - 1]
+  if (value === undefined) delete cursor[last]
+  else cursor[last] = value
+}
+
 export const useEditorStore = create<EditorStore>((set, get) => ({
   scene: null,
   registry: null,
@@ -132,6 +150,16 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
     const { container, index } = navigateToParentContainer(next, path)
     if (!container || (container as unknown[])[index] == null) return
     ;(container as unknown[])[index] = deepMerge((container as unknown[])[index], patch)
+    set({ scene: next, dirty: true })
+  },
+
+  setObjectPropertyAt: (path, dottedKey, value) => {
+    const { scene } = get()
+    if (!scene) return
+    const next = structuredClone(scene)
+    const { container, index } = navigateToParentContainer(next, path)
+    if (!container || (container as unknown[])[index] == null) return
+    setDottedValue((container as Record<string, unknown>[])[index], dottedKey, value)
     set({ scene: next, dirty: true })
   },
 

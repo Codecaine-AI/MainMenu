@@ -20,7 +20,7 @@ Snapshot of what's in the scene-engine right now. Update by re-reading `projects
 | ID    | Name         | Description                                                       |
 |-------|--------------|-------------------------------------------------------------------|
 | title | Title Screen | CODECAINE chrome logo, fire interleave, PRESS START, CRT, audio.  |
-| menu  | Main Menu    | Main-menu background with the editable menu-shield component.      |
+| menu  | Main Menu    | Main-menu background with a stateful nested main-menu component and inspector-editable menu graph. |
 
 Other pages from the retired `apps/frontend/` (projects, testimonials, links, about, guestbook) are planned migrations but not yet implemented as scenes.
 
@@ -43,6 +43,13 @@ Sources of truth: `apps/scene-engine/public/assets/registry.json` and `apps/scen
 | `procedural-cylinder-strips-mask` | component | `/modules/components/procedural-cylinder-strips/procedural-cylinder-strips-straight.js` |
 | `arc-letterbox` | component   | `/modules/components/arc-letterbox/arc-letterbox.js` |
 | `menu-shield` | component   | `/modules/components/menu-shield/menu-shield.js` |
+| `menu-items` | component   | `/modules/components/menu-items/menu-items.js` |
+| `side-menu` | component   | `/modules/components/side-menu/side-menu.js` |
+| `main-menu-system` | component | `/modules/components/main-menu-system/main-menu-system.js` |
+| `main-menu-rings` | component | `/modules/components/main-menu-rings/main-menu-rings.js` |
+| `background-pulse` | component | `/modules/components/background-pulse/background-pulse.js` |
+
+The `main-menu-system` component now supports two configuration sources. The active scene stores an inline `properties.menu-config` object for editor-driven menu data, including menus, item nesting, previews, shared `menuTheming` for the gold row treatment/pulse, and named menu themes for shield/side-panel color changes. `/modules/components/main-menu-system/menu-config.json` remains the starter/fallback config when no inline graph is present.
 
 ## Title Scene Layer Stack
 

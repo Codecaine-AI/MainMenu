@@ -1,0 +1,153 @@
+.side-menu {
+  --side-menu-stage-x: 0px;
+  --side-menu-stage-y: 0px;
+  --side-menu-stage-scale: 1;
+  --side-menu-perspective: 1700px;
+  --side-menu-panel-z: -42px;
+  --side-menu-frame-z: 8px;
+  --side-menu-panel-rotate-x: 0deg;
+  --side-menu-panel-rotate-y: -5deg;
+  --side-menu-panel-rotate-z: 0deg;
+  --side-menu-frame-rotate-x: 0deg;
+  --side-menu-frame-rotate-y: -2deg;
+  --side-menu-frame-rotate-z: 0deg;
+  --side-menu-panel-origin-x: 1130px;
+  --side-menu-panel-origin-y: 525px;
+  --side-menu-frame-origin-x: 942px;
+  --side-menu-frame-origin-y: 586px;
+  --side-menu-panel: #07515b;
+  --side-menu-panel-edge: #167783;
+  --side-menu-panel-opacity: 0.72;
+  --side-menu-panel-edge-opacity: 0.78;
+  --side-menu-frame: #b8bbc2;
+  --side-menu-frame-opacity: 0.78;
+  --side-menu-text: #dce0ee;
+  --side-menu-rail-text: #aaaeb6;
+  --side-menu-text-shadow: rgba(0, 0, 0, 0.6);
+  --side-menu-rail-font-size: 29px;
+
+  width: 100%;
+  height: 100%;
+  pointer-events: auto;
+  transform-style: preserve-3d;
+}
+
+.side-menu,
+.side-menu__stage,
+.side-menu__layer {
+  position: absolute;
+  inset: 0;
+}
+
+.side-menu__stage {
+  transform: translate3d(var(--side-menu-stage-x), var(--side-menu-stage-y), 0) scale(var(--side-menu-stage-scale));
+  transform-origin: center center;
+  transform-style: preserve-3d;
+}
+
+.side-menu__layer {
+  transform-style: preserve-3d;
+  backface-visibility: hidden;
+}
+
+.side-menu__panel-layer {
+  transform-origin: var(--side-menu-panel-origin-x) var(--side-menu-panel-origin-y);
+  transform:
+    perspective(var(--side-menu-perspective))
+    translate3d(0, 0, var(--side-menu-panel-z))
+    rotateX(var(--side-menu-panel-rotate-x))
+    rotateY(var(--side-menu-panel-rotate-y))
+    rotateZ(var(--side-menu-panel-rotate-z));
+}
+
+.side-menu__frame-layer {
+  transform-origin: var(--side-menu-frame-origin-x) var(--side-menu-frame-origin-y);
+  transform:
+    perspective(var(--side-menu-perspective))
+    translate3d(0, 0, var(--side-menu-frame-z))
+    rotateX(var(--side-menu-frame-rotate-x))
+    rotateY(var(--side-menu-frame-rotate-y))
+    rotateZ(var(--side-menu-frame-rotate-z));
+}
+
+.side-menu__svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.side-menu__panel-shadow {
+  fill: #010707;
+  opacity: 0.72;
+  filter: drop-shadow(16px 18px 24px rgba(0, 0, 0, 0.74));
+}
+
+.side-menu__panel-fill {
+  fill: var(--side-menu-panel);
+  fill-opacity: var(--side-menu-panel-opacity);
+  stroke: none;
+}
+
+.side-menu__panel-edge {
+  fill: none;
+  stroke: var(--side-menu-panel-edge);
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+
+.side-menu__panel-edge--outer {
+  stroke-width: 9;
+  stroke-opacity: var(--side-menu-panel-edge-opacity);
+  filter: drop-shadow(0 0 8px var(--side-menu-panel-edge));
+}
+
+.side-menu__frame-tab-fill {
+  fill: rgba(14, 15, 18, 0.36);
+  stroke: none;
+}
+
+.side-menu__frame-shadow,
+.side-menu__frame-line {
+  fill: none;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+
+.side-menu__frame-shadow {
+  stroke: rgba(0, 0, 0, 0.72);
+  stroke-width: 14;
+}
+
+.side-menu__frame-line--outer {
+  stroke: var(--side-menu-frame);
+  stroke-width: 5.5;
+  stroke-opacity: var(--side-menu-frame-opacity);
+  filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.28));
+}
+
+.side-menu__item-label,
+.side-menu__rail-label {
+  font-family: FolkPro, Impact, sans-serif;
+  font-style: italic;
+  font-weight: 900;
+  paint-order: stroke fill;
+  vector-effect: non-scaling-stroke;
+}
+
+.side-menu__item-label {
+  fill: var(--side-menu-text);
+  stroke: var(--side-menu-text-shadow);
+  stroke-width: 3px;
+  letter-spacing: 2px;
+  filter: drop-shadow(4px 4px 0 rgba(0, 0, 0, 0.32));
+}
+
+.side-menu__rail-label {
+  fill: var(--side-menu-rail-text);
+  stroke: rgba(0, 0, 0, 0.64);
+  stroke-width: 2px;
+  font-size: var(--side-menu-rail-font-size);
+  letter-spacing: 2px;
+  filter: drop-shadow(2px 2px 0 rgba(0, 0, 0, 0.48));
+}
