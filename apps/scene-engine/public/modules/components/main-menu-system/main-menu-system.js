@@ -422,7 +422,7 @@ function sidePanelPreview(preview) {
 
 function detailPreview(preview) {
   const content = resolvedPreview(preview);
-  return ['controller', 'display-settings', 'records-grid', 'toggles'].includes(content.type) ? content : null;
+  return ['controller', 'display-settings', 'records-grid', 'contribution-grid', 'toggles'].includes(content.type) ? content : null;
 }
 
 function selectedItem(menu, selectedIndex) {
@@ -751,6 +751,39 @@ function renderRecordsPreview() {
   return node;
 }
 
+function contributionLevel(index) {
+  const week = Math.floor(index / 7);
+  const day = index % 7;
+  if ((week + day * 3) % 17 === 0) return 0;
+  const score = (week * 11 + day * 7 + week * day * 3) % 23;
+  if (score > 19) return 4;
+  if (score > 14) return 3;
+  if (score > 8) return 2;
+  return 1;
+}
+
+function renderContributionGridPreview(preview) {
+  const weeks = clamp(Math.round(Number(preview?.weeks ?? 14)), 8, 20);
+  const node = document.createElement('div');
+  node.className = 'main-menu-system__records-detail main-menu-system__contribution-detail';
+
+  const shell = document.createElement('div');
+  shell.className = 'main-menu-system__contribution-shell';
+
+  const grid = document.createElement('div');
+  grid.className = 'main-menu-system__contribution-grid';
+  grid.style.setProperty('--main-menu-system-contribution-weeks', String(weeks));
+  for (let i = 0; i < weeks * 7; i += 1) {
+    const cell = document.createElement('span');
+    cell.className = `is-level-${contributionLevel(i)}`;
+    grid.appendChild(cell);
+  }
+  shell.appendChild(grid);
+
+  node.appendChild(shell);
+  return node;
+}
+
 function renderTogglePreview(preview) {
   const node = detailNode('main-menu-system__detail--toggle');
   addLabel(node, 'main-menu-system__detail-title', preview.label ?? 'Option');
@@ -772,6 +805,7 @@ function renderDetailPreview(preview) {
   if (preview.type === 'controller') return renderControllerPreview();
   if (preview.type === 'display-settings') return renderDisplayPreview();
   if (preview.type === 'records-grid') return renderRecordsPreview();
+  if (preview.type === 'contribution-grid') return renderContributionGridPreview(preview);
   if (preview.type === 'toggles') return renderTogglePreview(preview);
   return null;
 }
@@ -1070,9 +1104,7 @@ function createController(root, config, properties, parts, runtime) {
       foreground.appendChild(menuItems);
       nextView.appendChild(foreground);
       if (renderId !== renderSerial) return;
-      if (controller.canBack()) {
-        nextView.appendChild(renderBackButton(menu, controller));
-      }
+      nextView.appendChild(renderBackButton(menu, controller));
 
       installPointerBindings(nextView, controller);
 

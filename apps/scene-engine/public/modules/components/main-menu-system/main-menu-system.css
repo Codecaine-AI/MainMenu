@@ -474,14 +474,14 @@
   place-items: center;
   width: 50px;
   height: 43px;
-  border: 2px solid color-mix(in srgb, var(--main-menu-system-theme-soft) 70%, #f3f4ff);
+  border: 2px solid rgba(237, 239, 247, 0.78);
   border-radius: 8px 4px 8px 4px;
   background:
-    linear-gradient(135deg, color-mix(in srgb, var(--main-menu-system-theme) 40%, transparent), rgba(6, 8, 14, 0.72)),
+    linear-gradient(135deg, rgba(86, 92, 118, 0.42), rgba(6, 8, 14, 0.72)),
     rgba(8, 10, 16, 0.72);
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.24),
-    0 0 12px color-mix(in srgb, var(--main-menu-system-theme) 42%, transparent);
+    0 0 12px rgba(237, 239, 247, 0.22);
   cursor: pointer;
   pointer-events: auto;
   transform: skewX(-14deg) translate3d(0, 0, 0);
@@ -757,6 +757,61 @@
 
 .main-menu-system__records-grid span.is-axis {
   background: color-mix(in srgb, var(--main-menu-system-theme-soft) 42%, transparent);
+}
+
+.main-menu-system__contribution-detail {
+  left: calc(var(--main-menu-system-detail-wide-x, 730px) - 12px);
+  top: calc(var(--main-menu-system-detail-y, 318px) + 18px);
+  width: var(--main-menu-system-detail-wide-width, 574px);
+  min-height: 292px;
+}
+
+.main-menu-system__contribution-shell {
+  position: relative;
+  z-index: 1;
+  width: min(456px, 100%);
+  padding: 18px 20px;
+  border: 5px solid rgba(239, 241, 255, 0.52);
+  background: rgba(13, 16, 30, 0.5);
+  box-shadow:
+    inset 0 0 0 2px rgba(12, 18, 28, 0.72),
+    inset 0 1px 0 rgba(255, 255, 255, 0.14),
+    0 18px 34px rgba(0, 0, 0, 0.24);
+}
+
+.main-menu-system__contribution-grid {
+  display: grid;
+  grid-auto-flow: column;
+  grid-template-rows: repeat(7, 1fr);
+  grid-template-columns: repeat(var(--main-menu-system-contribution-weeks, 14), 1fr);
+  gap: 8px;
+  padding: 10px;
+  border: 3px solid rgba(239, 241, 255, 0.24);
+  background: rgba(3, 6, 10, 0.42);
+}
+
+.main-menu-system__contribution-grid span {
+  display: block;
+  aspect-ratio: 1;
+  border: 1px solid rgba(219, 241, 226, 0.18);
+  background: rgba(38, 45, 54, 0.64);
+}
+
+.main-menu-system__contribution-grid span.is-level-1 {
+  background: rgba(54, 109, 72, 0.72);
+}
+
+.main-menu-system__contribution-grid span.is-level-2 {
+  background: rgba(67, 145, 87, 0.82);
+}
+
+.main-menu-system__contribution-grid span.is-level-3 {
+  background: rgba(90, 186, 113, 0.9);
+}
+
+.main-menu-system__contribution-grid span.is-level-4 {
+  background: rgba(139, 226, 152, 0.96);
+  box-shadow: 0 0 10px rgba(139, 226, 152, 0.24);
 }
 
 .main-menu-system__detail--toggle {

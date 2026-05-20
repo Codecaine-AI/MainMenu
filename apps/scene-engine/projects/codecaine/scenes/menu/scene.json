@@ -148,7 +148,7 @@
         "config": "/modules/components/main-menu-system/menu-config.json",
         "initial-menu": "main",
         "initial-selected-index": 1,
-        "menu-x-offset": -55,
+        "menu-x-offset": -42,
         "menu-y-offset": 0,
         "menu-scale": 1,
         "menu-width-scale": 1,
@@ -190,7 +190,7 @@
         "detail-wide-x": 730,
         "detail-wide-y": 238,
         "detail-wide-width": 574,
-        "back-button-x": 174,
+        "back-button-x": 150,
         "back-button-y": 100,
         "enable-keyboard": true,
         "enable-gamepad": true,
@@ -221,322 +221,290 @@
           "initial": "main",
           "menus": {
             "main": {
-              "title": "Main Menu",
+              "title": "CODECAINE",
               "theme": "blue",
               "layout": "left-stack-5",
               "items": [
                 {
-                  "id": "solo",
-                  "label": "1-P Mode",
-                  "description": "Solo Smash!",
-                  "enter": "solo",
+                  "id": "open-source",
+                  "label": "OPEN SOURCE",
+                  "description": "Clone it. It works.",
+                  "enter": "open-source",
                   "preview": {
-                    "type": "rows",
-                    "rows": [
-                      "Regular Match",
-                      "Event Match",
-                      "Stadium",
-                      "Training"
-                    ],
-                    "railTextOpacity": 1
+                    "type": "contribution-grid",
+                    "weeks": 14
                   }
                 },
                 {
-                  "id": "vs",
-                  "label": "VS. Mode",
-                  "description": "Multiplayer battles!",
+                  "id": "build-logs",
+                  "label": "BUILD LOGS",
+                  "description": "Watch every agent get built.",
                   "theme": "red",
-                  "enter": "vs",
+                  "enter": "build-logs",
                   "preview": {
                     "type": "rows",
                     "rows": [
-                      "Melee",
-                      "Tournament Melee",
-                      "Special Melee",
-                      "Custom Rules",
-                      "Name Entry"
+                      "Latest",
+                      "All Builds",
+                      "YouTube"
                     ]
                   }
                 },
                 {
-                  "id": "trophies",
-                  "label": "Trophies",
-                  "description": "View and arrange collected trophies.",
-                  "theme": "green",
-                  "preview": {
-                    "type": "rows",
-                    "rows": [
-                      "Gallery",
-                      "Lottery",
-                      "Collection",
-                      "Special"
-                    ]
-                  }
-                },
-                {
-                  "id": "options",
-                  "label": "Options",
-                  "description": "Adjust settings.",
-                  "theme": "yellow",
-                  "enter": "options",
-                  "preview": {
-                    "type": "rows",
-                    "rows": [
-                      "Rumble",
-                      "Sound",
-                      "Screen Display",
-                      "Language",
-                      "Erase Data"
-                    ]
-                  }
-                },
-                {
-                  "id": "data",
-                  "label": "Data",
-                  "description": "Records, trophies, and archives.",
+                  "id": "library",
+                  "label": "LIBRARY",
+                  "description": "Every build, documented.",
                   "theme": "purple",
-                  "enter": "data",
+                  "enter": "library",
                   "preview": {
-                    "type": "records-grid"
+                    "type": "rows",
+                    "rows": [
+                      "What's Inside",
+                      "Pricing",
+                      "Join the Waitlist"
+                    ]
+                  }
+                },
+                {
+                  "id": "community",
+                  "label": "COMMUNITY",
+                  "description": "Builders who own their systems.",
+                  "theme": "green",
+                  "enter": "community",
+                  "preview": {
+                    "type": "rows",
+                    "rows": [
+                      "Coming Soon"
+                    ]
+                  }
+                },
+                {
+                  "id": "mission",
+                  "label": "MISSION",
+                  "description": "Why this exists.",
+                  "theme": "yellow",
+                  "enter": "mission",
+                  "preview": {
+                    "type": "rows",
+                    "rows": [
+                      "The Idea",
+                      "Who Runs This",
+                      "Contact"
+                    ]
                   }
                 }
               ]
             },
-            "solo": {
-              "title": "1-P Mode",
+            "open-source": {
+              "title": "OPEN SOURCE",
               "theme": "blue",
               "layout": "left-stack-4",
               "items": [
                 {
-                  "id": "regular-match",
-                  "label": "Regular Match",
-                  "description": "Multiple levels of standard Smash.",
+                  "id": "featured-repos",
+                  "label": "Featured Repos",
+                  "description": "The ones worth your time.",
                   "preview": {
                     "type": "rows",
                     "rows": [
-                      "Classic",
-                      "Adventure"
+                      "Curated repos",
+                      "Problem statements",
+                      "Clone-and-run picks"
                     ]
                   }
                 },
                 {
-                  "id": "event-match",
-                  "label": "Event Match",
-                  "description": "Special battles with fixed objectives.",
+                  "id": "all-projects",
+                  "label": "All Projects",
+                  "description": "Everything on GitHub.",
                   "preview": {
                     "type": "rows",
                     "rows": [
-                      "Event 1",
-                      "Event 2",
-                      "Event 3"
+                      "GitHub org",
+                      "Full project list"
                     ]
                   }
                 },
                 {
-                  "id": "stadium",
-                  "label": "Stadium",
-                  "description": "Target tests, home-run contests, and endurance challenges.",
+                  "id": "get-started",
+                  "label": "Get Started",
+                  "description": "Install, run, customize.",
                   "preview": {
                     "type": "rows",
                     "rows": [
-                      "Target Test",
-                      "Home-Run Contest",
-                      "Multi-Man Melee"
+                      "Install",
+                      "Run locally",
+                      "Customize"
                     ]
                   }
                 },
                 {
-                  "id": "training",
-                  "label": "Training",
-                  "description": "Practice movement, attacks, and item behavior.",
+                  "id": "contribute",
+                  "label": "Contribute",
+                  "description": "PRs, issues, conventions.",
                   "preview": {
                     "type": "rows",
                     "rows": [
-                      "Training Mode",
-                      "Item Switch",
-                      "CPU Behavior"
+                      "PR conventions",
+                      "Issue templates",
+                      "Local setup"
                     ]
                   }
                 }
               ]
             },
-            "vs": {
-              "title": "VS. Mode",
+            "build-logs": {
+              "title": "BUILD LOGS",
               "theme": "red",
-              "layout": "left-stack-5",
-              "items": [
-                {
-                  "id": "melee",
-                  "label": "Melee",
-                  "description": "A standard Smash battle for 1 to 4 players.",
-                  "preview": {
-                    "type": "controller"
-                  }
-                },
-                {
-                  "id": "tournament-melee",
-                  "label": "Tournament Melee",
-                  "description": "Set up a tournament bracket.",
-                  "preview": {
-                    "type": "rows",
-                    "rows": [
-                      "Single Elimination",
-                      "Bracket Setup",
-                      "Entrants"
-                    ]
-                  }
-                },
-                {
-                  "id": "special-melee",
-                  "label": "Special Melee",
-                  "description": "Battle with unusual rules and modifiers.",
-                  "preview": {
-                    "type": "rows",
-                    "rows": [
-                      "Giant",
-                      "Tiny",
-                      "Invisible",
-                      "Lightning"
-                    ]
-                  }
-                },
-                {
-                  "id": "custom-rules",
-                  "label": "Custom Rules",
-                  "description": "Change time, stock, items, and stage rules.",
-                  "preview": {
-                    "type": "rows",
-                    "rows": [
-                      "Time",
-                      "Stock",
-                      "Items",
-                      "Stage Select"
-                    ]
-                  }
-                },
-                {
-                  "id": "name-entry",
-                  "label": "Name Entry",
-                  "description": "Create and edit player tags.",
-                  "preview": {
-                    "type": "rows",
-                    "rows": [
-                      "Name Entry",
-                      "Copy",
-                      "Erase"
-                    ]
-                  }
-                }
-              ]
-            },
-            "options": {
-              "title": "Options",
-              "theme": "yellow",
-              "layout": "left-stack-5",
-              "items": [
-                {
-                  "id": "rumble",
-                  "label": "Rumble",
-                  "description": "Turn the Rumble feature on or off.",
-                  "preview": {
-                    "type": "toggles",
-                    "label": "Rumble",
-                    "value": "ON"
-                  }
-                },
-                {
-                  "id": "sound",
-                  "label": "Sound",
-                  "description": "Adjust audio output and volume.",
-                  "preview": {
-                    "type": "rows",
-                    "rows": [
-                      "Stereo",
-                      "Mono",
-                      "Sound Test"
-                    ]
-                  }
-                },
-                {
-                  "id": "screen-display",
-                  "label": "Screen Display",
-                  "description": "Adjust display softness and deflicker behavior.",
-                  "caption": "Adjust display softness.",
-                  "enter": "screen-display",
-                  "preview": {
-                    "type": "display-settings"
-                  }
-                },
-                {
-                  "id": "language",
-                  "label": "Japanese",
-                  "description": "Switch the display language.",
-                  "preview": {
-                    "type": "rows",
-                    "rows": [
-                      "English",
-                      "Japanese"
-                    ]
-                  }
-                },
-                {
-                  "id": "erase-data",
-                  "label": "Erase Data",
-                  "description": "Erase saved data.",
-                  "preview": {
-                    "type": "rows",
-                    "rows": [
-                      "Records",
-                      "Names",
-                      "All Data"
-                    ]
-                  }
-                }
-              ]
-            },
-            "screen-display": {
-              "title": "Options / Screen Display",
-              "theme": "yellow",
               "layout": "left-stack-3",
               "items": [
                 {
-                  "id": "deflicker",
-                  "label": "Deflicker",
-                  "description": "ON: Display will be smoother and softer. OFF: Display will be sharper and harder.",
-                  "caption": "Display will be smoother and softer.",
+                  "id": "latest",
+                  "label": "Latest",
+                  "description": "This week's build.",
                   "preview": {
-                    "type": "display-settings"
+                    "type": "rows",
+                    "rows": [
+                      "Newest devlog",
+                      "Current build",
+                      "Direct watch"
+                    ]
+                  }
+                },
+                {
+                  "id": "all-builds",
+                  "label": "All Builds",
+                  "description": "Every devlog, indexed.",
+                  "preview": {
+                    "type": "rows",
+                    "rows": [
+                      "Chronological index",
+                      "Thumbnails",
+                      "Build notes"
+                    ]
+                  }
+                },
+                {
+                  "id": "youtube",
+                  "label": "YouTube",
+                  "description": "Subscribe for new drops.",
+                  "preview": {
+                    "type": "rows",
+                    "rows": [
+                      "Channel link",
+                      "New drops",
+                      "Video archive"
+                    ]
                   }
                 }
               ]
             },
-            "data": {
-              "title": "Data / Melee Records",
+            "library": {
+              "title": "LIBRARY",
               "theme": "purple",
               "layout": "left-stack-3",
               "items": [
                 {
-                  "id": "vs-records",
-                  "label": "VS. Records",
-                  "description": "Records for VS. matches.",
+                  "id": "whats-inside",
+                  "label": "What's Inside",
+                  "description": "The agents. The walkthroughs. The room.",
                   "preview": {
-                    "type": "records-grid"
+                    "type": "rows",
+                    "rows": [
+                      "Agent previews",
+                      "Walkthroughs",
+                      "Member room"
+                    ]
                   }
                 },
                 {
-                  "id": "bonus-records",
-                  "label": "Bonus Records",
-                  "description": "Records for bonus stages.",
+                  "id": "pricing",
+                  "label": "Pricing",
+                  "description": "$100/mo or $1K/year.",
                   "preview": {
-                    "type": "records-grid"
+                    "type": "rows",
+                    "rows": [
+                      "Monthly: $100",
+                      "Annual: $1K",
+                      "FAQ"
+                    ]
                   }
                 },
                 {
-                  "id": "misc-records",
-                  "label": "Misc. Records",
-                  "description": "Other records and play data.",
+                  "id": "join-waitlist",
+                  "label": "Join the Waitlist",
+                  "description": "Be first when beta opens.",
                   "preview": {
-                    "type": "records-grid"
+                    "type": "rows",
+                    "rows": [
+                      "Beta launches Q3",
+                      "Email capture",
+                      "Early access"
+                    ]
+                  }
+                }
+              ]
+            },
+            "community": {
+              "title": "COMMUNITY",
+              "theme": "green",
+              "layout": "left-stack-3",
+              "items": [
+                {
+                  "id": "community-coming-soon",
+                  "label": "Coming Soon",
+                  "description": "10 member builds unlock this.",
+                  "preview": {
+                    "type": "rows",
+                    "rows": [
+                      "Member Builds",
+                      "Profiles",
+                      "% AI Tracker"
+                    ]
+                  }
+                }
+              ]
+            },
+            "mission": {
+              "title": "MISSION",
+              "theme": "yellow",
+              "layout": "left-stack-3",
+              "items": [
+                {
+                  "id": "the-idea",
+                  "label": "The Idea",
+                  "description": "One page. Read it or don't.",
+                  "preview": {
+                    "type": "rows",
+                    "rows": [
+                      "Manifesto",
+                      "Under 400 words"
+                    ]
+                  }
+                },
+                {
+                  "id": "who-runs-this",
+                  "label": "Who Runs This",
+                  "description": "Ford Lascari.",
+                  "preview": {
+                    "type": "rows",
+                    "rows": [
+                      "Short bio",
+                      "Personal site"
+                    ]
+                  }
+                },
+                {
+                  "id": "contact",
+                  "label": "Contact",
+                  "description": "Email, socials.",
+                  "preview": {
+                    "type": "rows",
+                    "rows": [
+                      "Email",
+                      "Socials",
+                      "Mailto"
+                    ]
                   }
                 }
               ]
@@ -589,9 +557,9 @@
               "yStart": 238,
               "spacing": 184,
               "rowX": [
-                185,
-                120,
-                185
+                200,
+                140,
+                200
               ],
               "rowWidth": 760,
               "itemProps": {
