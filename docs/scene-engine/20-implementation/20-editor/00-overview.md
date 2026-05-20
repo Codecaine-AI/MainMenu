@@ -1,7 +1,7 @@
 ---
-covers: Visual editor — Next.js client app, Zustand store, three panels, scene save/export controls, schema-driven property inspector.
+covers: Visual editor — Next.js client app, Zustand store, three panels, scene save/export controls, collapsible sections, schema-driven property inspector.
 type: overview
-concepts: [editor, react, zustand, panels, mutations, schema-driven, property-schema]
+concepts: [editor, react, zustand, panels, mutations, collapsible-sections, schema-driven, property-schema]
 design_refs: [10-system-design/40-authoring-surfaces.md, 10-system-design/16-property-schema.md]
 ---
 
@@ -24,6 +24,7 @@ apps/scene-engine/app/editor/
     ├── HierarchyRow.tsx                recursive tree row
     ├── InspectorPanel.tsx              shell that resolves selected object
     ├── LayerForm.tsx                   always-present sections + schema-driven properties
+    ├── MainMenuConfigEditor.tsx        bespoke main-menu graph and tuning editor
     ├── PropertySection.tsx             section header + nested properties + nested sections
     ├── PropertyField.tsx               clickable label + input dispatch by schema type
     ├── DescriptionPopover.tsx          floating popover (anchored, click-away/Esc dismiss)
@@ -72,6 +73,7 @@ The React components — Toolbar, Canvas, Hierarchy, Inspector — including alw
 | Object path                 | Dotted string like `0`, `2.children.1`, `0.children.3.children.0`. Encodes a position in the scene tree. |
 | Mutation                    | A function that produces a new scene tree (via `structuredClone`), replaces the store's `scene`, and marks dirty. |
 | Always-present section      | Transform and Appearance render on every selection, even when the JSON omits them. |
+| Collapsible section         | Editor and schema sections can opt into local open/closed state; dense groups can start collapsed. |
 | Schema-driven property field| Property field rendered from a `PropertySchema` — sections, clickable labels, description popovers. Covers components and built-in layer types. |
 | Manifest-driven field       | Property field generated from the asset's `manifest.json` descriptor. Used only for effects. |
 | Slot                        | Glyph-group sub-surface edited under the parent object, not as a separate hierarchy entry. |

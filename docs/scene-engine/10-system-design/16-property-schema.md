@@ -1,6 +1,6 @@
 ---
-covers: The property schema convention — sectioned property declarations with labels, descriptions, and a locked type taxonomy. Drives the inspector for all layer types.
-concepts: [property-schema, sections, property-types, descriptions, popover, orphan, general-fallback, schema-resolution]
+covers: The property schema convention — sectioned property declarations with labels, descriptions, collapse defaults, and a locked type taxonomy. Drives the inspector for all layer types.
+concepts: [property-schema, sections, collapsible-sections, property-types, color-fields, descriptions, popover, orphan, general-fallback, schema-resolution]
 ---
 
 # Property Schema
@@ -19,7 +19,7 @@ Components and other layer types can accumulate many properties with terse or te
 
 ## Schema Shape
 
-A schema is an ordered list of **sections**. Each section has an identifier, a display label, an optional description, and an ordered map of **property definitions**. Sections can nest: a section may contain child sections in addition to properties.
+A schema is an ordered list of **sections**. Each section has an identifier, a display label, an optional description, optional collapse behavior, and an ordered map of **property definitions**. Sections can nest: a section may contain child sections in addition to properties.
 
 A property definition declares:
 
@@ -39,6 +39,7 @@ The set of allowed property types is closed:
 | `number`  | Slider + numeric input. Optional min, max, step.                |
 | `string`  | Single-line text field.                                         |
 | `boolean` | Toggle / checkbox.                                              |
+| `color`   | Native color picker plus editable color text field.             |
 | `select`  | Dropdown with inline options (string list or value+label pairs).|
 | `blend`   | Blend-mode dropdown (canonical CSS blend modes).                |
 | `fit`     | Object-fit dropdown.                                            |
@@ -69,11 +70,22 @@ Every schema is a list of sections — there is no "flat mode." Even a layer wit
 - Authors start with minimal ceremony (one section named "General" or after the layer type).
 - Adding sections later is purely additive — no structural migration.
 
+## Section Collapsibility
+
+Every schema section can declare whether it collapses and whether it starts open:
+
+- `collapsible: true` makes a section header toggle its body.
+- `collapsible: false` pins the section open, even for nested sections.
+- `defaultOpen: false` starts a section collapsed. On top-level sections, this also opts the section into collapse behavior.
+- `defaultOpen: true` starts a collapsible section expanded.
+
+Top-level sections are open by default. Nested sections are collapsible and closed by default unless the schema says otherwise. Use nesting for meaningful ownership boundaries — for example, a broad "Motion" section can contain "Selection", "Layer Changes", and "Title Prism" subsections. Avoid using nesting only to hide unrelated settings; if a group needs to collapse, it should still live under the parent concept that owns it.
+
 ## The General Fallback
 
 When a layer has no declared schema (or a component whose schema hasn't loaded yet), all of its saved properties render under an auto-generated **General** section. This ensures every layer is editable immediately.
 
-Properties that exist in the saved data but are absent from the declared schema — **orphans** — also render under General. The system infers an input type from the value's runtime type (number → slider, boolean → toggle, string → text). A developer warning names the orphan and the schema source, so renames and removals don't go unnoticed.
+Properties that exist in the saved data but are absent from the declared schema — **orphans** — also render under General. The system infers an input type from the value's runtime type (number → slider, boolean → toggle, color-like string → color field, other string → text). A developer warning names the orphan and the schema source, so renames and removals don't go unnoticed.
 
 ## Description Popovers
 

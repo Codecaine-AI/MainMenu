@@ -1,6 +1,6 @@
 ---
-covers: The editor's React components — Scene controls, Canvas, Hierarchy, Inspector. Always-present sections, schema-driven property fields with sections and description popovers, slot/event editing, project export.
-concepts: [scene-section, canvas, hierarchy, inspector, layer-form, property-section, property-field, description-popover, manifest-property-field, slots-section, events-section, drag-drop]
+covers: The editor's React components — Scene controls, Canvas, Hierarchy, Inspector. Always-present sections, collapsible editor sections, schema-driven property fields with sections and description popovers, slot/event editing, project export.
+concepts: [scene-section, canvas, hierarchy, inspector, layer-form, inspector-section, property-section, collapsible-section, property-field, description-popover, manifest-property-field, slots-section, events-section, drag-drop]
 design_refs: [10-system-design/40-authoring-surfaces.md, 10-system-design/16-property-schema.md]
 ---
 
@@ -65,12 +65,21 @@ Property editor for the object at `selectedPath`. The shell `InspectorPanel` is 
 | Asset        | When `layer.asset` is set. Read-only id; `AssetSwapDropdown` for swappable container types (`audio`, `image`, `video`, `glyph`). |
 | Transform    | Always (skipped for sub-layer overrides). Fill toggle. Fill mode → rotation + scale. Explicit → x, y, width, height, anchor, rotation, scale. |
 | Appearance   | Always (skipped for sub-layer overrides) — opacity, blend, hue. Adds `fit` for media types (`video`, `image`). |
-| Properties (schema) | For components and built-in layer types — one `PropertySection` per section in the resolved schema. Each section renders `PropertyField` entries with clickable label → `DescriptionPopover`. Orphan properties (saved but not in schema) render under an auto-generated "General" section with inferred inputs + console warning. |
+| Properties (schema) | For components and built-in layer types — one `PropertySection` per section in the resolved schema. Each section renders `PropertyField` entries with clickable label → `DescriptionPopover`, and can opt into collapse behavior through the schema. Orphan properties (saved but not in schema) render under an auto-generated "General" section with inferred inputs + console warning. |
 | Properties (effect) | For effects only — one `ManifestPropertyField` per manifest descriptor, under a single "Properties" heading. |
 | Slots        | Glyph-groups only — `SlotsSection` for adding/editing exposed sub-surface fills.      |
 | Events       | Always — `EventsSection` lists `events[]` with add/remove and `(trigger, action, target)` selects. |
 
 Each field's onChange dispatches `mutateObjectAt(path, patchFromDottedKey('transform.x', 50))` or similar — the dotted-key helper builds the nested patch object that `deepMerge` then merges into the canonical shape.
+
+### Section Collapse Behavior
+
+There are two collapse layers in the inspector:
+
+- `InspectorSection` is the reusable top-level editor section shell. It is open and static by default. Pass `collapsible` to make its header toggle the body, and `defaultOpen={false}` to start it closed. The main menu system opts all of its top-level authoring sections into collapse behavior; `Menu Structure` starts collapsed so the menu graph does not dominate the inspector.
+- `PropertySection` is schema-driven. It reads `collapsible` and `defaultOpen` from the `Section` schema type. Nested property sections collapse by default; top-level property sections remain open unless `collapsible: true` or `defaultOpen: false` is declared.
+
+The local open/closed state is UI-only. It is not saved in the scene JSON and resets when the editor selection remounts.
 
 ### Schema Resolution in `LayerForm`
 
@@ -96,8 +105,9 @@ The "fields set to undefined" trick relies on `deepMerge` treating `undefined` a
 
 | Component               | Renders                                                                  |
 |-------------------------|--------------------------------------------------------------------------|
-| `PropertySection`       | A schema section: header label (clickable if section has a description), nested `PropertyField` entries, recursive child `PropertySection` entries. Expanded by default. |
-| `PropertyField`         | One property row: clickable label + input dispatched by the `PropertyDef.type`. Maps `number` → `RangedInput`, `string` → text input, `boolean` → checkbox, `select` → dropdown, `blend` → `BlendSelect`, `fit` → `FitSelect`, `clip` → `ClipSelect`, `anchor` → `AnchorSelect`. |
+| `InspectorSection`      | A top-level editor section shell. Static by default; `collapsible` + `defaultOpen` opt a section into local open/closed state. |
+| `PropertySection`       | A schema section: header label (clickable if section has a description), nested `PropertyField` entries, recursive child `PropertySection` entries, and schema-driven collapse defaults. |
+| `PropertyField`         | One property row: clickable label + input dispatched by the `PropertyDef.type`. Maps `number` → `RangedInput`, `string` → text input, `color` → native color field + text value, `boolean` → checkbox, `select` → dropdown, `blend` → `BlendSelect`, `fit` → `FitSelect`, `clip` → `ClipSelect`, `anchor` → `AnchorSelect`. |
 | `DescriptionPopover`    | Floating popover anchored next to the clicked label. Shows the property's full label and plain-text description. Dismisses on click-outside or Escape. Used by both property labels and section labels. |
 
 ### Inputs (`inputs/`)
@@ -105,6 +115,7 @@ The "fields set to undefined" trick relies on `deepMerge` treating `undefined` a
 | Component               | Renders                                                                  |
 |-------------------------|--------------------------------------------------------------------------|
 | `RangedInput`           | Slider + numeric input synced, debounced commit.                         |
+| Color fields            | Native `type="color"` picker paired with an editable text value where the property can preserve authored color text. |
 | `BlendSelect`           | Blend-mode dropdown (canonical CSS blend modes from `inspector-config`). |
 | `FitSelect`             | Object-fit dropdown.                                                     |
 | `ClipSelect`            | Clip-path dropdown.                                                      |

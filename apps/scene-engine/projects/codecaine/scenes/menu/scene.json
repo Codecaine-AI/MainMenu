@@ -122,6 +122,21 @@
       }
     },
     {
+      "id": "main-menu-music",
+      "name": "Main Menu Music",
+      "type": "audio",
+      "asset": "melee-menu-song",
+      "transform": {
+        "mode": "fill"
+      },
+      "properties": {
+        "volume": 0.35,
+        "loop": true,
+        "autoplay": true
+      },
+      "visible": false
+    },
+    {
       "id": "main-menu-system",
       "name": "Main Menu System",
       "type": "component",

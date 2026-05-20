@@ -15,11 +15,11 @@ interface Props {
 export function PropertySection({ section, values, onChange, depth = 0 }: Props) {
   const anchorRef = useRef<HTMLButtonElement>(null)
   const [descriptionOpen, setDescriptionOpen] = useState(false)
-  const [collapsed, setCollapsed] = useState(depth > 0)
   const hasDescription = Boolean(section.description)
   const isTopLevel = depth === 0
-  const canCollapse = !isTopLevel
-  const isCollapsed = canCollapse && collapsed
+  const canCollapse = section.collapsible ?? (!isTopLevel || section.defaultOpen === false)
+  const [open, setOpen] = useState(section.defaultOpen ?? isTopLevel)
+  const isCollapsed = canCollapse && !open
 
   const headerButtonClass = isTopLevel
     ? 'text-[12px] font-semibold text-gray-200 truncate flex-1 text-left bg-transparent border-0 p-0'
@@ -47,7 +47,7 @@ export function PropertySection({ section, values, onChange, depth = 0 }: Props)
           ref={anchorRef}
           onClick={
             canCollapse
-              ? () => setCollapsed((next) => !next)
+              ? () => setOpen((next) => !next)
               : hasDescription
                 ? () => setDescriptionOpen((next) => !next)
                 : undefined

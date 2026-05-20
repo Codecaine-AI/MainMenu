@@ -52,11 +52,44 @@ function OverflowTooltipText({
 
 interface SectionProps {
   title: string
+  collapsible?: boolean
   defaultOpen?: boolean
   children: React.ReactNode
 }
 
-export function InspectorSection({ title, children }: SectionProps) {
+export function InspectorSection({
+  title,
+  collapsible = false,
+  defaultOpen = true,
+  children,
+}: SectionProps) {
+  const [open, setOpen] = useState(defaultOpen)
+
+  if (collapsible) {
+    return (
+      <div className="mt-1.5">
+        <button
+          type="button"
+          onClick={() => setOpen((next) => !next)}
+          aria-expanded={open}
+          className="w-full flex items-center gap-1 py-1 px-1.5 bg-[#303030] border-t border-b border-[#444] text-left hover:bg-[#353535]"
+        >
+          <span className="w-3 shrink-0 text-[11px] text-gray-500">{open ? 'v' : '>'}</span>
+          <OverflowTooltipText
+            className="text-[13px] font-bold text-gray-100 truncate block flex-1 min-w-0"
+            wrapperClassName="flex-1"
+            children={title}
+          />
+        </button>
+        {open && (
+          <div className="pt-1.5 pb-0.5 px-1">
+            {children}
+          </div>
+        )}
+      </div>
+    )
+  }
+
   return (
     <div className="mt-1.5">
       <div className="w-full flex items-center gap-1 py-1 px-1.5 bg-[#303030] border-t border-b border-[#444]">

@@ -84,6 +84,8 @@ export interface Section {
   id: string
   label: string
   description?: string
+  collapsible?: boolean
+  defaultOpen?: boolean
   properties?: Record<string, PropertyDef>
   sections?: Section[]
 }

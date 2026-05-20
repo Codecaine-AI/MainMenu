@@ -101,7 +101,26 @@ const audioSchema: PropertySchema = {
     {
       id: 'audio',
       label: 'Audio',
-      properties: {},
+      properties: {
+        volume: {
+          type: 'number',
+          label: 'Volume',
+          description: 'Playback volume multiplier for this audio layer.',
+          min: 0,
+          max: 1,
+          step: 0.01,
+        },
+        loop: {
+          type: 'boolean',
+          label: 'Loop',
+          description: 'Restart this audio layer when playback reaches the end.',
+        },
+        autoplay: {
+          type: 'boolean',
+          label: 'Autoplay',
+          description: 'Start playback when the audio layer mounts.',
+        },
+      },
     },
   ],
 }

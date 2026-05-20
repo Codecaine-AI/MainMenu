@@ -50,5 +50,9 @@
   "ui-back": {
     "type": "audio",
     "file": "/assets/audio/ui-back/ui-back.js"
+  },
+  "melee-menu-song": {
+    "type": "audio",
+    "file": "/assets/audio/melee-menu-song/melee-menu-song.js"
   }
 }

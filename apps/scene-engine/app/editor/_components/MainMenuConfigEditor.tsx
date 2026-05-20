@@ -697,35 +697,6 @@ function ColorInput({
   )
 }
 
-function NumberInput({
-  value,
-  onChange,
-  step = 0.01,
-  min,
-  max,
-}: {
-  value: number
-  onChange: (value: number) => void
-  step?: number
-  min?: number
-  max?: number
-}) {
-  return (
-    <input
-      type="number"
-      value={Number.isFinite(value) ? value : 0}
-      min={min}
-      max={max}
-      step={step}
-      onChange={(event) => {
-        const next = Number(event.target.value)
-        if (Number.isFinite(next)) onChange(next)
-      }}
-      className={INPUT_CLASS}
-    />
-  )
-}
-
 export function MainMenuConfigEditor({ path, properties }: Props) {
   const setObjectPropertyAt = useEditorStore((state) => state.setObjectPropertyAt)
   const registry = useEditorStore((state) => state.registry) as Registry | null
@@ -1052,7 +1023,7 @@ export function MainMenuConfigEditor({ path, properties }: Props) {
 
   if (!hasInlineConfig && !loadedConfig && !loadError) {
     return (
-      <InspectorSection title="Authoring Context">
+      <InspectorSection title="Authoring Context" collapsible>
         <p className="px-1 py-1 text-[11px] text-gray-500">Loading menu data...</p>
       </InspectorSection>
     )
@@ -1060,7 +1031,7 @@ export function MainMenuConfigEditor({ path, properties }: Props) {
 
   return (
     <>
-      <InspectorSection title="Authoring Context">
+      <InspectorSection title="Authoring Context" collapsible>
         {loadError && (
           <p className="mb-1.5 rounded-sm border border-[#6e3a3a] bg-[#2a1717] px-2 py-1 text-[11px] text-[#ffb8b8]">
             {loadError}
@@ -1104,7 +1075,7 @@ export function MainMenuConfigEditor({ path, properties }: Props) {
         </CollapsibleSubsection>
       </InspectorSection>
 
-      <InspectorSection title="Menu Structure">
+      <InspectorSection title="Menu Structure" collapsible defaultOpen={false}>
         <div className="mb-1.5 flex gap-1.5">
           <SmallButton onClick={addMenu}>Add Menu</SmallButton>
           <SmallButton onClick={deleteMenu} disabled={ids.length <= 1}>Delete</SmallButton>
@@ -1230,7 +1201,7 @@ export function MainMenuConfigEditor({ path, properties }: Props) {
         </CollapsibleSubsection>
       </InspectorSection>
 
-      <InspectorSection title="Item Preview">
+      <InspectorSection title="Item Preview" collapsible>
         {selectedItem ? (
           <>
             <FieldRow label="Preview">
@@ -1288,7 +1259,7 @@ export function MainMenuConfigEditor({ path, properties }: Props) {
         )}
       </InspectorSection>
 
-      <InspectorSection title="Stack & Placement">
+      <InspectorSection title="Stack & Placement" collapsible>
         <CollapsibleSubsection title="Global Stack" defaultOpen>
           <FieldRow label="X Offset">
             <RangedInput
@@ -1585,7 +1556,7 @@ export function MainMenuConfigEditor({ path, properties }: Props) {
         </CollapsibleSubsection>
       </InspectorSection>
 
-      <InspectorSection title="Side Panel">
+      <InspectorSection title="Side Panel" collapsible>
         <CollapsibleSubsection title="Panel" defaultOpen>
           <FieldRow label="Panel X">
             <RangedInput
@@ -1883,7 +1854,7 @@ export function MainMenuConfigEditor({ path, properties }: Props) {
         </CollapsibleSubsection>
       </InspectorSection>
 
-      <InspectorSection title="Visual Style">
+      <InspectorSection title="Visual Style" collapsible>
         <CollapsibleSubsection title="Row Colors">
           <FieldRow label="Hot Gold">
             <ColorInput value={menuThemingString('rowHot')} onChange={(value) => updateMenuThemingField('rowHot', value)} />
@@ -1979,46 +1950,46 @@ export function MainMenuConfigEditor({ path, properties }: Props) {
             <ColorInput value={menuThemingString('markerPulseColor')} onChange={(value) => updateMenuThemingField('markerPulseColor', value)} />
           </FieldRow>
           <FieldRow label="Pulse Speed">
-            <NumberInput value={menuThemingNumber('markerContractSpeed')} min={0} max={12} step={0.1} onChange={(value) => updateMenuThemingField('markerContractSpeed', value)} />
+            <RangedInput value={menuThemingNumber('markerContractSpeed')} min={0} max={12} step={0.1} onChange={(value) => updateMenuThemingField('markerContractSpeed', value)} />
           </FieldRow>
           <FieldRow label="Radius">
-            <NumberInput value={menuThemingNumber('markerPulseRadius')} min={0} max={20} step={0.1} onChange={(value) => updateMenuThemingField('markerPulseRadius', value)} />
+            <RangedInput value={menuThemingNumber('markerPulseRadius')} min={0} max={20} step={0.1} onChange={(value) => updateMenuThemingField('markerPulseRadius', value)} />
           </FieldRow>
           <FieldRow label="Target">
-            <NumberInput value={menuThemingNumber('markerPulseTargetRadius')} min={0} max={20} step={0.1} onChange={(value) => updateMenuThemingField('markerPulseTargetRadius', value)} />
+            <RangedInput value={menuThemingNumber('markerPulseTargetRadius')} min={0} max={20} step={0.1} onChange={(value) => updateMenuThemingField('markerPulseTargetRadius', value)} />
           </FieldRow>
           <FieldRow label="Opacity">
-            <NumberInput value={menuThemingNumber('markerPulseOpacity')} min={0} max={1} step={0.01} onChange={(value) => updateMenuThemingField('markerPulseOpacity', value)} />
+            <RangedInput value={menuThemingNumber('markerPulseOpacity')} min={0} max={1} step={0.01} onChange={(value) => updateMenuThemingField('markerPulseOpacity', value)} />
           </FieldRow>
           <FieldRow label="Thickness">
-            <NumberInput value={menuThemingNumber('markerPulseThickness')} min={0} max={10} step={0.1} onChange={(value) => updateMenuThemingField('markerPulseThickness', value)} />
+            <RangedInput value={menuThemingNumber('markerPulseThickness')} min={0} max={10} step={0.1} onChange={(value) => updateMenuThemingField('markerPulseThickness', value)} />
           </FieldRow>
           <FieldRow label="Feather">
-            <NumberInput value={menuThemingNumber('markerPulseFeatherWidth')} min={0} max={20} step={0.1} onChange={(value) => updateMenuThemingField('markerPulseFeatherWidth', value)} />
+            <RangedInput value={menuThemingNumber('markerPulseFeatherWidth')} min={0} max={20} step={0.1} onChange={(value) => updateMenuThemingField('markerPulseFeatherWidth', value)} />
           </FieldRow>
           <FieldRow label="Edge Opacity">
-            <NumberInput value={menuThemingNumber('markerPulseEdgeOpacity')} min={0} max={1} step={0.01} onChange={(value) => updateMenuThemingField('markerPulseEdgeOpacity', value)} />
+            <RangedInput value={menuThemingNumber('markerPulseEdgeOpacity')} min={0} max={1} step={0.01} onChange={(value) => updateMenuThemingField('markerPulseEdgeOpacity', value)} />
           </FieldRow>
         </CollapsibleSubsection>
 
         <CollapsibleSubsection title="Pulse Timing">
           <FieldRow label="Single Cool">
-            <NumberInput value={menuThemingNumber('markerSingleCooldown')} min={0} max={10} step={0.1} onChange={(value) => updateMenuThemingField('markerSingleCooldown', value)} />
+            <RangedInput value={menuThemingNumber('markerSingleCooldown')} min={0} max={10} step={0.1} onChange={(value) => updateMenuThemingField('markerSingleCooldown', value)} />
           </FieldRow>
           <FieldRow label="Double Cool">
-            <NumberInput value={menuThemingNumber('markerDoubleCooldown')} min={0} max={10} step={0.1} onChange={(value) => updateMenuThemingField('markerDoubleCooldown', value)} />
+            <RangedInput value={menuThemingNumber('markerDoubleCooldown')} min={0} max={10} step={0.1} onChange={(value) => updateMenuThemingField('markerDoubleCooldown', value)} />
           </FieldRow>
           <FieldRow label="Double Gap">
-            <NumberInput value={menuThemingNumber('markerDoubleGap')} min={0} max={3} step={0.01} onChange={(value) => updateMenuThemingField('markerDoubleGap', value)} />
+            <RangedInput value={menuThemingNumber('markerDoubleGap')} min={0} max={3} step={0.01} onChange={(value) => updateMenuThemingField('markerDoubleGap', value)} />
           </FieldRow>
         </CollapsibleSubsection>
 
         <CollapsibleSubsection title="Ring Glow">
           <FieldRow label="Ring Glow">
-            <NumberInput value={menuThemingNumber('markerRingGlowSize')} min={0} max={8} step={0.1} onChange={(value) => updateMenuThemingField('markerRingGlowSize', value)} />
+            <RangedInput value={menuThemingNumber('markerRingGlowSize')} min={0} max={8} step={0.1} onChange={(value) => updateMenuThemingField('markerRingGlowSize', value)} />
           </FieldRow>
           <FieldRow label="Ring Alpha">
-            <NumberInput value={menuThemingNumber('markerRingGlowOpacity')} min={0} max={1} step={0.01} onChange={(value) => updateMenuThemingField('markerRingGlowOpacity', value)} />
+            <RangedInput value={menuThemingNumber('markerRingGlowOpacity')} min={0} max={1} step={0.01} onChange={(value) => updateMenuThemingField('markerRingGlowOpacity', value)} />
           </FieldRow>
         </CollapsibleSubsection>
 
@@ -2027,16 +1998,16 @@ export function MainMenuConfigEditor({ path, properties }: Props) {
             <ColorInput value={menuThemingString('markerInnerPulseColor')} onChange={(value) => updateMenuThemingField('markerInnerPulseColor', value)} />
           </FieldRow>
           <FieldRow label="Inner Size">
-            <NumberInput value={menuThemingNumber('markerInnerPulseRadius')} min={0} max={120} step={1} onChange={(value) => updateMenuThemingField('markerInnerPulseRadius', value)} />
+            <RangedInput value={menuThemingNumber('markerInnerPulseRadius')} min={0} max={120} step={1} onChange={(value) => updateMenuThemingField('markerInnerPulseRadius', value)} />
           </FieldRow>
           <FieldRow label="Inner Alpha">
-            <NumberInput value={menuThemingNumber('markerInnerPulseOpacity')} min={0} max={1} step={0.01} onChange={(value) => updateMenuThemingField('markerInnerPulseOpacity', value)} />
+            <RangedInput value={menuThemingNumber('markerInnerPulseOpacity')} min={0} max={1} step={0.01} onChange={(value) => updateMenuThemingField('markerInnerPulseOpacity', value)} />
           </FieldRow>
           <FieldRow label="Inner Glow">
-            <NumberInput value={menuThemingNumber('markerInnerPulseGlowSize')} min={0} max={80} step={1} onChange={(value) => updateMenuThemingField('markerInnerPulseGlowSize', value)} />
+            <RangedInput value={menuThemingNumber('markerInnerPulseGlowSize')} min={0} max={80} step={1} onChange={(value) => updateMenuThemingField('markerInnerPulseGlowSize', value)} />
           </FieldRow>
           <FieldRow label="Inner Speed">
-            <NumberInput value={menuThemingNumber('markerInnerPulseSpeed')} min={0} max={12} step={0.1} onChange={(value) => updateMenuThemingField('markerInnerPulseSpeed', value)} />
+            <RangedInput value={menuThemingNumber('markerInnerPulseSpeed')} min={0} max={12} step={0.1} onChange={(value) => updateMenuThemingField('markerInnerPulseSpeed', value)} />
           </FieldRow>
         </CollapsibleSubsection>
 
@@ -2078,7 +2049,7 @@ export function MainMenuConfigEditor({ path, properties }: Props) {
         </CollapsibleSubsection>
       </InspectorSection>
 
-      <InspectorSection title="Motion">
+      <InspectorSection title="Motion" collapsible>
         <CollapsibleSubsection title="Selection">
           <FieldRow label="Border Color">
             <RangedInput
@@ -2245,7 +2216,7 @@ export function MainMenuConfigEditor({ path, properties }: Props) {
         </CollapsibleSubsection>
       </InspectorSection>
 
-      <InspectorSection title="Input & Audio">
+      <InspectorSection title="Input & Audio" collapsible>
         <CollapsibleSubsection title="Input" defaultOpen>
           <FieldRow label="Keyboard">
             <input

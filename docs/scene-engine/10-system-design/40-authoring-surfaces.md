@@ -1,6 +1,6 @@
 ---
-covers: The dual-surface authoring contract — visual editor and agent both editing the same scene.json. Always-present inspector sections. Schema-driven property fields with sections and description popovers.
-concepts: [authoring, editor, agent, dual-surface, dirty-tracking, save, inspector-sections, schema-driven, property-schema]
+covers: The dual-surface authoring contract — visual editor and agent both editing the same scene.json. Always-present inspector sections. Schema-driven property fields with collapsible sections and description popovers.
+concepts: [authoring, editor, agent, dual-surface, dirty-tracking, save, inspector-sections, collapsible-sections, schema-driven, property-schema]
 ---
 
 # Authoring Surfaces
@@ -35,7 +35,7 @@ Every selected object shows the same shell, regardless of type:
 2. **Asset** — read-only asset id, with an asset-swap dropdown when the asset is a swappable container (audio/image/video/glyph). Modules (effects/components) are not swappable.
 3. **Transform** — fill toggle. When fill: rotation + scale. When explicit: x, y, width (% or auto), height (% or auto), anchor select, rotation, scale.
 4. **Appearance** — opacity, blend, hue. For media types (video/image): also fit. For scene-level selection: also saturation.
-5. **Properties** — rendered by [property schema](16-property-schema.md). Properties are grouped into named sections with clickable labels that open description popovers. For effects, properties are driven by the manifest descriptor. For all other layer types, properties are driven by the schema (component-exported or built-in). Layers without a declared schema render all properties under a single auto-generated "General" section. Orphan properties (saved but absent from the schema) also land in General with an inferred input type.
+5. **Properties** — rendered by [property schema](16-property-schema.md). Properties are grouped into named sections with clickable labels that open description popovers. Dense groups can be nested and collapsed where that matches the owning concept. For effects, properties are driven by the manifest descriptor. For all other layer types, properties are driven by the schema (component-exported or built-in). Layers without a declared schema render all properties under a single auto-generated "General" section. Orphan properties (saved but absent from the schema) also land in General with an inferred input type.
 6. **Slots** — glyph-groups only. Lists the SVG's exposed slots; each slot has its own asset selector and per-slot appearance fields.
 7. **Events** — list of trigger → action → target rows with add/remove. Available for any object that can plausibly receive events.
 
@@ -84,7 +84,7 @@ Neither surface needs to know about the other. They are coordinated through the 
 |--------------------------------------------------|-------------|-------------|
 | Visual placement (drag, eyeball alignment)       | Primary     | Possible but awkward |
 | Object ordering, selection, grouping             | Primary     | Possible    |
-| Property tuning (sliders, blend, opacity, hue)   | Primary     | Primary     |
+| Property tuning (sliders, color fields, blend, opacity, hue) | Primary | Primary |
 | Bulk edits across many objects                   | Awkward     | Primary     |
 | Generating new asset combinations                | Possible    | Primary     |
 | Authoring new components/effects (code + manifest) | Awkward   | Primary     |
