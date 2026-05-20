@@ -73,12 +73,9 @@ export function SceneSection({ projectId, sceneId }: Props) {
 
   return (
     <div className="text-[12px] font-mono border-b border-[#2a2a2a] pb-2 mb-2">
-      <h3 className="text-[13px] uppercase tracking-wide text-gray-100 font-bold mb-2">
-        Globals
-      </h3>
-      <div className="flex items-center gap-2 mb-1.5">
-        <span className="text-[14px] font-semibold text-gray-200 truncate flex-1">
-          {scene.name}
+      <div className="flex items-center gap-2 mb-2 px-1 pt-1.5">
+        <span className="text-[11px] font-semibold uppercase tracking-wide text-gray-500 truncate flex-1">
+          Scene Settings
         </span>
         <span
           className={`w-2 h-2 rounded-full shrink-0 border ${
@@ -89,7 +86,7 @@ export function SceneSection({ projectId, sceneId }: Props) {
         />
       </div>
 
-      <InspectorSection title="Scene Details">
+      <InspectorSection title="Scene Details" collapsible defaultOpen={false}>
         <FieldRow label="ID">
           <span className="text-gray-300 truncate">{scene.id}</span>
         </FieldRow>
@@ -100,7 +97,7 @@ export function SceneSection({ projectId, sceneId }: Props) {
         </FieldRow>
       </InspectorSection>
 
-      <InspectorSection title="Appearance">
+      <InspectorSection title="Appearance" collapsible defaultOpen={false}>
         <FieldRow label="Opacity">
           <RangedInput
             value={appearance.opacity ?? 1}

@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useCallback } from 'react'
+import Link from 'next/link'
 import { useEditorStore } from '@/store/editor-store'
 import { resolveObject } from '@/lib/path'
 import type { Registry, SceneJson } from '@/types/scene'
@@ -11,6 +12,7 @@ import { AddLayerDialog } from './AddLayerDialog'
 interface Props {
   projectId: string | null
   sceneId: string
+  scenesHref: string
 }
 
 function computeRegion(e: React.DragEvent, row: HTMLElement, isGroup: boolean): 'before' | 'after' | 'into' {
@@ -38,7 +40,27 @@ function regionToToPath(targetPath: string, region: string, scene: SceneJson): s
   return parts.join('.children.')
 }
 
-export function HierarchyPanel({ projectId, sceneId }: Props) {
+function SidebarHeader({ title, scenesHref }: { title: string; scenesHref: string }) {
+  return (
+    <div className="sticky top-0 z-10 -mx-2 -mt-2 mb-2 border-b border-[#2d2d2d] bg-[#181818]/95 px-2 py-2 shadow-[0_1px_0_rgba(255,255,255,0.03)] backdrop-blur">
+      <div className="flex items-center gap-2">
+        <Link
+          href={scenesHref}
+          aria-label="Back to scenes"
+          className="inline-flex h-7 shrink-0 items-center gap-1.5 rounded-sm border border-[#3c3c3c] bg-[#242424] px-2 text-[12px] font-semibold text-gray-200 no-underline hover:bg-[#303030] active:translate-y-px"
+        >
+          <span aria-hidden="true" className="text-[15px] leading-none text-gray-400">←</span>
+          <span>Scenes</span>
+        </Link>
+        <div className="min-w-0 flex-1 text-right">
+          <div className="truncate text-[13px] font-bold text-gray-100">{title}</div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+export function HierarchyPanel({ projectId, sceneId, scenesHref }: Props) {
   const scene = useEditorStore((s) => s.scene)
   const registry = useEditorStore((s) => s.registry) as Registry | null
   const selectedPath = useEditorStore((s) => s.selectedPath)
@@ -139,8 +161,8 @@ export function HierarchyPanel({ projectId, sceneId }: Props) {
 
   if (!scene) {
     return (
-      <section className="bg-[#1a1a1a] overflow-auto p-2 pt-12" style={{ gridArea: 'hierarchy' }}>
-        <h3 className="text-[13px] uppercase tracking-wide text-gray-100 font-bold mb-2">Globals</h3>
+      <section className="bg-[#1a1a1a] overflow-auto p-2" style={{ gridArea: 'hierarchy' }}>
+        <SidebarHeader title="Loading" scenesHref={scenesHref} />
         <p className="text-gray-600 text-xs italic mb-3">Loading...</p>
         <h3 className="text-[13px] uppercase tracking-wide text-gray-100 font-bold mb-2">Hierarchy</h3>
         <p className="text-gray-600 text-xs italic">Loading...</p>
@@ -149,7 +171,8 @@ export function HierarchyPanel({ projectId, sceneId }: Props) {
   }
 
   return (
-    <section className="bg-[#1a1a1a] overflow-auto p-2 pt-12" style={{ gridArea: 'hierarchy' }}>
+    <section className="bg-[#1a1a1a] overflow-auto p-2" style={{ gridArea: 'hierarchy' }}>
+      <SidebarHeader title={scene.name ?? sceneId} scenesHref={scenesHref} />
       <SceneSection projectId={projectId} sceneId={sceneId} />
       <div className="mb-2 flex items-center justify-between gap-2">
         <h3 className="m-0 text-[13px] uppercase tracking-wide text-gray-100 font-bold">Hierarchy</h3>
