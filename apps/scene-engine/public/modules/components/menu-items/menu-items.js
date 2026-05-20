@@ -2,11 +2,13 @@ const SVG_NS = 'http://www.w3.org/2000/svg';
 const ITEM_SVG_URL = '/modules/components/menu-items/menu-item.svg';
 const ITEM_VIEWBOX_WIDTH = 760;
 const ITEM_VIEWBOX_HEIGHT = 128;
-const ITEM_LEFT_SLICE_END = 90;
-const ITEM_RIGHT_SLICE_START = 626;
-const ITEM_SLICE_OVERLAP = 2;
+const ITEM_LEFT_FIXED_END = 90;
+const ITEM_RIGHT_FIXED_START = 626;
+const ITEM_CAP_CENTER_X = 683;
+const ITEM_CAP_RIGHT_MARGIN = ITEM_VIEWBOX_WIDTH - ITEM_CAP_CENTER_X;
 
 let itemTemplatePromise = null;
+let renderInstanceCounter = 0;
 
 const DEFAULT_ITEMS = ['1-P Mode', 'VS. Mode', 'Trophies', 'Options', 'Data'];
 
@@ -25,6 +27,8 @@ const DEFAULTS = {
   'marker-visible': true,
   'x-offset': 0,
   'y-offset': 0,
+  'row-y-start': DEFAULT_ROW_LAYOUT[0].y,
+  'row-spacing': DEFAULT_ROW_LAYOUT[1].y - DEFAULT_ROW_LAYOUT[0].y,
   scale: 1,
   'width-scale': 1,
   'font-scale': 1,
@@ -37,6 +41,14 @@ const DEFAULTS = {
   'panel-color': '#050505',
   'selected-text-color': '#050505',
   'unselected-text-color': '#d8a33a',
+  'edge-opacity': 0.84,
+  'edge-feather-blur': 0.7,
+  'edge-glow-size': 7,
+  'edge-glow-opacity': 0.45,
+  'selected-edge-opacity': 0.96,
+  'selected-edge-feather-blur': 0.5,
+  'selected-edge-glow-size': 12,
+  'selected-edge-glow-opacity': 0.62,
   'marker-opacity': 1,
   'marker-ring-glow-size': 0.8,
   'marker-ring-glow-opacity': 0.08,
@@ -57,6 +69,9 @@ const DEFAULTS = {
   'marker-pulse-single-cooldown': 1.2,
   'marker-pulse-double-cooldown': 1.2,
   'marker-pulse-double-gap': 0.22,
+  'selection-target-fade-ms': 140,
+  'menu-item-color-transition-ms': 140,
+  'selection-easing': 'cubic-bezier(0.16, 1, 0.3, 1)',
 };
 
 function svgEl(tag, attrs = {}) {
@@ -85,6 +100,31 @@ function booleanProp(properties, key, fallback) {
 
 function clamp(value, min, max) {
   return Math.max(min, Math.min(max, value));
+}
+
+function hexToRgb(value) {
+  const raw = String(value ?? '').trim();
+  const short = raw.match(/^#([0-9a-fA-F]{3})$/);
+  if (short) {
+    return {
+      r: parseInt(`${short[1][0]}${short[1][0]}`, 16),
+      g: parseInt(`${short[1][1]}${short[1][1]}`, 16),
+      b: parseInt(`${short[1][2]}${short[1][2]}`, 16),
+    };
+  }
+
+  const long = raw.match(/^#([0-9a-fA-F]{6})$/);
+  if (!long) return null;
+  return {
+    r: parseInt(long[1].slice(0, 2), 16),
+    g: parseInt(long[1].slice(2, 4), 16),
+    b: parseInt(long[1].slice(4, 6), 16),
+  };
+}
+
+function alphaColor(value, alpha, fallback) {
+  const rgb = hexToRgb(value) ?? hexToRgb(fallback) ?? { r: 253, g: 201, b: 3 };
+  return `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, ${clamp(alpha, 0, 1)})`;
 }
 
 function pulseTiming(properties) {
@@ -355,7 +395,10 @@ function rowLayout(properties, index, offsetX, offsetY, scale, widthScale) {
   const base = DEFAULT_ROW_LAYOUT[index];
   const row = index + 1;
   const x = numberProp(properties, `row-${row}-x`, base.x);
-  const y = numberProp(properties, `row-${row}-y`, base.y);
+  const usesConstantSpacing = properties['row-y-start'] !== undefined || properties['row-spacing'] !== undefined;
+  const spacedY = numberProp(properties, 'row-y-start', DEFAULTS['row-y-start'])
+    + index * numberProp(properties, 'row-spacing', DEFAULTS['row-spacing']);
+  const y = numberProp(properties, `row-${row}-y`, usesConstantSpacing ? spacedY : base.y);
   const width = numberProp(properties, `row-${row}-width`, base.width);
   const height = numberProp(properties, `row-${row}-height`, base.height);
   return {
@@ -377,20 +420,142 @@ function setSelected(svg, selectedIndex) {
   }
 }
 
-function appendGeometrySlice(parent, template, x, width, viewBoxX, viewBoxWidth) {
-  const slice = svgEl('svg', {
-    class: 'menu-items__geometry-slice',
-    x: x.toFixed(3),
-    y: 0,
-    width: width.toFixed(3),
-    height: ITEM_VIEWBOX_HEIGHT,
-    viewBox: `${viewBoxX} 0 ${viewBoxWidth} ${ITEM_VIEWBOX_HEIGHT}`,
-    preserveAspectRatio: 'none',
-    overflow: 'hidden',
-  });
+function pathCoord(value) {
+  return value.toFixed(3);
+}
 
-  slice.appendChild(document.importNode(template.asset, true));
-  parent.appendChild(slice);
+function appendPath(parent, className, d, attrs = {}) {
+  parent.appendChild(svgEl('path', { class: className, d, ...attrs }));
+}
+
+function menuItemEdgePath(capX) {
+  const x = pathCoord(capX);
+  return [
+    'M 49 8',
+    `H ${x}`,
+    `A 56 56 0 0 1 ${x} 120`,
+    'H 31',
+    'L 8 78',
+    'Z',
+  ].join(' ');
+}
+
+function menuItemInternalCutPath(capX) {
+  return [
+    'M 56.45 21',
+    `H ${pathCoord(capX)}`,
+    'V 107',
+    'H 38.7',
+    'L 22.94 78.22',
+    'Z',
+  ].join(' ');
+}
+
+function menuItemNotchGapPath(capX) {
+  return [
+    `M ${pathCoord(capX + 43)} 64`,
+    `A 43 43 0 1 1 ${pathCoord(capX - 43)} 64`,
+    `A 43 43 0 1 1 ${pathCoord(capX + 43)} 64`,
+    'Z',
+    `M ${pathCoord(capX + 22)} 64`,
+    `A 22 22 0 1 0 ${pathCoord(capX - 22)} 64`,
+    `A 22 22 0 1 0 ${pathCoord(capX + 22)} 64`,
+    'Z',
+  ].join(' ');
+}
+
+function menuItemNotchStemPath(capX) {
+  const left = pathCoord(capX - 5);
+  const right = pathCoord(capX + 2);
+  return [
+    `M ${left} 108`,
+    `H ${right}`,
+    'V 120',
+    `H ${left}`,
+    'Z',
+  ].join(' ');
+}
+
+function menuItemNotchFillPath(capX) {
+  const left = pathCoord(capX - 5);
+  const center = pathCoord(capX);
+  const lowerRight = pathCoord(capX + 2);
+  return [
+    `M ${left} 42`,
+    `H ${center}`,
+    `A 22 22 0 0 1 ${center} 86`,
+    `H ${lowerRight}`,
+    'V 108',
+    `H ${left}`,
+    'Z',
+  ].join(' ');
+}
+
+function menuItemNotchPanelGapPath(capX) {
+  return [
+    `M ${pathCoord(capX + 2)} 86`,
+    `H ${pathCoord(capX + 12)}`,
+    'V 108',
+    `H ${pathCoord(capX + 2)}`,
+    'Z',
+  ].join(' ');
+}
+
+function menuItemNotchGlowCutoutPath(capX) {
+  return [
+    `M ${pathCoord(capX + 2)} 108`,
+    `H ${pathCoord(capX + 12)}`,
+    'V 148',
+    `H ${pathCoord(capX + 2)}`,
+    'Z',
+  ].join(' ');
+}
+
+function appendEdgeCutoutMask(parent, maskId, width, capX) {
+  const mask = svgEl('mask', {
+    id: maskId,
+    maskUnits: 'userSpaceOnUse',
+    x: -80,
+    y: -80,
+    width: width + 160,
+    height: ITEM_VIEWBOX_HEIGHT + 160,
+  });
+  mask.appendChild(svgEl('rect', {
+    x: -80,
+    y: -80,
+    width: width + 160,
+    height: ITEM_VIEWBOX_HEIGHT + 160,
+    fill: '#fff',
+  }));
+  mask.appendChild(svgEl('path', {
+    d: menuItemNotchGlowCutoutPath(capX),
+    fill: '#000',
+  }));
+  parent.appendChild(mask);
+}
+
+function menuItemNotchCutPath(capX) {
+  return [
+    `M ${pathCoord(capX + 2)} 55`,
+    `C ${pathCoord(capX + 9)} 55 ${pathCoord(capX + 12)} 58.5 ${pathCoord(capX + 12)} 64`,
+    `C ${pathCoord(capX + 12)} 69.5 ${pathCoord(capX + 9)} 73 ${pathCoord(capX + 2)} 73`,
+    'Z',
+  ].join(' ');
+}
+
+function appendEdgeShell(parent, width) {
+  const capX = width - ITEM_CAP_RIGHT_MARGIN;
+  appendPath(parent, 'menu-item__edge-fill', menuItemEdgePath(capX));
+  appendPath(parent, 'menu-item__edge-fill menu-item__notch-stem-edge', menuItemNotchStemPath(capX));
+}
+
+function appendPanelShell(parent, width) {
+  const capX = width - ITEM_CAP_RIGHT_MARGIN;
+  appendPath(parent, 'menu-item__internal-cut', menuItemInternalCutPath(capX));
+  appendPath(parent, 'menu-item__notch-gap', menuItemNotchGapPath(capX));
+  appendPath(parent, 'menu-item__notch-fill', menuItemNotchFillPath(capX));
+  appendPath(parent, 'menu-item__notch-lower-gap', menuItemNotchPanelGapPath(capX));
+  appendPath(parent, 'menu-item__notch-cut', menuItemNotchCutPath(capX));
 }
 
 function appendMarker(parent, template, markerX, pulse) {
@@ -415,7 +580,7 @@ function appendMarker(parent, template, markerX, pulse) {
   }
 }
 
-function appendRow(svg, template, label, index, layout, selectedIndex, fontScale, fitSettings, pulse) {
+function appendRow(svg, template, label, index, layout, selectedIndex, fontScale, fitSettings, pulse, instanceId) {
   const rowIndex = index + 1;
   const row = svgEl('g', {
     class: rowIndex === selectedIndex ? 'menu-items__row is-selected' : 'menu-items__row',
@@ -427,11 +592,14 @@ function appendRow(svg, template, label, index, layout, selectedIndex, fontScale
   row.dataset.menuIndex = String(rowIndex);
 
   const yScale = layout.height / ITEM_VIEWBOX_HEIGHT;
-  const leftWidth = ITEM_LEFT_SLICE_END;
-  const rightWidth = ITEM_VIEWBOX_WIDTH - ITEM_RIGHT_SLICE_START;
-  const baseMiddleWidth = ITEM_RIGHT_SLICE_START - ITEM_LEFT_SLICE_END;
+  const leftWidth = ITEM_LEFT_FIXED_END;
+  const rightWidth = ITEM_VIEWBOX_WIDTH - ITEM_RIGHT_FIXED_START;
   const targetSourceWidth = layout.width / yScale;
   const middleWidth = Math.max(8, targetSourceWidth - leftWidth - rightWidth);
+  const sourceWidth = leftWidth + middleWidth + rightWidth;
+  const markerX = sourceWidth - ITEM_CAP_RIGHT_MARGIN;
+  const capX = sourceWidth - ITEM_CAP_RIGHT_MARGIN;
+  const maskId = `menu-item-edge-cutout-${instanceId}-${rowIndex}`;
 
   const geometry = svgEl('g', {
     class: 'menu-items__geometry',
@@ -440,30 +608,22 @@ function appendRow(svg, template, label, index, layout, selectedIndex, fontScale
       `scale(${yScale.toFixed(5)})`,
     ].join(' '),
   });
-  const shell = svgEl('g', { class: 'menu-items__item-shell' });
-  appendGeometrySlice(
-    shell,
-    template,
-    leftWidth - ITEM_SLICE_OVERLAP,
-    middleWidth + ITEM_SLICE_OVERLAP * 2,
-    ITEM_LEFT_SLICE_END - ITEM_SLICE_OVERLAP,
-    baseMiddleWidth + ITEM_SLICE_OVERLAP * 2,
-  );
-  appendGeometrySlice(shell, template, 0, leftWidth + ITEM_SLICE_OVERLAP, 0, leftWidth + ITEM_SLICE_OVERLAP);
-  appendGeometrySlice(
-    shell,
-    template,
-    leftWidth + middleWidth - ITEM_SLICE_OVERLAP,
-    rightWidth + ITEM_SLICE_OVERLAP,
-    ITEM_RIGHT_SLICE_START - ITEM_SLICE_OVERLAP,
-    rightWidth + ITEM_SLICE_OVERLAP,
-  );
-  geometry.appendChild(shell);
-  appendMarker(geometry, template, leftWidth + middleWidth + (683 - ITEM_RIGHT_SLICE_START), pulse);
+  appendEdgeCutoutMask(geometry, maskId, sourceWidth, capX);
+  const edgeShell = svgEl('g', {
+    class: 'menu-items__item-shell',
+    mask: `url(#${maskId})`,
+  });
+  appendEdgeShell(edgeShell, sourceWidth);
+  geometry.appendChild(edgeShell);
+
+  const panelShell = svgEl('g', { class: 'menu-items__panel-shell' });
+  appendPanelShell(panelShell, sourceWidth);
+  geometry.appendChild(panelShell);
+  appendMarker(geometry, template, markerX, pulse);
   row.appendChild(geometry);
 
   const textCenter = layout.x + layout.width * layout.textX;
-  const textLeftBound = layout.x + (ITEM_LEFT_SLICE_END * yScale) + fitSettings.padding;
+  const textLeftBound = layout.x + (ITEM_LEFT_FIXED_END * yScale) + fitSettings.padding;
   const textRightBound = layout.x + ((leftWidth + middleWidth) * yScale) - fitSettings.padding;
   const fitWidth = Math.max(24, Math.min(textCenter - textLeftBound, textRightBound - textCenter) * 2);
   const baseFontSize = layout.fontSize * fontScale;
@@ -528,6 +688,47 @@ function applyCssProperties(root, properties) {
   root.style.setProperty('--menu-items-panel', stringProp(properties, 'panel-color', DEFAULTS['panel-color']));
   root.style.setProperty('--menu-items-selected-text', stringProp(properties, 'selected-text-color', DEFAULTS['selected-text-color']));
   root.style.setProperty('--menu-items-unselected-text', stringProp(properties, 'unselected-text-color', DEFAULTS['unselected-text-color']));
+  const edgeGlowColor = stringProp(properties, 'edge-glow-color', stringProp(properties, 'hot-gold-color', DEFAULTS['hot-gold-color']));
+  const selectedEdgeGlowColor = stringProp(
+    properties,
+    'selected-edge-glow-color',
+    stringProp(properties, 'hot-gold-color', DEFAULTS['hot-gold-color']),
+  );
+  const edgeGlowOpacity = clamp(numberProp(properties, 'edge-glow-opacity', DEFAULTS['edge-glow-opacity']), 0, 1);
+  const selectedEdgeGlowOpacity = clamp(
+    numberProp(properties, 'selected-edge-glow-opacity', DEFAULTS['selected-edge-glow-opacity']),
+    0,
+    1,
+  );
+  root.style.setProperty(
+    '--menu-items-edge-opacity',
+    String(clamp(numberProp(properties, 'edge-opacity', DEFAULTS['edge-opacity']), 0, 1)),
+  );
+  root.style.setProperty(
+    '--menu-items-edge-feather-blur',
+    `${clamp(numberProp(properties, 'edge-feather-blur', DEFAULTS['edge-feather-blur']), 0, 8)}px`,
+  );
+  root.style.setProperty(
+    '--menu-items-edge-glow-size',
+    `${clamp(numberProp(properties, 'edge-glow-size', DEFAULTS['edge-glow-size']), 0, 48)}px`,
+  );
+  root.style.setProperty('--menu-items-edge-glow-color-rgba', alphaColor(edgeGlowColor, edgeGlowOpacity, DEFAULTS['hot-gold-color']));
+  root.style.setProperty(
+    '--menu-items-selected-edge-opacity',
+    String(clamp(numberProp(properties, 'selected-edge-opacity', DEFAULTS['selected-edge-opacity']), 0, 1)),
+  );
+  root.style.setProperty(
+    '--menu-items-selected-edge-feather-blur',
+    `${clamp(numberProp(properties, 'selected-edge-feather-blur', DEFAULTS['selected-edge-feather-blur']), 0, 8)}px`,
+  );
+  root.style.setProperty(
+    '--menu-items-selected-edge-glow-size',
+    `${clamp(numberProp(properties, 'selected-edge-glow-size', DEFAULTS['selected-edge-glow-size']), 0, 64)}px`,
+  );
+  root.style.setProperty(
+    '--menu-items-selected-edge-glow-color-rgba',
+    alphaColor(selectedEdgeGlowColor, selectedEdgeGlowOpacity, DEFAULTS['hot-gold-color']),
+  );
   root.style.setProperty(
     '--menu-items-marker-opacity',
     String(clamp(numberProp(properties, 'marker-opacity', DEFAULTS['marker-opacity']), 0, 1)),
@@ -628,9 +829,18 @@ function applyCssProperties(root, properties) {
     '--menu-items-marker-pulse-cycle',
     `${pulse.cycle}s`,
   );
+  const targetFade = clamp(numberProp(properties, 'selection-target-fade-ms', DEFAULTS['selection-target-fade-ms']), 0, 2000);
+  const colorTransition = clamp(numberProp(properties, 'menu-item-color-transition-ms', targetFade), 0, 2000);
+  root.style.setProperty('--menu-items-target-fade-ms', `${targetFade}ms`);
+  root.style.setProperty('--menu-items-color-transition-ms', `${colorTransition}ms`);
+  root.style.setProperty(
+    '--menu-items-selection-easing',
+    stringProp(properties, 'selection-easing', DEFAULTS['selection-easing']),
+  );
 }
 
 export default async function ({ properties = {}, layerId } = {}) {
+  const instanceId = `${layerId || 'menu-items'}-${renderInstanceCounter += 1}`;
   const root = document.createElement('div');
   root.className = 'menu-items';
   if (booleanProp(properties, 'marker-visible', DEFAULTS['marker-visible'])) {
@@ -672,6 +882,7 @@ export default async function ({ properties = {}, layerId } = {}) {
         fontScale,
         fitSettings,
         pulse,
+        instanceId,
       );
     });
   } catch (err) {
@@ -760,6 +971,22 @@ export const properties = {
           max: 400,
           step: 1,
         },
+        'row-y-start': {
+          type: 'number',
+          label: 'Start Y',
+          description: 'Base Y for row 1 when using constant stack spacing.',
+          min: 0,
+          max: 1080,
+          step: 1,
+        },
+        'row-spacing': {
+          type: 'number',
+          label: 'Row Spacing',
+          description: 'Constant vertical distance between generated stack rows.',
+          min: 0,
+          max: 260,
+          step: 1,
+        },
         scale: {
           type: 'number',
           label: 'Scale',
@@ -813,6 +1040,46 @@ export const properties = {
           max: 120,
           step: 1,
         },
+        'row-1-x': {
+          type: 'number',
+          label: 'Row 1 X',
+          description: 'Horizontal position for row 1 before global offset and scale.',
+          min: -400,
+          max: 1440,
+          step: 1,
+        },
+        'row-2-x': {
+          type: 'number',
+          label: 'Row 2 X',
+          description: 'Horizontal position for row 2 before global offset and scale.',
+          min: -400,
+          max: 1440,
+          step: 1,
+        },
+        'row-3-x': {
+          type: 'number',
+          label: 'Row 3 X',
+          description: 'Horizontal position for row 3 before global offset and scale.',
+          min: -400,
+          max: 1440,
+          step: 1,
+        },
+        'row-4-x': {
+          type: 'number',
+          label: 'Row 4 X',
+          description: 'Horizontal position for row 4 before global offset and scale.',
+          min: -400,
+          max: 1440,
+          step: 1,
+        },
+        'row-5-x': {
+          type: 'number',
+          label: 'Row 5 X',
+          description: 'Horizontal position for row 5 before global offset and scale.',
+          min: -400,
+          max: 1440,
+          step: 1,
+        },
       },
     },
     {
@@ -858,8 +1125,100 @@ export const properties = {
           max: 1,
           step: 0.01,
         },
+        'selection-target-fade-ms': {
+          type: 'number',
+          label: 'Target Fade',
+          description: 'Fade-in and fade-out duration for the selected target marker.',
+          min: 0,
+          max: 2000,
+          step: 10,
+        },
+        'menu-item-color-transition-ms': {
+          type: 'number',
+          label: 'Menu Item Color',
+          description: 'Transition duration for selected row fill and label color changes.',
+          min: 0,
+          max: 2000,
+          step: 10,
+        },
+        'selection-easing': {
+          type: 'string',
+          label: 'Easing',
+          description: 'CSS easing used for active row and marker changes.',
+        },
       },
       sections: [
+        {
+          id: 'menu-items-edge-falloff',
+          label: 'Edge Falloff',
+          description: 'Opacity, feathering, and outer glow controls for normal and selected row borders.',
+          properties: {
+            'edge-opacity': {
+              type: 'number',
+              label: 'Edge Opacity',
+              description: 'Opacity of the unselected row border fill.',
+              min: 0,
+              max: 1,
+              step: 0.01,
+            },
+            'edge-feather-blur': {
+              type: 'number',
+              label: 'Edge Feather',
+              description: 'Blur applied to the unselected row edge fill, in SVG pixels.',
+              min: 0,
+              max: 8,
+              step: 0.1,
+            },
+            'edge-glow-size': {
+              type: 'number',
+              label: 'Edge Glow Size',
+              description: 'Outer glow radius for unselected row borders.',
+              min: 0,
+              max: 48,
+              step: 0.5,
+            },
+            'edge-glow-opacity': {
+              type: 'number',
+              label: 'Edge Glow Opacity',
+              description: 'Opacity of the unselected row outer glow.',
+              min: 0,
+              max: 1,
+              step: 0.01,
+            },
+            'selected-edge-opacity': {
+              type: 'number',
+              label: 'Selected Edge Opacity',
+              description: 'Opacity of the selected row fill.',
+              min: 0,
+              max: 1,
+              step: 0.01,
+            },
+            'selected-edge-feather-blur': {
+              type: 'number',
+              label: 'Selected Feather',
+              description: 'Blur applied to the selected row fill edge, in SVG pixels.',
+              min: 0,
+              max: 8,
+              step: 0.1,
+            },
+            'selected-edge-glow-size': {
+              type: 'number',
+              label: 'Selected Glow Size',
+              description: 'Outer glow radius for the selected row.',
+              min: 0,
+              max: 64,
+              step: 0.5,
+            },
+            'selected-edge-glow-opacity': {
+              type: 'number',
+              label: 'Selected Glow Opacity',
+              description: 'Opacity of the selected row outer glow.',
+              min: 0,
+              max: 1,
+              step: 0.01,
+            },
+          },
+        },
         {
           id: 'menu-items-target-ring',
           label: 'Target Ring',

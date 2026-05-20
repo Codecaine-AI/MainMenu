@@ -28,6 +28,18 @@
   transform-origin: center;
 }
 
+.background-pulse__swirl-cluster {
+  opacity: 0;
+  fill: none;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.background-pulse__swirl-curl {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
 .background-pulse__ring-feather,
 .background-pulse__ring-core {
   fill: none;
@@ -39,5 +51,20 @@
 }
 
 .background-pulse__ring-core {
+  filter: blur(var(--background-pulse-core-blur, 1.4px));
+}
+
+.background-pulse__swirl-path {
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+}
+
+.background-pulse__swirl-path--feather {
+  filter: blur(var(--background-pulse-feather-blur, 5px));
+}
+
+.background-pulse__swirl-path--core {
   filter: blur(var(--background-pulse-core-blur, 1.4px));
 }

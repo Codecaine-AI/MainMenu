@@ -242,7 +242,7 @@
         {
           "trigger": "click",
           "action": "play-audio",
-          "target": "start-cue"
+          "target": "ui-forward"
         }
       ],
       "children": [

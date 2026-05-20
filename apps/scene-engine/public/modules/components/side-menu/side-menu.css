@@ -19,10 +19,14 @@
   --side-menu-panel-edge: #167783;
   --side-menu-panel-opacity: 0.72;
   --side-menu-panel-edge-opacity: 0.78;
+  --side-menu-rain-color: rgb(94, 135, 142);
+  --side-menu-rain-duration: 8.333s;
   --side-menu-frame: #b8bbc2;
   --side-menu-frame-opacity: 0.78;
   --side-menu-text: #dce0ee;
+  --side-menu-text-opacity: 1;
   --side-menu-rail-text: #aaaeb6;
+  --side-menu-rail-text-opacity: 1;
   --side-menu-text-shadow: rgba(0, 0, 0, 0.6);
   --side-menu-rail-font-size: 29px;
 
@@ -89,6 +93,21 @@
   stroke: none;
 }
 
+.side-menu__rain {
+  pointer-events: none;
+  mix-blend-mode: screen;
+}
+
+.side-menu__rain-drop {
+  fill: var(--side-menu-rain-color);
+  opacity: 0;
+  transform-box: fill-box;
+  transform-origin: center center;
+  animation: side-menu-rain-fall var(--side-menu-rain-duration) linear infinite;
+  animation-delay: var(--side-menu-rain-delay);
+  will-change: transform, opacity;
+}
+
 .side-menu__panel-edge {
   fill: none;
   stroke: var(--side-menu-panel-edge);
@@ -137,6 +156,7 @@
 
 .side-menu__item-label {
   fill: var(--side-menu-text);
+  opacity: var(--side-menu-text-opacity);
   stroke: var(--side-menu-text-shadow);
   stroke-width: 3px;
   letter-spacing: 2px;
@@ -145,9 +165,33 @@
 
 .side-menu__rail-label {
   fill: var(--side-menu-rail-text);
+  opacity: var(--side-menu-rail-text-opacity);
   stroke: rgba(0, 0, 0, 0.64);
   stroke-width: 2px;
   font-size: var(--side-menu-rail-font-size);
   letter-spacing: 2px;
   filter: drop-shadow(2px 2px 0 rgba(0, 0, 0, 0.48));
+}
+
+.side-menu__content-image {
+  filter:
+    drop-shadow(8px 10px 0 rgba(0, 0, 0, 0.34))
+    drop-shadow(0 0 10px rgba(255, 255, 255, 0.16));
+}
+
+@keyframes side-menu-rain-fall {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, -500px, 0);
+  }
+
+  10%,
+  86% {
+    opacity: var(--side-menu-rain-alpha);
+  }
+
+  100% {
+    opacity: 0;
+    transform: translate3d(var(--side-menu-rain-drift), 500px, 0);
+  }
 }

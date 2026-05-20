@@ -38,5 +38,17 @@
   "start-cue": {
     "type": "audio",
     "file": "/assets/audio/start-cue/start-cue.js"
+  },
+  "ui-navigation": {
+    "type": "audio",
+    "file": "/assets/audio/ui-navigation/ui-navigation.js"
+  },
+  "ui-forward": {
+    "type": "audio",
+    "file": "/assets/audio/ui-forward/ui-forward.js"
+  },
+  "ui-back": {
+    "type": "audio",
+    "file": "/assets/audio/ui-back/ui-back.js"
   }
 }

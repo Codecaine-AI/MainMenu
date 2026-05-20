@@ -78,7 +78,9 @@
         "dot-back-speed": 1.1,
         "dot-direction": "counter-clockwise",
         "ring-radius": 530,
-        "ring-opacity": 0.55
+        "ring-opacity": 0.55,
+        "dot-front-scale": 0.8,
+        "dot-back-scale": 3
       }
     },
     {
@@ -95,21 +97,28 @@
       },
       "properties": {
         "field-x": 1007,
-        "field-y": 219,
-        "field-width": 500,
-        "field-height": 197,
+        "field-y": 193,
+        "field-width": 480,
+        "field-height": 126,
         "show-debug-rect": false,
         "pulse-base-radius": 66,
         "pulse-mode": "random",
         "marker-pulse-color": "#8a97ff",
-        "marker-pulse-opacity": 0.25,
-        "marker-pulse-edge-opacity": 0.18,
+        "marker-pulse-opacity": 0.2,
+        "marker-pulse-edge-opacity": 0.15,
         "marker-pulse-thickness": 1,
         "marker-pulse-feather-width": 9,
         "marker-pulse-radius": 2.7,
         "marker-pulse-target-radius": 0,
-        "marker-pulse-contract-speed": 3.3,
-        "pulse-gap": 0.7
+        "marker-pulse-contract-speed": 1.8,
+        "pulse-gap": 0.7,
+        "swirl-count-min": 3,
+        "swirl-count-max": 4,
+        "swirl-turns": 2.05,
+        "swirl-twist-degrees": -45,
+        "swirl-size": 0.9,
+        "swirl-arm-twist-degrees": 475,
+        "swirl-spacing": 0.7
       }
     },
     {
@@ -124,48 +133,82 @@
         "config": "/modules/components/main-menu-system/menu-config.json",
         "initial-menu": "main",
         "initial-selected-index": 1,
-        "menu-x-offset": 0,
+        "menu-x-offset": -55,
         "menu-y-offset": 0,
         "menu-scale": 1,
         "menu-width-scale": 1,
         "menu-font-scale": 1,
-        "title-x": 179,
-        "title-y": 120,
+        "title-x": 177,
+        "title-y": 123,
+        "title-box-width": 444,
+        "title-box-height": 76,
+        "title-fit-padding-x": 10,
+        "title-fit-padding-y": 10,
         "title-font-size": 47,
         "caption-x": 730,
         "caption-y": 950,
+        "caption-center-in-box": true,
         "caption-font-size": 56,
         "caption-box-x": 344,
         "caption-box-y": 902,
         "caption-box-width": 762,
         "caption-box-height": 85,
-        "side-x": -14,
-        "side-y": 0,
-        "side-scale": 1,
-        "side-perspective": 1700,
-        "side-content-x": 1027,
-        "side-content-y": 414,
+        "shield-text-debug": false,
+        "side-x": -47,
+        "side-y": 17,
+        "side-scale": 1.1,
+        "side-perspective": 1100,
+        "side-panel-opacity": 0.25,
+        "side-frame-visible": false,
+        "side-rain-density": 70,
+        "side-rain-speed": 3,
+        "side-rain-color-offset": 0.36,
+        "side-content-x": 993,
+        "side-content-y": 377,
         "side-content-width": 250,
-        "side-line-height": 70,
-        "side-font-scale": 1,
+        "side-line-height": 60,
+        "side-font-scale": 0.9,
+        "side-text-opacity": 0.65,
         "detail-x": 910,
         "detail-y": 318,
         "detail-width": 388,
         "detail-wide-x": 730,
         "detail-wide-y": 238,
         "detail-wide-width": 574,
-        "back-button-x": 150,
-        "back-button-y": 112,
+        "back-button-x": 174,
+        "back-button-y": 100,
         "enable-keyboard": true,
         "enable-gamepad": true,
-        "transition-ms": 300,
+        "transition-ms": 1000,
+        "theme-transition-ms": 1000,
+        "selection-target-fade-ms": 1200,
+        "menu-item-color-transition-ms": 500,
+        "menu-motion-easing": "cubic-bezier(0.16, 1, 0.3, 1)",
+        "menu-orbit-radius": 1165,
+        "menu-orbit-angle": 110,
+        "menu-orbit-debug": false,
+        "menu-orbit-center-x": 1660,
+        "menu-orbit-center-y": 560,
+        "menu-orbit-debug-opacity": 1,
+        "title-prism-ms": 200,
+        "title-prism-depth": 15,
+        "title-prism-lift": 0,
+        "title-prism-perspective": 1200,
+        "title-prism-angle": 120,
+        "ui-navigation-sound": "ui-navigation",
+        "ui-forward-sound": "ui-forward",
+        "ui-back-sound": "ui-back",
+        "ui-navigation-volume": 0.2,
+        "ui-forward-volume": 0.8,
+        "ui-back-volume": 0.65,
+        "back-target": "title",
         "menu-config": {
           "initial": "main",
           "menus": {
             "main": {
               "title": "Main Menu",
               "theme": "blue",
-              "layout": "main-stack",
+              "layout": "left-stack-5",
               "items": [
                 {
                   "id": "solo",
@@ -179,7 +222,8 @@
                       "Event Match",
                       "Stadium",
                       "Training"
-                    ]
+                    ],
+                    "railTextOpacity": 1
                   }
                 },
                 {
@@ -373,7 +417,7 @@
             "options": {
               "title": "Options",
               "theme": "yellow",
-              "layout": "options-stack",
+              "layout": "left-stack-5",
               "items": [
                 {
                   "id": "rumble",
@@ -438,7 +482,7 @@
             "screen-display": {
               "title": "Options / Screen Display",
               "theme": "yellow",
-              "layout": "detail-only",
+              "layout": "left-stack-3",
               "items": [
                 {
                   "id": "deflicker",
@@ -454,7 +498,7 @@
             "data": {
               "title": "Data / Melee Records",
               "theme": "purple",
-              "layout": "data-stack",
+              "layout": "left-stack-3",
               "items": [
                 {
                   "id": "vs-records",
@@ -483,6 +527,67 @@
               ]
             }
           },
+          "layouts": {
+            "left-stack-5": {
+              "label": "Five Stack",
+              "itemCount": 5,
+              "yStart": 274,
+              "spacing": 110,
+              "rowX": [
+                326,
+                240,
+                154,
+                230,
+                197
+              ],
+              "rowWidth": 760,
+              "itemProps": {
+                "x-offset": -50,
+                "y-offset": -10,
+                "width-scale": 0.84,
+                "font-scale": 0.96,
+                "text-max-font-size": 64
+              }
+            },
+            "left-stack-4": {
+              "label": "Four Stack",
+              "itemCount": 4,
+              "yStart": 276,
+              "spacing": 128,
+              "rowX": [
+                320,
+                215,
+                130,
+                130
+              ],
+              "rowWidth": 760,
+              "itemProps": {
+                "x-offset": -54,
+                "y-offset": 10,
+                "width-scale": 0.86,
+                "text-max-font-size": 64
+              }
+            },
+            "left-stack-3": {
+              "label": "Three Stack",
+              "itemCount": 3,
+              "yStart": 238,
+              "spacing": 184,
+              "rowX": [
+                185,
+                120,
+                185
+              ],
+              "rowWidth": 760,
+              "itemProps": {
+                "x-offset": -70,
+                "y-offset": 38,
+                "width-scale": 0.88,
+                "font-scale": 0.94,
+                "text-max-font-size": 60
+              }
+            }
+          },
           "themes": {
             "blue": {
               "border": "#3158e8",
@@ -495,7 +600,7 @@
               "wash": "rgba(39, 76, 222, 0.14)"
             },
             "red": {
-              "border": "#c24334",
+              "border": "#de1212",
               "borderSoft": "#e47b65",
               "sidePanel": "#563244",
               "sideEdge": "#9b4b55",
@@ -505,7 +610,7 @@
               "wash": "rgba(188, 54, 42, 0.18)"
             },
             "yellow": {
-              "border": "#b4a64b",
+              "border": "#f4db34",
               "borderSoft": "#e2cf62",
               "sidePanel": "#4d4a35",
               "sideEdge": "#9a8740",
@@ -515,7 +620,7 @@
               "wash": "rgba(188, 160, 42, 0.14)"
             },
             "green": {
-              "border": "#45a86b",
+              "border": "#0ab84d",
               "borderSoft": "#7ee29b",
               "sidePanel": "#254f3a",
               "sideEdge": "#4c9d65",
@@ -525,7 +630,7 @@
               "wash": "rgba(50, 152, 88, 0.16)"
             },
             "purple": {
-              "border": "#7c32c8",
+              "border": "#8c24f5",
               "borderSoft": "#b06aff",
               "sidePanel": "#392c5d",
               "sideEdge": "#7b48a6",
@@ -540,6 +645,21 @@
             "rowPanel": "#050505",
             "rowSelectedText": "#050505",
             "rowText": "#fbba2d",
+            "titleTextColor": "#ededed",
+            "titleTextOpacity": 0.75,
+            "titleTextGlowSize": 40,
+            "titleTextGlowOpacity": 0.55,
+            "captionTextColor": "#e4e7ff",
+            "sideTextColor": "#dce0ee",
+            "railTextColor": "#aaaeb6",
+            "rowEdgeOpacity": 1,
+            "rowEdgeFeather": 8,
+            "rowEdgeGlowSize": 0,
+            "rowEdgeGlowOpacity": 0.8,
+            "rowSelectedEdgeOpacity": 1,
+            "rowSelectedEdgeFeather": 8,
+            "rowSelectedEdgeGlowSize": 0,
+            "rowSelectedEdgeGlowOpacity": 0.8,
             "markerPulseColor": "#dce0cd",
             "markerContractSpeed": 2,
             "markerCooldown": 0,
@@ -560,13 +680,20 @@
             "markerInnerPulseGlowSize": 24,
             "markerInnerPulseSpeed": 4.2
           }
-        }
+        },
+        "caption-transition-ms": 240,
+        "side-rain-x-scale": 3.5,
+        "side-rain-y-scale": 0.25,
+        "side-rail-font-size": 36,
+        "side-rail-y": 519,
+        "side-rail-x": 923,
+        "side-rail-visible": false
       }
     }
   ],
   "appearance": {
     "opacity": 1,
     "hue": 0,
-    "saturation": 1
+    "saturation": 1.1
   }
 }

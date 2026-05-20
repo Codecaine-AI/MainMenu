@@ -30,13 +30,11 @@
 .menu-shield__outer-line {
   stroke-width: 7;
   stroke-opacity: var(--menu-shield-border-opacity);
-  filter: drop-shadow(0 0 8px var(--menu-shield-border));
 }
 
 .menu-shield__inner-line {
   stroke-width: 5;
   stroke-opacity: var(--menu-shield-inner-opacity);
-  filter: drop-shadow(0 0 5px var(--menu-shield-border));
 }
 
 .menu-shield__rib-fill {
@@ -99,6 +97,7 @@
 
 .menu-shield__top-text {
   fill: var(--menu-shield-top-text);
+  opacity: var(--menu-shield-top-text-opacity);
   stroke: rgba(0, 0, 0, 0.58);
   stroke-width: 4;
   paint-order: stroke fill;
@@ -107,7 +106,9 @@
   font-style: italic;
   font-weight: 900;
   letter-spacing: 2px;
-  filter: drop-shadow(6px 5px 0 rgba(0, 0, 0, 0.42));
+  filter:
+    drop-shadow(6px 5px 0 rgba(0, 0, 0, 0.42))
+    drop-shadow(0 0 var(--menu-shield-top-text-glow-size) var(--menu-shield-top-text-glow-color));
 }
 
 .menu-shield__bottom-text {
@@ -120,4 +121,21 @@
   font-weight: 900;
   letter-spacing: 2px;
   filter: drop-shadow(0 0 3px rgba(238, 241, 255, 0.45));
+}
+
+.menu-shield__text-debug {
+  pointer-events: none;
+}
+
+.menu-shield__text-debug-box {
+  fill: rgba(255, 64, 180, 0.08);
+  stroke: rgba(255, 64, 180, 0.95);
+  stroke-width: 3;
+  stroke-dasharray: 12 8;
+  vector-effect: non-scaling-stroke;
+}
+
+.menu-shield__text-debug-box--caption {
+  fill: rgba(72, 232, 255, 0.08);
+  stroke: rgba(72, 232, 255, 0.95);
 }

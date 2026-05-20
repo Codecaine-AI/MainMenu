@@ -2,8 +2,15 @@ const SVG_NS = 'http://www.w3.org/2000/svg';
 const TEMPLATE_URL = '/modules/components/side-menu/side-menu.svg';
 
 let templatePromise = null;
+let instanceCounter = 0;
 
 const DEFAULT_ITEMS = ['Regular Match', 'Event Match', 'Stadium', 'Training'];
+const PANEL_RAIN_BOUNDS = {
+  x: 961,
+  y: 296,
+  width: 362,
+  height: 455,
+};
 
 const DEFAULTS = {
   items: DEFAULT_ITEMS.join('|'),
@@ -28,12 +35,21 @@ const DEFAULTS = {
   'panel-edge-color': '#167783',
   'panel-opacity': 0.72,
   'panel-edge-opacity': 0.78,
+  'rain-density': 36,
+  'rain-speed': 0.9,
+  'rain-color-offset': 0.36,
+  'rain-x-scale': 1,
+  'rain-y-scale': 1,
+  'frame-visible': true,
   'frame-color': '#b8bbc2',
   'frame-opacity': 0.78,
   'text-color': '#dce0ee',
+  'text-opacity': 1,
   'text-shadow-color': 'rgba(0, 0, 0, 0.6)',
+  'rail-visible': true,
   'rail-text': 'START PAUSE',
   'rail-text-color': '#aaaeb6',
+  'rail-text-opacity': 1,
   'rail-x': 884,
   'rail-y': 565,
   'rail-rotation': -90,
@@ -43,9 +59,17 @@ const DEFAULTS = {
   'content-width': 240,
   'content-line-height': 70,
   'content-font-size': 43,
+  'content-type': 'rows',
+  'content-visible': true,
   'text-auto-fit': true,
   'text-min-font-size': 28,
   'text-max-font-size': 54,
+  'image-src': '',
+  'image-x': 990,
+  'image-y': 360,
+  'image-width': 278,
+  'image-height': 238,
+  'image-opacity': 0.92,
 };
 
 function svgEl(tag, attrs = {}) {
@@ -74,6 +98,69 @@ function booleanProp(properties, key, fallback) {
 
 function clamp(value, min, max) {
   return Math.max(min, Math.min(max, value));
+}
+
+function hashUnit(index, salt) {
+  const value = Math.sin((index + 1) * 12.9898 + salt * 78.233) * 43758.5453;
+  return value - Math.floor(value);
+}
+
+function parseCssColor(value) {
+  const text = String(value ?? '').trim();
+  const hex = text.match(/^#([0-9a-f]{3}|[0-9a-f]{6})$/i);
+  if (hex) {
+    const raw = hex[1];
+    const full = raw.length === 3 ? raw.split('').map((char) => char + char).join('') : raw;
+    return {
+      r: Number.parseInt(full.slice(0, 2), 16),
+      g: Number.parseInt(full.slice(2, 4), 16),
+      b: Number.parseInt(full.slice(4, 6), 16),
+    };
+  }
+
+  const rgb = text.match(/^rgba?\(\s*([0-9.]+)\s*,\s*([0-9.]+)\s*,\s*([0-9.]+)/i);
+  if (rgb) {
+    return {
+      r: clamp(Math.round(Number(rgb[1])), 0, 255),
+      g: clamp(Math.round(Number(rgb[2])), 0, 255),
+      b: clamp(Math.round(Number(rgb[3])), 0, 255),
+    };
+  }
+
+  return null;
+}
+
+function mixTowardWhite(color, offset) {
+  const amount = clamp(offset, 0, 1);
+  const rgb = parseCssColor(color);
+  if (!rgb) {
+    const whitePercent = Math.round(amount * 100);
+    return `color-mix(in srgb, ${color} ${100 - whitePercent}%, #ffffff ${whitePercent}%)`;
+  }
+
+  const r = Math.round(rgb.r + (255 - rgb.r) * amount);
+  const g = Math.round(rgb.g + (255 - rgb.g) * amount);
+  const b = Math.round(rgb.b + (255 - rgb.b) * amount);
+  return `rgb(${r}, ${g}, ${b})`;
+}
+
+function rainDensity(properties) {
+  return clamp(Math.round(numberProp(properties, 'rain-density', DEFAULTS['rain-density'])), 0, 160);
+}
+
+function rainDurationSeconds(properties) {
+  const speed = clamp(numberProp(properties, 'rain-speed', DEFAULTS['rain-speed']), 0.05, 5);
+  return clamp(7.5 / speed, 1.5, 60);
+}
+
+function rainColor(properties) {
+  const panelColor = stringProp(properties, 'panel-color', DEFAULTS['panel-color']);
+  const offset = numberProp(properties, 'rain-color-offset', DEFAULTS['rain-color-offset']);
+  return mixTowardWhite(panelColor, offset);
+}
+
+function rainScale(properties, key) {
+  return clamp(numberProp(properties, key, DEFAULTS[key]), 0.1, 8);
 }
 
 function cssPx(root, name, value) {
@@ -170,13 +257,15 @@ async function loadTemplate() {
 }
 
 function parseItems(properties) {
+  if (!booleanProp(properties, 'content-visible', DEFAULTS['content-visible'])) return [];
+
   const fromList = stringProp(properties, 'items', DEFAULTS.items)
     .split('|')
     .map((item) => item.trim())
     .filter(Boolean);
   const count = clamp(
     Math.round(numberProp(properties, 'item-count', fromList.length || DEFAULTS['item-count'])),
-    1,
+    0,
     6,
   );
 
@@ -207,6 +296,8 @@ function applyCssProperties(root, properties) {
 
   root.style.setProperty('--side-menu-panel', stringProp(properties, 'panel-color', DEFAULTS['panel-color']));
   root.style.setProperty('--side-menu-panel-edge', stringProp(properties, 'panel-edge-color', DEFAULTS['panel-edge-color']));
+  root.style.setProperty('--side-menu-rain-color', rainColor(properties));
+  root.style.setProperty('--side-menu-rain-duration', `${rainDurationSeconds(properties).toFixed(3)}s`);
   root.style.setProperty(
     '--side-menu-panel-opacity',
     String(clamp(numberProp(properties, 'panel-opacity', DEFAULTS['panel-opacity']), 0, 1)),
@@ -222,10 +313,18 @@ function applyCssProperties(root, properties) {
   );
   root.style.setProperty('--side-menu-text', stringProp(properties, 'text-color', DEFAULTS['text-color']));
   root.style.setProperty(
+    '--side-menu-text-opacity',
+    String(clamp(numberProp(properties, 'text-opacity', DEFAULTS['text-opacity']), 0, 1)),
+  );
+  root.style.setProperty(
     '--side-menu-text-shadow',
     stringProp(properties, 'text-shadow-color', DEFAULTS['text-shadow-color']),
   );
   root.style.setProperty('--side-menu-rail-text', stringProp(properties, 'rail-text-color', DEFAULTS['rail-text-color']));
+  root.style.setProperty(
+    '--side-menu-rail-text-opacity',
+    String(clamp(numberProp(properties, 'rail-text-opacity', DEFAULTS['rail-text-opacity']), 0, 1)),
+  );
   root.style.setProperty(
     '--side-menu-rail-font-size',
     `${clamp(numberProp(properties, 'rail-font-size', DEFAULTS['rail-font-size']), 12, 80)}px`,
@@ -241,7 +340,64 @@ function createSvg(className) {
   });
 }
 
+function appendPanelRain(svg, panelGroup, properties, instanceId) {
+  const density = rainDensity(properties);
+  if (density <= 0) return;
+
+  const panelFill = panelGroup.querySelector('.side-menu__panel-fill');
+  if (!panelFill) return;
+
+  const panelPath = panelFill.getAttribute('d');
+  if (!panelPath) return;
+
+  const clipId = `side-menu-rain-clip-${instanceId}`;
+  const defs = svgEl('defs');
+  const clipPath = svgEl('clipPath', { id: clipId });
+  clipPath.appendChild(svgEl('path', { d: panelPath }));
+  defs.appendChild(clipPath);
+  svg.insertBefore(defs, svg.firstChild);
+
+  const rain = svgEl('g', {
+    class: 'side-menu__rain',
+    'clip-path': `url(#${clipId})`,
+  });
+  const duration = rainDurationSeconds(properties);
+  const xScale = rainScale(properties, 'rain-x-scale');
+  const yScale = rainScale(properties, 'rain-y-scale');
+
+  for (let index = 0; index < density; index += 1) {
+    const x = PANEL_RAIN_BOUNDS.x + 8 + hashUnit(index, 1) * (PANEL_RAIN_BOUNDS.width - 16);
+    const y = PANEL_RAIN_BOUNDS.y + hashUnit(index, 2) * PANEL_RAIN_BOUNDS.height;
+    const isPixel = hashUnit(index, 3) < 0.3;
+    const baseWidth = isPixel ? 2 + Math.floor(hashUnit(index, 4) * 3) : 2 + Math.floor(hashUnit(index, 4) * 4);
+    const baseHeight = isPixel ? baseWidth : 8 + Math.floor(hashUnit(index, 5) * 28);
+    const width = clamp(baseWidth * xScale, 1, 80);
+    const height = clamp(baseHeight * yScale, 1, 80);
+    const alpha = 0.14 + hashUnit(index, 6) * 0.34;
+    const drift = (hashUnit(index, 7) - 0.5) * 14;
+    const delay = -hashUnit(index, 8) * duration;
+
+    const drop = svgEl('rect', {
+      class: 'side-menu__rain-drop',
+      x: x.toFixed(2),
+      y: y.toFixed(2),
+      width: width.toFixed(2),
+      height: height.toFixed(2),
+      rx: Math.min(width / 2, height / 2, 1.5).toFixed(2),
+    });
+    drop.style.setProperty('--side-menu-rain-alpha', alpha.toFixed(3));
+    drop.style.setProperty('--side-menu-rain-delay', `${delay.toFixed(3)}s`);
+    drop.style.setProperty('--side-menu-rain-drift', `${drift.toFixed(2)}px`);
+    rain.appendChild(drop);
+  }
+
+  const panelEdge = panelGroup.querySelector('.side-menu__panel-edge');
+  panelGroup.insertBefore(rain, panelEdge ?? null);
+}
+
 function appendItems(svg, properties) {
+  if (stringProp(properties, 'content-type', DEFAULTS['content-type']) !== 'rows') return [];
+
   const items = parseItems(properties);
   const x = clamp(numberProp(properties, 'content-x', DEFAULTS['content-x']), 0, 1440);
   const y = clamp(numberProp(properties, 'content-y', DEFAULTS['content-y']), 0, 1080);
@@ -273,7 +429,29 @@ function appendItems(svg, properties) {
   return items;
 }
 
+function appendImage(svg, properties) {
+  if (stringProp(properties, 'content-type', DEFAULTS['content-type']) !== 'image') return false;
+
+  const href = stringProp(properties, 'image-src', DEFAULTS['image-src']).trim();
+  if (!href) return false;
+
+  const image = svgEl('image', {
+    class: 'side-menu__content-image',
+    href,
+    x: clamp(numberProp(properties, 'image-x', DEFAULTS['image-x']), -200, 1440),
+    y: clamp(numberProp(properties, 'image-y', DEFAULTS['image-y']), -200, 1080),
+    width: clamp(numberProp(properties, 'image-width', DEFAULTS['image-width']), 1, 900),
+    height: clamp(numberProp(properties, 'image-height', DEFAULTS['image-height']), 1, 900),
+    opacity: clamp(numberProp(properties, 'image-opacity', DEFAULTS['image-opacity']), 0, 1),
+    preserveAspectRatio: stringProp(properties, 'image-preserve-aspect', 'xMidYMid meet'),
+  });
+  image.setAttributeNS('http://www.w3.org/1999/xlink', 'href', href);
+  svg.appendChild(image);
+  return true;
+}
+
 function appendRailLabel(svg, properties) {
+  if (!booleanProp(properties, 'rail-visible', DEFAULTS['rail-visible'])) return;
   const rawText = stringProp(properties, 'rail-text', DEFAULTS['rail-text']).toUpperCase();
   const x = clamp(numberProp(properties, 'rail-x', DEFAULTS['rail-x']), 0, 1440);
   const y = clamp(numberProp(properties, 'rail-y', DEFAULTS['rail-y']), 0, 1080);
@@ -296,7 +474,10 @@ function appendRailLabel(svg, properties) {
 export default async function ({ properties = {}, layerId } = {}) {
   const root = document.createElement('div');
   root.className = 'side-menu';
+  const instanceId = ++instanceCounter;
   if (layerId) root.dataset.layerId = layerId;
+  const frameVisible = booleanProp(properties, 'frame-visible', DEFAULTS['frame-visible']);
+  root.dataset.frameVisible = frameVisible ? 'true' : 'false';
   applyCssProperties(root, properties);
 
   const stage = document.createElement('div');
@@ -312,15 +493,17 @@ export default async function ({ properties = {}, layerId } = {}) {
   let items = DEFAULT_ITEMS;
   try {
     const template = await loadTemplate();
-    panelSvg.appendChild(document.importNode(template.panel, true));
-    frameSvg.appendChild(document.importNode(template.frame, true));
-    items = appendItems(panelSvg, properties);
+    const panelGroup = document.importNode(template.panel, true);
+    appendPanelRain(panelSvg, panelGroup, properties, instanceId);
+    panelSvg.appendChild(panelGroup);
+    if (frameVisible) frameSvg.appendChild(document.importNode(template.frame, true));
+    items = appendImage(panelSvg, properties) ? [] : appendItems(panelSvg, properties);
     appendRailLabel(frameSvg, properties);
   } catch (err) {
     console.warn('[side-menu] failed to load side-menu SVG', err);
   }
 
-  root.setAttribute('aria-label', `Side menu: ${items.join(', ')}`);
+  root.setAttribute('aria-label', items.length ? `Side menu: ${items.join(', ')}` : 'Side menu panel');
   panelLayer.appendChild(panelSvg);
   frameLayer.appendChild(frameSvg);
   stage.append(panelLayer, frameLayer);
@@ -581,58 +764,148 @@ export const properties = {
       id: 'side-menu-appearance',
       label: 'Appearance',
       description: 'Color and opacity controls for the panel, frame, and text.',
-      properties: {
-        'panel-color': { type: 'color', label: 'Panel', description: 'Green panel fill color.' },
-        'panel-edge-color': { type: 'color', label: 'Panel Edge', description: 'Green panel rim color.' },
-        'panel-opacity': {
-          type: 'number',
-          label: 'Panel Opacity',
-          description: 'Opacity for the green panel fill.',
-          min: 0,
-          max: 1,
-          step: 0.01,
+      sections: [
+        {
+          id: 'side-menu-surface',
+          label: 'Panel',
+          properties: {
+            'panel-color': { type: 'color', label: 'Fill', description: 'Green panel fill color.' },
+            'panel-edge-color': { type: 'color', label: 'Edge', description: 'Green panel rim color.' },
+            'panel-opacity': {
+              type: 'number',
+              label: 'Fill Opacity',
+              description: 'Opacity for the green panel fill.',
+              min: 0,
+              max: 1,
+              step: 0.01,
+            },
+            'panel-edge-opacity': {
+              type: 'number',
+              label: 'Edge Opacity',
+              description: 'Opacity for the green panel rim.',
+              min: 0,
+              max: 1,
+              step: 0.01,
+            },
+          },
         },
-        'panel-edge-opacity': {
-          type: 'number',
-          label: 'Edge Opacity',
-          description: 'Opacity for the green panel rim.',
-          min: 0,
-          max: 1,
-          step: 0.01,
+        {
+          id: 'side-menu-rain',
+          label: 'Rain',
+          properties: {
+            'rain-density': {
+              type: 'number',
+              label: 'Density',
+              description: 'Number of falling pixel streaks clipped inside the panel. Set to 0 to hide the rain.',
+              min: 0,
+              max: 160,
+              step: 1,
+            },
+            'rain-speed': {
+              type: 'number',
+              label: 'Speed',
+              description: 'Multiplier for the downward pixel rain animation.',
+              min: 0.05,
+              max: 5,
+              step: 0.05,
+            },
+            'rain-color-offset': {
+              type: 'number',
+              label: 'White Offset',
+              description: 'How far the rain color is mixed from the panel color toward white.',
+              min: 0,
+              max: 1,
+              step: 0.01,
+            },
+            'rain-x-scale': {
+              type: 'number',
+              label: 'X Scale',
+              description: 'Width multiplier for each falling rain pixel or rectangle.',
+              min: 0.1,
+              max: 8,
+              step: 0.05,
+            },
+            'rain-y-scale': {
+              type: 'number',
+              label: 'Y Scale',
+              description: 'Height multiplier for each falling rain pixel or rectangle.',
+              min: 0.1,
+              max: 8,
+              step: 0.05,
+            },
+          },
         },
-        'frame-color': { type: 'color', label: 'Frame', description: 'Primary gray frame line color.' },
-        'frame-opacity': {
-          type: 'number',
-          label: 'Frame Opacity',
-          description: 'Opacity for the primary gray frame line.',
-          min: 0,
-          max: 1,
-          step: 0.01,
+        {
+          id: 'side-menu-frame',
+          label: 'Frame',
+          properties: {
+            'frame-visible': {
+              type: 'boolean',
+              label: 'Gray Frame',
+              description: 'Draws the projected gray frame around the side panel.',
+            },
+            'frame-color': { type: 'color', label: 'Frame', description: 'Primary gray frame line color.' },
+            'frame-opacity': {
+              type: 'number',
+              label: 'Opacity',
+              description: 'Opacity for the primary gray frame line.',
+              min: 0,
+              max: 1,
+              step: 0.01,
+            },
+          },
         },
-        'text-color': { type: 'color', label: 'Text', description: 'Panel item text color.' },
-        'rail-text-color': { type: 'color', label: 'Rail Text', description: 'Rotated rail label color.' },
-        'text-auto-fit': {
-          type: 'boolean',
-          label: 'Auto Text Fit',
-          description: 'Shrinks panel rows independently when labels are wider than the available text width.',
+        {
+          id: 'side-menu-text',
+          label: 'Text',
+          properties: {
+            'text-color': { type: 'color', label: 'Text', description: 'Panel item text color.' },
+            'text-opacity': {
+              type: 'number',
+              label: 'Text Opacity',
+              description: 'Opacity for the panel item text.',
+              min: 0,
+              max: 1,
+              step: 0.01,
+            },
+            'rail-text-color': { type: 'color', label: 'Rail Text', description: 'Rotated rail label color.' },
+            'rail-visible': {
+              type: 'boolean',
+              label: 'Rail Visible',
+              description: 'Show the rotated rail label.',
+            },
+            'rail-text-opacity': {
+              type: 'number',
+              label: 'Rail Opacity',
+              description: 'Opacity for the rotated rail label.',
+              min: 0,
+              max: 1,
+              step: 0.01,
+            },
+            'text-auto-fit': {
+              type: 'boolean',
+              label: 'Auto Fit',
+              description: 'Shrinks panel rows independently when labels are wider than the available text width.',
+            },
+            'text-min-font-size': {
+              type: 'number',
+              label: 'Min Font',
+              description: 'Smallest panel row font size auto fit can use.',
+              min: 8,
+              max: 120,
+              step: 1,
+            },
+            'text-max-font-size': {
+              type: 'number',
+              label: 'Max Font',
+              description: 'Largest panel row font size auto fit can use.',
+              min: 8,
+              max: 140,
+              step: 1,
+            },
+          },
         },
-        'text-min-font-size': {
-          type: 'number',
-          label: 'Min Font',
-          description: 'Smallest panel row font size auto fit can use.',
-          min: 8,
-          max: 120,
-          step: 1,
-        },
-        'text-max-font-size': {
-          type: 'number',
-          label: 'Max Font',
-          description: 'Largest panel row font size auto fit can use.',
-          min: 8,
-          max: 140,
-          step: 1,
-        },
-      },
+      ],
     },
   ],
 };

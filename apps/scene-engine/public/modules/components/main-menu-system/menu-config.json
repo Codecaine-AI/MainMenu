@@ -4,7 +4,7 @@
     "main": {
       "title": "Main Menu",
       "theme": "blue",
-      "layout": "main-stack",
+      "layout": "left-stack-5",
       "items": [
         {
           "id": "solo",
@@ -212,7 +212,7 @@
     "options": {
       "title": "Options",
       "theme": "yellow",
-      "layout": "options-stack",
+      "layout": "left-stack-5",
       "items": [
         {
           "id": "rumble",
@@ -277,7 +277,7 @@
     "screen-display": {
       "title": "Options / Screen Display",
       "theme": "yellow",
-      "layout": "detail-only",
+      "layout": "left-stack-3",
       "items": [
         {
           "id": "deflicker",
@@ -293,7 +293,7 @@
     "data": {
       "title": "Data / Melee Records",
       "theme": "purple",
-      "layout": "data-stack",
+      "layout": "left-stack-3",
       "items": [
         {
           "id": "vs-records",
@@ -320,6 +320,52 @@
           }
         }
       ]
+    }
+  },
+  "layouts": {
+    "left-stack-5": {
+      "label": "Five Stack",
+      "itemCount": 5,
+      "yStart": 274,
+      "spacing": 119,
+      "rowX": [326, 210, 98, 154, 116],
+      "rowWidth": 760,
+      "itemProps": {
+        "x-offset": -50,
+        "y-offset": -10,
+        "width-scale": 0.84,
+        "font-scale": 0.96,
+        "text-max-font-size": 64
+      }
+    },
+    "left-stack-4": {
+      "label": "Four Stack",
+      "itemCount": 4,
+      "yStart": 276,
+      "spacing": 128,
+      "rowX": [320, 215, 100, 170],
+      "rowWidth": 760,
+      "itemProps": {
+        "x-offset": -54,
+        "y-offset": 10,
+        "width-scale": 0.86,
+        "text-max-font-size": 64
+      }
+    },
+    "left-stack-3": {
+      "label": "Three Stack",
+      "itemCount": 3,
+      "yStart": 306,
+      "spacing": 184,
+      "rowX": [328, 120, 112],
+      "rowWidth": 760,
+      "itemProps": {
+        "x-offset": -70,
+        "y-offset": 38,
+        "width-scale": 0.88,
+        "font-scale": 0.94,
+        "text-max-font-size": 60
+      }
     }
   },
   "themes": {
@@ -379,6 +425,21 @@
     "rowPanel": "#050505",
     "rowSelectedText": "#050505",
     "rowText": "#fbba2d",
+    "titleTextColor": "#ededed",
+    "titleTextOpacity": 1,
+    "titleTextGlowSize": 0,
+    "titleTextGlowOpacity": 0,
+    "captionTextColor": "#e4e7ff",
+    "sideTextColor": "#dce0ee",
+    "railTextColor": "#aaaeb6",
+    "rowEdgeOpacity": 0.84,
+    "rowEdgeFeather": 0.7,
+    "rowEdgeGlowSize": 7,
+    "rowEdgeGlowOpacity": 0.45,
+    "rowSelectedEdgeOpacity": 0.96,
+    "rowSelectedEdgeFeather": 0.5,
+    "rowSelectedEdgeGlowSize": 12,
+    "rowSelectedEdgeGlowOpacity": 0.62,
     "markerPulseColor": "#dce0cd",
     "markerContractSpeed": 2,
     "markerCooldown": 0,

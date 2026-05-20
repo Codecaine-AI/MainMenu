@@ -29,7 +29,7 @@ function loadModule(path) {
   return promise;
 }
 
-export async function renderComponent(layer, entry) {
+export async function renderComponent(layer, entry, options = {}) {
   const cssPath = deriveCssPath(entry.path);
   if (cssPath) ensureStylesheet(cssPath);
   const mod = await loadModule(entry.path);
@@ -39,6 +39,10 @@ export async function renderComponent(layer, entry) {
     placeholder.dataset.layerId = layer.id;
     return placeholder;
   }
-  const el = await mod.default({ properties: layer.properties || {}, layerId: layer.id });
+  const el = await mod.default({
+    properties: layer.properties || {},
+    layerId: layer.id,
+    runtime: options.runtime,
+  });
   return el;
 }

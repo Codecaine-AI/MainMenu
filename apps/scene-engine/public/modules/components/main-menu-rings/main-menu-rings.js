@@ -53,6 +53,8 @@ const DEFAULTS = {
   'dot-color': '#f2eeff',
   'dot-radius': 8,
   'dot-opacity': 0.92,
+  'dot-front-scale': 0.52,
+  'dot-back-scale': 1.75,
   'dot-angle': 214,
   'dot-speed': 1.15,
   'dot-front-speed': 0.34,
@@ -307,7 +309,8 @@ function drawOrbitDot(ctx, ring, angle, options) {
   const point = toCanvasPoint(projected, options.scaleX, options.scaleY);
   const frontness = frontnessForZ(projected.z, depth.minZ, depth.maxZ);
   const depthAlpha = lerp(0.28, 1, frontness);
-  const sizeScale = lerp(0.72, 1.16, frontness) * clamp(projected.perspective, 0.65, 1.7);
+  const depthScale = lerp(options.dotBackScale, options.dotFrontScale, frontness);
+  const sizeScale = depthScale * clamp(projected.perspective, 0.65, 1.7);
   const radius = options.dotRadius * options.unitScale * sizeScale;
   drawDotCircle(ctx, point, radius, options.dotColor, options.dotOpacity * depthAlpha);
 }
@@ -337,6 +340,8 @@ function drawFrame(ctx, width, height, properties, dotAngle) {
     dotColor: stringProp(properties, 'dot-color', DEFAULTS['dot-color']),
     dotRadius: clamp(numberProp(properties, 'dot-radius', DEFAULTS['dot-radius']), 0.5, 48),
     dotOpacity: clamp(numberProp(properties, 'dot-opacity', DEFAULTS['dot-opacity']), 0, 2),
+    dotFrontScale: clamp(numberProp(properties, 'dot-front-scale', DEFAULTS['dot-front-scale']), 0.05, 4),
+    dotBackScale: clamp(numberProp(properties, 'dot-back-scale', DEFAULTS['dot-back-scale']), 0.05, 4),
     dotDirection: stringProp(properties, 'dot-direction', DEFAULTS['dot-direction']) === 'counter-clockwise' ? -1 : 1,
     dprCap,
   };
@@ -652,7 +657,7 @@ export const properties = {
         'dot-radius': {
           type: 'number',
           label: 'Radius',
-          description: 'Front-facing dot radius in CSS pixels.',
+          description: 'Base dot radius in CSS pixels before front/back depth scaling.',
           min: 0.5,
           max: 48,
           step: 0.5,
@@ -663,6 +668,22 @@ export const properties = {
           description: 'Dot opacity multiplier.',
           min: 0,
           max: 2,
+          step: 0.01,
+        },
+        'dot-front-scale': {
+          type: 'number',
+          label: 'Front Scale',
+          description: 'Dot size multiplier when the dot is on the front half of the ring.',
+          min: 0.05,
+          max: 4,
+          step: 0.01,
+        },
+        'dot-back-scale': {
+          type: 'number',
+          label: 'Back Scale',
+          description: 'Dot size multiplier when the dot is on the back half of the ring.',
+          min: 0.05,
+          max: 4,
           step: 0.01,
         },
         'dot-angle': {

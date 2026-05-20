@@ -189,7 +189,7 @@ async function mountObject(parent, obj, beforeEl = null, path = '', options = {}
   }
   if (obj.visible === false) return null;
 
-  const wrapper = await getRenderer(obj.type)(obj, entry);
+  const wrapper = await getRenderer(obj.type)(obj, entry, options);
   wrapper.dataset.layerId = obj.id;
   wrapper.dataset.scenePath = path;
   wrapper.dataset.layerType = obj.type;

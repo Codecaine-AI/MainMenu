@@ -50,6 +50,17 @@ const MEDIA_PROPERTY_DEFAULTS = {
   rotation: 0,
   speed: 1,
 } as const
+const MAIN_MENU_SYSTEM_CUSTOM_SCHEMA_SECTION_IDS = new Set([
+  'main-menu-system-data',
+  'main-menu-system-menu-layout',
+  'main-menu-system-shield-layout',
+  'main-menu-system-side-layout',
+  'main-menu-system-detail-layout',
+  'main-menu-system-back-layout',
+  'main-menu-system-motion',
+  'main-menu-system-input',
+  'main-menu-system-audio',
+])
 const aspectRatioCache = new Map<string, Promise<number | null>>()
 type PositionAxisValue = number | string | undefined
 
@@ -247,6 +258,17 @@ export function LayerForm({ layer, path }: Props) {
     [props, declaredKeys, isText, isMainMenuSystem],
   )
   const orphanKeySignature = orphans.map(([k]) => k).join(',')
+  const visibleSchemaSections = useMemo(
+    () =>
+      layerSchema?.sections.filter(
+        (section) =>
+          !(
+            isMainMenuSystem &&
+            MAIN_MENU_SYSTEM_CUSTOM_SCHEMA_SECTION_IDS.has(section.id)
+          ),
+      ) ?? [],
+    [layerSchema, isMainMenuSystem],
+  )
 
   useEffect(() => {
     if (layerType === 'effect') return
@@ -501,13 +523,13 @@ export function LayerForm({ layer, path }: Props) {
         <MainMenuConfigEditor path={path} properties={props} />
       )}
 
-      {(layerSchema || (layerType !== 'effect' && orphans.length > 0)) && (
+      {((layerSchema && visibleSchemaSections.length > 0) || (layerType !== 'effect' && orphans.length > 0)) && (
         <InspectorSection title="Properties">
-          {layerSchema && (() => {
+          {layerSchema && visibleSchemaSections.length > 0 && (() => {
             const schemaValues: Record<string, unknown> = isMedia
               ? { ...MEDIA_PROPERTY_DEFAULTS, ...props }
               : props
-            return layerSchema.sections.map((section) => (
+            return visibleSchemaSections.map((section) => (
               <PropertySection
                 key={section.id}
                 section={section}

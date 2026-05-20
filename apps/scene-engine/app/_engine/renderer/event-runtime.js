@@ -29,6 +29,7 @@ function orderedBindings(bindings) {
 
 async function defaultPlayAudio(target, binding = {}) {
   if (!target) return;
+  const properties = { autoplay: false, ...(binding.properties ?? {}) };
   let el = audioElements.get(target);
   if (!el || !el.isConnected) {
     const entry = resolveAsset(target);
@@ -38,7 +39,7 @@ async function defaultPlayAudio(target, binding = {}) {
         id: `event-audio-${target}`,
         type: 'audio',
         asset: target,
-        properties: { autoplay: false, ...(binding.properties ?? {}) },
+        properties,
       },
       entry,
     );
@@ -46,8 +47,18 @@ async function defaultPlayAudio(target, binding = {}) {
     el.style.display = 'none';
     document.body.appendChild(el);
     audioElements.set(target, el);
+  } else if (typeof el.setAudioProperties === 'function') {
+    el.setAudioProperties(properties);
   }
   if (typeof el.play === 'function') el.play();
+}
+
+export async function playAudio(target, binding = {}) {
+  await defaultPlayAudio(target, binding);
+}
+
+if (typeof window !== 'undefined' && typeof window.MELEE_playAudio !== 'function') {
+  window.MELEE_playAudio = (target, binding = {}) => playAudio(target, binding);
 }
 
 async function runBinding(binding, layer, runtime) {
@@ -72,7 +83,7 @@ async function runBinding(binding, layer, runtime) {
       await runtime.playAudio(audioTarget, { binding, layer });
       return;
     }
-    await defaultPlayAudio(audioTarget, binding);
+    await playAudio(audioTarget, binding);
     return;
   }
 
