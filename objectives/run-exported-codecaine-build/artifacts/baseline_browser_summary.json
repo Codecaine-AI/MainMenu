@@ -1,0 +1,50 @@
+{
+  "pages": [
+    {
+      "label": "baseline-title",
+      "url": "http://localhost:4173/",
+      "dom": {
+        "href": "http://localhost:4173/",
+        "title": "Title Screen",
+        "stageExists": true,
+        "stageChildElementCount": 7,
+        "stageHtmlLength": 5984094,
+        "stageText": "Premium Lines\nPress Start",
+        "bodyText": "Premium Lines\nPress Start",
+        "stageRect": {
+          "x": 0,
+          "y": 0,
+          "width": 1440,
+          "height": 1080
+        },
+        "imageCount": 1,
+        "videoCount": 2,
+        "canvasCount": 6,
+        "moduleScriptCount": 1
+      }
+    },
+    {
+      "label": "baseline-menu",
+      "url": "http://localhost:4173/menu/",
+      "dom": {
+        "href": "http://localhost:4173/menu/",
+        "title": "Main Menu",
+        "stageExists": true,
+        "stageChildElementCount": 4,
+        "stageHtmlLength": 67723,
+        "stageText": "CODECAINE\nClone it. It works.\nOPEN SOURCE\nBUILD LOGS\nLIBRARY\nCOMMUNITY\nMISSION",
+        "bodyText": "CODECAINE\nClone it. It works.\nOPEN SOURCE\nBUILD LOGS\nLIBRARY\nCOMMUNITY\nMISSION",
+        "stageRect": {
+          "x": 0,
+          "y": 0,
+          "width": 1440,
+          "height": 1080
+        },
+        "imageCount": 0,
+        "videoCount": 1,
+        "canvasCount": 1,
+        "moduleScriptCount": 1
+      }
+    }
+  ]
+}

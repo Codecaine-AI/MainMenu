@@ -61,3 +61,8 @@ assets/
 !apps/scene-engine/public/modules/**
 !apps/scene-engine/app/api/assets/
 !apps/scene-engine/app/api/assets/**
+
+# Objective-local generated export bundles
+objectives/*/artifacts/*.zip
+objectives/*/artifacts/extracted/
+objectives/*/artifacts/chrome-profile/

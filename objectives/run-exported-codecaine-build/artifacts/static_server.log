@@ -1,0 +1,282 @@
+::1 - - [20/May/2026 19:45:30] "GET / HTTP/1.1" 200 -
+::1 - - [20/May/2026 19:45:30] "GET /boot.js HTTP/1.1" 200 -
+::1 - - [20/May/2026 19:45:30] "GET /renderer/scene-renderer.js HTTP/1.1" 200 -
+::1 - - [20/May/2026 19:45:30] "GET /renderer/asset-registry.js HTTP/1.1" 200 -
+::1 - - [20/May/2026 19:45:30] "GET /renderer/asset-renderers/index.js HTTP/1.1" 200 -
+::1 - - [20/May/2026 19:45:30] "GET /renderer/media-surface.js HTTP/1.1" 200 -
+::1 - - [20/May/2026 19:45:30] "GET /renderer/asset-renderers/css-effect.js HTTP/1.1" 200 -
+::1 - - [20/May/2026 19:45:30] "GET /renderer/positioning.js HTTP/1.1" 200 -
+::1 - - [20/May/2026 19:45:30] "GET /renderer/asset-renderers/text.js HTTP/1.1" 200 -
+::1 - - [20/May/2026 19:45:30] "GET /renderer/font-registry.js HTTP/1.1" 200 -
+::1 - - [20/May/2026 19:45:30] "GET /renderer/event-runtime.js HTTP/1.1" 200 -
+::1 - - [20/May/2026 19:45:30] "GET /renderer/asset-renderers/media.js HTTP/1.1" 200 -
+::1 - - [20/May/2026 19:45:30] "GET /renderer/asset-renderers/glyph-group.js HTTP/1.1" 200 -
+::1 - - [20/May/2026 19:45:30] "GET /renderer/runtime-url.js HTTP/1.1" 200 -
+::1 - - [20/May/2026 19:45:30] "GET /renderer/asset-renderers/component.js HTTP/1.1" 200 -
+::1 - - [20/May/2026 19:45:30] "GET /renderer/asset-renderers/audio.js HTTP/1.1" 200 -
+::1 - - [20/May/2026 19:45:30] "GET /renderer/asset-renderers/group.js HTTP/1.1" 200 -
+::1 - - [20/May/2026 19:45:30] "GET /renderer/asset-renderers/stylesheet.js HTTP/1.1" 200 -
+::1 - - [20/May/2026 19:45:30] "GET /project.json HTTP/1.1" 200 -
+::1 - - [20/May/2026 19:45:30] "GET /modules/registry.json HTTP/1.1" 200 -
+::1 - - [20/May/2026 19:45:30] "GET /fonts/registry.json HTTP/1.1" 200 -
+::1 - - [20/May/2026 19:45:30] "GET /assets/registry.json HTTP/1.1" 200 -
+::1 - - [20/May/2026 19:45:30] "GET /modules/effects/crt-overlay/manifest.json HTTP/1.1" 200 -
+::1 - - [20/May/2026 19:45:30] "GET /modules/components/orbit-press-start/manifest.json HTTP/1.1" 200 -
+::1 - - [20/May/2026 19:45:30] "GET /modules/components/procedural-sphere/manifest.json HTTP/1.1" 200 -
+::1 - - [20/May/2026 19:45:30] "GET /modules/components/codecaine-keycap-start/manifest.json HTTP/1.1" 200 -
+::1 - - [20/May/2026 19:45:30] "GET /modules/components/press-start/manifest.json HTTP/1.1" 200 -
+::1 - - [20/May/2026 19:45:30] "GET /modules/components/procedural-cylinder-strips/manifest.json HTTP/1.1" 200 -
+::1 - - [20/May/2026 19:45:30] "GET /modules/components/procedural-cylinder/manifest.json HTTP/1.1" 200 -
+::1 - - [20/May/2026 19:45:30] "GET /modules/components/arc-letterbox/manifest.json HTTP/1.1" 200 -
+::1 - - [20/May/2026 19:45:30] "GET /modules/components/menu-shield/manifest.json HTTP/1.1" 200 -
+::1 - - [20/May/2026 19:45:30] "GET /modules/components/menu-items/manifest.json HTTP/1.1" 200 -
+::1 - - [20/May/2026 19:45:30] "GET /modules/components/side-menu/manifest.json HTTP/1.1" 200 -
+::1 - - [20/May/2026 19:45:30] "GET /modules/components/main-menu-system/manifest.json HTTP/1.1" 200 -
+::1 - - [20/May/2026 19:45:30] "GET /modules/components/main-menu-rings/manifest.json HTTP/1.1" 200 -
+::1 - - [20/May/2026 19:45:30] "GET /modules/components/background-pulse/manifest.json HTTP/1.1" 200 -
+::1 - - [20/May/2026 19:45:30] "GET /scenes/title/scene.json HTTP/1.1" 200 -
+::1 - - [20/May/2026 19:45:30] "GET /fonts/FolkPro%20_Family/A-OTF-FolkPro-Bold.otf HTTP/1.1" 200 -
+::1 - - [20/May/2026 19:45:30] "GET /fonts/FolkPro%20_Family/A-OTF-FolkPro-Medium.otf HTTP/1.1" 200 -
+::1 - - [20/May/2026 19:45:30] "GET /fonts/FolkPro%20_Family/A-OTF-FolkPro-Heavy.otf HTTP/1.1" 200 -
+::1 - - [20/May/2026 19:45:30] "GET /fonts/FolkPro%20_Family/A-OTF-FolkPro-Regular.otf HTTP/1.1" 200 -
+::1 - - [20/May/2026 19:45:30] "GET /fonts/Impact/Impact-Wide.woff2 HTTP/1.1" 200 -
+::1 - - [20/May/2026 19:45:30] "GET /modules/components/procedural-cylinder-strips/procedural-cylinder-strips-straight.css HTTP/1.1" 200 -
+::1 - - [20/May/2026 19:45:30] "GET /modules/components/procedural-cylinder-strips/procedural-cylinder-strips-straight.js HTTP/1.1" 200 -
+::1 - - [20/May/2026 19:45:30] "GET /modules/components/procedural-sphere/procedural-sphere.css HTTP/1.1" 200 -
+::1 - - [20/May/2026 19:45:30] "GET /modules/components/procedural-sphere/procedural-sphere.js HTTP/1.1" 200 -
+::1 - - [20/May/2026 19:45:30] "GET /modules/components/procedural-cylinder/procedural-cylinder.css HTTP/1.1" 200 -
+::1 - - [20/May/2026 19:45:30] "GET /modules/components/procedural-cylinder/procedural-cylinder.js HTTP/1.1" 200 -
+::1 - - [20/May/2026 19:45:30] "GET /assets/glyph/CODECAINE.rounded-chrome.css-layers.svg HTTP/1.1" 200 -
+::1 - - [20/May/2026 19:45:30] "GET /assets/video/test-fire.mp4 HTTP/1.1" 200 -
+::1 - - [20/May/2026 19:45:31] "GET /modules/components/codecaine-keycap-start/codecaine-keycap-start.js HTTP/1.1" 200 -
+::1 - - [20/May/2026 19:45:31] "GET /modules/components/codecaine-keycap-start/codecaine-keycap-start.css HTTP/1.1" 200 -
+::1 - - [20/May/2026 19:45:31] "GET /assets/video/test-fire.mp4 HTTP/1.1" 304 -
+::1 - - [20/May/2026 19:45:31] "GET /modules/components/orbit-press-start/orbit-press-start.css HTTP/1.1" 200 -
+::1 - - [20/May/2026 19:45:31] "GET /modules/components/orbit-press-start/orbit-press-start.js HTTP/1.1" 200 -
+::1 - - [20/May/2026 19:45:31] "GET /assets/image/codecaine-start-keycap.png HTTP/1.1" 200 -
+::1 - - [20/May/2026 19:45:31] "GET /modules/components/arc-letterbox/arc-letterbox.css HTTP/1.1" 200 -
+::1 - - [20/May/2026 19:45:31] "GET /modules/components/arc-letterbox/arc-letterbox.js HTTP/1.1" 200 -
+----------------------------------------
+Exception occurred during processing of request from ('::1', 50588, 0, 0)
+Traceback (most recent call last):
+  File "/Users/Ford/anaconda3/lib/python3.11/socketserver.py", line 691, in process_request_thread
+    self.finish_request(request, client_address)
+  File "/Users/Ford/anaconda3/lib/python3.11/http/server.py", line 1310, in finish_request
+    self.RequestHandlerClass(request, client_address, self,
+  File "/Users/Ford/anaconda3/lib/python3.11/http/server.py", line 671, in __init__
+    super().__init__(*args, **kwargs)
+  File "/Users/Ford/anaconda3/lib/python3.11/socketserver.py", line 755, in __init__
+    self.handle()
+  File "/Users/Ford/anaconda3/lib/python3.11/http/server.py", line 436, in handle
+    self.handle_one_request()
+  File "/Users/Ford/anaconda3/lib/python3.11/http/server.py", line 424, in handle_one_request
+    method()
+  File "/Users/Ford/anaconda3/lib/python3.11/http/server.py", line 678, in do_GET
+    self.copyfile(f, self.wfile)
+  File "/Users/Ford/anaconda3/lib/python3.11/http/server.py", line 877, in copyfile
+    shutil.copyfileobj(source, outputfile)
+  File "/Users/Ford/anaconda3/lib/python3.11/shutil.py", line 200, in copyfileobj
+    fdst_write(buf)
+  File "/Users/Ford/anaconda3/lib/python3.11/socketserver.py", line 834, in write
+    self._sock.sendall(b)
+BrokenPipeError: [Errno 32] Broken pipe
+----------------------------------------
+::1 - - [20/May/2026 19:45:35] "GET /menu/ HTTP/1.1" 200 -
+::1 - - [20/May/2026 19:45:35] "GET /boot.js HTTP/1.1" 304 -
+::1 - - [20/May/2026 19:45:35] "GET /renderer/scene-renderer.js HTTP/1.1" 304 -
+::1 - - [20/May/2026 19:45:35] "GET /renderer/asset-registry.js HTTP/1.1" 304 -
+::1 - - [20/May/2026 19:45:35] "GET /renderer/asset-renderers/index.js HTTP/1.1" 304 -
+::1 - - [20/May/2026 19:45:35] "GET /renderer/media-surface.js HTTP/1.1" 304 -
+::1 - - [20/May/2026 19:45:35] "GET /renderer/positioning.js HTTP/1.1" 304 -
+::1 - - [20/May/2026 19:45:35] "GET /renderer/asset-renderers/css-effect.js HTTP/1.1" 304 -
+::1 - - [20/May/2026 19:45:35] "GET /renderer/asset-renderers/text.js HTTP/1.1" 304 -
+::1 - - [20/May/2026 19:45:35] "GET /renderer/font-registry.js HTTP/1.1" 304 -
+::1 - - [20/May/2026 19:45:35] "GET /renderer/event-runtime.js HTTP/1.1" 304 -
+::1 - - [20/May/2026 19:45:35] "GET /renderer/runtime-url.js HTTP/1.1" 304 -
+::1 - - [20/May/2026 19:45:35] "GET /renderer/asset-renderers/media.js HTTP/1.1" 304 -
+::1 - - [20/May/2026 19:45:35] "GET /renderer/asset-renderers/glyph-group.js HTTP/1.1" 304 -
+::1 - - [20/May/2026 19:45:35] "GET /renderer/asset-renderers/component.js HTTP/1.1" 304 -
+::1 - - [20/May/2026 19:45:35] "GET /renderer/asset-renderers/group.js HTTP/1.1" 304 -
+::1 - - [20/May/2026 19:45:35] "GET /renderer/asset-renderers/audio.js HTTP/1.1" 304 -
+::1 - - [20/May/2026 19:45:35] "GET /renderer/asset-renderers/stylesheet.js HTTP/1.1" 304 -
+::1 - - [20/May/2026 19:45:35] "GET /project.json HTTP/1.1" 304 -
+::1 - - [20/May/2026 19:45:35] "GET /modules/registry.json HTTP/1.1" 304 -
+::1 - - [20/May/2026 19:45:35] "GET /assets/registry.json HTTP/1.1" 304 -
+::1 - - [20/May/2026 19:45:35] "GET /fonts/registry.json HTTP/1.1" 304 -
+::1 - - [20/May/2026 19:45:35] "GET /modules/components/press-start/manifest.json HTTP/1.1" 304 -
+::1 - - [20/May/2026 19:45:35] "GET /modules/components/orbit-press-start/manifest.json HTTP/1.1" 304 -
+::1 - - [20/May/2026 19:45:35] "GET /modules/effects/crt-overlay/manifest.json HTTP/1.1" 304 -
+::1 - - [20/May/2026 19:45:35] "GET /modules/components/procedural-sphere/manifest.json HTTP/1.1" 304 -
+::1 - - [20/May/2026 19:45:35] "GET /modules/components/codecaine-keycap-start/manifest.json HTTP/1.1" 304 -
+::1 - - [20/May/2026 19:45:35] "GET /modules/components/procedural-cylinder-strips/manifest.json HTTP/1.1" 304 -
+::1 - - [20/May/2026 19:45:35] "GET /modules/components/arc-letterbox/manifest.json HTTP/1.1" 304 -
+::1 - - [20/May/2026 19:45:35] "GET /modules/components/menu-shield/manifest.json HTTP/1.1" 304 -
+::1 - - [20/May/2026 19:45:35] "GET /modules/components/procedural-cylinder/manifest.json HTTP/1.1" 304 -
+::1 - - [20/May/2026 19:45:35] "GET /modules/components/menu-items/manifest.json HTTP/1.1" 304 -
+::1 - - [20/May/2026 19:45:35] "GET /modules/components/main-menu-system/manifest.json HTTP/1.1" 304 -
+::1 - - [20/May/2026 19:45:35] "GET /modules/components/main-menu-rings/manifest.json HTTP/1.1" 304 -
+::1 - - [20/May/2026 19:45:35] "GET /modules/components/side-menu/manifest.json HTTP/1.1" 304 -
+::1 - - [20/May/2026 19:45:35] "GET /modules/components/background-pulse/manifest.json HTTP/1.1" 304 -
+::1 - - [20/May/2026 19:45:35] "GET /scenes/menu/scene.json HTTP/1.1" 200 -
+::1 - - [20/May/2026 19:45:35] "GET /fonts/FolkPro%20_Family/A-OTF-FolkPro-Heavy.otf HTTP/1.1" 304 -
+::1 - - [20/May/2026 19:45:35] "GET /fonts/FolkPro%20_Family/A-OTF-FolkPro-Medium.otf HTTP/1.1" 304 -
+::1 - - [20/May/2026 19:45:35] "GET /fonts/FolkPro%20_Family/A-OTF-FolkPro-Regular.otf HTTP/1.1" 304 -
+::1 - - [20/May/2026 19:45:35] "GET /fonts/FolkPro%20_Family/A-OTF-FolkPro-Bold.otf HTTP/1.1" 304 -
+::1 - - [20/May/2026 19:45:35] "GET /fonts/Impact/Impact-Wide.woff2 HTTP/1.1" 304 -
+::1 - - [20/May/2026 19:45:35] "GET /modules/components/main-menu-rings/main-menu-rings.css HTTP/1.1" 200 -
+::1 - - [20/May/2026 19:45:35] "GET /modules/components/main-menu-rings/main-menu-rings.js HTTP/1.1" 200 -
+::1 - - [20/May/2026 19:45:35] "GET /assets/video/main-menu-backgrounds/purple.webm HTTP/1.1" 200 -
+::1 - - [20/May/2026 19:45:35] "GET /modules/components/background-pulse/background-pulse.css HTTP/1.1" 200 -
+::1 - - [20/May/2026 19:45:35] "GET /modules/components/background-pulse/background-pulse.js HTTP/1.1" 200 -
+::1 - - [20/May/2026 19:45:35] "GET /modules/components/main-menu-system/main-menu-system.css HTTP/1.1" 200 -
+::1 - - [20/May/2026 19:45:35] "GET /modules/components/main-menu-system/main-menu-system.js HTTP/1.1" 200 -
+::1 - - [20/May/2026 19:45:35] "GET /modules/components/menu-items/menu-items.css HTTP/1.1" 200 -
+::1 - - [20/May/2026 19:45:35] "GET /modules/components/menu-shield/menu-shield.css HTTP/1.1" 200 -
+::1 - - [20/May/2026 19:45:35] "GET /modules/components/side-menu/side-menu.css HTTP/1.1" 200 -
+::1 - - [20/May/2026 19:45:35] "GET /modules/components/menu-items/menu-items.js HTTP/1.1" 200 -
+::1 - - [20/May/2026 19:45:35] "GET /modules/components/menu-shield/menu-shield.js HTTP/1.1" 200 -
+::1 - - [20/May/2026 19:45:35] "GET /modules/components/side-menu/side-menu.js HTTP/1.1" 200 -
+::1 - - [20/May/2026 19:45:35] "GET /modules/components/side-menu/side-menu.svg HTTP/1.1" 200 -
+::1 - - [20/May/2026 19:45:35] "GET /modules/components/menu-shield/menu-shield-frame.svg HTTP/1.1" 200 -
+::1 - - [20/May/2026 19:45:35] "GET /modules/components/menu-items/menu-item.svg HTTP/1.1" 200 -
+::1 - - [20/May/2026 19:45:39] "GET / HTTP/1.1" 304 -
+::1 - - [20/May/2026 19:45:39] "GET /boot.js HTTP/1.1" 304 -
+::1 - - [20/May/2026 19:45:39] "GET /renderer/scene-renderer.js HTTP/1.1" 304 -
+::1 - - [20/May/2026 19:45:39] "GET /renderer/asset-registry.js HTTP/1.1" 304 -
+::1 - - [20/May/2026 19:45:39] "GET /renderer/media-surface.js HTTP/1.1" 304 -
+::1 - - [20/May/2026 19:45:39] "GET /renderer/positioning.js HTTP/1.1" 304 -
+::1 - - [20/May/2026 19:45:39] "GET /renderer/asset-renderers/index.js HTTP/1.1" 304 -
+::1 - - [20/May/2026 19:45:39] "GET /renderer/asset-renderers/css-effect.js HTTP/1.1" 304 -
+::1 - - [20/May/2026 19:45:39] "GET /renderer/asset-renderers/text.js HTTP/1.1" 304 -
+::1 - - [20/May/2026 19:45:39] "GET /renderer/font-registry.js HTTP/1.1" 304 -
+::1 - - [20/May/2026 19:45:39] "GET /renderer/event-runtime.js HTTP/1.1" 304 -
+::1 - - [20/May/2026 19:45:39] "GET /renderer/runtime-url.js HTTP/1.1" 304 -
+::1 - - [20/May/2026 19:45:39] "GET /renderer/asset-renderers/media.js HTTP/1.1" 304 -
+::1 - - [20/May/2026 19:45:39] "GET /renderer/asset-renderers/component.js HTTP/1.1" 304 -
+::1 - - [20/May/2026 19:45:39] "GET /renderer/asset-renderers/glyph-group.js HTTP/1.1" 304 -
+::1 - - [20/May/2026 19:45:39] "GET /renderer/asset-renderers/group.js HTTP/1.1" 304 -
+::1 - - [20/May/2026 19:45:39] "GET /renderer/asset-renderers/audio.js HTTP/1.1" 304 -
+::1 - - [20/May/2026 19:45:39] "GET /renderer/asset-renderers/stylesheet.js HTTP/1.1" 304 -
+::1 - - [20/May/2026 19:45:39] "GET /project.json HTTP/1.1" 304 -
+::1 - - [20/May/2026 19:45:39] "GET /assets/registry.json HTTP/1.1" 304 -
+::1 - - [20/May/2026 19:45:39] "GET /modules/registry.json HTTP/1.1" 304 -
+::1 - - [20/May/2026 19:45:39] "GET /fonts/registry.json HTTP/1.1" 304 -
+::1 - - [20/May/2026 19:45:39] "GET /modules/effects/crt-overlay/manifest.json HTTP/1.1" 304 -
+::1 - - [20/May/2026 19:45:39] "GET /modules/components/press-start/manifest.json HTTP/1.1" 304 -
+::1 - - [20/May/2026 19:45:39] "GET /modules/components/orbit-press-start/manifest.json HTTP/1.1" 304 -
+::1 - - [20/May/2026 19:45:39] "GET /modules/components/codecaine-keycap-start/manifest.json HTTP/1.1" 304 -
+::1 - - [20/May/2026 19:45:39] "GET /modules/components/procedural-sphere/manifest.json HTTP/1.1" 304 -
+::1 - - [20/May/2026 19:45:39] "GET /modules/components/procedural-cylinder-strips/manifest.json HTTP/1.1" 304 -
+::1 - - [20/May/2026 19:45:39] "GET /modules/components/procedural-cylinder/manifest.json HTTP/1.1" 304 -
+::1 - - [20/May/2026 19:45:39] "GET /modules/components/arc-letterbox/manifest.json HTTP/1.1" 304 -
+::1 - - [20/May/2026 19:45:39] "GET /modules/components/menu-shield/manifest.json HTTP/1.1" 304 -
+::1 - - [20/May/2026 19:45:39] "GET /modules/components/menu-items/manifest.json HTTP/1.1" 304 -
+::1 - - [20/May/2026 19:45:39] "GET /modules/components/side-menu/manifest.json HTTP/1.1" 304 -
+::1 - - [20/May/2026 19:45:39] "GET /modules/components/main-menu-rings/manifest.json HTTP/1.1" 304 -
+::1 - - [20/May/2026 19:45:39] "GET /modules/components/main-menu-system/manifest.json HTTP/1.1" 304 -
+::1 - - [20/May/2026 19:45:39] "GET /modules/components/background-pulse/manifest.json HTTP/1.1" 304 -
+::1 - - [20/May/2026 19:45:39] "GET /scenes/title/scene.json HTTP/1.1" 304 -
+::1 - - [20/May/2026 19:45:39] "GET /fonts/FolkPro%20_Family/A-OTF-FolkPro-Bold.otf HTTP/1.1" 304 -
+::1 - - [20/May/2026 19:45:39] "GET /fonts/FolkPro%20_Family/A-OTF-FolkPro-Medium.otf HTTP/1.1" 304 -
+::1 - - [20/May/2026 19:45:39] "GET /fonts/FolkPro%20_Family/A-OTF-FolkPro-Heavy.otf HTTP/1.1" 304 -
+::1 - - [20/May/2026 19:45:39] "GET /fonts/Impact/Impact-Wide.woff2 HTTP/1.1" 304 -
+::1 - - [20/May/2026 19:45:39] "GET /fonts/FolkPro%20_Family/A-OTF-FolkPro-Regular.otf HTTP/1.1" 304 -
+::1 - - [20/May/2026 19:45:39] "GET /modules/components/procedural-cylinder-strips/procedural-cylinder-strips-straight.css HTTP/1.1" 304 -
+::1 - - [20/May/2026 19:45:39] "GET /modules/components/procedural-cylinder-strips/procedural-cylinder-strips-straight.js HTTP/1.1" 304 -
+::1 - - [20/May/2026 19:45:39] "GET /modules/components/procedural-sphere/procedural-sphere.css HTTP/1.1" 304 -
+::1 - - [20/May/2026 19:45:39] "GET /modules/components/procedural-sphere/procedural-sphere.js HTTP/1.1" 304 -
+::1 - - [20/May/2026 19:45:39] "GET /modules/components/procedural-cylinder/procedural-cylinder.js HTTP/1.1" 304 -
+::1 - - [20/May/2026 19:45:39] "GET /modules/components/procedural-cylinder/procedural-cylinder.css HTTP/1.1" 304 -
+::1 - - [20/May/2026 19:45:39] "GET /assets/glyph/CODECAINE.rounded-chrome.css-layers.svg HTTP/1.1" 304 -
+::1 - - [20/May/2026 19:45:39] "GET /assets/video/test-fire.mp4 HTTP/1.1" 200 -
+::1 - - [20/May/2026 19:45:40] "GET /modules/components/codecaine-keycap-start/codecaine-keycap-start.css HTTP/1.1" 304 -
+::1 - - [20/May/2026 19:45:40] "GET /modules/components/codecaine-keycap-start/codecaine-keycap-start.js HTTP/1.1" 304 -
+::1 - - [20/May/2026 19:45:40] "GET /assets/video/test-fire.mp4 HTTP/1.1" 304 -
+::1 - - [20/May/2026 19:45:40] "GET /modules/components/orbit-press-start/orbit-press-start.js HTTP/1.1" 304 -
+::1 - - [20/May/2026 19:45:40] "GET /modules/components/orbit-press-start/orbit-press-start.css HTTP/1.1" 304 -
+::1 - - [20/May/2026 19:45:40] "GET /assets/image/codecaine-start-keycap.png HTTP/1.1" 304 -
+::1 - - [20/May/2026 19:45:40] "GET /modules/components/arc-letterbox/arc-letterbox.css HTTP/1.1" 304 -
+::1 - - [20/May/2026 19:45:40] "GET /modules/components/arc-letterbox/arc-letterbox.js HTTP/1.1" 304 -
+::1 - - [20/May/2026 19:45:43] "GET /menu/index.html HTTP/1.1" 200 -
+::1 - - [20/May/2026 19:45:43] "GET /boot.js HTTP/1.1" 304 -
+----------------------------------------
+Exception occurred during processing of request from ('::1', 50710, 0, 0)
+Traceback (most recent call last):
+  File "/Users/Ford/anaconda3/lib/python3.11/socketserver.py", line 691, in process_request_thread
+    self.finish_request(request, client_address)
+  File "/Users/Ford/anaconda3/lib/python3.11/http/server.py", line 1310, in finish_request
+    self.RequestHandlerClass(request, client_address, self,
+  File "/Users/Ford/anaconda3/lib/python3.11/http/server.py", line 671, in __init__
+    super().__init__(*args, **kwargs)
+  File "/Users/Ford/anaconda3/lib/python3.11/socketserver.py", line 755, in __init__
+    self.handle()
+  File "/Users/Ford/anaconda3/lib/python3.11/http/server.py", line 436, in handle
+    self.handle_one_request()
+  File "/Users/Ford/anaconda3/lib/python3.11/http/server.py", line 424, in handle_one_request
+    method()
+  File "/Users/Ford/anaconda3/lib/python3.11/http/server.py", line 678, in do_GET
+    self.copyfile(f, self.wfile)
+  File "/Users/Ford/anaconda3/lib/python3.11/http/server.py", line 877, in copyfile
+    shutil.copyfileobj(source, outputfile)
+  File "/Users/Ford/anaconda3/lib/python3.11/shutil.py", line 200, in copyfileobj
+    fdst_write(buf)
+  File "/Users/Ford/anaconda3/lib/python3.11/socketserver.py", line 834, in write
+    self._sock.sendall(b)
+::1 - - [20/May/2026 19:45:43] "GET /renderer/scene-renderer.js HTTP/1.1" 304 -
+::1 - - [20/May/2026 19:45:43] "GET /renderer/asset-registry.js HTTP/1.1" 304 -
+BrokenPipeError: [Errno 32] Broken pipe
+----------------------------------------
+::1 - - [20/May/2026 19:45:43] "GET /renderer/asset-renderers/index.js HTTP/1.1" 304 -
+::1 - - [20/May/2026 19:45:43] "GET /renderer/media-surface.js HTTP/1.1" 304 -
+::1 - - [20/May/2026 19:45:43] "GET /renderer/positioning.js HTTP/1.1" 304 -
+::1 - - [20/May/2026 19:45:43] "GET /renderer/asset-renderers/text.js HTTP/1.1" 304 -
+::1 - - [20/May/2026 19:45:43] "GET /renderer/asset-renderers/css-effect.js HTTP/1.1" 304 -
+::1 - - [20/May/2026 19:45:43] "GET /renderer/event-runtime.js HTTP/1.1" 304 -
+::1 - - [20/May/2026 19:45:43] "GET /renderer/font-registry.js HTTP/1.1" 304 -
+::1 - - [20/May/2026 19:45:43] "GET /renderer/runtime-url.js HTTP/1.1" 304 -
+::1 - - [20/May/2026 19:45:43] "GET /renderer/asset-renderers/media.js HTTP/1.1" 304 -
+::1 - - [20/May/2026 19:45:43] "GET /renderer/asset-renderers/glyph-group.js HTTP/1.1" 304 -
+::1 - - [20/May/2026 19:45:43] "GET /renderer/asset-renderers/audio.js HTTP/1.1" 304 -
+::1 - - [20/May/2026 19:45:43] "GET /renderer/asset-renderers/component.js HTTP/1.1" 304 -
+::1 - - [20/May/2026 19:45:43] "GET /renderer/asset-renderers/group.js HTTP/1.1" 304 -
+::1 - - [20/May/2026 19:45:43] "GET /renderer/asset-renderers/stylesheet.js HTTP/1.1" 304 -
+::1 - - [20/May/2026 19:45:43] "GET /project.json HTTP/1.1" 304 -
+::1 - - [20/May/2026 19:45:43] "GET /assets/registry.json HTTP/1.1" 304 -
+::1 - - [20/May/2026 19:45:43] "GET /fonts/registry.json HTTP/1.1" 304 -
+::1 - - [20/May/2026 19:45:43] "GET /modules/registry.json HTTP/1.1" 304 -
+::1 - - [20/May/2026 19:45:43] "GET /modules/effects/crt-overlay/manifest.json HTTP/1.1" 304 -
+::1 - - [20/May/2026 19:45:43] "GET /modules/components/procedural-sphere/manifest.json HTTP/1.1" 304 -
+::1 - - [20/May/2026 19:45:43] "GET /modules/components/press-start/manifest.json HTTP/1.1" 304 -
+::1 - - [20/May/2026 19:45:43] "GET /modules/components/orbit-press-start/manifest.json HTTP/1.1" 304 -
+::1 - - [20/May/2026 19:45:43] "GET /modules/components/procedural-cylinder-strips/manifest.json HTTP/1.1" 304 -
+::1 - - [20/May/2026 19:45:43] "GET /modules/components/procedural-cylinder/manifest.json HTTP/1.1" 304 -
+::1 - - [20/May/2026 19:45:43] "GET /modules/components/codecaine-keycap-start/manifest.json HTTP/1.1" 304 -
+::1 - - [20/May/2026 19:45:43] "GET /modules/components/arc-letterbox/manifest.json HTTP/1.1" 304 -
+::1 - - [20/May/2026 19:45:43] "GET /modules/components/menu-shield/manifest.json HTTP/1.1" 304 -
+::1 - - [20/May/2026 19:45:43] "GET /modules/components/menu-items/manifest.json HTTP/1.1" 304 -
+::1 - - [20/May/2026 19:45:43] "GET /modules/components/side-menu/manifest.json HTTP/1.1" 304 -
+::1 - - [20/May/2026 19:45:43] "GET /modules/components/main-menu-system/manifest.json HTTP/1.1" 304 -
+::1 - - [20/May/2026 19:45:43] "GET /modules/components/main-menu-rings/manifest.json HTTP/1.1" 304 -
+::1 - - [20/May/2026 19:45:43] "GET /modules/components/background-pulse/manifest.json HTTP/1.1" 304 -
+::1 - - [20/May/2026 19:45:43] "GET /scenes/menu/scene.json HTTP/1.1" 304 -
+::1 - - [20/May/2026 19:45:43] "GET /fonts/FolkPro%20_Family/A-OTF-FolkPro-Heavy.otf HTTP/1.1" 304 -
+::1 - - [20/May/2026 19:45:43] "GET /fonts/FolkPro%20_Family/A-OTF-FolkPro-Bold.otf HTTP/1.1" 304 -
+::1 - - [20/May/2026 19:45:43] "GET /fonts/FolkPro%20_Family/A-OTF-FolkPro-Medium.otf HTTP/1.1" 304 -
+::1 - - [20/May/2026 19:45:43] "GET /fonts/FolkPro%20_Family/A-OTF-FolkPro-Regular.otf HTTP/1.1" 304 -
+::1 - - [20/May/2026 19:45:43] "GET /fonts/Impact/Impact-Wide.woff2 HTTP/1.1" 304 -
+::1 - - [20/May/2026 19:45:43] "GET /modules/components/main-menu-rings/main-menu-rings.css HTTP/1.1" 304 -
+::1 - - [20/May/2026 19:45:43] "GET /modules/components/main-menu-rings/main-menu-rings.js HTTP/1.1" 304 -
+::1 - - [20/May/2026 19:45:43] "GET /assets/video/main-menu-backgrounds/purple.webm HTTP/1.1" 304 -
+::1 - - [20/May/2026 19:45:43] "GET /modules/components/background-pulse/background-pulse.css HTTP/1.1" 304 -
+::1 - - [20/May/2026 19:45:43] "GET /modules/components/background-pulse/background-pulse.js HTTP/1.1" 304 -
+::1 - - [20/May/2026 19:45:43] "GET /modules/components/main-menu-system/main-menu-system.css HTTP/1.1" 304 -
+::1 - - [20/May/2026 19:45:43] "GET /modules/components/main-menu-system/main-menu-system.js HTTP/1.1" 304 -
+::1 - - [20/May/2026 19:45:43] "GET /modules/components/menu-items/menu-items.css HTTP/1.1" 304 -
+::1 - - [20/May/2026 19:45:43] "GET /modules/components/menu-shield/menu-shield.css HTTP/1.1" 304 -
+::1 - - [20/May/2026 19:45:43] "GET /modules/components/side-menu/side-menu.css HTTP/1.1" 304 -
+::1 - - [20/May/2026 19:45:43] "GET /modules/components/menu-items/menu-items.js HTTP/1.1" 304 -
+::1 - - [20/May/2026 19:45:43] "GET /modules/components/menu-shield/menu-shield.js HTTP/1.1" 304 -
+::1 - - [20/May/2026 19:45:43] "GET /modules/components/side-menu/side-menu.js HTTP/1.1" 304 -
+::1 - - [20/May/2026 19:45:43] "GET /modules/components/side-menu/side-menu.svg HTTP/1.1" 304 -
+::1 - - [20/May/2026 19:45:43] "GET /modules/components/menu-shield/menu-shield-frame.svg HTTP/1.1" 304 -
+::1 - - [20/May/2026 19:45:43] "GET /modules/components/menu-items/menu-item.svg HTTP/1.1" 304 -

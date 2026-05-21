@@ -46,17 +46,21 @@ async function fetchModuleManifest(url) {
   }
 }
 
+function fontManifestUrls() {
+  if (globalThis.MELEE_BUNDLE_ROOT) return ['/fonts/registry.json'];
+  return ['/fonts/registry.json', '/api/fonts'];
+}
+
 export async function loadRegistry() {
   if (mergedRegistry) return mergedRegistry;
   if (loadPromise) return loadPromise;
   loadPromise = (async () => {
-    const [assets, modules, discoveredFonts, exportedFonts] = await Promise.all([
+    const [assets, modules, ...fontRegistries] = await Promise.all([
       fetchManifest('/assets/registry.json'),
       fetchManifest('/modules/registry.json'),
-      fetchOptionalManifest('/api/fonts'),
-      fetchOptionalManifest('/fonts/registry.json'),
+      ...fontManifestUrls().map((url) => fetchOptionalManifest(url)),
     ]);
-    const merged = { ...exportedFonts, ...discoveredFonts, ...assets };
+    const merged = { ...Object.assign({}, ...fontRegistries), ...assets };
     for (const [id, entry] of Object.entries(modules)) {
       if (id in merged) {
         console.warn(`[asset-registry] id collision: ${id} — module overrides asset`);
