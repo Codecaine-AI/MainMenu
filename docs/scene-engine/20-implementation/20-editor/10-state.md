@@ -36,7 +36,7 @@ interface EditorStore {
 | `scene`        | `setScene` (loader, mutations)       | Canvas, Hierarchy, Inspector                     |
 | `registry`     | `setRegistry` (loader)               | Inspector (manifest, container swap), Hierarchy   |
 | `selectedPath` | `setSelectedPath` (hierarchy / canvas) | Inspector (which object), highlight overlay      |
-| `dirty`        | `markDirty` / `markClean`            | SceneSection (save button enabled, dirty indicator) |
+| `dirty`        | `markDirty` / `markClean`            | SceneSaveControls (save button enabled, dirty indicator) |
 
 ## Object Paths
 

@@ -30,7 +30,7 @@ apps/scene-engine/app/editor/
     ├── DescriptionPopover.tsx          floating popover (anchored, click-away/Esc dismiss)
     ├── SlotsSection.tsx                glyph-group slot editor
     ├── AssetSwapDropdown.tsx           per-container file swap
-    ├── SceneSection.tsx                scene metadata, Save, Export, dirty indicator
+    ├── SceneSection.tsx                collapsed scene settings + hierarchy save controls
     └── inputs/
         ├── RangedInput.tsx             slider + numeric, debounced
         ├── BlendSelect.tsx             blend-mode dropdown

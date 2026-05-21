@@ -1031,35 +1031,35 @@ export function MainMenuConfigEditor({ path, properties }: Props) {
 
   return (
     <>
-      <InspectorSection title="Authoring Context" collapsible>
+      <InspectorSection title="Menu Graph" collapsible>
         {loadError && (
           <p className="mb-1.5 rounded-sm border border-[#6e3a3a] bg-[#2a1717] px-2 py-1 text-[11px] text-[#ffb8b8]">
             {loadError}
           </p>
         )}
-        <FieldRow label="Initial">
-          <SelectInput
-            value={config.initial ?? activeMenuId}
-            onChange={(value) => {
-              updateConfig((next) => {
-                next.initial = value
-              })
-              previewMenu(value)
-            }}
-          >
-            {ids.map((id) => (
-              <option key={id} value={id}>{id}</option>
-            ))}
-          </SelectInput>
-        </FieldRow>
-        <FieldRow label="Editing">
-          <SelectInput value={activeMenuId} onChange={previewMenu}>
-            {ids.map((id) => (
-              <option key={id} value={id}>{id}</option>
-            ))}
-          </SelectInput>
-        </FieldRow>
-        <CollapsibleSubsection title="Fallback Data">
+        <CollapsibleSubsection title="Authoring" defaultOpen>
+          <FieldRow label="Initial">
+            <SelectInput
+              value={config.initial ?? activeMenuId}
+              onChange={(value) => {
+                updateConfig((next) => {
+                  next.initial = value
+                })
+                previewMenu(value)
+              }}
+            >
+              {ids.map((id) => (
+                <option key={id} value={id}>{id}</option>
+              ))}
+            </SelectInput>
+          </FieldRow>
+          <FieldRow label="Editing">
+            <SelectInput value={activeMenuId} onChange={previewMenu}>
+              {ids.map((id) => (
+                <option key={id} value={id}>{id}</option>
+              ))}
+            </SelectInput>
+          </FieldRow>
           <FieldRow label="Config URL">
             <TextInput value={configUrl} onChange={(value) => updateSystemProperty('config', value)} />
           </FieldRow>
@@ -1073,9 +1073,8 @@ export function MainMenuConfigEditor({ path, properties }: Props) {
             />
           </FieldRow>
         </CollapsibleSubsection>
-      </InspectorSection>
 
-      <InspectorSection title="Menu Structure" collapsible defaultOpen={false}>
+        <CollapsibleSubsection title="Selected Menu" defaultOpen>
         <div className="mb-1.5 flex gap-1.5">
           <SmallButton onClick={addMenu}>Add Menu</SmallButton>
           <SmallButton onClick={deleteMenu} disabled={ids.length <= 1}>Delete</SmallButton>
@@ -1114,7 +1113,7 @@ export function MainMenuConfigEditor({ path, properties }: Props) {
           </SelectInput>
         </FieldRow>
 
-        <CollapsibleSubsection title="Selected Item" defaultOpen>
+        <CollapsibleSubsection title="Items" defaultOpen>
           <FieldRow label="Item">
             <SelectInput value={String(itemIndex)} onChange={(value) => setSelectedItemIndex(Number(value))}>
               {items.length === 0 ? (
@@ -1134,133 +1133,440 @@ export function MainMenuConfigEditor({ path, properties }: Props) {
           </div>
           {selectedItem && (
             <>
-              <FieldRow label="Item ID">
-                <TextInput
-                  value={selectedItem.id ?? ''}
-                  onChange={(value) => updateItem((item) => {
-                    item.id = normalizeId(value, item.id ?? `item-${itemIndex + 1}`)
-                  })}
-                />
-              </FieldRow>
-              <FieldRow label="Label">
-                <TextInput
-                  value={selectedItem.label ?? ''}
-                  onChange={(value) => updateItem((item) => {
-                    item.label = value
-                  })}
-                />
-              </FieldRow>
-              <FieldRow label="Desc">
-                <TextInput
-                  value={selectedItem.description ?? ''}
-                  onChange={(value) => updateItem((item) => {
-                    item.description = value
-                  })}
-                />
-              </FieldRow>
-              <FieldRow label="Caption">
-                <TextInput
-                  value={selectedItem.caption ?? ''}
-                  onChange={(value) => updateItem((item) => {
-                    item.caption = optional(value)
-                  })}
-                />
-              </FieldRow>
-              <FieldRow label="Theme">
-                <SelectInput
-                  value={selectedItem.theme ?? ''}
-                  onChange={(value) => updateItem((item) => {
-                    item.theme = optional(value)
-                  })}
-                >
-                  <option value="">Menu theme</option>
-                  {themeOptions.map((id) => (
-                    <option key={id} value={id}>{id}</option>
-                  ))}
-                </SelectInput>
-              </FieldRow>
-              <FieldRow label="Enter">
-                <SelectInput
-                  value={selectedItem.enter ?? ''}
-                  onChange={(value) => updateItem((item) => {
-                    item.enter = optional(value)
-                  })}
-                >
-                  <option value="">None</option>
-                  {ids.map((id) => (
-                    <option key={id} value={id}>{id}</option>
-                  ))}
-                </SelectInput>
-              </FieldRow>
-              <div className="mb-1.5 flex gap-1.5">
-                <SmallButton onClick={createChildMenu}>Create Child</SmallButton>
-                {selectedItem.enter && <SmallButton onClick={() => previewMenu(selectedItem.enter!)}>Open Child</SmallButton>}
-              </div>
+              <CollapsibleSubsection title="Row Content" defaultOpen>
+                <FieldRow label="Item ID">
+                  <TextInput
+                    value={selectedItem.id ?? ''}
+                    onChange={(value) => updateItem((item) => {
+                      item.id = normalizeId(value, item.id ?? `item-${itemIndex + 1}`)
+                    })}
+                  />
+                </FieldRow>
+                <FieldRow label="Label">
+                  <TextInput
+                    value={selectedItem.label ?? ''}
+                    onChange={(value) => updateItem((item) => {
+                      item.label = value
+                    })}
+                  />
+                </FieldRow>
+                <FieldRow label="Desc">
+                  <TextInput
+                    value={selectedItem.description ?? ''}
+                    onChange={(value) => updateItem((item) => {
+                      item.description = value
+                    })}
+                  />
+                </FieldRow>
+                <FieldRow label="Caption">
+                  <TextInput
+                    value={selectedItem.caption ?? ''}
+                    onChange={(value) => updateItem((item) => {
+                      item.caption = optional(value)
+                    })}
+                  />
+                </FieldRow>
+              </CollapsibleSubsection>
+
+              <CollapsibleSubsection title="Presentation">
+                <FieldRow label="Theme">
+                  <SelectInput
+                    value={selectedItem.theme ?? ''}
+                    onChange={(value) => updateItem((item) => {
+                      item.theme = optional(value)
+                    })}
+                  >
+                    <option value="">Menu theme</option>
+                    {themeOptions.map((id) => (
+                      <option key={id} value={id}>{id}</option>
+                    ))}
+                  </SelectInput>
+                </FieldRow>
+                <FieldRow label="Enter">
+                  <SelectInput
+                    value={selectedItem.enter ?? ''}
+                    onChange={(value) => updateItem((item) => {
+                      item.enter = optional(value)
+                    })}
+                  >
+                    <option value="">None</option>
+                    {ids.map((id) => (
+                      <option key={id} value={id}>{id}</option>
+                    ))}
+                  </SelectInput>
+                </FieldRow>
+                <div className="mb-1.5 flex gap-1.5">
+                  <SmallButton onClick={createChildMenu}>Create Child</SmallButton>
+                  {selectedItem.enter && <SmallButton onClick={() => previewMenu(selectedItem.enter!)}>Open Child</SmallButton>}
+                </div>
+              </CollapsibleSubsection>
+
+              <CollapsibleSubsection title="Sidebar Preview" defaultOpen>
+                <FieldRow label="Preview">
+                  <SelectInput value={selectedPreview.type ?? 'empty'} onChange={setPreviewType}>
+                    {PREVIEW_OPTIONS.map((option) => (
+                      <option key={option.value} value={option.value}>{option.label}</option>
+                    ))}
+                  </SelectInput>
+                </FieldRow>
+                {(selectedPreview.type ?? 'empty') === 'rows' && (
+                  <FieldRow label="Rows">
+                    <textarea
+                      value={previewRows(selectedPreview).join('\n')}
+                      onChange={(event) => updateItem((item) => {
+                        item.preview = { ...previewContent(item.preview), type: 'rows', rows: rowsFromText(event.target.value) }
+                      })}
+                      rows={4}
+                      className={`${INPUT_CLASS} resize-y leading-snug`}
+                    />
+                  </FieldRow>
+                )}
+                {selectedPreview.type === 'image' && (
+                  <FieldRow label="Image">
+                    <TextInput
+                      value={previewImageSource(selectedPreview)}
+                      onChange={(value) => updateItem((item) => {
+                        item.preview = { ...previewContent(item.preview), type: 'image', src: value }
+                      })}
+                    />
+                  </FieldRow>
+                )}
+                {selectedPreview.type === 'toggles' && (
+                  <>
+                    <FieldRow label="Toggle">
+                      <TextInput
+                        value={selectedPreview.label ?? ''}
+                        onChange={(value) => updateItem((item) => {
+                          item.preview = { ...previewContent(item.preview), type: 'toggles', label: value }
+                        })}
+                      />
+                    </FieldRow>
+                    <FieldRow label="Value">
+                      <TextInput
+                        value={selectedPreview.value ?? ''}
+                        onChange={(value) => updateItem((item) => {
+                          item.preview = { ...previewContent(item.preview), type: 'toggles', value }
+                        })}
+                      />
+                    </FieldRow>
+                  </>
+                )}
+                <FieldRow label="Rail Text">
+                  <TextInput
+                    value={previewRailText(selectedItem.preview, selectedItem.label ?? '')}
+                    onChange={(value) => updateItem((item) => {
+                      item.preview = { ...previewContent(item.preview), railText: value }
+                    })}
+                  />
+                </FieldRow>
+                <FieldRow label="Rail Opacity">
+                  <RangedInput
+                    value={previewRailTextOpacity(selectedItem.preview, 1)}
+                    min={0}
+                    max={1}
+                    step={0.01}
+                    onChange={(value) => updateItem((item) => {
+                      item.preview = { ...previewContent(item.preview), railTextOpacity: value }
+                    })}
+                  />
+                </FieldRow>
+              </CollapsibleSubsection>
             </>
           )}
         </CollapsibleSubsection>
+        </CollapsibleSubsection>
       </InspectorSection>
 
-      <InspectorSection title="Item Preview" collapsible>
-        {selectedItem ? (
-          <>
-            <FieldRow label="Preview">
-              <SelectInput value={selectedPreview.type ?? 'empty'} onChange={setPreviewType}>
-                {PREVIEW_OPTIONS.map((option) => (
-                  <option key={option.value} value={option.value}>{option.label}</option>
-                ))}
-              </SelectInput>
+      <InspectorSection title="Menu Border" collapsible defaultOpen={false}>
+        <CollapsibleSubsection title="Frame" defaultOpen>
+          <CollapsibleSubsection title="Motion">
+            <FieldRow label="Color Fade">
+              <RangedInput
+                value={systemNumber('theme-transition-ms', DEFAULT_MOTION.themeTransitionMs)}
+                min={0}
+                max={2000}
+                step={10}
+                onChange={(value) => updateSystemProperty('theme-transition-ms', value)}
+              />
             </FieldRow>
-            {(selectedPreview.type ?? 'empty') === 'rows' && (
-              <FieldRow label="Rows">
-                <textarea
-                  value={previewRows(selectedPreview).join('\n')}
-                  onChange={(event) => updateItem((item) => {
-                    item.preview = { ...previewContent(item.preview), type: 'rows', rows: rowsFromText(event.target.value) }
-                  })}
-                  rows={4}
-                  className={`${INPUT_CLASS} resize-y leading-snug`}
-                />
-              </FieldRow>
-            )}
-            {selectedPreview.type === 'image' && (
-              <FieldRow label="Image">
-                <TextInput
-                  value={previewImageSource(selectedPreview)}
-                  onChange={(value) => updateItem((item) => {
-                    item.preview = { ...previewContent(item.preview), type: 'image', src: value }
-                  })}
-                />
-              </FieldRow>
-            )}
-            {selectedPreview.type === 'toggles' && (
-              <>
-                <FieldRow label="Toggle">
-                  <TextInput
-                    value={selectedPreview.label ?? ''}
-                    onChange={(value) => updateItem((item) => {
-                      item.preview = { ...previewContent(item.preview), type: 'toggles', label: value }
-                    })}
-                  />
-                </FieldRow>
-                <FieldRow label="Value">
-                  <TextInput
-                    value={selectedPreview.value ?? ''}
-                    onChange={(value) => updateItem((item) => {
-                      item.preview = { ...previewContent(item.preview), type: 'toggles', value }
-                    })}
-                  />
-                </FieldRow>
-              </>
-            )}
-          </>
-        ) : (
-          <p className="px-1 py-1 text-[11px] text-gray-500">No item selected.</p>
-        )}
+          </CollapsibleSubsection>
+        </CollapsibleSubsection>
+
+        <CollapsibleSubsection title="Title" defaultOpen>
+          <CollapsibleSubsection title="Geometry" defaultOpen>
+            <FieldRow label="Box X">
+              <RangedInput
+                value={systemNumber('title-x', DEFAULT_SHIELD_TEXT.titleX)}
+                min={0}
+                max={1440}
+                step={1}
+                onChange={(value) => updateSystemProperty('title-x', value)}
+              />
+            </FieldRow>
+            <FieldRow label="Center Y">
+              <RangedInput
+                value={systemNumber('title-y', DEFAULT_SHIELD_TEXT.titleY)}
+                min={0}
+                max={1080}
+                step={1}
+                onChange={(value) => updateSystemProperty('title-y', value)}
+              />
+            </FieldRow>
+            <FieldRow label="Box Width">
+              <RangedInput
+                value={systemNumber('title-box-width', DEFAULT_SHIELD_TEXT.titleBoxWidth)}
+                min={80}
+                max={900}
+                step={1}
+                onChange={(value) => updateSystemProperty('title-box-width', value)}
+              />
+            </FieldRow>
+            <FieldRow label="Box Height">
+              <RangedInput
+                value={systemNumber('title-box-height', DEFAULT_SHIELD_TEXT.titleBoxHeight)}
+                min={24}
+                max={220}
+                step={1}
+                onChange={(value) => updateSystemProperty('title-box-height', value)}
+              />
+            </FieldRow>
+            <FieldRow label="Pad X">
+              <RangedInput
+                value={systemNumber('title-fit-padding-x', DEFAULT_SHIELD_TEXT.titleFitPaddingX)}
+                min={0}
+                max={120}
+                step={1}
+                onChange={(value) => updateSystemProperty('title-fit-padding-x', value)}
+              />
+            </FieldRow>
+            <FieldRow label="Pad Y">
+              <RangedInput
+                value={systemNumber('title-fit-padding-y', DEFAULT_SHIELD_TEXT.titleFitPaddingY)}
+                min={0}
+                max={80}
+                step={1}
+                onChange={(value) => updateSystemProperty('title-fit-padding-y', value)}
+              />
+            </FieldRow>
+            <FieldRow label="Size">
+              <RangedInput
+                value={systemNumber('title-font-size', DEFAULT_SHIELD_TEXT.titleFontSize)}
+                min={24}
+                max={120}
+                step={1}
+                onChange={(value) => updateSystemProperty('title-font-size', value)}
+              />
+            </FieldRow>
+          </CollapsibleSubsection>
+
+          <CollapsibleSubsection title="Styling">
+            <FieldRow label="Text Color">
+              <ColorInput value={menuThemingString('titleTextColor')} onChange={(value) => updateMenuThemingField('titleTextColor', value)} />
+            </FieldRow>
+            <FieldRow label="Text Opacity">
+              <RangedInput
+                value={menuThemingNumber('titleTextOpacity')}
+                min={0}
+                max={1}
+                step={0.01}
+                onChange={(value) => updateMenuThemingField('titleTextOpacity', value)}
+              />
+            </FieldRow>
+            <FieldRow label="Glow Size">
+              <RangedInput
+                value={menuThemingNumber('titleTextGlowSize')}
+                min={0}
+                max={40}
+                step={0.5}
+                onChange={(value) => updateMenuThemingField('titleTextGlowSize', value)}
+              />
+            </FieldRow>
+            <FieldRow label="Glow Alpha">
+              <RangedInput
+                value={menuThemingNumber('titleTextGlowOpacity')}
+                min={0}
+                max={1}
+                step={0.01}
+                onChange={(value) => updateMenuThemingField('titleTextGlowOpacity', value)}
+              />
+            </FieldRow>
+          </CollapsibleSubsection>
+
+          <CollapsibleSubsection title="Motion">
+            <FieldRow label="Duration">
+              <RangedInput
+                value={systemNumber('title-prism-ms', DEFAULT_MOTION.titlePrismMs)}
+                min={0}
+                max={2000}
+                step={10}
+                onChange={(value) => updateSystemProperty('title-prism-ms', value)}
+              />
+            </FieldRow>
+            <FieldRow label="Depth">
+              <RangedInput
+                value={systemNumber('title-prism-depth', DEFAULT_MOTION.titlePrismDepth)}
+                min={0}
+                max={220}
+                step={1}
+                onChange={(value) => updateSystemProperty('title-prism-depth', value)}
+              />
+            </FieldRow>
+            <FieldRow label="Back Lift">
+              <RangedInput
+                value={systemNumber('title-prism-lift', DEFAULT_MOTION.titlePrismLift)}
+                min={0}
+                max={160}
+                step={1}
+                onChange={(value) => updateSystemProperty('title-prism-lift', value)}
+              />
+            </FieldRow>
+            <FieldRow label="Perspective">
+              <RangedInput
+                value={systemNumber('title-prism-perspective', DEFAULT_MOTION.titlePrismPerspective)}
+                min={220}
+                max={1600}
+                step={10}
+                onChange={(value) => updateSystemProperty('title-prism-perspective', value)}
+              />
+            </FieldRow>
+            <FieldRow label="Face Angle">
+              <RangedInput
+                value={systemNumber('title-prism-angle', DEFAULT_MOTION.titlePrismAngle)}
+                min={60}
+                max={150}
+                step={1}
+                onChange={(value) => updateSystemProperty('title-prism-angle', value)}
+              />
+            </FieldRow>
+          </CollapsibleSubsection>
+        </CollapsibleSubsection>
+
+        <CollapsibleSubsection title="Caption Box">
+          <CollapsibleSubsection title="Geometry" defaultOpen>
+            <FieldRow label="Center Text">
+              <input
+                type="checkbox"
+                checked={systemBoolean('caption-center-in-box', DEFAULT_SHIELD_TEXT.captionCenterInBox)}
+                onChange={(event) => updateSystemProperty('caption-center-in-box', event.target.checked)}
+                className="accent-[#4a8fc2]"
+              />
+            </FieldRow>
+            <FieldRow label="Text X">
+              <RangedInput
+                value={systemNumber('caption-x', DEFAULT_SHIELD_TEXT.captionX)}
+                min={0}
+                max={1440}
+                step={1}
+                onChange={(value) => updateSystemProperty('caption-x', value)}
+              />
+            </FieldRow>
+            <FieldRow label="Text Y">
+              <RangedInput
+                value={systemNumber('caption-y', DEFAULT_SHIELD_TEXT.captionY)}
+                min={0}
+                max={1080}
+                step={1}
+                onChange={(value) => updateSystemProperty('caption-y', value)}
+              />
+            </FieldRow>
+            <FieldRow label="Text Size">
+              <RangedInput
+                value={systemNumber('caption-font-size', DEFAULT_SHIELD_TEXT.captionFontSize)}
+                min={18}
+                max={90}
+                step={1}
+                onChange={(value) => updateSystemProperty('caption-font-size', value)}
+              />
+            </FieldRow>
+            <FieldRow label="Box X">
+              <RangedInput
+                value={systemNumber('caption-box-x', DEFAULT_SHIELD_TEXT.captionBoxX)}
+                min={0}
+                max={1440}
+                step={1}
+                onChange={(value) => updateSystemProperty('caption-box-x', value)}
+              />
+            </FieldRow>
+            <FieldRow label="Box Y">
+              <RangedInput
+                value={systemNumber('caption-box-y', DEFAULT_SHIELD_TEXT.captionBoxY)}
+                min={0}
+                max={1080}
+                step={1}
+                onChange={(value) => updateSystemProperty('caption-box-y', value)}
+              />
+            </FieldRow>
+            <FieldRow label="Box Width">
+              <RangedInput
+                value={systemNumber('caption-box-width', DEFAULT_SHIELD_TEXT.captionBoxWidth)}
+                min={200}
+                max={1200}
+                step={1}
+                onChange={(value) => updateSystemProperty('caption-box-width', value)}
+              />
+            </FieldRow>
+            <FieldRow label="Box Height">
+              <RangedInput
+                value={systemNumber('caption-box-height', DEFAULT_SHIELD_TEXT.captionBoxHeight)}
+                min={40}
+                max={180}
+                step={1}
+                onChange={(value) => updateSystemProperty('caption-box-height', value)}
+              />
+            </FieldRow>
+          </CollapsibleSubsection>
+
+          <CollapsibleSubsection title="Styling">
+            <FieldRow label="Text Color">
+              <ColorInput value={menuThemingString('captionTextColor')} onChange={(value) => updateMenuThemingField('captionTextColor', value)} />
+            </FieldRow>
+            <FieldRow label="Show Boxes">
+              <input
+                type="checkbox"
+                checked={systemBoolean('shield-text-debug', DEFAULT_SHIELD_TEXT.shieldTextDebug)}
+                onChange={(event) => updateSystemProperty('shield-text-debug', event.target.checked)}
+                className="accent-[#4a8fc2]"
+              />
+            </FieldRow>
+          </CollapsibleSubsection>
+
+          <CollapsibleSubsection title="Motion">
+            <FieldRow label="Fade">
+              <RangedInput
+                value={systemNumber('caption-transition-ms', DEFAULT_MOTION.captionFadeMs)}
+                min={0}
+                max={2000}
+                step={10}
+                onChange={(value) => updateSystemProperty('caption-transition-ms', value)}
+              />
+            </FieldRow>
+          </CollapsibleSubsection>
+        </CollapsibleSubsection>
+
+        <CollapsibleSubsection title="Back Button">
+          <FieldRow label="Back X">
+            <RangedInput
+              value={systemNumber('back-button-x', DEFAULT_DETAIL_PREVIEW.backButtonX)}
+              min={0}
+              max={1440}
+              step={1}
+              onChange={(value) => updateSystemProperty('back-button-x', value)}
+            />
+          </FieldRow>
+          <FieldRow label="Back Y">
+            <RangedInput
+              value={systemNumber('back-button-y', DEFAULT_DETAIL_PREVIEW.backButtonY)}
+              min={0}
+              max={1080}
+              step={1}
+              onChange={(value) => updateSystemProperty('back-button-y', value)}
+            />
+          </FieldRow>
+        </CollapsibleSubsection>
       </InspectorSection>
 
-      <InspectorSection title="Stack & Placement" collapsible>
-        <CollapsibleSubsection title="Global Stack" defaultOpen>
+      <InspectorSection title="Menu Item List" collapsible defaultOpen={false}>
+        <CollapsibleSubsection title="Stack" defaultOpen>
           <FieldRow label="X Offset">
             <RangedInput
               value={systemNumber('menu-x-offset', DEFAULT_STACK_TUNING.menuXOffset)}
@@ -1353,210 +1659,315 @@ export function MainMenuConfigEditor({ path, properties }: Props) {
           ))}
         </CollapsibleSubsection>
 
-        <CollapsibleSubsection title="Border Text">
-          <FieldRow label="Box X">
-            <RangedInput
-              value={systemNumber('title-x', DEFAULT_SHIELD_TEXT.titleX)}
-              min={0}
-              max={1440}
-              step={1}
-              onChange={(value) => updateSystemProperty('title-x', value)}
+        <CollapsibleSubsection title="Rows">
+          <CollapsibleSubsection title="Styling" defaultOpen>
+            <FieldRow label="Hot Gold">
+              <ColorInput value={menuThemingString('rowHot')} onChange={(value) => updateMenuThemingField('rowHot', value)} />
+            </FieldRow>
+            <FieldRow label="Row Base">
+              <ColorInput value={menuThemingString('rowPanel')} onChange={(value) => updateMenuThemingField('rowPanel', value)} />
+            </FieldRow>
+            <FieldRow label="Row Text">
+              <ColorInput value={menuThemingString('rowText')} onChange={(value) => updateMenuThemingField('rowText', value)} />
+            </FieldRow>
+            <FieldRow label="Selected">
+              <ColorInput value={menuThemingString('rowSelectedText')} onChange={(value) => updateMenuThemingField('rowSelectedText', value)} />
+            </FieldRow>
+          </CollapsibleSubsection>
+
+          <CollapsibleSubsection title="Edge Falloff">
+            <FieldRow label="Edge Alpha">
+              <RangedInput
+                value={menuThemingNumber('rowEdgeOpacity')}
+                min={0}
+                max={1}
+                step={0.01}
+                onChange={(value) => updateMenuThemingField('rowEdgeOpacity', value)}
+              />
+            </FieldRow>
+            <FieldRow label="Edge Feather">
+              <RangedInput
+                value={menuThemingNumber('rowEdgeFeather')}
+                min={0}
+                max={8}
+                step={0.1}
+                onChange={(value) => updateMenuThemingField('rowEdgeFeather', value)}
+              />
+            </FieldRow>
+            <FieldRow label="Glow Size">
+              <RangedInput
+                value={menuThemingNumber('rowEdgeGlowSize')}
+                min={0}
+                max={48}
+                step={0.5}
+                onChange={(value) => updateMenuThemingField('rowEdgeGlowSize', value)}
+              />
+            </FieldRow>
+            <FieldRow label="Glow Alpha">
+              <RangedInput
+                value={menuThemingNumber('rowEdgeGlowOpacity')}
+                min={0}
+                max={1}
+                step={0.01}
+                onChange={(value) => updateMenuThemingField('rowEdgeGlowOpacity', value)}
+              />
+            </FieldRow>
+            <FieldRow label="Selected Alpha">
+              <RangedInput
+                value={menuThemingNumber('rowSelectedEdgeOpacity')}
+                min={0}
+                max={1}
+                step={0.01}
+                onChange={(value) => updateMenuThemingField('rowSelectedEdgeOpacity', value)}
+              />
+            </FieldRow>
+            <FieldRow label="Selected Feather">
+              <RangedInput
+                value={menuThemingNumber('rowSelectedEdgeFeather')}
+                min={0}
+                max={8}
+                step={0.1}
+                onChange={(value) => updateMenuThemingField('rowSelectedEdgeFeather', value)}
+              />
+            </FieldRow>
+            <FieldRow label="Selected Glow">
+              <RangedInput
+                value={menuThemingNumber('rowSelectedEdgeGlowSize')}
+                min={0}
+                max={64}
+                step={0.5}
+                onChange={(value) => updateMenuThemingField('rowSelectedEdgeGlowSize', value)}
+              />
+            </FieldRow>
+            <FieldRow label="Selected Glow Alpha">
+              <RangedInput
+                value={menuThemingNumber('rowSelectedEdgeGlowOpacity')}
+                min={0}
+                max={1}
+                step={0.01}
+                onChange={(value) => updateMenuThemingField('rowSelectedEdgeGlowOpacity', value)}
+              />
+            </FieldRow>
+          </CollapsibleSubsection>
+
+          <CollapsibleSubsection title="Motion">
+            <FieldRow label="Target Fade">
+              <RangedInput
+                value={systemNumber('selection-target-fade-ms', DEFAULT_MOTION.targetFadeMs)}
+                min={0}
+                max={2000}
+                step={10}
+                onChange={(value) => updateSystemProperty('selection-target-fade-ms', value)}
+              />
+            </FieldRow>
+            <FieldRow label="Row Color">
+              <RangedInput
+                value={systemNumber(
+                  'menu-item-color-transition-ms',
+                  systemNumber('selection-target-fade-ms', DEFAULT_MOTION.menuItemColorMs),
+                )}
+                min={0}
+                max={2000}
+                step={10}
+                onChange={(value) => updateSystemProperty('menu-item-color-transition-ms', value)}
+              />
+            </FieldRow>
+            <FieldRow label="Forward/Back">
+              <RangedInput
+                value={systemNumber('transition-ms', DEFAULT_MOTION.transitionMs)}
+                min={0}
+                max={2000}
+                step={10}
+                onChange={(value) => updateSystemProperty('transition-ms', value)}
+              />
+            </FieldRow>
+            <FieldRow label="Orbit Radius">
+              <RangedInput
+                value={systemNumber('menu-orbit-radius', DEFAULT_MOTION.orbitRadius)}
+                min={120}
+                max={1800}
+                step={5}
+                onChange={(value) => updateSystemProperty('menu-orbit-radius', value)}
+              />
+            </FieldRow>
+            <FieldRow label="Orbit Angle">
+              <RangedInput
+                value={systemNumber('menu-orbit-angle', DEFAULT_MOTION.orbitAngle)}
+                min={0}
+                max={180}
+                step={1}
+                onChange={(value) => updateSystemProperty('menu-orbit-angle', value)}
+              />
+            </FieldRow>
+            <FieldRow label="Easing">
+              <SelectInput
+                value={systemString('menu-motion-easing', DEFAULT_MOTION.easing)}
+                onChange={(value) => updateSystemProperty('menu-motion-easing', value)}
+              >
+                {MOTION_EASING_OPTIONS.map((option) => (
+                  <option key={option.value} value={option.value}>{option.label}</option>
+                ))}
+              </SelectInput>
+            </FieldRow>
+            <FieldRow label="Show Guide">
+              <input
+                type="checkbox"
+                checked={systemBoolean('menu-orbit-debug', DEFAULT_MOTION.orbitDebug)}
+                onChange={(event) => updateSystemProperty('menu-orbit-debug', event.target.checked)}
+                className="accent-[#4a8fc2]"
+              />
+            </FieldRow>
+            <FieldRow label="Guide Center X">
+              <RangedInput
+                value={systemNumber('menu-orbit-center-x', DEFAULT_MOTION.orbitCenterX)}
+                min={-1440}
+                max={2880}
+                step={1}
+                onChange={(value) => updateSystemProperty('menu-orbit-center-x', value)}
+              />
+            </FieldRow>
+            <FieldRow label="Guide Center Y">
+              <RangedInput
+                value={systemNumber('menu-orbit-center-y', DEFAULT_MOTION.orbitCenterY)}
+                min={-1080}
+                max={2160}
+                step={1}
+                onChange={(value) => updateSystemProperty('menu-orbit-center-y', value)}
+              />
+            </FieldRow>
+            <FieldRow label="Guide Opacity">
+              <RangedInput
+                value={systemNumber('menu-orbit-debug-opacity', DEFAULT_MOTION.orbitDebugOpacity)}
+                min={0}
+                max={1}
+                step={0.01}
+                onChange={(value) => updateSystemProperty('menu-orbit-debug-opacity', value)}
+              />
+            </FieldRow>
+          </CollapsibleSubsection>
+        </CollapsibleSubsection>
+
+        <CollapsibleSubsection title="Target Marker">
+          <CollapsibleSubsection title="Pulse Styling" defaultOpen>
+            <FieldRow label="Pulse">
+              <ColorInput value={menuThemingString('markerPulseColor')} onChange={(value) => updateMenuThemingField('markerPulseColor', value)} />
+            </FieldRow>
+            <FieldRow label="Radius">
+              <RangedInput value={menuThemingNumber('markerPulseRadius')} min={0} max={20} step={0.1} onChange={(value) => updateMenuThemingField('markerPulseRadius', value)} />
+            </FieldRow>
+            <FieldRow label="Target">
+              <RangedInput value={menuThemingNumber('markerPulseTargetRadius')} min={0} max={20} step={0.1} onChange={(value) => updateMenuThemingField('markerPulseTargetRadius', value)} />
+            </FieldRow>
+            <FieldRow label="Opacity">
+              <RangedInput value={menuThemingNumber('markerPulseOpacity')} min={0} max={1} step={0.01} onChange={(value) => updateMenuThemingField('markerPulseOpacity', value)} />
+            </FieldRow>
+            <FieldRow label="Thickness">
+              <RangedInput value={menuThemingNumber('markerPulseThickness')} min={0} max={10} step={0.1} onChange={(value) => updateMenuThemingField('markerPulseThickness', value)} />
+            </FieldRow>
+            <FieldRow label="Feather">
+              <RangedInput value={menuThemingNumber('markerPulseFeatherWidth')} min={0} max={20} step={0.1} onChange={(value) => updateMenuThemingField('markerPulseFeatherWidth', value)} />
+            </FieldRow>
+            <FieldRow label="Edge Opacity">
+              <RangedInput value={menuThemingNumber('markerPulseEdgeOpacity')} min={0} max={1} step={0.01} onChange={(value) => updateMenuThemingField('markerPulseEdgeOpacity', value)} />
+            </FieldRow>
+          </CollapsibleSubsection>
+
+          <CollapsibleSubsection title="Ring Glow">
+            <FieldRow label="Ring Glow">
+              <RangedInput value={menuThemingNumber('markerRingGlowSize')} min={0} max={8} step={0.1} onChange={(value) => updateMenuThemingField('markerRingGlowSize', value)} />
+            </FieldRow>
+            <FieldRow label="Ring Alpha">
+              <RangedInput value={menuThemingNumber('markerRingGlowOpacity')} min={0} max={1} step={0.01} onChange={(value) => updateMenuThemingField('markerRingGlowOpacity', value)} />
+            </FieldRow>
+          </CollapsibleSubsection>
+
+          <CollapsibleSubsection title="Inner Pulse">
+            <FieldRow label="Inner Color">
+              <ColorInput value={menuThemingString('markerInnerPulseColor')} onChange={(value) => updateMenuThemingField('markerInnerPulseColor', value)} />
+            </FieldRow>
+            <FieldRow label="Inner Size">
+              <RangedInput value={menuThemingNumber('markerInnerPulseRadius')} min={0} max={120} step={1} onChange={(value) => updateMenuThemingField('markerInnerPulseRadius', value)} />
+            </FieldRow>
+            <FieldRow label="Inner Alpha">
+              <RangedInput value={menuThemingNumber('markerInnerPulseOpacity')} min={0} max={1} step={0.01} onChange={(value) => updateMenuThemingField('markerInnerPulseOpacity', value)} />
+            </FieldRow>
+            <FieldRow label="Inner Glow">
+              <RangedInput value={menuThemingNumber('markerInnerPulseGlowSize')} min={0} max={80} step={1} onChange={(value) => updateMenuThemingField('markerInnerPulseGlowSize', value)} />
+            </FieldRow>
+          </CollapsibleSubsection>
+
+          <CollapsibleSubsection title="Motion">
+            <FieldRow label="Pulse Speed">
+              <RangedInput value={menuThemingNumber('markerContractSpeed')} min={0} max={12} step={0.1} onChange={(value) => updateMenuThemingField('markerContractSpeed', value)} />
+            </FieldRow>
+            <FieldRow label="Inner Speed">
+              <RangedInput value={menuThemingNumber('markerInnerPulseSpeed')} min={0} max={12} step={0.1} onChange={(value) => updateMenuThemingField('markerInnerPulseSpeed', value)} />
+            </FieldRow>
+            <FieldRow label="Single Cool">
+              <RangedInput value={menuThemingNumber('markerSingleCooldown')} min={0} max={10} step={0.1} onChange={(value) => updateMenuThemingField('markerSingleCooldown', value)} />
+            </FieldRow>
+            <FieldRow label="Double Cool">
+              <RangedInput value={menuThemingNumber('markerDoubleCooldown')} min={0} max={10} step={0.1} onChange={(value) => updateMenuThemingField('markerDoubleCooldown', value)} />
+            </FieldRow>
+            <FieldRow label="Double Gap">
+              <RangedInput value={menuThemingNumber('markerDoubleGap')} min={0} max={3} step={0.01} onChange={(value) => updateMenuThemingField('markerDoubleGap', value)} />
+            </FieldRow>
+          </CollapsibleSubsection>
+        </CollapsibleSubsection>
+
+        <CollapsibleSubsection title="Audio">
+          <FieldRow label="Navigation">
+            <AudioAssetSelect
+              value={systemString('ui-navigation-sound', DEFAULT_AUDIO.navigationSound)}
+              options={audioOptions}
+              onChange={(value) => updateSystemProperty('ui-navigation-sound', value)}
             />
           </FieldRow>
-          <FieldRow label="Center Y">
+          <FieldRow label="Level">
             <RangedInput
-              value={systemNumber('title-y', DEFAULT_SHIELD_TEXT.titleY)}
-              min={0}
-              max={1080}
-              step={1}
-              onChange={(value) => updateSystemProperty('title-y', value)}
-            />
-          </FieldRow>
-          <FieldRow label="Box Width">
-            <RangedInput
-              value={systemNumber('title-box-width', DEFAULT_SHIELD_TEXT.titleBoxWidth)}
-              min={80}
-              max={900}
-              step={1}
-              onChange={(value) => updateSystemProperty('title-box-width', value)}
-            />
-          </FieldRow>
-          <FieldRow label="Box Height">
-            <RangedInput
-              value={systemNumber('title-box-height', DEFAULT_SHIELD_TEXT.titleBoxHeight)}
-              min={24}
-              max={220}
-              step={1}
-              onChange={(value) => updateSystemProperty('title-box-height', value)}
-            />
-          </FieldRow>
-          <FieldRow label="Pad X">
-            <RangedInput
-              value={systemNumber('title-fit-padding-x', DEFAULT_SHIELD_TEXT.titleFitPaddingX)}
-              min={0}
-              max={120}
-              step={1}
-              onChange={(value) => updateSystemProperty('title-fit-padding-x', value)}
-            />
-          </FieldRow>
-          <FieldRow label="Pad Y">
-            <RangedInput
-              value={systemNumber('title-fit-padding-y', DEFAULT_SHIELD_TEXT.titleFitPaddingY)}
-              min={0}
-              max={80}
-              step={1}
-              onChange={(value) => updateSystemProperty('title-fit-padding-y', value)}
-            />
-          </FieldRow>
-          <FieldRow label="Size">
-            <RangedInput
-              value={systemNumber('title-font-size', DEFAULT_SHIELD_TEXT.titleFontSize)}
-              min={24}
-              max={120}
-              step={1}
-              onChange={(value) => updateSystemProperty('title-font-size', value)}
-            />
-          </FieldRow>
-          <FieldRow label="Text Color">
-            <ColorInput value={menuThemingString('titleTextColor')} onChange={(value) => updateMenuThemingField('titleTextColor', value)} />
-          </FieldRow>
-          <FieldRow label="Text Opacity">
-            <RangedInput
-              value={menuThemingNumber('titleTextOpacity')}
+              value={systemNumber('ui-navigation-volume', DEFAULT_AUDIO.navigationVolume)}
               min={0}
               max={1}
               step={0.01}
-              onChange={(value) => updateMenuThemingField('titleTextOpacity', value)}
+              onChange={(value) => updateSystemProperty('ui-navigation-volume', value)}
             />
           </FieldRow>
-          <FieldRow label="Glow Size">
-            <RangedInput
-              value={menuThemingNumber('titleTextGlowSize')}
-              min={0}
-              max={40}
-              step={0.5}
-              onChange={(value) => updateMenuThemingField('titleTextGlowSize', value)}
+          <FieldRow label="Forward">
+            <AudioAssetSelect
+              value={systemString('ui-forward-sound', DEFAULT_AUDIO.forwardSound)}
+              options={audioOptions}
+              onChange={(value) => updateSystemProperty('ui-forward-sound', value)}
             />
           </FieldRow>
-          <FieldRow label="Glow Alpha">
+          <FieldRow label="Level">
             <RangedInput
-              value={menuThemingNumber('titleTextGlowOpacity')}
+              value={systemNumber('ui-forward-volume', DEFAULT_AUDIO.forwardVolume)}
               min={0}
               max={1}
               step={0.01}
-              onChange={(value) => updateMenuThemingField('titleTextGlowOpacity', value)}
+              onChange={(value) => updateSystemProperty('ui-forward-volume', value)}
             />
           </FieldRow>
-        </CollapsibleSubsection>
-
-        <CollapsibleSubsection title="Border Caption">
-          <FieldRow label="Center Text">
-            <input
-              type="checkbox"
-              checked={systemBoolean('caption-center-in-box', DEFAULT_SHIELD_TEXT.captionCenterInBox)}
-              onChange={(event) => updateSystemProperty('caption-center-in-box', event.target.checked)}
-              className="accent-[#4a8fc2]"
+          <FieldRow label="Back">
+            <AudioAssetSelect
+              value={systemString('ui-back-sound', DEFAULT_AUDIO.backSound)}
+              options={audioOptions}
+              onChange={(value) => updateSystemProperty('ui-back-sound', value)}
             />
           </FieldRow>
-          <FieldRow label="Text X">
+          <FieldRow label="Level">
             <RangedInput
-              value={systemNumber('caption-x', DEFAULT_SHIELD_TEXT.captionX)}
+              value={systemNumber('ui-back-volume', DEFAULT_AUDIO.backVolume)}
               min={0}
-              max={1440}
-              step={1}
-              onChange={(value) => updateSystemProperty('caption-x', value)}
-            />
-          </FieldRow>
-          <FieldRow label="Text Y">
-            <RangedInput
-              value={systemNumber('caption-y', DEFAULT_SHIELD_TEXT.captionY)}
-              min={0}
-              max={1080}
-              step={1}
-              onChange={(value) => updateSystemProperty('caption-y', value)}
-            />
-          </FieldRow>
-          <FieldRow label="Text Size">
-            <RangedInput
-              value={systemNumber('caption-font-size', DEFAULT_SHIELD_TEXT.captionFontSize)}
-              min={18}
-              max={90}
-              step={1}
-              onChange={(value) => updateSystemProperty('caption-font-size', value)}
-            />
-          </FieldRow>
-          <FieldRow label="Text Color">
-            <ColorInput value={menuThemingString('captionTextColor')} onChange={(value) => updateMenuThemingField('captionTextColor', value)} />
-          </FieldRow>
-          <FieldRow label="Box X">
-            <RangedInput
-              value={systemNumber('caption-box-x', DEFAULT_SHIELD_TEXT.captionBoxX)}
-              min={0}
-              max={1440}
-              step={1}
-              onChange={(value) => updateSystemProperty('caption-box-x', value)}
-            />
-          </FieldRow>
-          <FieldRow label="Box Y">
-            <RangedInput
-              value={systemNumber('caption-box-y', DEFAULT_SHIELD_TEXT.captionBoxY)}
-              min={0}
-              max={1080}
-              step={1}
-              onChange={(value) => updateSystemProperty('caption-box-y', value)}
-            />
-          </FieldRow>
-          <FieldRow label="Box Width">
-            <RangedInput
-              value={systemNumber('caption-box-width', DEFAULT_SHIELD_TEXT.captionBoxWidth)}
-              min={200}
-              max={1200}
-              step={1}
-              onChange={(value) => updateSystemProperty('caption-box-width', value)}
-            />
-          </FieldRow>
-          <FieldRow label="Box Height">
-            <RangedInput
-              value={systemNumber('caption-box-height', DEFAULT_SHIELD_TEXT.captionBoxHeight)}
-              min={40}
-              max={180}
-              step={1}
-              onChange={(value) => updateSystemProperty('caption-box-height', value)}
-            />
-          </FieldRow>
-          <FieldRow label="Show Boxes">
-            <input
-              type="checkbox"
-              checked={systemBoolean('shield-text-debug', DEFAULT_SHIELD_TEXT.shieldTextDebug)}
-              onChange={(event) => updateSystemProperty('shield-text-debug', event.target.checked)}
-              className="accent-[#4a8fc2]"
-            />
-          </FieldRow>
-        </CollapsibleSubsection>
-
-        <CollapsibleSubsection title="Back Button">
-          <FieldRow label="Back X">
-            <RangedInput
-              value={systemNumber('back-button-x', DEFAULT_DETAIL_PREVIEW.backButtonX)}
-              min={0}
-              max={1440}
-              step={1}
-              onChange={(value) => updateSystemProperty('back-button-x', value)}
-            />
-          </FieldRow>
-          <FieldRow label="Back Y">
-            <RangedInput
-              value={systemNumber('back-button-y', DEFAULT_DETAIL_PREVIEW.backButtonY)}
-              min={0}
-              max={1080}
-              step={1}
-              onChange={(value) => updateSystemProperty('back-button-y', value)}
+              max={1}
+              step={0.01}
+              onChange={(value) => updateSystemProperty('ui-back-volume', value)}
             />
           </FieldRow>
         </CollapsibleSubsection>
       </InspectorSection>
 
-      <InspectorSection title="Side Panel" collapsible>
+      <InspectorSection title="Sidebar" collapsible defaultOpen={false}>
         <CollapsibleSubsection title="Panel" defaultOpen>
           <FieldRow label="Panel X">
             <RangedInput
@@ -1613,7 +2024,7 @@ export function MainMenuConfigEditor({ path, properties }: Props) {
           </FieldRow>
         </CollapsibleSubsection>
 
-        <CollapsibleSubsection title="Panel Rain">
+        <CollapsibleSubsection title="Rain">
           <FieldRow label="Density">
             <RangedInput
               value={systemNumber('side-rain-density', DEFAULT_SIDE_PREVIEW.sideRainDensity)}
@@ -1661,7 +2072,7 @@ export function MainMenuConfigEditor({ path, properties }: Props) {
           </FieldRow>
         </CollapsibleSubsection>
 
-        <CollapsibleSubsection title="Panel Text">
+        <CollapsibleSubsection title="Preview Text">
           <FieldRow label="Text Color">
             <ColorInput value={menuThemingString('sideTextColor')} onChange={(value) => updateMenuThemingField('sideTextColor', value)} />
           </FieldRow>
@@ -1730,31 +2141,6 @@ export function MainMenuConfigEditor({ path, properties }: Props) {
               className="accent-[#4a8fc2]"
             />
           </FieldRow>
-          {selectedItem ? (
-            <>
-              <FieldRow label="Rail Text">
-                <TextInput
-                  value={previewRailText(selectedItem.preview, selectedItem.label ?? '')}
-                  onChange={(value) => updateItem((item) => {
-                    item.preview = { ...previewContent(item.preview), railText: value }
-                  })}
-                />
-              </FieldRow>
-              <FieldRow label="Rail Opacity">
-                <RangedInput
-                  value={previewRailTextOpacity(selectedItem.preview, 1)}
-                  min={0}
-                  max={1}
-                  step={0.01}
-                  onChange={(value) => updateItem((item) => {
-                    item.preview = { ...previewContent(item.preview), railTextOpacity: value }
-                  })}
-                />
-              </FieldRow>
-            </>
-          ) : (
-            <p className="px-1 py-1 text-[11px] text-gray-500">No item selected.</p>
-          )}
           <FieldRow label="Rail Color">
             <ColorInput value={menuThemingString('railTextColor')} onChange={(value) => updateMenuThemingField('railTextColor', value)} />
           </FieldRow>
@@ -1796,7 +2182,7 @@ export function MainMenuConfigEditor({ path, properties }: Props) {
           </FieldRow>
         </CollapsibleSubsection>
 
-        <CollapsibleSubsection title="Panel Object">
+        <CollapsibleSubsection title="Detail Object">
           <FieldRow label="Detail X">
             <RangedInput
               value={systemNumber('detail-x', DEFAULT_DETAIL_PREVIEW.detailX)}
@@ -1854,163 +2240,7 @@ export function MainMenuConfigEditor({ path, properties }: Props) {
         </CollapsibleSubsection>
       </InspectorSection>
 
-      <InspectorSection title="Visual Style" collapsible>
-        <CollapsibleSubsection title="Row Colors">
-          <FieldRow label="Hot Gold">
-            <ColorInput value={menuThemingString('rowHot')} onChange={(value) => updateMenuThemingField('rowHot', value)} />
-          </FieldRow>
-          <FieldRow label="Row Base">
-            <ColorInput value={menuThemingString('rowPanel')} onChange={(value) => updateMenuThemingField('rowPanel', value)} />
-          </FieldRow>
-          <FieldRow label="Row Text">
-            <ColorInput value={menuThemingString('rowText')} onChange={(value) => updateMenuThemingField('rowText', value)} />
-          </FieldRow>
-          <FieldRow label="Selected">
-            <ColorInput value={menuThemingString('rowSelectedText')} onChange={(value) => updateMenuThemingField('rowSelectedText', value)} />
-          </FieldRow>
-        </CollapsibleSubsection>
-
-        <CollapsibleSubsection title="Row Edge Falloff">
-          <FieldRow label="Edge Alpha">
-            <RangedInput
-              value={menuThemingNumber('rowEdgeOpacity')}
-              min={0}
-              max={1}
-              step={0.01}
-              onChange={(value) => updateMenuThemingField('rowEdgeOpacity', value)}
-            />
-          </FieldRow>
-          <FieldRow label="Edge Feather">
-            <RangedInput
-              value={menuThemingNumber('rowEdgeFeather')}
-              min={0}
-              max={8}
-              step={0.1}
-              onChange={(value) => updateMenuThemingField('rowEdgeFeather', value)}
-            />
-          </FieldRow>
-          <FieldRow label="Glow Size">
-            <RangedInput
-              value={menuThemingNumber('rowEdgeGlowSize')}
-              min={0}
-              max={48}
-              step={0.5}
-              onChange={(value) => updateMenuThemingField('rowEdgeGlowSize', value)}
-            />
-          </FieldRow>
-          <FieldRow label="Glow Alpha">
-            <RangedInput
-              value={menuThemingNumber('rowEdgeGlowOpacity')}
-              min={0}
-              max={1}
-              step={0.01}
-              onChange={(value) => updateMenuThemingField('rowEdgeGlowOpacity', value)}
-            />
-          </FieldRow>
-          <FieldRow label="Selected Alpha">
-            <RangedInput
-              value={menuThemingNumber('rowSelectedEdgeOpacity')}
-              min={0}
-              max={1}
-              step={0.01}
-              onChange={(value) => updateMenuThemingField('rowSelectedEdgeOpacity', value)}
-            />
-          </FieldRow>
-          <FieldRow label="Selected Feather">
-            <RangedInput
-              value={menuThemingNumber('rowSelectedEdgeFeather')}
-              min={0}
-              max={8}
-              step={0.1}
-              onChange={(value) => updateMenuThemingField('rowSelectedEdgeFeather', value)}
-            />
-          </FieldRow>
-          <FieldRow label="Selected Glow">
-            <RangedInput
-              value={menuThemingNumber('rowSelectedEdgeGlowSize')}
-              min={0}
-              max={64}
-              step={0.5}
-              onChange={(value) => updateMenuThemingField('rowSelectedEdgeGlowSize', value)}
-            />
-          </FieldRow>
-          <FieldRow label="Selected Glow Alpha">
-            <RangedInput
-              value={menuThemingNumber('rowSelectedEdgeGlowOpacity')}
-              min={0}
-              max={1}
-              step={0.01}
-              onChange={(value) => updateMenuThemingField('rowSelectedEdgeGlowOpacity', value)}
-            />
-          </FieldRow>
-        </CollapsibleSubsection>
-
-        <CollapsibleSubsection title="Marker Pulse">
-          <FieldRow label="Pulse">
-            <ColorInput value={menuThemingString('markerPulseColor')} onChange={(value) => updateMenuThemingField('markerPulseColor', value)} />
-          </FieldRow>
-          <FieldRow label="Pulse Speed">
-            <RangedInput value={menuThemingNumber('markerContractSpeed')} min={0} max={12} step={0.1} onChange={(value) => updateMenuThemingField('markerContractSpeed', value)} />
-          </FieldRow>
-          <FieldRow label="Radius">
-            <RangedInput value={menuThemingNumber('markerPulseRadius')} min={0} max={20} step={0.1} onChange={(value) => updateMenuThemingField('markerPulseRadius', value)} />
-          </FieldRow>
-          <FieldRow label="Target">
-            <RangedInput value={menuThemingNumber('markerPulseTargetRadius')} min={0} max={20} step={0.1} onChange={(value) => updateMenuThemingField('markerPulseTargetRadius', value)} />
-          </FieldRow>
-          <FieldRow label="Opacity">
-            <RangedInput value={menuThemingNumber('markerPulseOpacity')} min={0} max={1} step={0.01} onChange={(value) => updateMenuThemingField('markerPulseOpacity', value)} />
-          </FieldRow>
-          <FieldRow label="Thickness">
-            <RangedInput value={menuThemingNumber('markerPulseThickness')} min={0} max={10} step={0.1} onChange={(value) => updateMenuThemingField('markerPulseThickness', value)} />
-          </FieldRow>
-          <FieldRow label="Feather">
-            <RangedInput value={menuThemingNumber('markerPulseFeatherWidth')} min={0} max={20} step={0.1} onChange={(value) => updateMenuThemingField('markerPulseFeatherWidth', value)} />
-          </FieldRow>
-          <FieldRow label="Edge Opacity">
-            <RangedInput value={menuThemingNumber('markerPulseEdgeOpacity')} min={0} max={1} step={0.01} onChange={(value) => updateMenuThemingField('markerPulseEdgeOpacity', value)} />
-          </FieldRow>
-        </CollapsibleSubsection>
-
-        <CollapsibleSubsection title="Pulse Timing">
-          <FieldRow label="Single Cool">
-            <RangedInput value={menuThemingNumber('markerSingleCooldown')} min={0} max={10} step={0.1} onChange={(value) => updateMenuThemingField('markerSingleCooldown', value)} />
-          </FieldRow>
-          <FieldRow label="Double Cool">
-            <RangedInput value={menuThemingNumber('markerDoubleCooldown')} min={0} max={10} step={0.1} onChange={(value) => updateMenuThemingField('markerDoubleCooldown', value)} />
-          </FieldRow>
-          <FieldRow label="Double Gap">
-            <RangedInput value={menuThemingNumber('markerDoubleGap')} min={0} max={3} step={0.01} onChange={(value) => updateMenuThemingField('markerDoubleGap', value)} />
-          </FieldRow>
-        </CollapsibleSubsection>
-
-        <CollapsibleSubsection title="Ring Glow">
-          <FieldRow label="Ring Glow">
-            <RangedInput value={menuThemingNumber('markerRingGlowSize')} min={0} max={8} step={0.1} onChange={(value) => updateMenuThemingField('markerRingGlowSize', value)} />
-          </FieldRow>
-          <FieldRow label="Ring Alpha">
-            <RangedInput value={menuThemingNumber('markerRingGlowOpacity')} min={0} max={1} step={0.01} onChange={(value) => updateMenuThemingField('markerRingGlowOpacity', value)} />
-          </FieldRow>
-        </CollapsibleSubsection>
-
-        <CollapsibleSubsection title="Inner Pulse">
-          <FieldRow label="Inner Color">
-            <ColorInput value={menuThemingString('markerInnerPulseColor')} onChange={(value) => updateMenuThemingField('markerInnerPulseColor', value)} />
-          </FieldRow>
-          <FieldRow label="Inner Size">
-            <RangedInput value={menuThemingNumber('markerInnerPulseRadius')} min={0} max={120} step={1} onChange={(value) => updateMenuThemingField('markerInnerPulseRadius', value)} />
-          </FieldRow>
-          <FieldRow label="Inner Alpha">
-            <RangedInput value={menuThemingNumber('markerInnerPulseOpacity')} min={0} max={1} step={0.01} onChange={(value) => updateMenuThemingField('markerInnerPulseOpacity', value)} />
-          </FieldRow>
-          <FieldRow label="Inner Glow">
-            <RangedInput value={menuThemingNumber('markerInnerPulseGlowSize')} min={0} max={80} step={1} onChange={(value) => updateMenuThemingField('markerInnerPulseGlowSize', value)} />
-          </FieldRow>
-          <FieldRow label="Inner Speed">
-            <RangedInput value={menuThemingNumber('markerInnerPulseSpeed')} min={0} max={12} step={0.1} onChange={(value) => updateMenuThemingField('markerInnerPulseSpeed', value)} />
-          </FieldRow>
-        </CollapsibleSubsection>
-
+      <InspectorSection title="Global Defaults" collapsible defaultOpen={false}>
         <CollapsibleSubsection title="Named Themes">
           <FieldRow label="Theme">
             <SelectInput value={activeThemeId} onChange={setSelectedTheme}>
@@ -2049,174 +2279,7 @@ export function MainMenuConfigEditor({ path, properties }: Props) {
         </CollapsibleSubsection>
       </InspectorSection>
 
-      <InspectorSection title="Motion" collapsible>
-        <CollapsibleSubsection title="Selection">
-          <FieldRow label="Border Color">
-            <RangedInput
-              value={systemNumber('theme-transition-ms', DEFAULT_MOTION.themeTransitionMs)}
-              min={0}
-              max={2000}
-              step={10}
-              onChange={(value) => updateSystemProperty('theme-transition-ms', value)}
-            />
-          </FieldRow>
-          <FieldRow label="Target Fade">
-            <RangedInput
-              value={systemNumber('selection-target-fade-ms', DEFAULT_MOTION.targetFadeMs)}
-              min={0}
-              max={2000}
-              step={10}
-              onChange={(value) => updateSystemProperty('selection-target-fade-ms', value)}
-            />
-          </FieldRow>
-          <FieldRow label="Menu Item Color">
-            <RangedInput
-              value={systemNumber(
-                'menu-item-color-transition-ms',
-                systemNumber('selection-target-fade-ms', DEFAULT_MOTION.menuItemColorMs),
-              )}
-              min={0}
-              max={2000}
-              step={10}
-              onChange={(value) => updateSystemProperty('menu-item-color-transition-ms', value)}
-            />
-          </FieldRow>
-          <FieldRow label="Description Fade">
-            <RangedInput
-              value={systemNumber('caption-transition-ms', DEFAULT_MOTION.captionFadeMs)}
-              min={0}
-              max={2000}
-              step={10}
-              onChange={(value) => updateSystemProperty('caption-transition-ms', value)}
-            />
-          </FieldRow>
-          <FieldRow label="Easing">
-            <SelectInput
-              value={systemString('menu-motion-easing', DEFAULT_MOTION.easing)}
-              onChange={(value) => updateSystemProperty('menu-motion-easing', value)}
-            >
-              {MOTION_EASING_OPTIONS.map((option) => (
-                <option key={option.value} value={option.value}>{option.label}</option>
-              ))}
-            </SelectInput>
-          </FieldRow>
-        </CollapsibleSubsection>
-
-        <CollapsibleSubsection title="Layer Changes">
-          <FieldRow label="Forward/Back">
-            <RangedInput
-              value={systemNumber('transition-ms', DEFAULT_MOTION.transitionMs)}
-              min={0}
-              max={2000}
-              step={10}
-              onChange={(value) => updateSystemProperty('transition-ms', value)}
-            />
-          </FieldRow>
-          <FieldRow label="Orbit Radius">
-            <RangedInput
-              value={systemNumber('menu-orbit-radius', DEFAULT_MOTION.orbitRadius)}
-              min={120}
-              max={1800}
-              step={5}
-              onChange={(value) => updateSystemProperty('menu-orbit-radius', value)}
-            />
-          </FieldRow>
-          <FieldRow label="Orbit Angle">
-            <RangedInput
-              value={systemNumber('menu-orbit-angle', DEFAULT_MOTION.orbitAngle)}
-              min={0}
-              max={180}
-              step={1}
-              onChange={(value) => updateSystemProperty('menu-orbit-angle', value)}
-            />
-          </FieldRow>
-          <FieldRow label="Show Guide">
-            <input
-              type="checkbox"
-              checked={systemBoolean('menu-orbit-debug', DEFAULT_MOTION.orbitDebug)}
-              onChange={(event) => updateSystemProperty('menu-orbit-debug', event.target.checked)}
-              className="accent-[#4a8fc2]"
-            />
-          </FieldRow>
-          <FieldRow label="Guide Center X">
-            <RangedInput
-              value={systemNumber('menu-orbit-center-x', DEFAULT_MOTION.orbitCenterX)}
-              min={-1440}
-              max={2880}
-              step={1}
-              onChange={(value) => updateSystemProperty('menu-orbit-center-x', value)}
-            />
-          </FieldRow>
-          <FieldRow label="Guide Center Y">
-            <RangedInput
-              value={systemNumber('menu-orbit-center-y', DEFAULT_MOTION.orbitCenterY)}
-              min={-1080}
-              max={2160}
-              step={1}
-              onChange={(value) => updateSystemProperty('menu-orbit-center-y', value)}
-            />
-          </FieldRow>
-          <FieldRow label="Guide Opacity">
-            <RangedInput
-              value={systemNumber('menu-orbit-debug-opacity', DEFAULT_MOTION.orbitDebugOpacity)}
-              min={0}
-              max={1}
-              step={0.01}
-              onChange={(value) => updateSystemProperty('menu-orbit-debug-opacity', value)}
-            />
-          </FieldRow>
-        </CollapsibleSubsection>
-
-        <CollapsibleSubsection title="Title Prism">
-          <FieldRow label="Duration">
-            <RangedInput
-              value={systemNumber('title-prism-ms', DEFAULT_MOTION.titlePrismMs)}
-              min={0}
-              max={2000}
-              step={10}
-              onChange={(value) => updateSystemProperty('title-prism-ms', value)}
-            />
-          </FieldRow>
-          <FieldRow label="Depth">
-            <RangedInput
-              value={systemNumber('title-prism-depth', DEFAULT_MOTION.titlePrismDepth)}
-              min={0}
-              max={220}
-              step={1}
-              onChange={(value) => updateSystemProperty('title-prism-depth', value)}
-            />
-          </FieldRow>
-          <FieldRow label="Back Lift">
-            <RangedInput
-              value={systemNumber('title-prism-lift', DEFAULT_MOTION.titlePrismLift)}
-              min={0}
-              max={160}
-              step={1}
-              onChange={(value) => updateSystemProperty('title-prism-lift', value)}
-            />
-          </FieldRow>
-          <FieldRow label="Perspective">
-            <RangedInput
-              value={systemNumber('title-prism-perspective', DEFAULT_MOTION.titlePrismPerspective)}
-              min={220}
-              max={1600}
-              step={10}
-              onChange={(value) => updateSystemProperty('title-prism-perspective', value)}
-            />
-          </FieldRow>
-          <FieldRow label="Face Angle">
-            <RangedInput
-              value={systemNumber('title-prism-angle', DEFAULT_MOTION.titlePrismAngle)}
-              min={60}
-              max={150}
-              step={1}
-              onChange={(value) => updateSystemProperty('title-prism-angle', value)}
-            />
-          </FieldRow>
-        </CollapsibleSubsection>
-      </InspectorSection>
-
-      <InspectorSection title="Input & Audio" collapsible>
+      <InspectorSection title="Menu Shell" collapsible defaultOpen={false}>
         <CollapsibleSubsection title="Input" defaultOpen>
           <FieldRow label="Keyboard">
             <input
@@ -2238,57 +2301,6 @@ export function MainMenuConfigEditor({ path, properties }: Props) {
             <TextInput
               value={systemString('back-target', DEFAULT_AUDIO.backTarget)}
               onChange={(value) => updateSystemProperty('back-target', value)}
-            />
-          </FieldRow>
-        </CollapsibleSubsection>
-
-        <CollapsibleSubsection title="Sound Assets">
-          <FieldRow label="Navigation">
-            <AudioAssetSelect
-              value={systemString('ui-navigation-sound', DEFAULT_AUDIO.navigationSound)}
-              options={audioOptions}
-              onChange={(value) => updateSystemProperty('ui-navigation-sound', value)}
-            />
-          </FieldRow>
-          <FieldRow label="Level">
-            <RangedInput
-              value={systemNumber('ui-navigation-volume', DEFAULT_AUDIO.navigationVolume)}
-              min={0}
-              max={1}
-              step={0.01}
-              onChange={(value) => updateSystemProperty('ui-navigation-volume', value)}
-            />
-          </FieldRow>
-          <FieldRow label="Forward">
-            <AudioAssetSelect
-              value={systemString('ui-forward-sound', DEFAULT_AUDIO.forwardSound)}
-              options={audioOptions}
-              onChange={(value) => updateSystemProperty('ui-forward-sound', value)}
-            />
-          </FieldRow>
-          <FieldRow label="Level">
-            <RangedInput
-              value={systemNumber('ui-forward-volume', DEFAULT_AUDIO.forwardVolume)}
-              min={0}
-              max={1}
-              step={0.01}
-              onChange={(value) => updateSystemProperty('ui-forward-volume', value)}
-            />
-          </FieldRow>
-          <FieldRow label="Back">
-            <AudioAssetSelect
-              value={systemString('ui-back-sound', DEFAULT_AUDIO.backSound)}
-              options={audioOptions}
-              onChange={(value) => updateSystemProperty('ui-back-sound', value)}
-            />
-          </FieldRow>
-          <FieldRow label="Level">
-            <RangedInput
-              value={systemNumber('ui-back-volume', DEFAULT_AUDIO.backVolume)}
-              min={0}
-              max={1}
-              step={0.01}
-              onChange={(value) => updateSystemProperty('ui-back-volume', value)}
             />
           </FieldRow>
         </CollapsibleSubsection>

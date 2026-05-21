@@ -15,9 +15,9 @@ Three-panel layout in the browser:
 
 | Panel         | Role                                                                                |
 |---------------|-------------------------------------------------------------------------------------|
-| Hierarchy     | Scene globals, Save, Export, dirty indicator, scene metadata, object tree, drag-and-drop reorder, drag-into-group, and add-layer dialog. |
+| Hierarchy     | Object tree, drag-and-drop reorder, drag-into-group, add-layer dialog, and scene save status/actions below the tree. |
 | Canvas        | Live preview of the scene rendered by the same code path as production.             |
-| Inspector     | Property editor for the selected object. Always renders Transform and Appearance; conditionally renders Properties (manifest-driven), Events, Slots, Text, Asset swap. |
+| Inspector     | Collapsed scene globals at the top, then the property editor for the selected object. Always renders Transform and Appearance; conditionally renders Properties (manifest-driven), Events, Slots, Text, Asset swap. |
 
 State is held in a Zustand store with three pieces:
 
@@ -43,13 +43,13 @@ The "always-present" rule is the key change from older revisions: Transform and 
 
 ### Dirty Tracking and Save
 
-Edits set the dirty flag. `SceneSection` shows a dirty indicator in the hierarchy panel. Save writes the current scene back to disk via the Next API route (`PUT /api/scenes/<id>?project=<project-id>`). The post-save state is "clean" until the next mutation.
+Edits set the dirty flag. `SceneSaveControls` shows a dirty indicator below the hierarchy tree. Save writes the current scene back to disk via the Next API route (`PUT /api/scenes/<id>?project=<project-id>`). The post-save state is "clean" until the next mutation.
 
 The dirty flag is **not persisted** — refreshing the editor discards any unsaved edits. This is the agreed semantic; it forces deliberate save and keeps the file as the source of truth.
 
 ### Export
 
-The hierarchy panel's Export button is a separate one-shot action: `POST /api/export?project=<project-id>` returns a zip of the selected project (renderer + scenes + assets + modules + fonts + boot files). See [build output](50-build-output.md). Export is independent of save; the export reads what's on disk, not the in-memory scene.
+The project page's Export Project button is a separate one-shot action: `POST /api/export?project=<project-id>` returns a zip of the selected project (renderer + scenes + assets + modules + fonts + boot files). See [build output](50-build-output.md). Export is independent of save; the export reads what's on disk, not the in-memory scene.
 
 ## Agent / File Surface
 

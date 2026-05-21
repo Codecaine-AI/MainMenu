@@ -4,6 +4,7 @@ import { useEditorStore } from '@/store/editor-store'
 import { resolveObject } from '@/lib/path'
 import type { SceneJson } from '@/types/scene'
 import { LayerForm } from './LayerForm'
+import { SceneSettingsSection } from './SceneSection'
 
 export function InspectorPanel() {
   const scene = useEditorStore((s) => s.scene)
@@ -28,6 +29,7 @@ export function InspectorPanel() {
       <h3 className="text-[13px] uppercase tracking-wide text-gray-100 font-bold mb-2">
         Inspector
       </h3>
+      <SceneSettingsSection />
       {content}
     </section>
   )

@@ -56,7 +56,7 @@ apps/scene-engine/
         InspectorPanel.tsx   Property editor for selected layer
         LayerForm.tsx        Generic top-level layer properties (mounts AssetSwapDropdown)
         AssetSwapDropdown.tsx  Per-container file swap menu (asset types only)
-        SceneSection.tsx     Scene metadata, save, and export controls
+        SceneSection.tsx     Collapsed scene settings + hierarchy save controls
         SlotsSection.tsx     Slot property editing
         TextSection.tsx      Text-specific property editing
         inputs/

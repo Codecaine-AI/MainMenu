@@ -1,5 +1,5 @@
 ---
-covers: The editor's React components — Scene controls, Canvas, Hierarchy, Inspector. Always-present sections, collapsible editor sections, schema-driven property fields with sections and description popovers, slot/event editing, project export.
+covers: The editor's React components — Scene controls, Canvas, Hierarchy, Inspector. Always-present sections, collapsible editor sections, schema-driven property fields with sections and description popovers, slot/event editing.
 concepts: [scene-section, canvas, hierarchy, inspector, layer-form, inspector-section, property-section, collapsible-section, property-field, description-popover, manifest-property-field, slots-section, events-section, drag-drop]
 design_refs: [10-system-design/40-authoring-surfaces.md, 10-system-design/16-property-schema.md]
 ---
@@ -12,11 +12,11 @@ The editor lives under `apps/scene-engine/app/editor/` as a Next.js client app. 
 
 ## Scene Controls (`SceneSection.tsx`)
 
-Scene-level control section above the hierarchy with the scene name, dirty dot, scene appearance fields, **Export** button, and **Save** button.
+Scene-level controls are split across the hierarchy and inspector so the layer tree stays visually primary.
 
-- **Save**: `PUT /api/scenes/<id>?project=<project-id>` with the in-memory scene as the body. On success, `markClean()`. Disabled when `dirty === false`.
-- **Export**: `POST /api/export?project=<project-id>`, reads the response as a blob, parses the `Content-Disposition` filename, and triggers a download via a hidden anchor click. Independent of save — the export reads what's on disk, not the in-memory scene. A local `exporting` flag disables the button while the request is in flight.
-- **Dirty indicator**: a small dot whose color toggles on `store.dirty`.
+- **SceneSaveControls**: rendered below the hierarchy list. Save calls `PUT /api/scenes/<id>?project=<project-id>` with the in-memory scene as the body. On success, `markClean()`. Disabled when `dirty === false`.
+- **SceneSettingsSection**: rendered at the top of the inspector, collapsed by default. Contains scene ID, stage dimensions, and global appearance controls.
+- **Dirty indicator**: shown with the save controls; the dot color toggles on `store.dirty`.
 
 ## Canvas (`CanvasPanel.tsx`)
 
@@ -50,12 +50,12 @@ A drop indicator (`{ path, region }`) is rendered as a styled border on the targ
 ### Group expansion
 Tracked locally in the panel as a `Set<string>` of collapsed paths. Not part of the store — refreshing the editor expands everything.
 
-### `SceneSection`
-A small header above the hierarchy that displays scene-level info (id, name) and lets the user select the scene root for editing scene-level appearance.
+### Scene Save Controls
+The hierarchy panel keeps global save controls below the layer tree. This keeps the top-left of the editor dedicated to navigation and layer structure.
 
 ## Inspector (`InspectorPanel.tsx` + `LayerForm.tsx`)
 
-Property editor for the object at `selectedPath`. The shell `InspectorPanel` is intentionally thin: it resolves the object via `resolveObject(scene, path)` and delegates to `LayerForm` keyed by `selectedPath` (so forms reset cleanly when selection changes).
+Property editor for scene-level settings and the object at `selectedPath`. `SceneSettingsSection` is always mounted at the top and starts collapsed. The rest of the shell resolves the selected object via `resolveObject(scene, path)` and delegates to `LayerForm` keyed by `selectedPath` (so forms reset cleanly when selection changes).
 
 `LayerForm` renders **always-present** sections plus conditional ones:
 

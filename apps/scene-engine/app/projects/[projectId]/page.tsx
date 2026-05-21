@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { discoverScenes, loadProject } from '@/lib/scenes'
+import { ProjectExportButton } from './ProjectExportButton'
 
 export default async function ProjectPage({
   params,
@@ -25,12 +26,15 @@ export default async function ProjectPage({
           </h1>
           <p className="mt-0.5 font-mono text-xs text-gray-600">{projectId}</p>
         </div>
-        <Link
-          href="/upload"
-          className="rounded-sm border border-[#2a6da3] bg-[#173247] px-2.5 py-1 text-xs text-[#cfe6ff] no-underline hover:bg-[#1d3d54]"
-        >
-          Upload Asset
-        </Link>
+        <div className="flex items-center gap-2">
+          <ProjectExportButton projectId={projectId} />
+          <Link
+            href="/upload"
+            className="rounded-sm border border-[#2a6da3] bg-[#173247] px-2.5 py-1 text-xs text-[#cfe6ff] no-underline hover:bg-[#1d3d54]"
+          >
+            Upload Asset
+          </Link>
+        </div>
       </div>
 
       {scenes.length === 0 ? (

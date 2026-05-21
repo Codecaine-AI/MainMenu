@@ -6,7 +6,7 @@ import { useEditorStore } from '@/store/editor-store'
 import { resolveObject } from '@/lib/path'
 import type { Registry, SceneJson } from '@/types/scene'
 import { HierarchyRow } from './HierarchyRow'
-import { SceneSection } from './SceneSection'
+import { SceneSaveControls } from './SceneSection'
 import { AddLayerDialog } from './AddLayerDialog'
 
 interface Props {
@@ -173,8 +173,7 @@ export function HierarchyPanel({ projectId, sceneId, scenesHref }: Props) {
   return (
     <section className="bg-[#1a1a1a] overflow-auto p-2" style={{ gridArea: 'hierarchy' }}>
       <SidebarHeader title={scene.name ?? sceneId} scenesHref={scenesHref} />
-      <SceneSection projectId={projectId} sceneId={sceneId} />
-      <div className="mb-2 flex items-center justify-between gap-2">
+      <div className="mt-3 mb-2 flex items-center justify-between gap-2">
         <h3 className="m-0 text-[13px] uppercase tracking-wide text-gray-100 font-bold">Hierarchy</h3>
         <button
           type="button"
@@ -211,6 +210,7 @@ export function HierarchyPanel({ projectId, sceneId, scenesHref }: Props) {
           )
         })}
       </ul>
+      <SceneSaveControls projectId={projectId} sceneId={sceneId} />
       {addTarget && (
         <AddLayerDialog
           scene={scene as SceneJson}
