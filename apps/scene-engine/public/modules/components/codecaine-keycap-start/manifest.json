@@ -1,6 +1,12 @@
 {
   "name": "Codecaine Keycap Start",
   "type": "component",
+  "dependencies": {
+    "publicFiles": [
+      "/assets/image/codecaine-start-keycap.png",
+      "/assets/image/codecaine-start-keycap-normal.png"
+    ]
+  },
   "properties": {
     "text": {
       "type": "string",

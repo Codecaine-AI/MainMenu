@@ -1,88 +1,83 @@
 'use client'
 
-import { useEffect, useState } from 'react'
-import { useEditorStore } from '@/store/editor-store'
-import type { AssetType } from '@/types/scene'
+import { useEffect, useMemo, useState } from 'react'
+import type { AssetLibraryRecord, AssetType } from '@/types/scene'
 
 interface Props {
   assetId: string
   assetType: AssetType
-  currentFile: string
+  projectId?: string | null
+  onSelect: (assetId: string) => void
 }
 
-interface FileEntry {
-  name: string
-  file: string
-}
-
-export function AssetSwapDropdown({ assetId, assetType, currentFile }: Props) {
-  const [files, setFiles] = useState<FileEntry[] | null>(null)
+export function AssetSwapDropdown({ assetId, assetType, projectId, onSelect }: Props) {
+  const [assets, setAssets] = useState<AssetLibraryRecord[] | null>(null)
   const [error, setError] = useState<string | null>(null)
-  const updateContainerFile = useEditorStore((s) => s.updateContainerFile)
 
   useEffect(() => {
     let cancelled = false
-    setFiles(null)
+    const params = new URLSearchParams({ type: assetType, usage: '0' })
+    if (projectId) params.set('project', projectId)
+    setAssets(null)
     setError(null)
-    fetch('/api/assets/' + assetType)
-      .then((r) => r.json())
-      .then((j) => {
-        if (!cancelled) setFiles(Array.isArray(j.files) ? j.files : [])
+    fetch(`/api/asset-library?${params.toString()}`)
+      .then((r) => {
+        if (!r.ok) throw new Error(`Asset library failed: ${r.status}`)
+        return r.json()
       })
-      .catch(() => {
-        if (!cancelled) setFiles([])
+      .then((j) => {
+        if (!cancelled) setAssets(Array.isArray(j.assets) ? j.assets : [])
+      })
+      .catch((err) => {
+        if (!cancelled) {
+          setAssets([])
+          setError(err instanceof Error ? err.message : 'Asset library failed')
+        }
       })
     return () => {
       cancelled = true
     }
-  }, [assetType])
+  }, [assetType, projectId])
 
-  async function onChange(e: React.ChangeEvent<HTMLSelectElement>) {
-    const newFile = e.target.value
-    if (newFile === currentFile) return
-    setError(null)
-    const res = await fetch('/api/registry/' + assetId, {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ file: newFile }),
-    })
-    if (!res.ok) {
-      const j = await res.json().catch(() => ({}))
-      setError(j.error ?? 'Swap failed')
-      return
-    }
-    await updateContainerFile(assetId, newFile)
+  const currentAsset = useMemo(
+    () => assets?.find((asset) => asset.id === assetId) ?? null,
+    [assets, assetId],
+  )
+  const currentInList = assets?.some((asset) => asset.id === assetId) ?? false
+
+  function onChange(e: React.ChangeEvent<HTMLSelectElement>) {
+    const nextAssetId = e.target.value
+    if (nextAssetId === assetId) return
+    onSelect(nextAssetId)
   }
 
-  const currentInList = files?.some((f) => f.file === currentFile) ?? false
-
   return (
-    <>
-      <dt className="text-gray-500 whitespace-nowrap">file</dt>
-      <dd className="m-0 text-gray-300 break-all">
-        <select
-          value={currentFile}
-          onChange={onChange}
-          disabled={files === null}
-          className="w-full bg-[#0e0e0e] border border-[#2a2a2a] text-gray-300 text-xs font-mono px-1 py-0.5 rounded-sm"
-        >
-          {files === null ? (
-            <option value={currentFile}>Loading…</option>
-          ) : (
-            <>
-              {!currentInList && <option value={currentFile}>{currentFile}</option>}
-              {files.map((f) => (
-                <option key={f.file} value={f.file}>
-                  {f.name}
-                </option>
-              ))}
-            </>
-          )}
-        </select>
-        {error && (
-          <span className="text-red-400 text-[10px] block mt-1">{error}</span>
+    <div className="min-w-0">
+      <select
+        value={assetId}
+        onChange={onChange}
+        disabled={assets === null}
+        className="w-full rounded-sm border border-[#2a2a2a] bg-[#0e0e0e] px-1 py-0.5 font-mono text-xs text-gray-300"
+      >
+        {assets === null ? (
+          <option value={assetId}>Loading...</option>
+        ) : (
+          <>
+            {!currentInList && <option value={assetId}>{assetId}</option>}
+            {assets.map((asset) => (
+              <option key={asset.id} value={asset.id}>
+                {asset.label}
+              </option>
+            ))}
+          </>
         )}
-      </dd>
-    </>
+      </select>
+      <div className="mt-1 truncate font-mono text-[10px] text-gray-600">
+        {currentAsset?.file ?? assetId}
+      </div>
+      {error && (
+        <span className="mt-1 block text-[10px] text-red-400">{error}</span>
+      )}
+    </div>
   )
 }

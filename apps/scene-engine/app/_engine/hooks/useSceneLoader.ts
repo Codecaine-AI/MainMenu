@@ -21,7 +21,7 @@ function collectComponentAssetIds(scene: SceneJson): string[] {
 }
 
 export function useSceneLoader(projectId: string | null, sceneId: string) {
-  const { setScene, setRegistry, setComponentSchema, markClean } = useEditorStore()
+  const { setProjectContext, setScene, setRegistry, setComponentSchema, markClean } = useEditorStore()
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const loadCount = useRef(0)
@@ -41,6 +41,7 @@ export function useSceneLoader(projectId: string | null, sceneId: string) {
       const scene = await res.json()
 
       if (thisLoad === loadCount.current) {
+        setProjectContext(projectId, sceneId)
         setScene(scene)
         markClean()
 
@@ -68,7 +69,7 @@ export function useSceneLoader(projectId: string | null, sceneId: string) {
         setLoading(false)
       }
     }
-  }, [projectId, sceneId, setScene, setRegistry, setComponentSchema, markClean])
+  }, [projectId, sceneId, setProjectContext, setScene, setRegistry, setComponentSchema, markClean])
 
   useEffect(() => { load() }, [load])
 

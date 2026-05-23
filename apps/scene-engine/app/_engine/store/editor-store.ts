@@ -11,10 +11,13 @@ export interface EditorStore {
   scene: SceneJson | null
   registry: Registry | null
   componentSchemas: Record<string, PropertySchema | null>
+  projectId: string | null
+  sceneId: string | null
   selectedPath: string | null
   drillCursor: DrillCursor | null
   dirty: boolean
 
+  setProjectContext: (projectId: string | null, sceneId: string | null) => void
   setScene: (scene: SceneJson) => void
   setRegistry: (registry: Registry) => void
   setComponentSchema: (componentId: string, schema: PropertySchema | null) => void
@@ -25,10 +28,11 @@ export interface EditorStore {
   mutateScene: (patch: Partial<SceneJson>) => void
   mutateObjectAt: (path: string, patch: Record<string, unknown>) => void
   setObjectPropertyAt: (path: string, dottedKey: string, value: unknown) => void
+  setObjectAssetAt: (path: string, assetId: string) => void
+  setSlotAssetAt: (path: string, slotIndex: number, assetId: string) => void
   addObjectAt: (parentPath: string, index: number, layer: Record<string, unknown>) => void
   removeObjectAt: (path: string) => Record<string, unknown> | null
   moveObject: (fromPath: string, toPath: string) => void
-  updateContainerFile: (id: string, file: string) => Promise<void>
 }
 
 function parsePath(path: string): number[] {
@@ -122,10 +126,13 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
   scene: null,
   registry: null,
   componentSchemas: {},
+  projectId: null,
+  sceneId: null,
   selectedPath: null,
   drillCursor: null,
   dirty: false,
 
+  setProjectContext: (projectId, sceneId) => set({ projectId, sceneId }),
   setScene: (scene) => set({ scene }),
   setRegistry: (registry) => set({ registry }),
   setComponentSchema: (componentId, schema) =>
@@ -160,6 +167,30 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
     const { container, index } = navigateToParentContainer(next, path)
     if (!container || (container as unknown[])[index] == null) return
     setDottedValue((container as Record<string, unknown>[])[index], dottedKey, value)
+    set({ scene: next, dirty: true })
+  },
+
+  setObjectAssetAt: (path, assetId) => {
+    const { scene } = get()
+    if (!scene) return
+    const next = structuredClone(scene)
+    const { container, index } = navigateToParentContainer(next, path)
+    if (!container || (container as unknown[])[index] == null) return
+    ;((container as Record<string, unknown>[])[index]).asset = assetId
+    set({ scene: next, dirty: true })
+  },
+
+  setSlotAssetAt: (path, slotIndex, assetId) => {
+    const { scene } = get()
+    if (!scene) return
+    const next = structuredClone(scene)
+    const { container, index } = navigateToParentContainer(next, path)
+    if (!container || (container as unknown[])[index] == null) return
+    const layer = (container as Record<string, unknown>[])[index]
+    const slots = Array.isArray(layer.slots) ? [...layer.slots] as Record<string, unknown>[] : []
+    if (!slots[slotIndex]) return
+    slots[slotIndex] = { ...slots[slotIndex], asset: assetId }
+    layer.slots = slots
     set({ scene: next, dirty: true })
   },
 
@@ -205,11 +236,4 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
     set({ scene: next, dirty: true })
   },
 
-  updateContainerFile: async (id, file) => {
-    const { registry } = get()
-    if (!registry || !registry[id]) return
-    const { updateEntry } = await import('@/renderer/asset-registry')
-    updateEntry(id, { file })
-    set({ registry: { ...registry, [id]: { ...registry[id], file } } as Registry })
-  },
 }))

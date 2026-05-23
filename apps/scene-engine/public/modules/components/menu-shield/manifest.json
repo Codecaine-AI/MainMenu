@@ -2,6 +2,12 @@
   "name": "Menu Shield",
   "type": "component",
   "sizing": "fill",
+  "dependencies": {
+    "publicFiles": [
+      "/modules/components/menu-shield/menu-shield.css",
+      "/modules/components/menu-shield/menu-shield-frame.svg"
+    ]
+  },
   "properties": {
     "top-text": { "type": "string", "default": "Main Menu" },
     "bottom-text": { "type": "string", "default": "Solo Smash!" },

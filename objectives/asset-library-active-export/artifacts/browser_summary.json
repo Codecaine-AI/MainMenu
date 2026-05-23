@@ -1,0 +1,162 @@
+{
+  "timestamp": "2026-05-21T15:42:44.974Z",
+  "dev": {
+    "urls": [
+      "http://localhost:3000/",
+      "http://localhost:3000/asset-library",
+      "http://localhost:3000/projects/codecaine",
+      "http://localhost:3000/editor?project=codecaine&scene=menu"
+    ],
+    "console": [
+      {
+        "type": "info",
+        "text": "%cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold",
+        "location": {
+          "url": "webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js",
+          "lineNumber": 25630,
+          "columnNumber": 16
+        }
+      },
+      {
+        "type": "info",
+        "text": "%cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold",
+        "location": {
+          "url": "webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js",
+          "lineNumber": 25630,
+          "columnNumber": 16
+        }
+      },
+      {
+        "type": "info",
+        "text": "%cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold",
+        "location": {
+          "url": "webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js",
+          "lineNumber": 25630,
+          "columnNumber": 16
+        }
+      },
+      {
+        "type": "info",
+        "text": "%cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold",
+        "location": {
+          "url": "webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js",
+          "lineNumber": 25630,
+          "columnNumber": 16
+        }
+      },
+      {
+        "type": "error",
+        "text": "Failed to load resource: the server responded with a status of 404 (Not Found)",
+        "location": {
+          "url": "http://localhost:3000/fonts/registry.json",
+          "lineNumber": 0,
+          "columnNumber": 0
+        }
+      }
+    ],
+    "failedRequests": [
+      {
+        "url": "http://localhost:3000/fonts/registry.json",
+        "status": 404
+      },
+      {
+        "url": "http://localhost:3000/assets/video/main-menu-backgrounds/red.webm",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "http://localhost:3000/assets/video/main-menu-backgrounds/purple.webm",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "http://localhost:3000/assets/video/main-menu-backgrounds/red.webm",
+        "failure": "net::ERR_ABORTED"
+      }
+    ],
+    "registryPatchRequests": [],
+    "pickerChange": {
+      "before": "main-menu-bg-purple",
+      "after": "main-menu-bg-red"
+    },
+    "dirtySignal": true,
+    "screenshots": {
+      "dashboard": "screenshots/dashboard.png",
+      "assetLibrary": "screenshots/asset-library.png",
+      "project": "screenshots/project-codecaine.png",
+      "editorAssetPicker": "screenshots/editor-asset-picker.png"
+    },
+    "optionalFailures": [
+      {
+        "url": "http://localhost:3000/fonts/registry.json",
+        "status": 404
+      }
+    ],
+    "requiredFailures": [],
+    "nonFatalAbortedRequests": [
+      {
+        "url": "http://localhost:3000/assets/video/main-menu-backgrounds/red.webm",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "http://localhost:3000/assets/video/main-menu-backgrounds/purple.webm",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "http://localhost:3000/assets/video/main-menu-backgrounds/red.webm",
+        "failure": "net::ERR_ABORTED"
+      }
+    ]
+  },
+  "exported": {
+    "urls": [
+      "http://127.0.0.1:4174/",
+      "http://127.0.0.1:4174/menu/index.html",
+      "http://127.0.0.1:4174/menu/"
+    ],
+    "console": [],
+    "failedRequests": [
+      {
+        "url": "http://127.0.0.1:4174/assets/video/test-fire.mp4",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "http://127.0.0.1:4174/assets/audio/ui-forward/ui-forward.wav",
+        "failure": "net::ERR_ABORTED"
+      }
+    ],
+    "navigationResult": {
+      "beforeUrl": "http://127.0.0.1:4174/",
+      "afterUrl": "http://127.0.0.1:4174/menu/index.html",
+      "reachedMenu": true
+    },
+    "renderedSignals": {
+      "titleLayerCount": 10,
+      "titleScene": "Title Screen",
+      "menuLayerCount": 8,
+      "menuScene": "Main Menu",
+      "directMenuScene": "Main Menu"
+    },
+    "screenshots": {
+      "title": "screenshots/exported-title.png",
+      "menu": "screenshots/exported-menu.png"
+    },
+    "nonFatalAbortedRequests": [
+      {
+        "url": "http://127.0.0.1:4174/assets/video/test-fire.mp4",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "http://127.0.0.1:4174/assets/audio/ui-forward/ui-forward.wav",
+        "failure": "net::ERR_ABORTED"
+      }
+    ],
+    "requiredFailures": [],
+    "fatalConsoleErrors": []
+  },
+  "validation": {
+    "devRequiredFailureCount": 0,
+    "registryPatchRequestCount": 0,
+    "exportedRequiredFailureCount": 0,
+    "exportedFatalConsoleErrorCount": 0,
+    "navigationReachedMenu": true
+  }
+}

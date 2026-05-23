@@ -17,7 +17,6 @@ const DEFAULT_THEMES: Record<string, MenuTheme> = {
     sideFrame: '#b8bbc2',
     sideText: '#dce0ee',
     railText: '#aaaeb6',
-    wash: 'rgba(39, 76, 222, 0.14)',
   },
   red: {
     border: '#c24334',
@@ -27,7 +26,6 @@ const DEFAULT_THEMES: Record<string, MenuTheme> = {
     sideFrame: '#d1a184',
     sideText: '#ffe0d1',
     railText: '#dca78d',
-    wash: 'rgba(188, 54, 42, 0.18)',
   },
   yellow: {
     border: '#b4a64b',
@@ -37,7 +35,6 @@ const DEFAULT_THEMES: Record<string, MenuTheme> = {
     sideFrame: '#d5b967',
     sideText: '#fff1bc',
     railText: '#d7bd6a',
-    wash: 'rgba(188, 160, 42, 0.14)',
   },
   green: {
     border: '#45a86b',
@@ -47,7 +44,6 @@ const DEFAULT_THEMES: Record<string, MenuTheme> = {
     sideFrame: '#93cfba',
     sideText: '#d9fff2',
     railText: '#98d7c2',
-    wash: 'rgba(50, 152, 88, 0.16)',
   },
   purple: {
     border: '#7c32c8',
@@ -57,7 +53,6 @@ const DEFAULT_THEMES: Record<string, MenuTheme> = {
     sideFrame: '#a8aee4',
     sideText: '#e3e7ff',
     railText: '#aeb5e5',
-    wash: 'rgba(111, 41, 186, 0.18)',
   },
 }
 
@@ -66,6 +61,7 @@ const DEFAULT_MENU_THEMING: MenuTheming = {
   rowPanel: '#050505',
   rowSelectedText: '#050505',
   rowText: '#fbba2d',
+  rowTextAlign: 'center',
   titleTextColor: '#ededed',
   titleTextOpacity: 1,
   titleTextGlowSize: 0,
@@ -270,6 +266,12 @@ const MOTION_EASING_OPTIONS = [
   { value: 'cubic-bezier(0.22, 1, 0.36, 1)', label: 'Snap' },
   { value: 'ease-in-out', label: 'Even' },
   { value: 'linear', label: 'Linear' },
+]
+
+const ROW_TEXT_ALIGN_OPTIONS = [
+  { value: 'left', label: 'Left' },
+  { value: 'center', label: 'Center' },
+  { value: 'right', label: 'Right' },
 ]
 
 const INPUT_CLASS = 'w-full bg-[#222] border border-[#333] text-gray-300 text-[11px] font-mono px-1 py-[3px] rounded-sm focus:border-[#4a8fc2] focus:outline-none'
@@ -996,6 +998,9 @@ export function MainMenuConfigEditor({ path, properties }: Props) {
   }
 
   const menuThemingString = (key: string) => String(menuTheming[key] ?? DEFAULT_MENU_THEMING[key] ?? '')
+  const menuThemingTextAlign = ROW_TEXT_ALIGN_OPTIONS.some((option) => option.value === menuThemingString('rowTextAlign'))
+    ? menuThemingString('rowTextAlign')
+    : 'center'
   const menuThemingNumber = (key: string) => {
     const value = Number(menuTheming[key] ?? DEFAULT_MENU_THEMING[key] ?? 0)
     return Number.isFinite(value) ? value : 0
@@ -1670,6 +1675,13 @@ export function MainMenuConfigEditor({ path, properties }: Props) {
             <FieldRow label="Row Text">
               <ColorInput value={menuThemingString('rowText')} onChange={(value) => updateMenuThemingField('rowText', value)} />
             </FieldRow>
+            <FieldRow label="Text Align">
+              <SelectInput value={menuThemingTextAlign} onChange={(value) => updateMenuThemingField('rowTextAlign', value)}>
+                {ROW_TEXT_ALIGN_OPTIONS.map((option) => (
+                  <option key={option.value} value={option.value}>{option.label}</option>
+                ))}
+              </SelectInput>
+            </FieldRow>
             <FieldRow label="Selected">
               <ColorInput value={menuThemingString('rowSelectedText')} onChange={(value) => updateMenuThemingField('rowSelectedText', value)} />
             </FieldRow>
@@ -2269,11 +2281,6 @@ export function MainMenuConfigEditor({ path, properties }: Props) {
             </FieldRow>
             <FieldRow label="Side Frame">
               <ColorInput value={activeTheme.sideFrame ?? ''} onChange={(value) => updateThemeField('sideFrame', value)} />
-            </FieldRow>
-          </CollapsibleSubsection>
-          <CollapsibleSubsection title="Wash">
-            <FieldRow label="Wash">
-              <TextInput value={activeTheme.wash ?? ''} onChange={(value) => updateThemeField('wash', value)} />
             </FieldRow>
           </CollapsibleSubsection>
         </CollapsibleSubsection>

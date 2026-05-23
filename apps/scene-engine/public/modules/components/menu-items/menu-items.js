@@ -36,6 +36,7 @@ const DEFAULTS = {
   'text-min-font-size': 42,
   'text-max-font-size': 84,
   'text-fit-padding': 18,
+  'text-align': 'center',
   'gold-color': '#d5a02a',
   'hot-gold-color': '#fdc903',
   'panel-color': '#050505',
@@ -96,6 +97,17 @@ function booleanProp(properties, key, fallback) {
   if (properties[key] === 'true') return true;
   if (properties[key] === 'false') return false;
   return fallback;
+}
+
+function textAlignment(properties) {
+  const value = stringProp(properties, 'text-align', DEFAULTS['text-align']).trim().toLowerCase();
+  return value === 'left' || value === 'right' || value === 'center' ? value : DEFAULTS['text-align'];
+}
+
+function textAnchorForAlignment(alignment) {
+  if (alignment === 'left') return 'start';
+  if (alignment === 'right') return 'end';
+  return 'middle';
 }
 
 function clamp(value, min, max) {
@@ -580,7 +592,7 @@ function appendMarker(parent, template, markerX, pulse) {
   }
 }
 
-function appendRow(svg, template, label, index, layout, selectedIndex, fontScale, fitSettings, pulse, instanceId) {
+function appendRow(svg, template, label, index, layout, selectedIndex, fontScale, fitSettings, textAlign, pulse, instanceId) {
   const rowIndex = index + 1;
   const row = svgEl('g', {
     class: rowIndex === selectedIndex ? 'menu-items__row is-selected' : 'menu-items__row',
@@ -625,7 +637,10 @@ function appendRow(svg, template, label, index, layout, selectedIndex, fontScale
   const textCenter = layout.x + layout.width * layout.textX;
   const textLeftBound = layout.x + (ITEM_LEFT_FIXED_END * yScale) + fitSettings.padding;
   const textRightBound = layout.x + ((leftWidth + middleWidth) * yScale) - fitSettings.padding;
-  const fitWidth = Math.max(24, Math.min(textCenter - textLeftBound, textRightBound - textCenter) * 2);
+  const textX = textAlign === 'left' ? textLeftBound : textAlign === 'right' ? textRightBound : textCenter;
+  const fitWidth = textAlign === 'center'
+    ? Math.max(24, Math.min(textCenter - textLeftBound, textRightBound - textCenter) * 2)
+    : Math.max(24, textRightBound - textLeftBound);
   const baseFontSize = layout.fontSize * fontScale;
   const fontSize = fitSettings.enabled
     ? clamp(baseFontSize, fitSettings.minFontSize, fitSettings.maxFontSize)
@@ -633,9 +648,9 @@ function appendRow(svg, template, label, index, layout, selectedIndex, fontScale
 
   const text = svgEl('text', {
     class: 'menu-items__label',
-    x: textCenter.toFixed(3),
+    x: textX.toFixed(3),
     y: (layout.y + layout.height * 0.54).toFixed(3),
-    'text-anchor': 'middle',
+    'text-anchor': textAnchorForAlignment(textAlign),
     'dominant-baseline': 'middle',
     'font-size': fontSize.toFixed(3),
   });
@@ -866,6 +881,7 @@ export default async function ({ properties = {}, layerId } = {}) {
   const widthScale = clamp(numberProp(properties, 'width-scale', DEFAULTS['width-scale']), 0.4, 1.4);
   const fontScale = clamp(numberProp(properties, 'font-scale', DEFAULTS['font-scale']), 0.4, 1.8);
   const fitSettings = textFitSettings(properties);
+  const textAlign = textAlignment(properties);
   const pulse = pulseTiming(properties);
 
   try {
@@ -881,6 +897,7 @@ export default async function ({ properties = {}, layerId } = {}) {
         selectedIndex,
         fontScale,
         fitSettings,
+        textAlign,
         pulse,
         instanceId,
       );
@@ -1039,6 +1056,16 @@ export const properties = {
           min: 0,
           max: 120,
           step: 1,
+        },
+        'text-align': {
+          type: 'select',
+          label: 'Text Align',
+          description: 'Horizontal alignment for row labels inside each menu item.',
+          options: [
+            { value: 'left', label: 'Left' },
+            { value: 'center', label: 'Center' },
+            { value: 'right', label: 'Right' },
+          ],
         },
         'row-1-x': {
           type: 'number',

@@ -17,7 +17,6 @@ const DEFAULT_THEMES = {
     sideFrame: '#b8bbc2',
     sideText: '#dce0ee',
     railText: '#aaaeb6',
-    wash: 'rgba(39, 76, 222, 0.14)',
   },
   red: {
     name: 'red',
@@ -28,7 +27,6 @@ const DEFAULT_THEMES = {
     sideFrame: '#d1a184',
     sideText: '#ffe0d1',
     railText: '#dca78d',
-    wash: 'rgba(188, 54, 42, 0.18)',
   },
   yellow: {
     name: 'yellow',
@@ -39,7 +37,6 @@ const DEFAULT_THEMES = {
     sideFrame: '#d5b967',
     sideText: '#fff1bc',
     railText: '#d7bd6a',
-    wash: 'rgba(188, 160, 42, 0.14)',
   },
   green: {
     name: 'green',
@@ -50,7 +47,6 @@ const DEFAULT_THEMES = {
     sideFrame: '#93cfba',
     sideText: '#d9fff2',
     railText: '#98d7c2',
-    wash: 'rgba(50, 152, 88, 0.16)',
   },
   purple: {
     name: 'purple',
@@ -61,7 +57,6 @@ const DEFAULT_THEMES = {
     sideFrame: '#a8aee4',
     sideText: '#e3e7ff',
     railText: '#aeb5e5',
-    wash: 'rgba(111, 41, 186, 0.18)',
   },
 };
 
@@ -70,6 +65,7 @@ const DEFAULT_MENU_THEMING = {
   rowPanel: '#050505',
   rowSelectedText: '#050505',
   rowText: '#fbba2d',
+  rowTextAlign: 'center',
   titleTextColor: '#ededed',
   titleTextOpacity: 1,
   titleTextGlowSize: 0,
@@ -446,7 +442,6 @@ function applyTheme(root, theme) {
   root.dataset.theme = theme.name;
   root.style.setProperty('--main-menu-system-theme', theme.border);
   root.style.setProperty('--main-menu-system-theme-soft', theme.borderSoft);
-  root.style.setProperty('--main-menu-system-wash', theme.wash);
 }
 
 function motionEasing(properties) {
@@ -498,6 +493,7 @@ function menuItemProps(config, menu, state, properties, menuTheming) {
     'gold-color': menuTheming.rowHot ?? '#fbba2d',
     'selected-text-color': menuTheming.rowSelectedText ?? '#050505',
     'unselected-text-color': menuTheming.rowText ?? '#fbba2d',
+    'text-align': menuTheming.rowTextAlign ?? 'center',
     'edge-opacity': numberProp(menuTheming, 'rowEdgeOpacity', 0.84),
     'edge-feather-blur': numberProp(menuTheming, 'rowEdgeFeather', 0.7),
     'edge-glow-size': numberProp(menuTheming, 'rowEdgeGlowSize', 7),

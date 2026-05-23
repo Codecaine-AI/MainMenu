@@ -1,3 +1,4 @@
+Makefile
 assets/
 assets/audio/
 assets/audio/melee-menu-song/
@@ -134,5 +135,6 @@ scenes/menu/
 scenes/menu/scene.json
 scenes/title/
 scenes/title/scene.json
+server.mjs
 title/
 title/index.html

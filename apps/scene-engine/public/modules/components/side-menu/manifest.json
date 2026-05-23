@@ -2,6 +2,12 @@
   "name": "Side Menu",
   "type": "component",
   "sizing": "fill",
+  "dependencies": {
+    "publicFiles": [
+      "/modules/components/side-menu/side-menu.css",
+      "/modules/components/side-menu/side-menu.svg"
+    ]
+  },
   "properties": {
     "items": { "type": "string", "default": "Regular Match|Event Match|Stadium|Training" },
     "item-count": { "type": "number", "default": 4, "min": 1, "max": 6, "step": 1 },

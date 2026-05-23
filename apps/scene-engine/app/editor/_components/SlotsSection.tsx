@@ -27,6 +27,8 @@ const MEDIA_PROPERTY_DEFAULTS = {
 
 export function SlotsSection({ slots, path }: Props) {
   const mutateObjectAt = useEditorStore((s) => s.mutateObjectAt)
+  const setSlotAssetAt = useEditorStore((s) => s.setSlotAssetAt)
+  const projectId = useEditorStore((s) => s.projectId)
   const registry = useEditorStore((s) => s.registry) as Registry | null
 
   function commitAppearance(i: number, key: keyof Appearance, value: unknown) {
@@ -54,20 +56,18 @@ export function SlotsSection({ slots, path }: Props) {
         const containerEntry = registry ? registry[slot.asset] : undefined
         const containerType = containerEntry?.type
         const assetType = containerType && isAssetType(containerType) ? containerType : null
-        const currentFile =
-          containerEntry && 'file' in containerEntry ? containerEntry.file : null
-
         return (
           <InspectorSection key={slot.id} title={`Slot: ${slot.id}`}>
             <FieldRow label="Type">
               <ReadonlyValue value={slot.type} />
             </FieldRow>
             <FieldRow label="Asset">
-              {assetType && currentFile ? (
+              {assetType ? (
                 <AssetSwapDropdown
                   assetId={slot.asset}
                   assetType={assetType}
-                  currentFile={currentFile}
+                  projectId={projectId}
+                  onSelect={(nextAssetId) => setSlotAssetAt(path, i, nextAssetId)}
                 />
               ) : (
                 <ReadonlyValue value={slot.asset} />

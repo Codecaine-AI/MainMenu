@@ -7,7 +7,6 @@
   color: #eef1ff;
   --main-menu-system-theme: #3158e8;
   --main-menu-system-theme-soft: #617bff;
-  --main-menu-system-wash: rgba(39, 76, 222, 0.14);
   --main-menu-system-transition-ms: 300ms;
   --main-menu-system-selection-transition-ms: 180ms;
   --main-menu-system-active-transition-ms: var(--main-menu-system-transition-ms);

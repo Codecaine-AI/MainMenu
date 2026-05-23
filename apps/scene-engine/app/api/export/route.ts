@@ -5,7 +5,8 @@ import { existsSync } from 'node:fs'
 import path from 'node:path'
 import { loadProject, projectRoot } from '@/lib/scenes'
 import { discoverFontAssets } from '@/lib/font-discovery'
-import type { ProjectManifest } from '@/types/scene'
+import { collectExportGraph, moduleDirectoryForEntry } from '@/lib/export-reachability'
+import type { AssetContainer, ModuleEntry, ProjectManifest } from '@/types/scene'
 
 const LEGACY_PUBLIC_PATH_REWRITES = new Map<string, string>([
   ['/generation/inputs/extras/test-fire.mp4', '/assets/video/test-fire.mp4'],
@@ -71,6 +72,10 @@ function rewriteRegistryPaths(raw: string): string {
     }
   }
   return JSON.stringify(reg, null, 2)
+}
+
+function rewriteRegistryObject(registry: Record<string, { file?: string; path?: string }>): string {
+  return rewriteRegistryPaths(JSON.stringify(registry, null, 2))
 }
 
 function normalizePublicReference(value: string): string {
@@ -269,62 +274,66 @@ export async function POST(req: Request) {
     if (!project.scenes.some((scene) => scene.id === project.entry)) {
       return NextResponse.json({ error: `project.entry '${project.entry}' is not listed in project.scenes` }, { status: 400 })
     }
+    const activeSceneRefs = project.scenes.filter((scene) => scene.active !== false && scene.export !== false)
+    if (!activeSceneRefs.some((scene) => scene.id === project.entry)) {
+      return NextResponse.json({ error: `project.entry '${project.entry}' is not active for export` }, { status: 400 })
+    }
 
     const zip = new JSZip()
     const appRoot = process.cwd()
     const projectDir = selectedProjectRoot
-    const referencedPublicFiles = new Set<string>()
+    const assetsRegRaw = await readFile(path.join(appRoot, 'public/assets/registry.json'), 'utf-8')
+    const modulesRegRaw = await readFile(path.join(appRoot, 'public/modules/registry.json'), 'utf-8')
+    const discoveredFonts = await discoverFontAssets(appRoot)
+    const assetsReg = JSON.parse(assetsRegRaw) as Record<string, AssetContainer>
+    const modulesReg = JSON.parse(modulesRegRaw) as Record<string, ModuleEntry>
+    const exportedProject: ProjectManifest = { ...project, scenes: activeSceneRefs }
+    const graph = await collectExportGraph({
+      appRoot,
+      projectDir,
+      project: exportedProject,
+      assetsRegistry: assetsReg,
+      modulesRegistry: modulesReg,
+      fontsRegistry: discoveredFonts,
+    })
 
-    zip.file('project.json', await readFile(path.join(projectDir, 'project.json')))
+    zip.file('project.json', JSON.stringify(exportedProject, null, 2) + '\n')
 
     const sceneNames = new Map<string, string | undefined>()
-    for (const ref of project.scenes) {
-      const sceneAbs = path.join(projectDir, 'scenes', ref.id, 'scene.json')
-      const sceneRaw = await readFile(sceneAbs, 'utf-8')
-      zip.file(`scenes/${ref.id}/scene.json`, sceneRaw)
-      try {
-        const scene = JSON.parse(sceneRaw) as { name?: string }
-        collectPublicReferences(scene, referencedPublicFiles)
-        sceneNames.set(ref.id, ref.name ?? scene.name)
-      } catch {
-        collectPublicReferences(sceneRaw, referencedPublicFiles)
-        sceneNames.set(ref.id, ref.name)
-      }
+    for (const sceneFile of graph.scenes) {
+      zip.file(`scenes/${sceneFile.id}/scene.json`, sceneFile.raw)
+      sceneNames.set(sceneFile.id, sceneFile.name)
     }
 
     await copyRendererToZip(zip, path.join(appRoot, 'app/_engine/renderer'), 'renderer')
 
     zip.file('boot.js', await readFile(path.join(appRoot, 'app/_engine/export/boot.js')))
+    zip.file('Makefile', await readFile(path.join(appRoot, 'app/_engine/export/Makefile'), 'utf-8'))
+    zip.file('server.mjs', await readFile(path.join(appRoot, 'app/_engine/export/server.mjs'), 'utf-8'))
 
     await addScenePageToZip({
       zip,
       projectDir,
-      project,
-      sceneId: project.entry,
-      sceneName: sceneNames.get(project.entry),
+      project: exportedProject,
+      sceneId: exportedProject.entry,
+      sceneName: sceneNames.get(exportedProject.entry),
       routeDir: '',
     })
-    for (const ref of project.scenes) {
+    for (const ref of exportedProject.scenes) {
       await addScenePageToZip({
         zip,
         projectDir,
-        project,
+        project: exportedProject,
         sceneId: ref.id,
         sceneName: sceneNames.get(ref.id),
         routeDir: `${ref.id}/`,
       })
     }
 
-    const assetsRegRaw = await readFile(path.join(appRoot, 'public/assets/registry.json'), 'utf-8')
-    const discoveredFonts = await discoverFontAssets(appRoot)
-    zip.file('assets/registry.json', rewriteRegistryPaths(assetsRegRaw))
-    zip.file('fonts/registry.json', rewriteRegistryPaths(JSON.stringify(discoveredFonts, null, 2)))
-    const assetsReg = {
-      ...JSON.parse(assetsRegRaw) as Record<string, { file: string }>,
-      ...discoveredFonts,
-    }
+    zip.file('assets/registry.json', rewriteRegistryObject(graph.assetsRegistry))
+    zip.file('fonts/registry.json', rewriteRegistryObject(graph.fontsRegistry))
     const copiedAssetDirs = new Set<string>()
-    for (const entry of Object.values(assetsReg)) {
+    for (const entry of Object.values(graph.assetsRegistry)) {
       if (!entry.file?.startsWith('/')) continue
       const stripped = publicFilePath(entry.file)
       const containingDir = path.posix.dirname(stripped)
@@ -337,25 +346,24 @@ export async function POST(req: Request) {
       }
     }
 
-    const modulesRegRaw = await readFile(path.join(appRoot, 'public/modules/registry.json'), 'utf-8')
-    zip.file('modules/registry.json', rewriteRegistryPaths(modulesRegRaw))
-    collectPublicReferences(modulesRegRaw, referencedPublicFiles)
-    const modulesReg = JSON.parse(modulesRegRaw) as Record<string, { path: string }>
+    zip.file('modules/registry.json', rewriteRegistryObject(graph.modulesRegistry))
     const copiedModuleDirs = new Set<string>()
-    for (const entry of Object.values(modulesReg)) {
-      if (!entry.path?.startsWith('/')) continue
-      const stripped = publicFilePath(entry.path)
-      const containingDir = path.posix.dirname(stripped)
+    for (const entry of Object.values(graph.modulesRegistry)) {
+      const containingDir = moduleDirectoryForEntry(entry)
+      if (!containingDir) continue
       if (copiedModuleDirs.has(containingDir)) continue
       copiedModuleDirs.add(containingDir)
       const moduleDir = path.join(appRoot, 'public', containingDir)
-      await collectPublicReferencesFromDir(moduleDir, referencedPublicFiles)
       await addDirToZip(zip, moduleDir, containingDir, { rewriteText: true })
     }
 
-    await addDirToZip(zip, path.join(appRoot, 'public/fonts'), 'fonts')
+    for (const entry of Object.values(graph.fontsRegistry)) {
+      if (!entry.file?.startsWith('/')) continue
+      const stripped = publicFilePath(entry.file)
+      await addFileToZip(zip, path.join(appRoot, 'public', stripped), stripped, { rewriteText: true })
+    }
 
-    for (const ref of referencedPublicFiles) {
+    for (const ref of graph.publicFiles) {
       const stripped = publicFilePath(ref)
       const abs = path.join(appRoot, 'public', stripped)
       if (!existsSync(abs)) continue
@@ -366,6 +374,19 @@ export async function POST(req: Request) {
         await addFileToZip(zip, abs, stripped, { rewriteText: true })
       }
     }
+
+    zip.file('export-graph.json', JSON.stringify({
+      projectId: graph.projectId,
+      activeSceneIds: graph.activeSceneIds,
+      assetIds: graph.assetIds,
+      moduleIds: graph.moduleIds,
+      fontIds: graph.fontIds,
+      publicFiles: graph.publicFiles,
+      warnings: graph.warnings,
+      excludedAssetIds: graph.excludedAssetIds,
+      excludedModuleIds: graph.excludedModuleIds,
+      excludedFontIds: graph.excludedFontIds,
+    }, null, 2) + '\n')
 
     const buf = await zip.generateAsync({ type: 'nodebuffer' })
 

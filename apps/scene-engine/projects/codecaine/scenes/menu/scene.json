@@ -579,8 +579,7 @@
               "sideEdge": "#167783",
               "sideFrame": "#b8bbc2",
               "sideText": "#dce0ee",
-              "railText": "#aaaeb6",
-              "wash": "rgba(39, 76, 222, 0.14)"
+              "railText": "#aaaeb6"
             },
             "red": {
               "border": "#de1212",
@@ -589,8 +588,7 @@
               "sideEdge": "#b85a2c",
               "sideFrame": "#d1a184",
               "sideText": "#ffe0d1",
-              "railText": "#dca78d",
-              "wash": "rgba(188, 54, 42, 0.18)"
+              "railText": "#dca78d"
             },
             "yellow": {
               "border": "#f4db34",
@@ -599,8 +597,7 @@
               "sideEdge": "#c18c2f",
               "sideFrame": "#d5b967",
               "sideText": "#fff1bc",
-              "railText": "#d7bd6a",
-              "wash": "rgba(188, 160, 42, 0.14)"
+              "railText": "#d7bd6a"
             },
             "green": {
               "border": "#0ab84d",
@@ -609,8 +606,7 @@
               "sideEdge": "#2db38d",
               "sideFrame": "#93cfba",
               "sideText": "#d9fff2",
-              "railText": "#98d7c2",
-              "wash": "rgba(50, 152, 88, 0.16)"
+              "railText": "#98d7c2"
             },
             "purple": {
               "border": "#8c24f5",
@@ -619,8 +615,7 @@
               "sideEdge": "#5b62c9",
               "sideFrame": "#a8aee4",
               "sideText": "#e3e7ff",
-              "railText": "#aeb5e5",
-              "wash": "rgba(111, 41, 186, 0.18)"
+              "railText": "#aeb5e5"
             }
           },
           "menuTheming": {
@@ -628,6 +623,7 @@
             "rowPanel": "#050505",
             "rowSelectedText": "#050505",
             "rowText": "#fbba2d",
+            "rowTextAlign": "center",
             "titleTextColor": "#ededed",
             "titleTextOpacity": 0.75,
             "titleTextGlowSize": 40,

@@ -190,8 +190,10 @@ async function resolveAssetAspectRatio(
 
 export function LayerForm({ layer, path }: Props) {
   const mutateObjectAt = useEditorStore((s) => s.mutateObjectAt)
+  const setObjectAssetAt = useEditorStore((s) => s.setObjectAssetAt)
   const removeObjectAt = useEditorStore((s) => s.removeObjectAt)
   const setSelectedPath = useEditorStore((s) => s.setSelectedPath)
+  const projectId = useEditorStore((s) => s.projectId)
   const registry = useEditorStore((s) => s.registry) as Registry | null
   const scene = useEditorStore((s) => s.scene)
   const componentSchemas = useEditorStore((s) => s.componentSchemas)
@@ -365,21 +367,20 @@ export function LayerForm({ layer, path }: Props) {
         onDelete={handleDelete}
       />
 
-      {!isSubLayerOverride && assetId && (
+      {!isSubLayerOverride && assetId && assetType ? (
         <FieldRow label="Asset">
-          <ReadonlyValue value={assetId} />
-        </FieldRow>
-      )}
-
-      {!isSubLayerOverride && assetType && assetId && currentFile && (
-        <FieldRow label="File">
           <AssetSwapDropdown
             assetId={assetId}
             assetType={assetType}
-            currentFile={currentFile}
+            projectId={projectId}
+            onSelect={(nextAssetId) => setObjectAssetAt(path, nextAssetId)}
           />
         </FieldRow>
-      )}
+      ) : !isSubLayerOverride && assetId ? (
+        <FieldRow label="Asset">
+          <ReadonlyValue value={assetId} />
+        </FieldRow>
+      ) : null}
 
       {!isSubLayerOverride && (
       <InspectorSection title="Transform">

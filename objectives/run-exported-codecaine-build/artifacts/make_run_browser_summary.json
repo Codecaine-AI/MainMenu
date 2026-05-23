@@ -1,0 +1,26 @@
+{
+  "pages": [
+    {
+      "label": "make-run-title",
+      "url": "http://127.0.0.1:4174/",
+      "dom": {
+        "href": "http://127.0.0.1:4174/",
+        "title": "Title Screen",
+        "stageChildElementCount": 7,
+        "stageText": "Premium Lines\nPress Start"
+      }
+    },
+    {
+      "label": "make-run-menu",
+      "url": "http://127.0.0.1:4174/menu/",
+      "dom": {
+        "href": "http://127.0.0.1:4174/menu/",
+        "title": "Main Menu",
+        "stageChildElementCount": 4,
+        "stageText": "CODECAINE\nClone it. It works.\nOPEN SOURCE\nBUILD LOGS\nLIBRARY\nCOMMUNITY\nMISSION"
+      }
+    }
+  ],
+  "consoleEntries": [],
+  "networkFailures": []
+}

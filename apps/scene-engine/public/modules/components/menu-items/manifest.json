@@ -2,6 +2,12 @@
   "name": "Menu Items",
   "type": "component",
   "sizing": "fill",
+  "dependencies": {
+    "publicFiles": [
+      "/modules/components/menu-items/menu-items.css",
+      "/modules/components/menu-items/menu-item.svg"
+    ]
+  },
   "properties": {
     "items": { "type": "string", "default": "1-P Mode|VS. Mode|Trophies|Options|Data" },
     "item-count": { "type": "number", "default": 5, "min": 1, "max": 5, "step": 1 },
@@ -44,6 +50,7 @@
     "text-min-font-size": { "type": "number", "default": 42, "min": 18, "max": 140, "step": 1 },
     "text-max-font-size": { "type": "number", "default": 84, "min": 18, "max": 160, "step": 1 },
     "text-fit-padding": { "type": "number", "default": 18, "min": 0, "max": 120, "step": 1 },
+    "text-align": { "type": "enum", "default": "center", "options": ["left", "center", "right"] },
     "gold-color": { "type": "color", "default": "#d5a02a" },
     "hot-gold-color": { "type": "color", "default": "#fdc903" },
     "panel-color": { "type": "color", "default": "#050505" },

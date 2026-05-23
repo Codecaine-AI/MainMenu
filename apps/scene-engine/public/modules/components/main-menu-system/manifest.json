@@ -2,6 +2,18 @@
   "name": "Main Menu System",
   "type": "component",
   "sizing": "fill",
+  "dependencies": {
+    "modules": ["menu-items", "menu-shield", "side-menu"],
+    "publicFiles": [
+      "/modules/components/main-menu-system/menu-config.json",
+      "/modules/components/menu-items/menu-items.css",
+      "/modules/components/menu-items/menu-item.svg",
+      "/modules/components/menu-shield/menu-shield.css",
+      "/modules/components/menu-shield/menu-shield-frame.svg",
+      "/modules/components/side-menu/side-menu.css",
+      "/modules/components/side-menu/side-menu.svg"
+    ]
+  },
   "properties": {
     "config": {
       "type": "string",
@@ -134,14 +146,17 @@
     },
     "ui-navigation-sound": {
       "type": "string",
+      "assetType": "audio",
       "default": "ui-navigation"
     },
     "ui-forward-sound": {
       "type": "string",
+      "assetType": "audio",
       "default": "ui-forward"
     },
     "ui-back-sound": {
       "type": "string",
+      "assetType": "audio",
       "default": "ui-back"
     },
     "ui-navigation-volume": {

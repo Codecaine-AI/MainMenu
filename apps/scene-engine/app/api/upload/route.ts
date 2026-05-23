@@ -3,7 +3,7 @@ import { existsSync } from 'fs'
 import path from 'path'
 import { NextResponse } from 'next/server'
 import { isAssetType, validateUpload, slugifyFilename } from '@/lib/asset-types'
-import type { AssetContainer, AssetType } from '@/types/scene'
+import type { AssetContainer, AssetScope, AssetType } from '@/types/scene'
 
 const REGISTRY_PATH = path.join(process.cwd(), 'public', 'assets', 'registry.json')
 
@@ -13,6 +13,13 @@ function titleCaseFamily(slug: string): string {
     .filter(Boolean)
     .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
     .join(' ')
+}
+
+function uniqueSlug(base: string, used: Set<string>): string {
+  if (!used.has(base)) return base
+  let index = 2
+  while (used.has(`${base}-${index}`)) index += 1
+  return `${base}-${index}`
 }
 
 export async function POST(req: Request) {
@@ -35,27 +42,43 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Invalid asset type' }, { status: 400 })
     }
     const type: AssetType = typeRaw
+    const labelRaw = form.get('label')
+    const label = typeof labelRaw === 'string' && labelRaw.trim() ? labelRaw.trim() : undefined
+    const projectRaw = form.get('projectId')
+    const projectId = typeof projectRaw === 'string' && projectRaw.trim() ? projectRaw.trim() : undefined
+    const scopeRaw = form.get('scope')
+    const scope: AssetScope = scopeRaw === 'project' && projectId ? 'project' : 'global'
 
     const { slug, ext } = slugifyFilename(file.name)
+    const text = await readFile(REGISTRY_PATH, 'utf-8')
+    const registry = JSON.parse(text) as Record<string, AssetContainer>
+    const id = uniqueSlug(slug, new Set(Object.keys(registry)))
     const dir = path.join(process.cwd(), 'public', 'assets', type)
     if (!existsSync(dir)) {
       await mkdir(dir, { recursive: true })
     }
-    const filename = ext ? `${slug}.${ext}` : slug
+    const filename = ext ? `${id}.${ext}` : id
     const diskPath = path.join(dir, filename)
     await writeFile(diskPath, Buffer.from(await file.arrayBuffer()))
 
-    const text = await readFile(REGISTRY_PATH, 'utf-8')
-    const registry = JSON.parse(text) as Record<string, AssetContainer>
-    registry[slug] = { type, file: `/assets/${type}/${filename}` }
+    const now = new Date().toISOString()
+    registry[id] = {
+      type,
+      file: `/assets/${type}/${filename}`,
+      label,
+      scope,
+      projectIds: scope === 'project' && projectId ? [projectId] : undefined,
+      createdAt: now,
+      updatedAt: now,
+    }
     if (type === 'font') {
-      registry[slug].family = titleCaseFamily(slug)
-      registry[slug].weight = 400
-      registry[slug].style = 'normal'
+      registry[id].family = titleCaseFamily(id)
+      registry[id].weight = 400
+      registry[id].style = 'normal'
     }
     await writeFile(REGISTRY_PATH, JSON.stringify(registry, null, 2) + '\n', 'utf-8')
 
-    return NextResponse.json({ id: slug, type, file: registry[slug].file })
+    return NextResponse.json({ id, type, file: registry[id].file, label: registry[id].label, scope })
   } catch (err) {
     return NextResponse.json(
       { error: err instanceof Error ? err.message : 'Upload failed' },

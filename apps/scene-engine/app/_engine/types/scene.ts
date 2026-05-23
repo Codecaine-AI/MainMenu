@@ -130,13 +130,35 @@ export interface SceneJson {
 
 export type AssetType = 'audio' | 'image' | 'video' | 'glyph' | 'font'
 export type ModuleType = 'effect' | 'component'
+export type AssetScope = 'global' | 'project'
 
 export interface AssetContainer {
   type: AssetType
   file: string
+  label?: string
+  scope?: AssetScope
+  projectIds?: string[]
+  tags?: string[]
+  createdAt?: string
+  updatedAt?: string
   family?: string
   weight?: number
   style?: string
+}
+
+export interface AssetUsageLocation {
+  projectId: string
+  sceneId: string
+  objectId?: string
+  slotId?: string
+  property?: string
+}
+
+export interface AssetLibraryRecord extends AssetContainer {
+  id: string
+  label: string
+  usageCount?: number
+  usage?: AssetUsageLocation[]
 }
 
 export interface ManifestNumberProperty {
@@ -151,6 +173,7 @@ export interface ManifestNumberProperty {
 export interface ManifestStringProperty {
   type: 'string'
   default?: string
+  assetType?: AssetType
   description?: string
 }
 
@@ -185,6 +208,12 @@ export interface Manifest {
   type: ModuleType
   sizing?: 'fill' | 'explicit'
   aspectRatio?: number
+  dependencies?: {
+    modules?: string[]
+    assets?: string[]
+    publicFiles?: string[]
+    fonts?: string[]
+  }
   properties: Record<string, ManifestProperty>
 }
 
@@ -199,6 +228,8 @@ export type Registry = Record<string, AssetContainer | ModuleEntry>
 export interface ProjectSceneRef {
   id: string
   name?: string
+  active?: boolean
+  export?: boolean
 }
 
 export interface ProjectManifest {
@@ -207,4 +238,14 @@ export interface ProjectManifest {
   entry: string
   scenes: ProjectSceneRef[]
   stage: StageDef
+}
+
+export interface ExportGraphSummary {
+  projectId: string
+  activeSceneIds: string[]
+  assetIds: string[]
+  moduleIds: string[]
+  fontIds: string[]
+  publicFiles: string[]
+  warnings: string[]
 }
