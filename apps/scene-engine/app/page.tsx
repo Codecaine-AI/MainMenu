@@ -11,7 +11,7 @@ export default function DashboardPage() {
       <div className="mx-auto max-w-6xl">
         <header className="mb-7 border-b border-[#2a2a2a] pb-5">
           <h1 className="text-2xl font-semibold tracking-wide text-gray-100">
-            scene engine
+            Main Menu
           </h1>
         </header>
 

@@ -28,6 +28,7 @@ node_modules/
 **/.vercel/
 out/
 dist/
+dist-next/
 build/
 coverage/
 *.tsbuildinfo

@@ -1,0 +1,113 @@
+{
+  "capturedAt": "2026-05-23T16:09:20-05:00",
+  "commands": [
+    {
+      "command": "git status --short",
+      "cwd": "/Users/Ford/Github Repos/Codecaine/MELEE",
+      "exitCode": 0,
+      "summary": "Clean worktree at baseline kickoff."
+    },
+    {
+      "command": "curl -fS -I http://localhost:3000/",
+      "cwd": "/Users/Ford/Github Repos/Codecaine/MELEE",
+      "exitCode": 0,
+      "summary": "Initial baseline health check returned HTTP 200."
+    },
+    {
+      "command": "cd apps/scene-engine && npm install --save-dev electron@30.5.1 electron-builder@26.0.12",
+      "cwd": "/Users/Ford/Github Repos/Codecaine/MELEE/apps/scene-engine",
+      "exitCode": 0,
+      "summary": "Installed Electron and Electron Builder. npm reported audit warnings; no audit fixes were applied because they are outside the packaging objective."
+    },
+    {
+      "command": "cd apps/scene-engine && npm run desktop:compile",
+      "cwd": "/Users/Ford/Github Repos/Codecaine/MELEE/apps/scene-engine",
+      "exitCode": 0,
+      "summary": "Electron main/preload TypeScript compiled successfully."
+    },
+    {
+      "command": "cd apps/scene-engine && npx tsc --noEmit",
+      "cwd": "/Users/Ford/Github Repos/Codecaine/MELEE/apps/scene-engine",
+      "exitCode": 0,
+      "summary": "Scene-engine TypeScript validation passed, including renderer bridge typing."
+    },
+    {
+      "command": "cd apps/scene-engine && npm run desktop:dev",
+      "cwd": "/Users/Ford/Github Repos/Codecaine/MELEE/apps/scene-engine",
+      "exitCode": 0,
+      "summary": "Opened Electron window titled Main Menu. The pre-existing localhost:3000 root later returned 500, so the dev script started a private Next server at 127.0.0.1:59243 and loaded /editor?project=codecaine&scene=title.",
+      "screenshots": [
+        "objectives/main-menu-desktop-app/artifacts/screenshots/desktop_dev_editor.png"
+      ]
+    },
+    {
+      "command": "Playwright Electron bridge smoke, dev compiled main",
+      "cwd": "/Users/Ford/Github Repos/Codecaine/MELEE/apps/pi-asset-loop",
+      "exitCode": 0,
+      "summary": "window.mainMenu.app.getInfo() returned productName Main Menu, packaged false, title Main Menu, and typeof window.require was undefined.",
+      "screenshots": [
+        "objectives/main-menu-desktop-app/artifacts/screenshots/desktop_dev_playwright_editor.png"
+      ]
+    },
+    {
+      "command": "cd apps/scene-engine && npm run desktop:build:next",
+      "cwd": "/Users/Ford/Github Repos/Codecaine/MELEE/apps/scene-engine",
+      "exitCode": 0,
+      "summary": "Next production build succeeded and prepared desktop/dist-next standalone runtime staging."
+    },
+    {
+      "command": "cd apps/scene-engine && npm run desktop:pack:mac",
+      "cwd": "/Users/Ford/Github Repos/Codecaine/MELEE/apps/scene-engine",
+      "exitCode": 0,
+      "summary": "Electron Builder produced apps/scene-engine/dist/desktop/mac-arm64/Main Menu.app. Signing was skipped intentionally with mac.identity = null."
+    },
+    {
+      "command": "Playwright Electron packaged launch and scene persistence smoke",
+      "cwd": "/Users/Ford/Github Repos/Codecaine/MELEE/apps/pi-asset-loop",
+      "exitCode": 0,
+      "summary": "Packaged app launched without external localhost:3000. Bridge reported packaged true and rendererUrl http://127.0.0.1:59500/editor?project=codecaine&scene=title. Scene GET returned 200 and scene PUT returned 204.",
+      "screenshots": [
+        "objectives/main-menu-desktop-app/artifacts/screenshots/mac_packaged_editor.png"
+      ]
+    },
+    {
+      "command": "Playwright Electron packaged layer selection smoke",
+      "cwd": "/Users/Ford/Github Repos/Codecaine/MELEE/apps/pi-asset-loop",
+      "exitCode": 0,
+      "summary": "Packaged editor rendered hierarchy rows. Clicked first row data-path=0 labeled Base Barber Cylinder [component]; selected styling changed from false to true."
+    },
+    {
+      "command": "rg Electron/bridge/security source check",
+      "cwd": "/Users/Ford/Github Repos/Codecaine/MELEE",
+      "exitCode": 0,
+      "summary": "Electron imports are confined to desktop/main and desktop/preload. BrowserWindow uses contextIsolation true and nodeIntegration false. Renderer usage is limited to window.mainMenu in DesktopBridgeProbe."
+    }
+  ],
+  "artifacts": {
+    "baselineInventory": "objectives/main-menu-desktop-app/artifacts/baseline_inventory.json",
+    "runtimeStrategy": "objectives/main-menu-desktop-app/artifacts/desktop_runtime_strategy.md",
+    "packageManifest": "objectives/main-menu-desktop-app/artifacts/mac_package_manifest.txt",
+    "devScreenshots": [
+      "objectives/main-menu-desktop-app/artifacts/screenshots/desktop_dev_editor.png",
+      "objectives/main-menu-desktop-app/artifacts/screenshots/desktop_dev_playwright_editor.png"
+    ],
+    "packagedScreenshot": "objectives/main-menu-desktop-app/artifacts/screenshots/mac_packaged_editor.png",
+    "macApp": "apps/scene-engine/dist/desktop/mac-arm64/Main Menu.app"
+  },
+  "validationVerdicts": {
+    "mainMenuNaming": "passed",
+    "desktopDevelopment": "passed",
+    "safePreloadBridge": "passed",
+    "macPackaging": "passed",
+    "packagedNoExternalDevServer": "passed",
+    "scenePersistence": "passed",
+    "layerSelection": "passed",
+    "helperLayout": "deferred with no move"
+  },
+  "residualRisks": [
+    "Packaged app uses the default Electron icon.",
+    "Local mac app is unsigned and unnotarized by design.",
+    "Packaged runtime is large because standalone Next dependencies and media assets are bundled.",
+    "The pre-existing localhost:3000 dev server returned 500 for / during validation; desktop:dev now handles this by starting a private free-port dev server."
+  ]
+}

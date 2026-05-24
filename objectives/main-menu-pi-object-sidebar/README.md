@@ -1,10 +1,13 @@
-# Main Menu Desktop App
+# Main Menu PI Object Sidebar
 
-Use this objective bundle to turn the current Scene Engine into the macOS
-desktop authoring app named **Main Menu**. The bundle treats
-`apps/scene-engine` as the main product app, keeps the current Next editor as
-the renderer, and adds a native Electron shell for local filesystem and
-packaging. It does not include PI Agent sidebar implementation.
+Use this objective bundle to add the next desktop authoring layer on top of the
+completed Main Menu Electron app: a left-sidebar PI/object workspace inside the
+editor for choosing the object being worked on or creating a new one, then
+routing code/project updates through safe desktop-owned services.
+
+Terminology note: the user said "pie menu" in conversation. This bundle treats
+that as the PI/object authoring menu unless implementation discovery confirms a
+literal radial pie-control design is intended.
 
 ## Objective Files
 
@@ -20,7 +23,7 @@ packaging. It does not include PI Agent sidebar implementation.
 - `context/04_validation_and_handoff.md` - acceptance checks and handoff rules.
 - `examples/` - configs, prompts, command snippets, or fixtures that make the
   objective concrete.
-- `artifacts/` - validation logs, screenshots, packaging notes, and generated
-  macOS app outputs or manifests.
+- `artifacts/` - validation logs, screenshots, service contracts, and generated
+  reports.
 
-Objective path: `objectives/main-menu-desktop-app/`
+Objective path: `objectives/main-menu-pi-object-sidebar/`

@@ -1,0 +1,121 @@
+{
+  "capturedAt": "2026-05-23T15:56:53-05:00",
+  "worktree": {
+    "command": "git status --short",
+    "dirtyPaths": []
+  },
+  "devServer": {
+    "command": "curl -fS -I http://localhost:3000/",
+    "url": "http://localhost:3000/",
+    "status": "ok",
+    "httpStatus": 200,
+    "notes": "Existing Next dev server was already responding before desktop work started."
+  },
+  "packageManager": {
+    "sceneEngine": "npm",
+    "lockfile": "apps/scene-engine/package-lock.json",
+    "lockfileVersion": 3,
+    "rootWorkspacePackage": false
+  },
+  "sceneEngine": {
+    "packagePath": "apps/scene-engine/package.json",
+    "scripts": {
+      "dev": "next dev",
+      "build": "next build",
+      "start": "next start"
+    },
+    "dependencies": [
+      "jszip",
+      "next",
+      "react",
+      "react-dom",
+      "zustand"
+    ],
+    "devDependencies": [
+      "@tailwindcss/postcss",
+      "@types/node",
+      "@types/react",
+      "@types/react-dom",
+      "tailwindcss",
+      "typescript"
+    ],
+    "metadataTitle": "CODECAINE - Scene Engine",
+    "nextConfig": "empty NextConfig object before desktop work",
+    "typescriptConfig": "single Next app tsconfig with strict mode and @/* path to app/_engine/*"
+  },
+  "routes": {
+    "pages": [
+      "app/page.tsx",
+      "app/editor/page.tsx",
+      "app/projects/[projectId]/page.tsx",
+      "app/scenes/[id]/page.tsx",
+      "app/upload/page.tsx",
+      "app/asset-library/page.tsx"
+    ],
+    "apiRoutes": [
+      "app/api/asset-library/route.ts",
+      "app/api/assets/[type]/route.ts",
+      "app/api/export/route.ts",
+      "app/api/fonts/route.ts",
+      "app/api/registry/[id]/route.ts",
+      "app/api/scenes/[id]/route.ts",
+      "app/api/scenes/route.ts",
+      "app/api/upload/route.ts"
+    ]
+  },
+  "filesystemSurfaces": {
+    "projectDiscovery": [
+      "app/_engine/lib/scenes.ts reads process.cwd()/projects",
+      "app/_engine/lib/scenes.ts also supports legacy process.cwd()/project.json"
+    ],
+    "scenePersistence": [
+      "app/api/scenes/[id]/route.ts reads and writes project scenes under process.cwd()/projects/<project>/scenes/<scene>/scene.json"
+    ],
+    "assetPersistence": [
+      "app/api/upload/route.ts writes uploaded files under process.cwd()/public/assets/<type>",
+      "app/api/upload/route.ts writes process.cwd()/public/assets/registry.json",
+      "app/api/registry/[id]/route.ts updates process.cwd()/public/assets/registry.json",
+      "app/_engine/lib/asset-library.ts reads and writes process.cwd()/public/assets/registry.json"
+    ],
+    "readOnlyRuntimeInputs": [
+      "app/api/export/route.ts reads public assets/modules/fonts and app/_engine/export templates",
+      "app/_engine/lib/font-discovery.ts reads process.cwd()/public/fonts",
+      "app/_engine/lib/export-reachability.ts reads project scenes and public module manifests"
+    ],
+    "packagingRisk": "The current API and server-side helpers rely on process.cwd(); packaged Main Menu must run these paths against a writable workspace, not the macOS app bundle resources."
+  },
+  "helperApps": {
+    "piAssetLoop": {
+      "path": "apps/pi-asset-loop",
+      "packageManager": "npm package-lock plus bun script entrypoint",
+      "scripts": {
+        "postinstall": "playwright install chromium",
+        "asset-loop": "bun run ./bin/asset-loop.ts",
+        "typecheck": "tsc --noEmit"
+      }
+    },
+    "assetExtractionPipeline": {
+      "path": "apps/asset-extraction-pipeline",
+      "packageManager": "npm package-lock plus Python uv project",
+      "scripts": {
+        "dev": "next dev",
+        "build": "next build",
+        "start": "next start"
+      }
+    },
+    "pathReferences": [
+      "Makefile uses PIPELINE_DIR ?= apps/asset-extraction-pipeline",
+      "apps/pi-asset-loop/README.md documents apps/pi-asset-loop and apps/asset-extraction-pipeline",
+      "apps/asset-extraction-pipeline/README.md documents apps/asset-extraction-pipeline",
+      "docs/scene-engine/00-overview.md references both helper app paths",
+      "apps/asset-extraction-pipeline/asset_extraction_pipeline/io/paths.py derives repository paths from apps/asset-extraction-pipeline"
+    ],
+    "moveDecision": "Deferred for this implementation pass because the helper apps have Makefile, README, Python path-derivation, and bun entrypoint references. Keeping them in place avoids a broken half-move while the desktop package milestone is implemented."
+  },
+  "initialImplementationRoute": {
+    "desktopBoundary": "Add apps/scene-engine/desktop/main and apps/scene-engine/desktop/preload.",
+    "developmentRuntime": "Electron loads the existing Next dev server, starting it only if the health check fails.",
+    "packagedRuntime": "Build Next output: standalone, stage it as an Electron extraResource, seed public/projects into Electron userData, create runtime symlinks, and launch the standalone server with ELECTRON_RUN_AS_NODE.",
+    "preloadBridge": "Expose window.mainMenu.app.getInfo() through contextBridge and typed IPC."
+  }
+}

@@ -18,6 +18,19 @@
       "@/*": ["./app/_engine/*"]
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
-  "exclude": ["node_modules"]
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    ".next/types/**/*.ts",
+    "desktop/types/**/*.d.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    "desktop/main",
+    "desktop/preload",
+    "desktop/scripts",
+    "desktop/dist",
+    "desktop/dist-next"
+  ]
 }

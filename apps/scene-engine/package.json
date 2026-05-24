@@ -1,11 +1,18 @@
 {
   "name": "scene-engine",
+  "productName": "Main Menu",
   "version": "1.0.0",
+  "description": "Main Menu desktop scene authoring app.",
   "private": true,
+  "main": "desktop/dist/main/index.js",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start"
+    "start": "next start",
+    "desktop:compile": "tsc -p desktop/tsconfig.json",
+    "desktop:dev": "node desktop/scripts/dev.mjs",
+    "desktop:build:next": "node desktop/scripts/run-with-compatible-node.mjs node_modules/next/dist/bin/next build && node desktop/scripts/run-with-compatible-node.mjs desktop/scripts/prepare-next-runtime.mjs",
+    "desktop:pack:mac": "npm run desktop:compile && npm run desktop:build:next && electron-builder --mac dir"
   },
   "dependencies": {
     "jszip": "^3.10.1",
@@ -19,7 +26,38 @@
     "@types/node": "^22.14.1",
     "@types/react": "^19.1.2",
     "@types/react-dom": "^19.1.2",
+    "electron": "^30.5.1",
+    "electron-builder": "^26.0.12",
     "tailwindcss": "^4.1.4",
     "typescript": "^5.8.3"
+  },
+  "build": {
+    "appId": "com.codecaine.main-menu",
+    "productName": "Main Menu",
+    "directories": {
+      "output": "dist/desktop"
+    },
+    "files": [
+      "desktop/dist/**/*",
+      "package.json"
+    ],
+    "extraResources": [
+      {
+        "from": "desktop/dist-next",
+        "to": "next-runtime",
+        "filter": [
+          "**/*"
+        ]
+      }
+    ],
+    "asar": true,
+    "npmRebuild": false,
+    "mac": {
+      "category": "public.app-category.developer-tools",
+      "identity": null,
+      "target": [
+        "dir"
+      ]
+    }
   }
 }

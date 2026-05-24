@@ -175,7 +175,7 @@
         "side-perspective": 1100,
         "side-panel-opacity": 0.25,
         "side-frame-visible": false,
-        "side-rain-density": 70,
+        "side-rain-density": 100,
         "side-rain-speed": 3,
         "side-rain-color-offset": 0.36,
         "side-content-x": 993,
