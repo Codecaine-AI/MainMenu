@@ -1,124 +1,172 @@
 ---
-covers: How a project becomes a deployable standalone site — /api/export bundles renderer + scenes + assets + modules + fonts + boot into a zip the user downloads.
-concepts: [export, standalone-bundle, zip, project-export, no-build, path-rewriting]
+covers: How a project becomes a deployable standalone site or packaged desktop authoring app.
+concepts: [export, standalone-bundle, zip, active-export-graph, desktop-app, path-rewriting]
 ---
 
-# Export Pipeline
+# Build And Distribution Output
 
-The scene-engine exports a **fully bundled standalone copy** of the project: a zip the user downloads, unzips, and opens — `index.html` works directly from the filesystem or any static host. There is no compilation step, no framework runtime in the output, no dependency on the Next.js dev server. The zip contains static pages, the same renderer code, scene JSON, and assets that the editor uses, with runtime paths resolved from the bundle root.
+The scene-engine has two output paths:
+
+- **Site export** — `POST /api/export?project=<project-id>` returns a standalone zip for the selected project.
+- **Desktop authoring app** — Electron packages the Next standalone runtime as the Main Menu macOS app.
+
+The site export contains static pages, the same renderer code, scene JSON, and the active project files needed by those scenes. There is no framework runtime in the exported site, and no dependency on the Next.js dev server.
 
 ---
 
-## Why a Standalone Bundle, Not a Build
+## Why A Standalone Bundle, Not A Build
 
-The renderer already exists as plain JS modules and works without bundling. The scene JSON **is** the source of truth in production — there is nothing to compile down to. So export is not a build; it's a copy with path rewrites.
+The renderer already exists as plain JS modules and works without bundling. The scene JSON is the source of truth in production; there is nothing to compile down to. Export is a copy with path rewrites and dependency pruning.
 
 Trade-offs:
-- Pro: zero build pipeline. The export and the editor share one renderer.
-- Pro: the output is inspectable — every file is the same one the developer wrote.
-- Pro: works from `file://` and any static host with no server.
-- Con: the bundle ships every asset registered, not only the ones used. (Currently acceptable for stylish 2–3 page sites.)
 
-## Trigger and Endpoint
+- Pro: the export and editor share one renderer.
+- Pro: the output is inspectable; every file is the same kind of file the developer authored.
+- Pro: the active dependency graph keeps unused registered media out of the zip.
+- Con: modules must declare dependencies that are not visible from scene references.
 
-`POST /api/export?project=<project-id>` is a Next route that returns `application/zip` with `Content-Disposition: attachment; filename="<project-id>.zip"`. The editor's scene controls call it with the active project, read the blob, and trigger a browser download.
+## Trigger And Endpoint
 
-There is no streaming or progress reporting; the project is small enough that synchronous zip generation is fine.
+`POST /api/export?project=<project-id>` returns `application/zip` with `Content-Disposition: attachment; filename="<project-id>.zip"`. The project page calls it with the active project and triggers a browser download.
 
-## What the Bundle Contains
+There is no streaming or progress reporting. The selected projects are small enough that synchronous zip generation is acceptable for the current tool.
+
+## What The Bundle Contains
 
 ```
 <project-id>.zip
 ├── index.html               entry scene page
 ├── boot.js                  loads project.json, mounts renderer, exposes navigate()
-├── project.json             copied as-is
-├── <scene-id>/index.html    one static page per scene, including the entry scene
-├── <scene-id>/scene.css     optional per-scene page CSS if scenes/<id>/page.css or scene.css exists
-├── scenes/<id>/scene.json   one per scene listed in project.scenes
+├── project.json             active project manifest copy
+├── <scene-id>/index.html    one static page per active scene
+├── <scene-id>/scene.css     optional per-scene page CSS
+├── scenes/<id>/scene.json   one per active scene
 ├── renderer/                copied from app/_engine/renderer/, paths rewritten
-│   ├── scene-renderer.js
-│   ├── asset-registry.js
-│   ├── positioning.js
-│   └── asset-renderers/...
-├── assets/                  registry + referenced files (audio dirs copied whole)
-│   ├── registry.json        with /assets/... rewritten to ./assets/...
+├── assets/
+│   ├── registry.json        active assets only; /assets/... rewritten to ./assets/...
 │   ├── audio/.../...
 │   ├── image/.../...
 │   ├── video/.../...
 │   └── glyph/.../...
-├── modules/                 effects + components + manifests
-│   ├── registry.json        with /modules/... rewritten to ./modules/...
+├── modules/
+│   ├── registry.json        active modules only; /modules/... rewritten to ./modules/...
 │   ├── effects/<id>/...
 │   └── components/<id>/...
-└── fonts/                   FolkPro family
+├── fonts/
+│   └── registry.json        active font entries only
+├── export-graph.json        included/excluded ids and warnings
+├── Makefile                 `make run` helper
+└── server.mjs               static server for local preview
 ```
 
-## How the Bundle Is Assembled
+## Active Export Graph
 
-1. **Read `projects/<project-id>/project.json`** via `loadProject(projectId)`. If it's missing, fail with HTTP 400 — exports are project-scoped.
-2. **Add `project.json`** to the zip as-is.
-3. **For each scene in `project.scenes`**: add `scenes/<id>/scene.json` from disk.
-4. **Copy `app/_engine/renderer/` into `renderer/`**: every file is read as text and absolute paths (`/assets/...`, `/modules/...`, `/fonts/...`) are rewritten to relative (`./assets/...`, etc.) so the bundle works without a server origin.
-5. **Generate static pages**: root `index.html` boots `project.entry`, and `<scene-id>/index.html` boots each listed scene. If `scenes/<id>/page.css` or `scenes/<id>/scene.css` exists, it is copied beside that page as `scene.css`.
-6. **Add `boot.js`** from `app/_engine/export/`. This is the shared runtime for every generated page.
-7. **Walk the assets registry**:
-   - Rewrite leading-slash paths in `registry.json` to `./` form.
-   - For each entry's `file` path: copy that file into the zip preserving its directory (`assets/<type>/<file>`).
-   - For audio entries: copy the entire containing directory once (audio bundles often include sidecar JS or sprite metadata).
-8. **Walk the modules registry**: same idea, but copy the entire module directory (CSS/JS/manifest live together).
-9. **Copy `public/fonts/`** wholesale.
-10. **Generate** the zip buffer and stream it as the response body.
+The export graph is built before registries are written. It includes:
 
-The deduplication sets (`copiedAssetDirs`, `copiedModuleDirs`) avoid copying the same directory twice when multiple registry entries point into it.
+- active scenes from `project.scenes`
+- direct layer `asset` references
+- glyph slot asset references
+- `play-audio` event targets
+- component/effect module references
+- module dependencies declared in `manifest.json`
+- public file references found in scene/module JSON, JS, CSS, SVG, or HTML text
+- string schema properties marked with `assetType`
+- discovered project fonts matching used font families
+
+Anything not reached is left out of the exported registries. `export-graph.json` records included ids, excluded ids, warnings, and public files so a surprising omission can be diagnosed from the bundle.
+
+## Assembly Flow
+
+1. Resolve the project through the workspace catalog and read `ProjectSettings/project.json`.
+2. Validate that `project.entry` exists and remains active for export.
+3. Filter scene refs with `active: false` or `export: false`.
+4. Collect the active export graph.
+5. Write `project.json` using only active scene refs.
+6. Add active scene JSON files under `scenes/<id>/scene.json`.
+7. Copy `app/_engine/renderer/` into `renderer/` with path rewrites.
+8. Add `boot.js`, `Makefile`, and `server.mjs` from `app/_engine/export/`.
+9. Generate root and per-scene HTML pages.
+10. Write pruned asset/module/font registries.
+11. Copy active asset files, active module directories, active fonts, and extra public files.
+12. Write `export-graph.json`.
+13. Generate the zip buffer and stream it as the response body.
+
+Audio entries copy their containing directory because audio bundles often include sidecar JS or sprite metadata. Module entries copy their containing directory because JS, CSS, manifests, SVGs, and local config commonly live together.
 
 ## Path Rewriting
 
-All renderer code and registry JSON use absolute paths during development (`/assets/...`, `/modules/...`, `/fonts/...`) so they work both from the Next dev server and from production routes. In the standalone bundle there is no server origin, so absolute paths break.
+Development uses logical paths such as `/assets/...`, `/modules/...`, and `/fonts/...`. The standalone bundle rewrites those to relative bundle-root paths.
 
-Two rewrite passes at export time:
+Two rewrite passes matter:
 
-- **Renderer code (text)**: simple regex `/(["'(])\/(assets|modules|fonts)\//g` → `$1./$2/`. The token-prefix capture (`"`, `'`, `(`) avoids touching things that aren't path-like (e.g. the `/` in a regex literal).
-- **Registry JSON**: parse, map every entry's `file` and `path` field from `/...` to `./...`, re-stringify with stable formatting.
+- **Renderer code and text assets**: absolute logical paths are rewritten to relative paths where needed.
+- **Registry JSON**: `file` and `path` fields move from `/...` to `./...`.
 
-Once relative, `boot.js` sets `window.MELEE_BUNDLE_ROOT` from `import.meta.url`, and renderer fetches resolve against that root. This matters because nested pages like `menu/index.html` must still load `assets/`, `modules/`, `fonts/`, and `scenes/` from the bundle root rather than from `menu/`.
+`boot.js` sets `window.MELEE_BUNDLE_ROOT` from `import.meta.url`, so nested pages like `menu/index.html` still load assets, modules, fonts, and scenes from the bundle root.
 
-## The Boot Page
+## Boot Runtime
 
-Each generated page is minimal: a stage container, FolkPro `@font-face` declarations with the correct relative prefix, optional `scene.css`, and a single boot script. Root `index.html` points to `./boot.js`; nested scene pages point to `../boot.js`.
+Each generated page contains a stage container, font declarations, optional scene CSS, and a boot script. `app/_engine/export/boot.js`:
 
-`app/_engine/export/boot.js`:
+1. sets the bundle root
+2. fetches `project.json`
+3. loads the merged asset/module/font registry
+4. fetches `scenes/<id>/scene.json`
+5. calls `renderScene(scene, stage)`
+6. exposes `window.MELEE_navigate(sceneId)`
+7. scales the fixed 1440x1080 stage to the viewport
 
-1. Sets the bundle root from `import.meta.url`.
-2. Fetches `project.json` from the bundle root.
-3. Loads the merged asset/module registry.
-4. Defines `showScene(sceneId)` that fetches `scenes/<id>/scene.json` and calls `renderScene(scene, stage)`.
-5. Exposes `window.MELEE_navigate(sceneId)` so click events with `action: "navigate"` move to `<scene-id>/index.html` in page-mode exports.
-6. Fits the stage to the viewport via uniform scale (preserves the 1440×1080 aspect).
-7. Boots `window.MELEE_INITIAL_SCENE`, falling back to `project.entry`.
+Page-mode exports perform real static-page navigation to `<scene-id>/index.html`.
 
-## What's Excluded From the Bundle
+## What's Excluded From The Site Export
 
-- The Next.js editor and its dev API. Editor code is not part of the standalone deliverable; it lives in the dev environment only.
-- Assets and modules not registered in `public/assets/registry.json` / `public/modules/registry.json`. Only registered things ship.
-- Session/spec/dev-notes scaffolding under `.spectre/`.
+- The Next.js editor and dev API.
+- Registered assets/modules/fonts that are not reached from the active export graph.
+- Scenes marked `active: false` or `export: false`.
+- Session/spec/dev-notes scaffolding.
 - Source maps unless explicitly opted in.
 
-## Deploy Surface
+## Local Export Preview
 
-`<project-id>.zip` is the deployable artifact. Drop it on:
-- A static host (S3 + CloudFront, Vercel static, GitHub Pages, plain nginx).
-- A USB stick — opens from `file://` directly.
-- A zip you email to a client.
+After extracting:
 
-No build step, no server, no dependencies.
+```bash
+make run
+```
+
+or:
+
+```bash
+node server.mjs --host 127.0.0.1 --port 4173
+```
+
+The server makes module, media, font, and nested scene page loading behave like a normal static host.
+
+## Desktop App Output
+
+Main Menu is the packaged authoring app, not the exported site. The desktop package:
+
+- builds Next with `output: 'standalone'`
+- stages `.next/standalone` into `desktop/dist-next`
+- packages Electron main/preload code and the standalone runtime
+- seeds a writable workspace under the user's application support directory
+- starts a local Next server and opens the editor route in an Electron window
+
+The macOS directory artifact is:
+
+```text
+apps/scene-engine/dist/desktop/mac-arm64/Main Menu.app
+```
+
+Signing, notarization, auto-update, and installer distribution are outside the current output contract.
 
 ## Failure Modes
 
-| Condition                                  | Response                                   |
-|--------------------------------------------|--------------------------------------------|
+| Condition | Response |
+| --- | --- |
 | `project.json` missing for selected project | 400 `{ error: "project.json not found" }`. |
+| Project root cannot be resolved | 404 `{ error: "Project not found" }`. |
 | `project.entry` not listed in `project.scenes` | 400 with a manifest consistency error. |
-| Asset file referenced in registry but missing on disk | 500 with the underlying file-system error. |
-| Any other read/zip failure                 | 500 with `{ error: <message> }`.           |
-
-The export is fail-closed: any inconsistency surfaces as an HTTP error, not a partial zip.
+| `project.entry` inactive for export | 400 with a manifest consistency error. |
+| Asset/module/font file referenced by the active graph but missing on disk | 500 with the underlying file-system error. |
+| Any other read/zip failure | 500 with `{ error: <message> }`. |

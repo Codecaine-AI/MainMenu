@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react'
 import { useEditorStore } from '@/store/editor-store'
+import { resolveRuntimeUrl } from '@/renderer/runtime-url'
 import { FieldRow, InspectorSection } from './inputs/InspectorSection'
 import { RangedInput } from './inputs/RangedInput'
 import type { Registry } from '@/types/scene'
@@ -716,7 +717,7 @@ export function MainMenuConfigEditor({ path, properties }: Props) {
     if (hasInlineConfig) return
     let cancelled = false
     setLoadError(null)
-    fetch(configUrl, { cache: 'no-store' })
+    fetch(resolveRuntimeUrl(configUrl), { cache: 'no-store' })
       .then((response) => {
         if (!response.ok) throw new Error(`Config ${response.status}`)
         return response.json()

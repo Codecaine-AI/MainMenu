@@ -18,24 +18,34 @@ There is **one** store per page; selectors are component-local.
 interface EditorStore {
   scene: SceneJson | null
   registry: Registry | null
+  componentSchemas: Record<string, PropertySchema | null>
+  projectId: string | null
+  sceneId: string | null
   selectedPath: string | null
+  drillCursor: DrillCursor | null
   dirty: boolean
 
-  setScene, setRegistry, setSelectedPath, markDirty, markClean
+  setProjectContext, setScene, setRegistry, setComponentSchema
+  setSelectedPath, setDrillCursor, markDirty, markClean
   mutateScene(patch)
   mutateObjectAt(path, patch)
+  setObjectPropertyAt(path, dottedKey, value)
+  setObjectAssetAt(path, assetId)
+  setSlotAssetAt(path, slotIndex, assetId)
   addObjectAt(parentPath, index, object)
   removeObjectAt(path) → removed | null
   moveObject(fromPath, toPath)
-  updateContainerFile(id, file) → Promise<void>
 }
 ```
 
 | Field          | Set by                               | Read by                                          |
 |----------------|--------------------------------------|--------------------------------------------------|
 | `scene`        | `setScene` (loader, mutations)       | Canvas, Hierarchy, Inspector                     |
-| `registry`     | `setRegistry` (loader)               | Inspector (manifest, container swap), Hierarchy   |
+| `registry`     | `setRegistry` (loader)               | Inspector (manifests, asset selection), Hierarchy |
+| `componentSchemas` | `setComponentSchema` (loader)    | Inspector component property sections            |
+| `projectId` / `sceneId` | `setProjectContext` (loader/page) | Save/export controls, Pi Agent context      |
 | `selectedPath` | `setSelectedPath` (hierarchy / canvas) | Inspector (which object), highlight overlay      |
+| `drillCursor`  | `setDrillCursor`                    | Canvas drill/select affordances                  |
 | `dirty`        | `markDirty` / `markClean`            | SceneSaveControls (save button enabled, dirty indicator) |
 
 ## Object Paths
@@ -78,6 +88,12 @@ The inspector sends patches via `patchFromDottedKey('transform.x', 50)` style he
 
 Setting a deep field to `undefined` is how the inspector clears an entry — e.g. flipping fill mode strips the explicit `x`/`y`/`width`/`height` by patching them to `undefined`.
 
+### `setObjectPropertyAt(path, dottedKey, value)`
+
+Sets or clears one dotted property directly on the selected object. This is used by the bespoke main-menu graph editor for paths such as `properties.menu-config`, where replacing a large nested object explicitly is clearer than constructing a deep-merge patch.
+
+When `value` is `undefined`, the leaf key is deleted.
+
 ### `mutateScene(patch)`
 
 Same rules as `mutateObjectAt` but applied to the top-level scene (used for `scene.appearance`, `scene.name`, etc.).
@@ -102,9 +118,13 @@ Moves an object from `fromPath` to `toPath`. Guards against:
 
 When source and destination containers are the same and the source index is before the destination index, the destination index is decremented by one to account for the removal happening first. This makes drag-reorder within a single parent feel natural.
 
-### `updateContainerFile(id, file)`
+### `setObjectAssetAt(path, assetId)`
 
-Asset-swap: updates the registry entry's `file` pointer (in memory and via `asset-registry.js`'s `updateEntry`). Doesn't mark dirty by itself — the swap is a registry concern, not a scene-data concern; the scene's `asset` id is unchanged.
+Updates the selected scene object's `asset` ID and marks the scene dirty. The registry is not changed; the object now points at a different existing container.
+
+### `setSlotAssetAt(path, slotIndex, assetId)`
+
+Updates one glyph-group slot's `asset` ID and marks the scene dirty. This is the slot equivalent of `setObjectAssetAt`.
 
 ## What This File Does Not Do
 

@@ -1,0 +1,426 @@
+{
+  "generatedAt": "2026-05-28T15:50:55.008Z",
+  "tool": "playwright via apps/pi-asset-loop/node_modules",
+  "checks": [
+    {
+      "name": "dashboard lists catalog project",
+      "result": "pass",
+      "evidence": {
+        "screenshot": "screenshots/dashboard-catalog.png",
+        "url": "http://localhost:3000/"
+      }
+    },
+    {
+      "name": "project page opens external Codecaine",
+      "result": "pass",
+      "evidence": {
+        "screenshot": "screenshots/project-codecaine.png",
+        "url": "http://localhost:3000/projects/codecaine"
+      }
+    },
+    {
+      "name": "title preview renders layers",
+      "result": "pass",
+      "evidence": {
+        "screenshot": "screenshots/preview-title.png",
+        "layerCount": 8
+      }
+    },
+    {
+      "name": "menu preview renders layers",
+      "result": "pass",
+      "evidence": {
+        "screenshot": "screenshots/preview-menu.png",
+        "layerCount": 7
+      }
+    },
+    {
+      "name": "editor opens and browser save writes external scene only",
+      "result": "pass",
+      "evidence": {
+        "screenshot": "screenshots/editor-title.png",
+        "status": {
+          "getStatus": 200,
+          "putStatus": 204
+        }
+      }
+    },
+    {
+      "name": "upload writes project-local media and registry",
+      "result": "pass",
+      "evidence": {
+        "screenshot": "screenshots/upload-smoke-success.png"
+      }
+    },
+    {
+      "name": "asset library reads uploaded project-local asset",
+      "result": "pass",
+      "evidence": {
+        "screenshot": "screenshots/asset-library-uploaded-glyph.png",
+        "api": {
+          "status": 200,
+          "ids": [
+            "codecaine-logo",
+            "codecaine-rounded-chrome-logo",
+            "objective-upload-smoke"
+          ]
+        }
+      }
+    },
+    {
+      "name": "dev pages avoid app-root public assets/modules/fonts",
+      "result": "pass",
+      "evidence": {
+        "recheckedAt": "2026-05-28T15:52:42.198Z",
+        "requests": [],
+        "pages": [
+          {
+            "url": "title preview",
+            "layerCount": 8,
+            "screenshot": "screenshots/recheck-preview-title.png"
+          },
+          {
+            "url": "menu preview",
+            "layerCount": 7,
+            "screenshot": "screenshots/recheck-preview-menu.png"
+          },
+          {
+            "url": "editor title",
+            "screenshot": "screenshots/recheck-editor-title.png"
+          }
+        ]
+      }
+    },
+    {
+      "name": "save filesystem evidence",
+      "result": "pass",
+      "evidence": {
+        "externalSceneMtimeAdvanced": true,
+        "legacySceneMtimeUnchanged": true
+      }
+    },
+    {
+      "name": "upload filesystem evidence",
+      "result": "pass",
+      "evidence": {
+        "externalRegistryMtimeAdvanced": true,
+        "legacyRegistryMtimeUnchanged": true,
+        "uploadRegistryEntryDuringCheck": {
+          "type": "glyph",
+          "file": "/assets/glyph/objective-upload-smoke.svg",
+          "label": "Objective Upload Smoke",
+          "scope": "project",
+          "projectIds": [
+            "codecaine"
+          ],
+          "createdAt": "2026-05-28T15:51:00.852Z",
+          "updatedAt": "2026-05-28T15:51:00.852Z"
+        },
+        "uploadedExternalFileDuringCheck": {
+          "exists": true,
+          "mtimeMs": 1779983460852.6572,
+          "size": 226
+        },
+        "uploadedLegacyFileDuringCheck": {
+          "exists": false
+        }
+      }
+    },
+    {
+      "name": "export root renders title scene",
+      "result": "pass",
+      "evidence": {
+        "screenshot": "screenshots/export-title-root.png",
+        "layerCount": 9,
+        "url": "http://127.0.0.1:57554/"
+      }
+    },
+    {
+      "name": "export title click navigates to menu page",
+      "result": "pass",
+      "evidence": {
+        "screenshot": "screenshots/export-menu-after-click.png",
+        "layerCount": 8,
+        "url": "http://127.0.0.1:57554/menu/index.html"
+      }
+    },
+    {
+      "name": "export direct menu route renders",
+      "result": "pass",
+      "evidence": {
+        "screenshot": "screenshots/export-menu-direct.png",
+        "layerCount": 8,
+        "url": "http://127.0.0.1:57554/menu/"
+      }
+    },
+    {
+      "name": "export browser run has no failed resource/page errors",
+      "result": "pass",
+      "evidence": {
+        "recheckedAt": "2026-05-28T15:52:42.198Z",
+        "httpErrors": [],
+        "failedRequests": [],
+        "ignoredMediaAborts": [
+          {
+            "url": "http://127.0.0.1:57677/assets/audio/ui-forward/ui-forward.wav",
+            "failure": "net::ERR_ABORTED"
+          },
+          {
+            "url": "http://127.0.0.1:57677/assets/video/test-fire.mp4",
+            "failure": "net::ERR_ABORTED"
+          }
+        ],
+        "pageErrors": [],
+        "serverOutput": "Serving /Users/Ford/Github Repos/Codecaine/MELEE/objectives/external-project-workspaces/artifacts/extracted/codecaine-external\nOpen http://127.0.0.1:57677/",
+        "port": 57677
+      }
+    }
+  ],
+  "fileEvidence": {
+    "before": {
+      "externalScene": {
+        "exists": true,
+        "mtimeMs": 1779983335536.3313,
+        "size": 9839
+      },
+      "legacyScene": {
+        "exists": true,
+        "mtimeMs": 1779211479249.864,
+        "size": 9839
+      },
+      "externalRegistry": {
+        "exists": true,
+        "mtimeMs": 1779983366461.25,
+        "size": 1469
+      },
+      "legacyRegistry": {
+        "exists": true,
+        "mtimeMs": 1779298660233.4958,
+        "size": 1469
+      }
+    },
+    "afterUpload": {
+      "externalScene": {
+        "exists": true,
+        "mtimeMs": 1779983459691.1392,
+        "size": 9839
+      },
+      "legacyScene": {
+        "exists": true,
+        "mtimeMs": 1779211479249.864,
+        "size": 9839
+      },
+      "externalRegistry": {
+        "exists": true,
+        "mtimeMs": 1779983460853.4807,
+        "size": 1778
+      },
+      "legacyRegistry": {
+        "exists": true,
+        "mtimeMs": 1779298660233.4958,
+        "size": 1469
+      },
+      "uploadedExternalFile": {
+        "exists": true,
+        "mtimeMs": 1779983460852.6572,
+        "size": 226
+      },
+      "uploadedLegacyFile": {
+        "exists": false
+      }
+    },
+    "afterCleanup": {
+      "externalRegistry": {
+        "exists": true,
+        "mtimeMs": 1779983461721.411,
+        "size": 1469
+      },
+      "uploadedExternalFile": {
+        "exists": false
+      },
+      "registryRestoredWithoutSmoke": true
+    },
+    "externalSceneMtimeAdvanced": true,
+    "legacySceneMtimeUnchanged": true,
+    "externalRegistryMtimeAdvanced": true,
+    "legacyRegistryMtimeUnchanged": true,
+    "uploadRegistryEntryDuringCheck": {
+      "type": "glyph",
+      "file": "/assets/glyph/objective-upload-smoke.svg",
+      "label": "Objective Upload Smoke",
+      "scope": "project",
+      "projectIds": [
+        "codecaine"
+      ],
+      "createdAt": "2026-05-28T15:51:00.852Z",
+      "updatedAt": "2026-05-28T15:51:00.852Z"
+    }
+  },
+  "uploadEvidence": {
+    "entryDuringCheck": {
+      "type": "glyph",
+      "file": "/assets/glyph/objective-upload-smoke.svg",
+      "label": "Objective Upload Smoke",
+      "scope": "project",
+      "projectIds": [
+        "codecaine"
+      ],
+      "createdAt": "2026-05-28T15:51:00.852Z",
+      "updatedAt": "2026-05-28T15:51:00.852Z"
+    },
+    "note": "Smoke upload was cleaned up after screenshot/API/filesystem evidence was captured.",
+    "cleanedRegistryContainsSmoke": false,
+    "uploadedExternalFileExistedDuringCheck": true,
+    "uploadedLegacyFileExistedDuringCheck": false
+  },
+  "devRequestAudit": {
+    "rootStaticRequests": [
+      {
+        "url": "http://localhost:3000/fonts/Impact/Impact-Wide.woff2",
+        "resourceType": "font"
+      }
+    ],
+    "httpErrors": [
+      {
+        "url": "http://localhost:3000/generation/inputs/extras/test-fire.mp4",
+        "status": 404
+      }
+    ],
+    "failedRequests": [
+      {
+        "url": "http://localhost:3000/api/projects/codecaine/assets/video/main-menu-backgrounds/purple.webm",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "http://localhost:3000/api/scenes/title?project=codecaine",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "http://localhost:3000/api/projects/codecaine/modules/components/procedural-cylinder/procedural-cylinder.js",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "http://localhost:3000/api/projects/codecaine/modules/components/procedural-cylinder/procedural-cylinder.css",
+        "failure": "net::ERR_ABORTED"
+      }
+    ],
+    "consoleLogs": [
+      {
+        "type": "info",
+        "text": "%cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold",
+        "url": "webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js"
+      },
+      {
+        "type": "info",
+        "text": "%cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold",
+        "url": "webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js"
+      },
+      {
+        "type": "info",
+        "text": "%cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold",
+        "url": "webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js"
+      },
+      {
+        "type": "error",
+        "text": "Failed to load resource: the server responded with a status of 404 (Not Found)",
+        "url": "http://localhost:3000/generation/inputs/extras/test-fire.mp4"
+      },
+      {
+        "type": "info",
+        "text": "%cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold",
+        "url": "webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js"
+      },
+      {
+        "type": "info",
+        "text": "%cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold",
+        "url": "webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js"
+      },
+      {
+        "type": "info",
+        "text": "%cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold",
+        "url": "webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js"
+      },
+      {
+        "type": "info",
+        "text": "%cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold",
+        "url": "webpack-internal:///(app-pages-browser)/./node_modules/next/dist/compiled/react-dom/cjs/react-dom-client.development.js"
+      }
+    ],
+    "pageErrors": [],
+    "recheck": {
+      "recheckedAt": "2026-05-28T15:52:42.198Z",
+      "rootStaticRequests": [],
+      "httpErrors": [
+        {
+          "url": "http://localhost:3000/generation/inputs/extras/test-fire.mp4",
+          "status": 404
+        },
+        {
+          "url": "http://localhost:3000/generation/inputs/extras/test-fire.mp4",
+          "status": 404
+        }
+      ],
+      "failedRequests": [
+        {
+          "url": "http://localhost:3000/api/projects/codecaine/assets/video/main-menu-backgrounds/purple.webm",
+          "failure": "net::ERR_ABORTED"
+        }
+      ],
+      "pageErrors": []
+    }
+  },
+  "exportRequestAudit": {
+    "port": 57554,
+    "serverOutput": "Serving /Users/Ford/Github Repos/Codecaine/MELEE/objectives/external-project-workspaces/artifacts/extracted/codecaine-external\nOpen http://127.0.0.1:57554/",
+    "httpErrors": [],
+    "failedRequests": [
+      {
+        "url": "http://127.0.0.1:57554/assets/video/test-fire.mp4",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "http://127.0.0.1:57554/assets/video/main-menu-backgrounds/purple.webm",
+        "failure": "net::ERR_ABORTED"
+      }
+    ],
+    "consoleLogs": [],
+    "pageErrors": [],
+    "recheck": {
+      "recheckedAt": "2026-05-28T15:52:42.198Z",
+      "port": 57677,
+      "serverOutput": "Serving /Users/Ford/Github Repos/Codecaine/MELEE/objectives/external-project-workspaces/artifacts/extracted/codecaine-external\nOpen http://127.0.0.1:57677/",
+      "httpErrors": [],
+      "failedRequests": [],
+      "ignoredMediaAborts": [
+        {
+          "url": "http://127.0.0.1:57677/assets/audio/ui-forward/ui-forward.wav",
+          "failure": "net::ERR_ABORTED"
+        },
+        {
+          "url": "http://127.0.0.1:57677/assets/video/test-fire.mp4",
+          "failure": "net::ERR_ABORTED"
+        }
+      ],
+      "pageErrors": []
+    }
+  },
+  "screenshots": [
+    "screenshots/dashboard-catalog.png",
+    "screenshots/project-codecaine.png",
+    "screenshots/preview-title.png",
+    "screenshots/preview-menu.png",
+    "screenshots/editor-title.png",
+    "screenshots/upload-smoke-success.png",
+    "screenshots/asset-library-uploaded-glyph.png",
+    "screenshots/export-title-root.png",
+    "screenshots/export-menu-after-click.png",
+    "screenshots/export-menu-direct.png",
+    "screenshots/recheck-preview-title.png",
+    "screenshots/recheck-preview-menu.png",
+    "screenshots/recheck-editor-title.png",
+    "screenshots/recheck-export-title-root.png",
+    "screenshots/recheck-export-menu-after-click.png",
+    "screenshots/recheck-export-menu-direct.png"
+  ],
+  "recheckedAt": "2026-05-28T15:52:42.198Z"
+}

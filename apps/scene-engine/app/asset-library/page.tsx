@@ -32,7 +32,7 @@ export default async function AssetLibraryPage({
             <h1 className="text-2xl font-semibold tracking-wide text-gray-100">Asset Library</h1>
           </div>
           <Link
-            href="/upload"
+            href={params.project ? `/upload?project=${encodeURIComponent(params.project)}` : '/upload'}
             className="rounded-sm border border-[#2a6da3] bg-[#173247] px-3 py-1.5 text-xs text-[#cfe6ff] no-underline hover:bg-[#1d3d54] active:translate-y-px"
           >
             Upload Asset
@@ -41,7 +41,7 @@ export default async function AssetLibraryPage({
 
         <nav className="mb-5 flex flex-wrap gap-2">
           <Link
-            href="/asset-library"
+            href={params.project ? `/asset-library?project=${encodeURIComponent(params.project)}` : '/asset-library'}
             className={`rounded-sm border px-2.5 py-1 text-xs no-underline ${
               selectedType
                 ? 'border-[#333] bg-[#1d1d1d] text-gray-400 hover:bg-[#252525]'
@@ -53,7 +53,10 @@ export default async function AssetLibraryPage({
           {ASSET_TYPES.map((type) => (
             <Link
               key={type}
-              href={`/asset-library?type=${encodeURIComponent(type)}`}
+              href={`/asset-library?${new URLSearchParams({
+                ...(params.project ? { project: params.project } : {}),
+                type,
+              }).toString()}`}
               className={`rounded-sm border px-2.5 py-1 text-xs no-underline ${
                 selectedType === type
                   ? 'border-[#2a6da3] bg-[#173247] text-[#cfe6ff]'

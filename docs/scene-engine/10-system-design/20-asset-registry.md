@@ -1,5 +1,5 @@
 ---
-covers: The asset and module registries — split manifests, container indirection, the four asset types, and the swap-by-id semantic that propagates file changes across scenes.
+covers: The asset and module registries — split manifests, container indirection, the five file asset types, and the swap-by-id semantic that propagates file changes across scenes.
 concepts: [registry, container, asset-id, indirection, type-dispatch, swap]
 ---
 
@@ -9,8 +9,8 @@ Scenes never reference files directly. They reference **container IDs**, and the
 
 There are two registries, split by what kind of thing they describe:
 
-- **`public/assets/registry.json`** — uploadable file assets. Four types: `audio`, `image`, `video`, `glyph`.
-- **`public/modules/registry.json`** — code modules. Two types: `effect`, `component`.
+- **`ProjectSettings/registries/assets.json`** — uploadable file assets. Types: `audio`, `image`, `video`, `glyph`, and `font`.
+- **`ProjectSettings/registries/modules.json`** — project-authored code modules. Two types: `effect`, `component`.
 
 Both share the same shape (id → typed entry) and both contribute to the same flat namespace at runtime: scene layers cannot tell which manifest an ID came from.
 
@@ -18,11 +18,11 @@ Both share the same shape (id → typed entry) and both contribute to the same f
 
 ## Asset vs Module
 
-The split is conceptual, not just organizational. An **asset** is an external file a non-developer would recognize as something they could upload — a video clip, an image, an audio sample, an SVG glyph. A **module** is hand-authored code — a CSS effect sheet, a JS component — that ships with the engine and is configured rather than uploaded.
+The split is conceptual, not just organizational. An **asset** is an external file a non-developer would recognize as something they could upload — a video clip, an image, an audio sample, an SVG glyph, or a font file. A **module** is hand-authored project code — a CSS effect sheet or JS component — that is configured rather than uploaded.
 
 The test: *would it make sense to drag this onto an upload page?* If yes, it's an asset.
 
-This split shapes everything downstream. The upload UI and inspector swap dropdown are scoped to file assets; the add-layer dialog uses the merged registry so it can add both file assets and authored modules.
+This split shapes everything downstream. The upload UI and inspector asset-selection dropdown are scoped to file assets; the add-layer dialog uses the merged registry so it can add both file assets and authored modules. For v1, authored Codecaine modules live in the Codecaine project workspace, not in a shared engine module library.
 
 ## The Container Model
 
@@ -32,7 +32,7 @@ A registry entry is a **container**: a typed slot that points at a file. Scene l
 ┌───────────┐    references    ┌──────────────────────┐    points to    ┌─────────────────┐
 │  Scene    │─────────────────▶│  Container (registry) │────────────────▶│  File on disk    │
 │  Layer    │ "asset":"bg-vid" │  id: "bg-vid"         │  file:          │  /assets/video/  │
-│           │                  │  type: "video"        │  "/assets/      │  test-fire-2.mp4 │
+│           │                  │  type: "video"        │  "/assets/      │  test-fire-3.mp4 │
 └───────────┘                  └──────────────────────┘  video/test..."  └─────────────────┘
 ```
 
@@ -40,29 +40,29 @@ The model is intentionally Unity-flavored: scenes describe *intent* (which conta
 
 ## Entry Shape
 
-Asset entries (in `assets/registry.json`):
+Asset entries (in `ProjectSettings/registries/assets.json`):
 
 ```json
 {
-  "bg-video":       { "type": "video", "file": "/assets/video/test-fire.mp4" },
-  "in-text-fire":   { "type": "video", "file": "/assets/video/test-fire-3.mp4" },
+  "bg-video":       { "type": "video", "file": "/assets/video/test-fire-3.mp4" },
+  "in-text-fire":   { "type": "video", "file": "/assets/video/codecaine-title-fire-loop.webm" },
   "codecaine-logo": { "type": "glyph", "file": "/assets/glyph/CODECAINE.css-layers.svg" },
   "start-cue":      { "type": "audio", "file": "/assets/audio/start-cue/start-cue.js" }
 }
 ```
 
-Module entries (in `modules/registry.json`):
+Module entries (in `ProjectSettings/registries/modules.json`):
 
 ```json
 {
-  "crt-overlay": { "type": "effect",    "path": "/modules/effects/crt-overlay.css" },
+  "crt-overlay": { "type": "effect",    "path": "/modules/effects/crt-overlay/crt-overlay.css" },
   "press-start": { "type": "component", "path": "/modules/components/press-start/press-start.js" }
 }
 ```
 
 | Field  | Where         | Meaning                                                                    |
 |--------|---------------|----------------------------------------------------------------------------|
-| `type` | both          | One of `audio`, `image`, `video`, `glyph` (asset) or `effect`, `component` (module). |
+| `type` | both          | One of `audio`, `image`, `video`, `glyph`, `font` (asset) or `effect`, `component` (module). |
 | `file` | asset entries | URL of the current bytes inside the container. Swappable.                  |
 | `path` | module entries| URL of the module source. Modules don't swap, so the field name reflects that. |
 
@@ -80,7 +80,7 @@ If scenes embedded paths directly:
 
 Indirection turns the registry into the single inventory and the single point where file pointers can change.
 
-## Asset Taxonomy: Four Types
+## Asset Taxonomy: Five File Types
 
 | Type     | Files                              | Why it's its own type                                                  |
 |----------|------------------------------------|------------------------------------------------------------------------|
@@ -88,6 +88,7 @@ Indirection turns the registry into the single inventory and the single point wh
 | `image`  | `.png`, `.jpg`, `.webp`, `.gif`    | Static raster, separate upload allowlist from video.                   |
 | `video`  | `.mp4`, `.webm`                    | Looping playback semantics, larger upload size, separate allowlist.    |
 | `glyph`  | `.svg`                             | SVG-with-CSS-layers — not a generic image; has its own renderer path.  |
+| `font`   | `.otf`, `.ttf`, `.woff`, `.woff2`  | Project-owned typography loaded through the same registry merge.       |
 
 Image and video are split (rather than collapsed under `media`) so the upload UI can reject mismatched files and so the renderers can diverge later.
 
@@ -106,12 +107,13 @@ The layer's `type` and the registry entry's `type` are *expected* to match in we
 
 ## File Swap Propagation
 
-The container model only earns its keep when something actually swaps a file. Two surfaces do:
+The container model only earns its keep when scenes can select containers without hard-coding file paths. Three surfaces participate:
 
-- **Inspector dropdown.** Selecting an asset-type layer in the editor surfaces a dropdown of every file under `public/assets/{type}/`. Picking one updates the container's `file` pointer. Every other scene that references that container picks up the new bytes on next render.
-- **Upload.** Uploading a file with the same slug as an existing container overwrites the file on disk and rewrites the container's `file` pointer to match.
+- **Inspector dropdown.** Selecting an asset-type layer in the editor surfaces project-local assets of that type. Picking one updates the scene to reference the selected container ID.
+- **Upload.** Uploading a file writes a project-local file and creates a registry entry with a unique slug. If the slug already exists, the new container receives a numeric suffix.
+- **Registry patch endpoint.** Direct maintenance calls can move an existing container's `file` pointer. The current editor dropdown does not use this endpoint for normal selection.
 
-The scene's JSON is never touched by either surface — the indirection makes both operations purely registry-level.
+Normal selection touches scene JSON because the layer points at a different container ID. Direct registry patching touches only the registry and affects every scene that still references that container.
 
 ## Foreign Children Reuse the Same Lookup
 
@@ -119,9 +121,9 @@ When a `glyph-group`'s `children` array contains a foreign asset (`{ type, asset
 
 ## Adding an Asset
 
-The expected path is the `/upload` page: pick a file, confirm the type, the server writes the file under `public/assets/{type}/` and adds a registry entry keyed by the slugified filename. See [Asset Uploads](60-asset-uploads.md).
+The expected path is the `/upload` page: pick a file, confirm the type, the server writes the file under the selected project (`Assets/Media/{type}/` or `Assets/Fonts/`) and adds a registry entry keyed by the slugified filename. See [Asset Uploads](60-asset-uploads.md).
 
-The manual path still works — drop a file under `public/assets/{type}/`, add an entry to `assets/registry.json` — but auto-population from upload is the supported flow.
+The manual path is project-local: drop a file under `Assets/Media/{type}/` or `Assets/Fonts/`, add an entry to `ProjectSettings/registries/assets.json`, and keep the entry's logical `file` path in `/assets/...` or `/fonts/...` form.
 
 ## What's NOT in the Registry
 

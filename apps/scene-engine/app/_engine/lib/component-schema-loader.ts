@@ -1,4 +1,5 @@
 import type { PropertySchema } from '@/types/property-schema'
+import { resolveRuntimeUrl } from '@/renderer/runtime-url'
 
 const moduleCache = new Map<string, Promise<PropertySchema | null>>()
 
@@ -16,7 +17,7 @@ export function loadComponentSchema(modulePath: string): Promise<PropertySchema 
 
   const promise = (async (): Promise<PropertySchema | null> => {
     try {
-      const res = await fetch(modulePath)
+      const res = await fetch(resolveRuntimeUrl(modulePath))
       if (!res.ok) throw new Error(`Failed to fetch ${modulePath}: ${res.status}`)
       const code = await res.text()
       const blob = new Blob([code], { type: 'application/javascript' })

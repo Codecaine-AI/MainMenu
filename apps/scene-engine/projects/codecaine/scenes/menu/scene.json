@@ -10,7 +10,7 @@
       "id": "main-menu-background",
       "name": "Main Menu Background",
       "type": "video",
-      "asset": "main-menu-bg-purple",
+      "asset": "main-menu-bg-purple-compact",
       "transform": {
         "mode": "fill"
       },
@@ -232,7 +232,9 @@
                   "enter": "open-source",
                   "preview": {
                     "type": "contribution-grid",
-                    "weeks": 14
+                    "weeks": 12,
+                    "rows": 5,
+                    "palette": "rose"
                   }
                 },
                 {

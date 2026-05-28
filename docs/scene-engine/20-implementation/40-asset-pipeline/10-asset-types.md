@@ -14,8 +14,8 @@ design_refs: [10-system-design/60-asset-uploads.md]
 
 | Export                              | Purpose                                                                                   |
 |-------------------------------------|-------------------------------------------------------------------------------------------|
-| `AssetType` (re-exported type)      | `'audio' \| 'image' \| 'video' \| 'glyph'`. Sourced from `@/types/scene`.                 |
-| `ASSET_TYPES`                       | The four types as a readonly tuple. Iteration order = UI order in the type select.        |
+| `AssetType` (re-exported type)      | `'audio' \| 'image' \| 'video' \| 'glyph' \| 'font'`. Sourced from `@/types/scene`.       |
+| `ASSET_TYPES`                       | The five file asset types as a readonly tuple. Iteration order = UI order in the type select. |
 | `ASSET_TYPE_RULES`                  | Per-type `{ extensions, mimes }` allowlist.                                               |
 | `isAssetType(value)`                | Type-guard for narrowing untyped strings (URL params, form fields) to `AssetType`.        |
 | `getTypeFromMime(mime)`             | Returns the type whose mime allowlist contains the given mime, or `null`.                 |
@@ -29,6 +29,7 @@ audio: { extensions: ['mp3', 'wav', 'ogg'],          mimes: ['audio/mpeg', 'audi
 image: { extensions: ['png','jpg','jpeg','webp','gif'], mimes: ['image/png', 'image/jpeg', 'image/webp', 'image/gif'] }
 video: { extensions: ['mp4', 'webm'],                mimes: ['video/mp4', 'video/webm'] }
 glyph: { extensions: ['svg'],                        mimes: ['image/svg+xml'] }
+font:  { extensions: ['otf','ttf','woff','woff2'],   mimes: ['font/otf', 'font/ttf', 'font/woff', 'font/woff2', ...] }
 ```
 
 ## Slug Semantics
@@ -52,7 +53,7 @@ The throw on empty is what guarantees the upload route never writes a registry e
 
 The route, the form, and any future programmatic uploader all funnel through `validateUpload`. The checks, in order:
 
-1. `type` is one of the four asset types.
+1. `type` is one of the five file asset types.
 2. The filename's extension is in the type's `extensions` list.
 3. The provided `mime` is in the type's `mimes` list.
 

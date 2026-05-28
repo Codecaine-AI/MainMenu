@@ -32,7 +32,8 @@ export function useSceneLoader(projectId: string | null, sceneId: string) {
     const thisLoad = ++loadCount.current
     try {
       const { loadRegistry, getRegistry } = await import('@/renderer/asset-registry')
-      await loadRegistry()
+      if (projectId) (window as typeof window & { MELEE_PROJECT_ID?: string }).MELEE_PROJECT_ID = projectId
+      await loadRegistry({ projectId })
       setRegistry(getRegistry())
 
       const projectQuery = projectId ? `?project=${encodeURIComponent(projectId)}` : ''

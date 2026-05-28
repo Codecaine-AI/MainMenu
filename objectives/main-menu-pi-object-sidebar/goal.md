@@ -1,8 +1,8 @@
 <goal>
-    - Add a left-sidebar **PI/object workspace** to the Main Menu editor in `apps/scene-engine`.
-    - Let the user select the scene object/layer they are working on, inspect active-object context, and create a new object in the current project/scene.
-    - Route object creation and code-backed edits through safe typed desktop/service boundaries, not direct renderer filesystem access.
-    - Build on the completed Electron app; do not redo desktop conversion except for targeted validation/fixes.
+    - Correct the previous misunderstanding: this objective is a classical **Pi agent chat panel**, not a "Pi object" workspace.
+    - Add a compact chat panel pinned to the bottom of the editor left sidebar in `apps/scene-engine`.
+    - Use the Pi agent SDK from Electron main so chat requests can edit the current Main Menu project through agent tools.
+    - Keep React/browser code on a typed `window.mainMenu.agent` bridge; no renderer filesystem, shell, Electron main, or Pi SDK access.
 </goal>
 
 <context_refresh>
@@ -15,42 +15,35 @@
         - objectives/main-menu-pi-object-sidebar/context/03_working_plan.md
         - objectives/main-menu-pi-object-sidebar/context/04_validation_and_handoff.md
     </required_files>
-
-    <instruction>
-        - At objective start and after compaction/resume, reread the required
-          files and treat this bundle as the authority for this objective.
-    </instruction>
 </context_refresh>
 
 <working_strategy>
-    - Preserve the current editor/store and extend the hierarchy sidebar rather than replacing it.
-    - Keep selected object context concrete: project id, scene id, object path, object type/name, and component/module file when known.
-    - Keep native/project-writing authority in Electron main or validated server routes; renderer sends typed requests and displays status/diffs/results.
-    - Integrate PI/service behavior only for object-focused create/update flows; avoid a general chat terminal.
-    - Treat "pie menu" as PI/object workspace unless phase 1 confirms a literal radial menu is intended.
+    - Replace the old object-workspace UI with a normal chat transcript/input docked at the bottom of the hierarchy sidebar.
+    - Preserve the hierarchy as the upper scrollable area and keep selection, drag/drop, add-layer, save, canvas, and inspector behavior intact.
+    - Pass current project, scene, and selected layer context with each chat request.
+    - Run Pi SDK sessions in Electron main with `cwd` set to the editable Main Menu workspace; stream status/messages back through preload IPC.
+    - Use the Pi SDK package version compatible with the current Electron Node runtime.
 </working_strategy>
 
 <success_metrics>
-    - A left-sidebar workspace binds to the selected hierarchy object and shows stable active-object context.
-    - The workspace creates a new object under a selected parent/top-level target and persists it.
-    - A code-backed object/component update can be applied through the desktop-owned service path with visible result/diff evidence.
-    - Renderer uses `window.mainMenu` or validated APIs only; no direct Node/Electron/PI SDK access is introduced.
-    - Dev and packaged Main Menu validation both pass.
+    - The left sidebar shows `Pi Agent` at the bottom with a transcript, message input, send, stop, and clear controls.
+    - The old `PI Object` panel and component scaffold bridge are absent.
+    - `window.mainMenu.agent` exposes typed `getState`, `sendMessage`, `abort`, `reset`, and event subscription methods.
+    - Electron main imports and owns the Pi SDK session; renderer Node access remains unavailable.
+    - Dev and packaged validation pass.
 </success_metrics>
 
 <non_goals>
-    - Do not redo Electron conversion, app naming, packaging baseline, or writable-workspace strategy except for targeted fixes.
-    - Do not build a general PI chat app, terminal emulator, release system, cloud sync, auth, or multi-project collaboration.
-    - Do not give React direct `fs`, shell, Electron main, or PI SDK access.
-    - Do not silently mutate project code without a visible request/result trail.
-    - Do not move helper apps unless the move is separately validated.
+    - Do not build an object creation/scaffold menu for this objective.
+    - Do not give React direct native access or Pi SDK access.
+    - Do not redo the Electron conversion or packaging baseline except for targeted validation.
+    - Do not implement a literal radial pie menu.
 </non_goals>
 
 <completion_criteria>
-    - Left-sidebar workspace appears without breaking hierarchy selection, inspector editing, canvas interaction, or scene saving.
-    - Existing-object selection syncs editor selection and workspace context.
-    - New-object creation writes valid scene/project data and the object is selectable/editable after save/reload.
-    - A code-backed update path is validated: PI-driven or documented service scaffold applying a concrete project file/code change safely.
-    - Desktop security remains intact: context isolation on, renderer Node integration off, typed preload/API boundary.
-    - Artifacts include command summaries, screenshots, service/API contract notes, before/after scene/code evidence, package/runtime notes, final report, and updated `current_state.md`.
+    - Chat panel is visually pinned to the bottom of the left sidebar and does not obscure or replace the hierarchy.
+    - Chat requests include current project/scene/selection context.
+    - Main-process Pi SDK integration compiles and can be loaded under Electron's runtime.
+    - Renderer security remains intact: context isolation on, renderer Node integration off, typed preload bridge only.
+    - Objective docs/artifacts are corrected so they no longer describe the misunderstood PI Object workflow.
 </completion_criteria>

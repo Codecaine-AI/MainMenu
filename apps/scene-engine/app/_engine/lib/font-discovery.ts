@@ -1,5 +1,7 @@
 import { readdir } from 'node:fs/promises'
 import path from 'node:path'
+import { defaultProjectId } from '@/lib/scenes'
+import { projectApiUrl, resolveProjectPaths } from '@/lib/project-paths'
 import type { AssetContainer } from '@/types/scene'
 
 const FONT_EXTENSIONS = new Set(['.otf', '.ttf', '.woff', '.woff2'])
@@ -80,6 +82,49 @@ export async function discoverFontAssets(root = process.cwd()): Promise<Record<s
     { absDir: path.join(root, 'public', 'fonts'), baseUrl: '/fonts', idPrefix: 'font' },
     { absDir: path.join(root, 'public', 'assets', 'font'), baseUrl: '/assets/font', idPrefix: 'font-asset' },
   ]
+  const registry: Record<string, AssetContainer> = {}
+
+  for (const source of sources) {
+    const files = await walkFonts(source.absDir)
+    for (const file of files) {
+      const filename = path.basename(file)
+      const id = slugify(`${source.idPrefix}-${file}`)
+      if (!id) continue
+      registry[id] = {
+        type: 'font',
+        file: toPublicUrl(source.baseUrl, file),
+        family: inferFamily(file),
+        weight: inferWeight(filename),
+        style: /italic/i.test(filename) ? 'italic' : 'normal',
+      }
+    }
+  }
+
+  return registry
+}
+
+export async function discoverProjectFontAssets(
+  projectId?: string | null,
+  options: { urlMode?: 'logical' | 'project-api' } = {},
+): Promise<Record<string, AssetContainer>> {
+  const selectedProjectId = projectId ?? defaultProjectId()
+  const paths = resolveProjectPaths(selectedProjectId)
+  if (!paths) return {}
+
+  const logicalSources = [
+    { absDir: paths.fontsRoot, baseUrl: '/fonts', idPrefix: 'font' },
+  ]
+  const mediaFontDir = path.join(paths.mediaRoot, 'font')
+  if (mediaFontDir !== paths.fontsRoot) {
+    logicalSources.push({ absDir: mediaFontDir, baseUrl: '/assets/font', idPrefix: 'font-asset' })
+  }
+  const sources = logicalSources.map((source) => {
+    if (options.urlMode !== 'project-api' || !selectedProjectId) return source
+    return {
+      ...source,
+      baseUrl: projectApiUrl(selectedProjectId, source.baseUrl) ?? source.baseUrl,
+    }
+  })
   const registry: Record<string, AssetContainer> = {}
 
   for (const source of sources) {

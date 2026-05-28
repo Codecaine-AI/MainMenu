@@ -18,20 +18,24 @@ This is the contract that makes the system open for extension — a new contribu
 ## Where Manifests Live
 
 ```
-public/modules/
-├── registry.json
-├── effects/
-│   └── crt-overlay/
-│       ├── crt-overlay.css
-│       └── manifest.json
-└── components/
-    └── press-start/
-        ├── press-start.js
-        ├── press-start.css
-        └── manifest.json
+codecaine-site/
+├── ProjectSettings/
+│   └── registries/
+│       └── modules.json
+└── Assets/
+    └── Modules/
+        ├── effects/
+        │   └── crt-overlay/
+        │       ├── crt-overlay.css
+        │       └── manifest.json
+        └── components/
+            └── press-start/
+                ├── press-start.js
+                ├── press-start.css
+                └── manifest.json
 ```
 
-`public/modules/registry.json` is the index — each entry declares `type` and the `path` to the module's primary file. The renderer reads the manifest from the module's directory and merges it into the registry entry at load time.
+`ProjectSettings/registries/modules.json` is the index — each entry declares `type` and the logical `path` to the module's primary file, such as `/modules/components/press-start/press-start.js`. The renderer reads the manifest from the module's directory through the project file routes and merges it into the registry entry at load time.
 
 ## Manifest Shape
 
@@ -147,10 +151,10 @@ When the add-layer dialog lists modules, it groups by `type` (effect / component
 
 ## Adding a New Module
 
-1. Create a directory under `public/modules/effects/<id>/` or `public/modules/components/<id>/`.
+1. Create a directory under `Assets/Modules/effects/<id>/` or `Assets/Modules/components/<id>/` in the project workspace.
 2. Add the code file (`<id>.css` for effects, `<id>.js` for components).
 3. Add a `manifest.json` declaring `name`, `type`, optional `sizing`, and `properties`.
-4. Register it in `public/modules/registry.json`:
+4. Register it in `ProjectSettings/registries/modules.json`:
    ```json
    "<id>": { "type": "effect", "path": "/modules/effects/<id>/<id>.css" }
    ```

@@ -5,6 +5,7 @@ import { useEditorStore } from '@/store/editor-store'
 import { patchFromDottedKey } from '@/lib/patch'
 import { NUMERIC_PROPERTY_STEPS, POSITION_X_OPTIONS, POSITION_Y_OPTIONS } from '@/lib/inspector-config'
 import { isAssetType } from '@/lib/asset-types'
+import { resolveRuntimeUrl } from '@/renderer/runtime-url'
 import { RangedInput } from './inputs/RangedInput'
 import { BlendSelect } from './inputs/BlendSelect'
 import { FitSelect } from './inputs/FitSelect'
@@ -170,16 +171,17 @@ async function resolveAssetAspectRatio(
 
   const promise = (async () => {
     if (typeof src === 'string') {
+      const resolvedSrc = resolveRuntimeUrl(src)
       if (src.endsWith('.svg')) {
         try {
-          const response = await fetch(src)
+          const response = await fetch(resolvedSrc)
           if (response.ok) return parseSvgAspectRatio(await response.text())
         } catch {
           return measuredLayerAspectRatio(layerId)
         }
       }
-      if (entry.type === 'image') return imageAspectRatio(src)
-      if (entry.type === 'video') return videoAspectRatio(src)
+      if (entry.type === 'image') return imageAspectRatio(resolvedSrc)
+      if (entry.type === 'video') return videoAspectRatio(resolvedSrc)
     }
     return measuredLayerAspectRatio(layerId)
   })()

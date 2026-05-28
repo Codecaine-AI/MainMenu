@@ -18,7 +18,7 @@ Where the project came from — a Melee home screen recreation that outgrew hand
 The friction that motivated the scene-engine: hand-wired pages don't compose, and the asset library has outgrown the per-page approach.
 
 ### [20-vision.md](20-vision.md)
-What success looks like — Unity-style scenes assembled from typed asset layers, authored from two surfaces (visual editor and AI agent) on the same data.
+What success looks like — Unity-style scenes assembled from typed asset layers, authored from browser, desktop, and agent surfaces on the same project data.
 
 ### [30-principles.md](30-principles.md)
-Decisions and constraints that shape the system: scene = page, content separate from composition, dual-surface authoring as a first-class pattern.
+Decisions and constraints that shape the system: scene = page, content separate from composition, shared-file authoring as a first-class pattern.

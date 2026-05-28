@@ -5,7 +5,7 @@
   },
   "in-text-fire": {
     "type": "video",
-    "file": "/assets/video/test-fire.mp4"
+    "file": "/assets/video/codecaine-title-fire-loop.webm"
   },
   "main-menu-bg-blue": {
     "type": "video",
@@ -18,6 +18,10 @@
   "main-menu-bg-purple": {
     "type": "video",
     "file": "/assets/video/main-menu-backgrounds/purple.webm"
+  },
+  "main-menu-bg-purple-compact": {
+    "type": "video",
+    "file": "/assets/video/main-menu-backgrounds/purple-compact.webm"
   },
   "main-menu-bg-red": {
     "type": "video",

@@ -1,0 +1,50 @@
+{
+  "recheckedAt": "2026-05-28T15:52:42.198Z",
+  "devRootStaticRequests": [],
+  "devHttpErrors": [
+    {
+      "url": "http://localhost:3000/generation/inputs/extras/test-fire.mp4",
+      "status": 404
+    },
+    {
+      "url": "http://localhost:3000/generation/inputs/extras/test-fire.mp4",
+      "status": 404
+    }
+  ],
+  "devFailedRequests": [
+    {
+      "url": "http://localhost:3000/api/projects/codecaine/assets/video/main-menu-backgrounds/purple.webm",
+      "failure": "net::ERR_ABORTED"
+    }
+  ],
+  "devPageErrors": [],
+  "titleLayers": 8,
+  "menuLayers": 7,
+  "export": {
+    "port": 57677,
+    "exportHttpErrors": [],
+    "exportFailedRequests": [],
+    "ignoredMediaAborts": [
+      {
+        "url": "http://127.0.0.1:57677/assets/audio/ui-forward/ui-forward.wav",
+        "failure": "net::ERR_ABORTED"
+      },
+      {
+        "url": "http://127.0.0.1:57677/assets/video/test-fire.mp4",
+        "failure": "net::ERR_ABORTED"
+      }
+    ],
+    "exportPageErrors": [],
+    "exportTitleLayers": 10,
+    "exportMenuClickLayers": 8,
+    "exportMenuLayers": 8
+  },
+  "screenshots": [
+    "screenshots/recheck-preview-title.png",
+    "screenshots/recheck-preview-menu.png",
+    "screenshots/recheck-editor-title.png",
+    "screenshots/recheck-export-title-root.png",
+    "screenshots/recheck-export-menu-after-click.png",
+    "screenshots/recheck-export-menu-direct.png"
+  ]
+}

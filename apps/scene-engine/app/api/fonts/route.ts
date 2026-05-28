@@ -1,9 +1,10 @@
 import { NextResponse } from 'next/server'
-import { discoverFontAssets } from '@/lib/font-discovery'
+import { discoverProjectFontAssets } from '@/lib/font-discovery'
 
-export async function GET() {
+export async function GET(req: Request) {
   try {
-    return NextResponse.json(await discoverFontAssets())
+    const projectId = new URL(req.url).searchParams.get('project')
+    return NextResponse.json(await discoverProjectFontAssets(projectId, { urlMode: 'logical' }))
   } catch (err) {
     return NextResponse.json(
       { error: err instanceof Error ? err.message : 'Font discovery failed' },

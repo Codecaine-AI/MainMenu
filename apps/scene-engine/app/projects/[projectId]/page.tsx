@@ -53,7 +53,7 @@ export default async function ProjectPage({
             <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-gray-400">Scenes</h2>
             {scenes.length === 0 ? (
               <p className="text-sm text-gray-500">
-                No scenes found under <code className="text-gray-400">projects/{projectId}/scenes/</code>.
+                No scenes found in this project workspace.
               </p>
             ) : (
               <div className="divide-y divide-[#242424] border-y border-[#242424]">

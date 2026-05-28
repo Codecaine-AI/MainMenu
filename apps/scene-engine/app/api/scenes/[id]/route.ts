@@ -1,14 +1,9 @@
 import { readFile, writeFile, mkdir } from 'fs/promises'
-import path from 'path'
 import { existsSync } from 'fs'
 import { NextResponse } from 'next/server'
-import { projectRoot } from '@/lib/scenes'
+import { resolveProjectPaths } from '@/lib/project-paths'
 
 const ID_RE = /^[a-z0-9]+(?:-[a-z0-9]+)*$/
-
-function scenePath(root: string, id: string) {
-  return path.join(root, 'scenes', id, 'scene.json')
-}
 
 export async function GET(
   req: Request,
@@ -18,11 +13,11 @@ export async function GET(
   if (!ID_RE.test(id)) {
     return NextResponse.json({ error: 'Invalid scene id' }, { status: 400 })
   }
-  const root = projectRoot(new URL(req.url).searchParams.get('project'))
-  if (!root) {
+  const paths = resolveProjectPaths(new URL(req.url).searchParams.get('project'))
+  if (!paths) {
     return NextResponse.json({ error: 'Project not found' }, { status: 404 })
   }
-  const file = scenePath(root, id)
+  const file = paths.sceneFile(id)
   if (!existsSync(file)) {
     return NextResponse.json({ error: 'Not found' }, { status: 404 })
   }
@@ -49,14 +44,14 @@ export async function PUT(
   if (!body || typeof body !== 'object' || Array.isArray(body)) {
     return NextResponse.json({ error: 'Body must be a JSON object' }, { status: 400 })
   }
-  const root = projectRoot(new URL(req.url).searchParams.get('project'))
-  if (!root) {
+  const paths = resolveProjectPaths(new URL(req.url).searchParams.get('project'))
+  if (!paths) {
     return NextResponse.json({ error: 'Project not found' }, { status: 404 })
   }
-  const dir = path.join(root, 'scenes', id)
+  const dir = paths.sceneDir(id)
   if (!existsSync(dir)) {
     await mkdir(dir, { recursive: true })
   }
-  await writeFile(scenePath(root, id), JSON.stringify(body, null, 2) + '\n', 'utf-8')
+  await writeFile(paths.sceneFile(id), JSON.stringify(body, null, 2) + '\n', 'utf-8')
   return new NextResponse(null, { status: 204 })
 }

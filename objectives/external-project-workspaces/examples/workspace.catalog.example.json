@@ -1,0 +1,13 @@
+{
+  "version": 1,
+  "activeProjectId": "codecaine",
+  "projects": [
+    {
+      "id": "codecaine",
+      "name": "Codecaine",
+      "root": "../../../codecaine-site",
+      "enabled": true,
+      "description": "External Codecaine Scene Engine project workspace"
+    }
+  ]
+}

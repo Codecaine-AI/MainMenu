@@ -1,11 +1,11 @@
 ---
-covers: The Unity-style scene model the engine is built around — pages as scenes, scenes as composed asset layers, edited by both human and agent.
-concepts: [unity-scene, composition, dual-surface, vertical-slice]
+covers: The Unity-style scene model the engine is built around — pages as scenes, scenes as composed asset layers, edited by human UI, desktop shell, and agent.
+concepts: [unity-scene, composition, shared-file-authoring, vertical-slice]
 ---
 
 # Vision
 
-A scene-engine that makes **composition** the primary authoring activity. Define assets once, drop them into a scene, edit their properties either visually or programmatically, build the result as a deployable web page. The first concrete deliverable is the CodeCaine title screen — a layer-rich scene that exercises every asset type end-to-end.
+A scene-engine that makes **composition** the primary authoring activity. Define assets once in a project workspace, drop them into a scene, edit their properties visually or programmatically, then build the result as a deployable web page or packaged desktop authoring app. The first concrete deliverable is the Codecaine title screen — a layer-rich scene that exercises every major asset path end-to-end.
 
 ---
 
@@ -17,21 +17,23 @@ Scenes are not interactive applications. They are landing pages and static websi
 
 > *"Similarly to the Unity naming, where a Scene is an actual stage of the game, and then everything for that stage is put in as assets into that scene."*
 
-## Five Asset Types, Day One
+## Asset And Module Types
 
-The vision requires all five asset types from the start because the title scene needs them all:
+The engine treats uploadable files and authored modules as separate registry entries because they are created and maintained differently:
 
 | Type          | What it is                                                          |
 |---------------|---------------------------------------------------------------------|
-| `media`       | Video, image, texture                                               |
-| `effect`      | CSS effect (CRT overlay, vortex, chromatic aberration)              |
-| `glyph-group` | Layered SVG glyph from the font pipeline, with expandable sub-layers |
-| `component`   | Data-driven JS component (menu, press-start) that owns its content  |
 | `audio`       | Web Audio sound (start cue, ambient loops)                          |
+| `image`       | Static raster media                                                 |
+| `video`       | Full-stage or interleaved video loops                               |
+| `glyph`       | Layered SVG glyph from the font pipeline                            |
+| `font`        | Project-owned font files                                            |
+| `effect`      | Authored CSS effect module (CRT overlay, chromatic aberration)      |
+| `component`   | Authored JS component module (menu, press-start, procedural shapes) |
 
 ## Tree Hierarchy, Not a Flat Stack
 
-Layers form a **tree**. Most layers are leaves; some are **groups** (e.g. the CodeCaine logo, which is itself a stack of ~30 SVG sub-layers).
+Layers form a **tree**. Most layers are leaves; some are **groups** (e.g. the Codecaine logo, which is itself a stack of ~30 SVG sub-layers).
 
 - Groups are collapsible: one row in the layer panel by default.
 - Sub-layers within a group are individually configurable (visibility, blend, hue, opacity).
@@ -39,20 +41,21 @@ Layers form a **tree**. Most layers are leaves; some are **groups** (e.g. the Co
 
 Z-order is array position. Last entry renders on top.
 
-## Dual-Surface Authoring
+## Shared-File Authoring
 
-The same scene data is edited by **two authoring surfaces**:
+The same project data is edited by multiple authoring surfaces:
 
-1. **Visual editor (human)** — Canvas-based UI with drag-and-drop, layer hierarchy, property inspector, save button.
-2. **Agent / file API (AI)** — Claude Code reads and writes `scene.json` directly, or PUTs to the Next API route. Heavy lifting tasks (figuring out layer ordering, normal maps, chrome tuning) belong here.
+1. **Visual editor** — browser UI with drag-and-drop, layer hierarchy, property inspector, save button, asset selection, and export action.
+2. **Main Menu desktop shell** — Electron app that opens the same editor and owns local native capabilities.
+3. **Pi Agent / file API** — desktop chat agent or external AI reads and writes project files directly, or PUTs to the Next API route.
 
-Neither surface is privileged. The pattern was proven at the glyph level by the font app's `layer-recipe.json`; the scene-engine generalizes it to whole-page compositions.
+No surface is the source of truth. Project files are. The pattern was proven at the glyph level by the font app's `layer-recipe.json`; the scene-engine generalizes it to whole-page compositions and project workspaces.
 
-## The Vertical Slice: CodeCaine Title Screen
+## The Vertical Slice: Codecaine Title Screen
 
 One concrete scene end-to-end:
 
-- CodeCaine logo, centered, top-third, idle shimmer
+- Codecaine logo, centered, top-third, idle shimmer
 - A texture/video placed *inside* the logo's layer stack (interleaved sub-layer)
 - Full-stage video background
 - "Press Start" interactive prompt with blink animation
@@ -63,7 +66,7 @@ This scene exercises every mechanic the system claims to support: rich z-orderin
 
 ## Output Model
 
-Scenes build to a **multi-page web app** bundled with its media. Each scene becomes one page in the built output. Not a single-file export (videos can't be inlined). Not a live-rendered CMS (scenes are authored, then built).
+Scenes build to a **multi-page web app** bundled with only the active media/modules/fonts required by the exported scenes. Each scene becomes one page in the built output. Not a single-file export (videos can't be inlined). Not a live-rendered CMS (scenes are authored, then built).
 
 ## Audience
 

@@ -89,7 +89,7 @@ Internal helper. `ensureStylesheet(href)` deduplicates `<link rel="stylesheet">`
 
 ## Manifest Reads
 
-When the asset registry merges `public/modules/registry.json`, each module entry is augmented with its `manifest.json` if present. The renderer doesn't consult the manifest itself — `properties` are passed through to components/effects unchanged. The manifest exists for the **editor** (to render property fields) and for **defaulting** (when a new object is added, the editor seeds `properties` from the manifest's `default` values). See the [component-manifest design doc](../../10-system-design/15-component-manifest.md).
+When the asset registry merges a project's module registry, each module entry is augmented with its sibling `manifest.json` if present. The renderer doesn't consult the manifest itself — `properties` are passed through to components/effects unchanged. The manifest exists for the **editor** (to render property fields) and for **defaulting** (when a new object is added, the editor seeds `properties` from the manifest's `default` values). See the [component-manifest design doc](../../10-system-design/15-component-manifest.md).
 
 ## Source
 

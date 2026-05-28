@@ -15,6 +15,7 @@
     "desktop:pack:mac": "npm run desktop:compile && npm run desktop:build:next && electron-builder --mac dir"
   },
   "dependencies": {
+    "@mariozechner/pi-coding-agent": "^0.73.1",
     "jszip": "^3.10.1",
     "next": "^15.3.1",
     "react": "^19.1.0",

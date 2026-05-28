@@ -1,10 +1,17 @@
 import Link from 'next/link'
-import { discoverProjects } from '@/lib/scenes'
+import { defaultProjectId, discoverProjectsWithDiagnostics } from '@/lib/scenes'
 import { listAssetLibrary } from '@/lib/asset-library'
 
 export default function DashboardPage() {
-  const projects = discoverProjects()
-  const assets = listAssetLibrary({ includeUsage: false })
+  const { projects, diagnostics } = discoverProjectsWithDiagnostics()
+  const activeProjectId = defaultProjectId()
+  const assets = listAssetLibrary({ projectId: activeProjectId, includeUsage: false })
+  const assetLibraryHref = activeProjectId
+    ? `/asset-library?project=${encodeURIComponent(activeProjectId)}`
+    : '/asset-library'
+  const uploadHref = activeProjectId
+    ? `/upload?project=${encodeURIComponent(activeProjectId)}`
+    : '/upload'
 
   return (
     <main className="min-h-[100dvh] bg-[#111] px-6 py-7 text-gray-300">
@@ -20,6 +27,15 @@ export default function DashboardPage() {
             <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-gray-400">
               Projects
             </h2>
+            {diagnostics.length > 0 && (
+              <div className="mb-4 border-y border-[#3a2f1f] py-3 text-xs text-amber-300">
+                {diagnostics.map((item) => (
+                  <p key={`${item.code}-${item.projectId ?? item.message}`} className="m-0 py-0.5">
+                    <span className="font-mono uppercase text-amber-500">{item.level}</span> {item.message}
+                  </p>
+                ))}
+              </div>
+            )}
             {projects.length === 0 ? (
               <div className="border-y border-[#242424] py-6 text-sm text-gray-500">
                 No projects found.
@@ -41,6 +57,11 @@ export default function DashboardPage() {
                             Legacy
                           </span>
                         )}
+                        {project.layout === 'external' && (
+                          <span className="rounded-sm border border-[#2a6da3] px-1.5 py-0.5 font-mono text-[10px] uppercase tracking-wide text-[#8fc6f2]">
+                            Catalog
+                          </span>
+                        )}
                       </div>
                       <p className="mt-1 font-mono text-xs text-gray-600">
                         {project.id} / entry {project.entry}
@@ -54,7 +75,7 @@ export default function DashboardPage() {
                         Preview
                       </Link>
                       <Link
-                        href={`/projects/${project.id}`}
+                        href={`/projects/${encodeURIComponent(project.id)}`}
                         className="rounded-sm border border-[#2a6da3] bg-[#173247] px-2.5 py-1 text-xs text-[#cfe6ff] no-underline hover:bg-[#1d3d54] active:translate-y-px"
                       >
                         Open
@@ -73,13 +94,13 @@ export default function DashboardPage() {
               </h2>
               <div className="flex items-center gap-2">
                 <Link
-                  href="/asset-library"
+                  href={assetLibraryHref}
                   className="rounded-sm border border-[#333] bg-[#222] px-2.5 py-1 text-xs text-gray-200 no-underline hover:bg-[#2b2b2b] active:translate-y-px"
                 >
                   Library
                 </Link>
                 <Link
-                  href="/upload"
+                  href={uploadHref}
                   className="rounded-sm border border-[#2a6da3] bg-[#173247] px-2.5 py-1 text-xs text-[#cfe6ff] no-underline hover:bg-[#1d3d54] active:translate-y-px"
                 >
                   Upload

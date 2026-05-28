@@ -13,7 +13,9 @@
           "enter": "open-source",
           "preview": {
             "type": "contribution-grid",
-            "weeks": 14
+            "weeks": 12,
+            "rows": 5,
+            "palette": "rose"
           }
         },
         {

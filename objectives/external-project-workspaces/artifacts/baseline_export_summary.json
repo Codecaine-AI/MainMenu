@@ -1,0 +1,51 @@
+{
+  "generatedAt": "2026-05-28T15:20:48-05:00",
+  "devServer": "http://localhost:3000",
+  "command": "curl -fS -X POST 'http://localhost:3000/api/export?project=codecaine' -o objectives/external-project-workspaces/artifacts/baseline-codecaine.zip",
+  "zipPath": "objectives/external-project-workspaces/artifacts/baseline-codecaine.zip",
+  "zipManifestPath": "objectives/external-project-workspaces/artifacts/baseline_zip_manifest.txt",
+  "zipBytes": 57309064,
+  "zipEntryCount": 127,
+  "uncompressedBytes": 57290166,
+  "projectId": "codecaine",
+  "activeSceneIds": [
+    "title",
+    "menu"
+  ],
+  "assetIds": [
+    "codecaine-rounded-chrome-logo",
+    "in-text-fire",
+    "main-menu-bg-purple",
+    "melee-menu-song",
+    "ui-back",
+    "ui-forward",
+    "ui-navigation"
+  ],
+  "moduleIds": [
+    "arc-letterbox",
+    "background-pulse",
+    "codecaine-keycap-start",
+    "crt-overlay",
+    "main-menu-rings",
+    "main-menu-system",
+    "menu-items",
+    "menu-shield",
+    "orbit-press-start",
+    "procedural-cylinder",
+    "procedural-cylinder-strips-mask",
+    "procedural-sphere",
+    "side-menu"
+  ],
+  "fontIds": [
+    "font-folkpro-family-a-otf-folkpro-bold",
+    "font-folkpro-family-a-otf-folkpro-heavy",
+    "font-folkpro-family-a-otf-folkpro-medium",
+    "font-folkpro-family-a-otf-folkpro-regular",
+    "font-impact-impact-wide"
+  ],
+  "warnings": [],
+  "notes": [
+    "Baseline export succeeded before migration.",
+    "Current export already prunes unused public assets/modules but still reads all source bytes from apps/scene-engine/public and apps/scene-engine/projects."
+  ]
+}

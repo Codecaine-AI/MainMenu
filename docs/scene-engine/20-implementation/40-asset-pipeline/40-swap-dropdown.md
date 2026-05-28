@@ -1,14 +1,14 @@
 ---
-covers: AssetSwapDropdown.tsx, LayerForm integration, and editor-store.updateContainerFile — how the inspector swaps a container's file and keeps the renderer cache in sync.
-concepts: [swap-dropdown, registry-mutation, store-mirror]
+covers: AssetSwapDropdown.tsx, LayerForm/SlotsSection integration, and editor-store asset selection actions — how the inspector points layers and slots at project-local containers.
+concepts: [asset-dropdown, asset-selection, store-mutation]
 design_refs: [10-system-design/60-asset-uploads.md]
 ---
 
-# Inspector Swap Dropdown
+# Inspector Asset Dropdown
 
-`apps/scene-engine/app/editor/_components/AssetSwapDropdown.tsx` is the client side of the swap flow. When an asset-type layer is selected in the inspector, the dropdown lists every file under `public/assets/{type}/` and lets the user re-point the container at a different one without leaving the scene.
+`apps/scene-engine/app/editor/_components/AssetSwapDropdown.tsx` is the client side of asset selection. When an asset-type layer or glyph slot is selected in the inspector, the dropdown lists project-available registry containers of the same type and lets the user point that scene reference at another container.
 
-Three pieces cooperate: the dropdown component, the `LayerForm` that mounts it, and the `editor-store` action that mirrors the change in memory.
+Three pieces cooperate: the dropdown component, the `LayerForm` or `SlotsSection` that mounts it, and the editor-store action that changes the selected scene reference.
 
 ---
 
@@ -17,60 +17,53 @@ Three pieces cooperate: the dropdown component, the `LayerForm` that mounts it, 
 | Prop          | Type        | Notes                                                            |
 |---------------|-------------|------------------------------------------------------------------|
 | `assetId`     | string      | The container ID (registry key).                                 |
-| `assetType`   | `AssetType` | One of the four asset types — drives the listing fetch.          |
-| `currentFile` | string      | The container's current `file` value. Pre-selected in the menu.  |
+| `assetType`   | `AssetType` | One of the file asset types — drives the listing fetch.          |
+| `projectId`   | string      | Optional project filter for the asset-library request.           |
+| `onSelect`    | function    | Receives the next asset id selected by the user.                 |
 
 ### Behavior
 
-- **Mount.** Fetches `/api/assets/{type}` and stores `[{ name, file }]` in local state. Cancels stale fetches on `assetType` change.
-- **Render.** Shows a `<select>` of every fetched file. If the current file isn't in the listing (e.g. it was just renamed), it's prepended so the dropdown still reflects truth.
+- **Mount.** Fetches `/api/asset-library?type={type}&usage=0&project={projectId}` and stores `AssetLibraryRecord[]` in local state. Cancels stale fetches on `assetType` or `projectId` change.
+- **Render.** Shows a `<select>` of matching containers by label. If the current asset id is not in the listing, it is prepended so the dropdown still reflects the saved scene.
 - **Change.** On selection:
-  1. PATCH `/api/registry/{assetId}` with `{ file: newFile }`.
-  2. On error, surfaces the server's `error` message inline.
-  3. On success, calls `useEditorStore.updateContainerFile(assetId, newFile)` to mirror the change.
+  1. Calls `onSelect(nextAssetId)`.
+  2. `LayerForm` maps that to `setObjectAssetAt(path, nextAssetId)`.
+  3. `SlotsSection` maps it to `setSlotAssetAt(path, slotIndex, nextAssetId)`.
 
-The component does not manage the network state of the upload page — it assumes the file already exists on disk.
+The component does not upload files and does not mutate registries. It assumes the container already exists in the selected project registry.
 
 ## Mounting: `LayerForm`
 
 `LayerForm` reads the selected layer's `asset` ID, looks the container up in the in-memory registry, and mounts the dropdown only when:
 
 - The container exists.
-- Its `type` is one of the four asset types (`isAssetType(...)`) — modules don't get a swap dropdown.
+- Its `type` is one of the file asset types (`isAssetType(...)`) — modules don't get a dropdown.
 - The entry has a `file` field — narrows from the `AssetContainer | ModuleEntry` union.
 
-This is the only place that distinguishes assets from modules in the inspector. Module-typed containers (effects, components) skip the dropdown silently.
+`SlotsSection` uses the same component for glyph-group slots. Module-typed containers (effects, components) skip the dropdown silently.
 
-## Cache mirror: `editor-store.updateContainerFile`
+## Store Mutations
 
-`apps/scene-engine/app/_engine/store/editor-store.ts` exposes `updateContainerFile(id, file)` — async because it lazy-imports the renderer's `asset-registry.js`:
+`apps/scene-engine/app/_engine/store/editor-store.ts` exposes two synchronous selection mutations:
 
 ```ts
-const { updateEntry } = await import('@/renderer/asset-registry')
-updateEntry(id, { file })
-set({ registry: { ...registry, [id]: { ...registry[id], file } } })
+setObjectAssetAt(path, assetId)
+setSlotAssetAt(path, slotIndex, assetId)
 ```
 
-Two caches end up updated:
+Both clone the scene, update only the selected `asset` field, and mark the store dirty. Save persists the changed scene JSON. The in-memory registry is not changed because the container did not change, only the scene's reference to it.
 
-- **Renderer cache** (`mergedRegistry` in `asset-registry.js`) — what the renderer reads on the next layer render.
-- **Zustand store** — what the inspector and add-layer dialog read for UI state.
+## Why Selection Updates Scene JSON
 
-Without both, the next render or the next inspector reload would still see the old pointer.
+Selection and registry maintenance are intentionally separate:
 
-The lazy `import('@/renderer/asset-registry')` is intentional: the renderer module is browser-only, and dynamic import keeps it out of any SSR boundary the store might be touched from.
+| Surface             | Persistent write       | Effect |
+|---------------------|------------------------|--------|
+| Asset dropdown      | scene JSON             | This layer/slot points at another container. |
+| Upload page         | project asset registry | New bytes and a new container are added. |
+| Registry PATCH API  | project asset registry | Existing container's file pointer changes. |
 
-## Why a Three-Way Update
-
-The flow looks redundant — server, renderer cache, store cache — but each has a different lifecycle:
-
-| Cache               | Lifetime              | Why it has to be touched                                              |
-|---------------------|-----------------------|-----------------------------------------------------------------------|
-| `assets/registry.json` | persistent          | Source of truth. Survives reload.                                    |
-| `mergedRegistry`    | page session          | Loaded once at scene boot; renderer reads it on every render.         |
-| Zustand `registry`  | editor lifecycle      | Drives inspector + add-layer dialog UI; unrelated to render path.     |
-
-Skipping any one of them produces a visible inconsistency: stale on disk, stale on canvas, or stale in the inspector.
+That split keeps a local scene selection from unexpectedly changing every other scene that references the same container.
 
 ## Sources
 

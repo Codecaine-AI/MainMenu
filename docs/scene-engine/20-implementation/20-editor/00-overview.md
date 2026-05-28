@@ -20,16 +20,17 @@ apps/scene-engine/app/editor/
 ├── page.tsx                            shell — 3-panel grid, useSceneLoader
 └── _components/
     ├── CanvasPanel.tsx                 live preview using the production renderer
-    ├── HierarchyPanel.tsx              object tree, drag reorder, add menu
+    ├── HierarchyPanel.tsx              object tree, drag reorder, add menu, Pi panel host
     ├── HierarchyRow.tsx                recursive tree row
     ├── InspectorPanel.tsx              shell that resolves selected object
     ├── LayerForm.tsx                   always-present sections + schema-driven properties
     ├── MainMenuConfigEditor.tsx        bespoke main-menu graph and tuning editor
+    ├── PiAgentChatPanel.tsx            desktop bridge chat panel for Pi Agent
     ├── PropertySection.tsx             section header + nested properties + nested sections
     ├── PropertyField.tsx               clickable label + input dispatch by schema type
     ├── DescriptionPopover.tsx          floating popover (anchored, click-away/Esc dismiss)
     ├── SlotsSection.tsx                glyph-group slot editor
-    ├── AssetSwapDropdown.tsx           per-container file swap
+    ├── AssetSwapDropdown.tsx           project asset selector for layers/slots
     ├── SceneSection.tsx                collapsed scene settings + hierarchy save controls
     └── inputs/
         ├── RangedInput.tsx             slider + numeric, debounced
@@ -57,7 +58,7 @@ apps/scene-engine/app/_engine/
 ## Contents
 
 ### [10-state.md](10-state.md)
-The Zustand store, object-path semantics, the deep-merge patch algorithm, and each mutation (`mutateObjectAt`, `addObjectAt`, `removeObjectAt`, `moveObject`, `updateContainerFile`).
+The Zustand store, object-path semantics, the deep-merge patch algorithm, and each mutation (`mutateObjectAt`, `setObjectAssetAt`, `setSlotAssetAt`, `addObjectAt`, `removeObjectAt`, `moveObject`).
 
 ### [20-panels.md](20-panels.md)
 The React components — Toolbar, Canvas, Hierarchy, Inspector — including always-present sections, drag-and-drop reorder, manifest-driven property fields, slots, and events.
@@ -79,3 +80,4 @@ The React components — Toolbar, Canvas, Hierarchy, Inspector — including alw
 | Slot                        | Glyph-group sub-surface edited under the parent object, not as a separate hierarchy entry. |
 | Event binding               | Trigger → action → target row stored on the object's `events[]`. |
 | Dirty                       | A boolean toggled by mutations and reset on save. Drives the toolbar's dirty indicator and Save button. |
+| Pi Agent panel              | Desktop-only chat panel hosted below the hierarchy. Sends project/scene/selection context through `window.mainMenu.agent`. |

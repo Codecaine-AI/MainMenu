@@ -1,6 +1,7 @@
 import { existsSync, readFileSync, writeFileSync } from 'node:fs'
 import path from 'node:path'
-import { discoverProjects, loadProject, projectRoot } from '@/lib/scenes'
+import { defaultProjectId, discoverProjects, loadProject } from '@/lib/scenes'
+import { resolveProjectPaths, type ProjectPaths } from '@/lib/project-paths'
 import type {
   AssetContainer,
   AssetLibraryRecord,
@@ -12,21 +13,26 @@ import type {
 
 const ID_RE = /^[a-z0-9]+(?:-[a-z0-9]+)*$/
 
-export function assetRegistryPath(root = process.cwd()) {
-  return path.join(root, 'public', 'assets', 'registry.json')
+function selectedProjectId(projectId?: string | null) {
+  return projectId ?? defaultProjectId()
 }
 
-export function readAssetRegistry(root = process.cwd()): Record<string, AssetContainer> {
-  const file = assetRegistryPath(root)
+export function assetRegistryPath(projectId?: string | null) {
+  const paths = resolveProjectPaths(selectedProjectId(projectId))
+  return paths?.assetRegistryFile ?? path.join(process.cwd(), 'public', 'assets', 'registry.json')
+}
+
+export function readAssetRegistry(projectId?: string | null): Record<string, AssetContainer> {
+  const file = assetRegistryPath(projectId)
   if (!existsSync(file)) return {}
   return JSON.parse(readFileSync(file, 'utf-8')) as Record<string, AssetContainer>
 }
 
 export function writeAssetRegistry(
   registry: Record<string, AssetContainer>,
-  root = process.cwd(),
+  projectId?: string | null,
 ) {
-  writeFileSync(assetRegistryPath(root), JSON.stringify(registry, null, 2) + '\n', 'utf-8')
+  writeFileSync(assetRegistryPath(projectId), JSON.stringify(registry, null, 2) + '\n', 'utf-8')
 }
 
 export function assetLabel(id: string, entry: AssetContainer): string {
@@ -50,8 +56,8 @@ export function assetAvailableForProject(
   return Array.isArray(entry.projectIds) && entry.projectIds.includes(projectId)
 }
 
-function readScene(projectDir: string, sceneId: string): SceneJson | null {
-  const file = path.join(projectDir, 'scenes', sceneId, 'scene.json')
+function readScene(projectPaths: ProjectPaths, sceneId: string): SceneJson | null {
+  const file = projectPaths.sceneFile(sceneId)
   if (!existsSync(file)) return null
   try {
     return JSON.parse(readFileSync(file, 'utf-8')) as SceneJson
@@ -143,14 +149,16 @@ function collectObjectUsage(
 
 export function collectAssetUsage(
   registry = readAssetRegistry(),
+  projectId?: string | null,
 ): Map<string, AssetUsageLocation[]> {
   const usage = new Map<string, AssetUsageLocation[]>()
   for (const descriptor of discoverProjects()) {
+    if (projectId && descriptor.id !== projectId) continue
     const project = loadProject(descriptor.id)
-    const root = projectRoot(descriptor.id)
-    if (!project || !root) continue
+    const paths = resolveProjectPaths(descriptor.id)
+    if (!project || !paths) continue
     for (const sceneRef of project.scenes ?? []) {
-      const scene = readScene(root, sceneRef.id)
+      const scene = readScene(paths, sceneRef.id)
       if (!scene) continue
       for (const object of scene.objects ?? []) {
         collectObjectUsage(object, usage, registry, {
@@ -168,12 +176,13 @@ export function listAssetLibrary(options: {
   projectId?: string | null
   includeUsage?: boolean
 } = {}): AssetLibraryRecord[] {
-  const registry = readAssetRegistry()
-  const usage = options.includeUsage ? collectAssetUsage(registry) : new Map<string, AssetUsageLocation[]>()
+  const projectId = selectedProjectId(options.projectId)
+  const registry = readAssetRegistry(projectId)
+  const usage = options.includeUsage ? collectAssetUsage(registry, projectId) : new Map<string, AssetUsageLocation[]>()
 
   return Object.entries(registry)
     .filter(([id, entry]) => ID_RE.test(id) && (!options.type || entry.type === options.type))
-    .filter(([, entry]) => assetAvailableForProject(entry, options.projectId))
+    .filter(([, entry]) => assetAvailableForProject(entry, projectId))
     .map(([id, entry]) => {
       const locations = usage.get(id) ?? []
       return {

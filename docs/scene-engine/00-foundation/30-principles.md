@@ -17,13 +17,13 @@ Each scene corresponds to one full page. No multi-scene composition, no nested s
 ### 2. Composition is the primary authoring activity
 The system optimizes for *placing existing assets into a stage*, not for creating new assets. Asset creation (font pipeline, extraction pipeline) lives outside this app. The scene-engine only consumes registered assets.
 
-### 3. Dual-surface authoring is symmetric
-The visual editor and the agent both read and write the same `scene.json`. Neither is the source of truth — the file is. No editor-state awareness in the agent, no real-time collaboration protocol, no operational transform.
+### 3. Shared-file authoring is symmetric
+The visual editor, Main Menu desktop shell, and Pi Agent all operate on the same project files. None is the source of truth — the files are. No real-time collaboration protocol, no operational transform.
 
 ### 4. Content separate from composition (Option A)
-- **Assets** in the registry are reusable visual building blocks.
-- **Content** lives with each component asset (e.g. `menu-data.json` next to `menu.js`).
-- **Scenes** are lean composition manifests — they reference assets by ID and declare placement, but never embed content.
+- **Assets/modules** in project registries are reusable visual building blocks.
+- **Component defaults** live with each component module.
+- **Scenes** are composition manifests — they reference assets by ID, declare placement, and may carry instance-level properties for editor-owned state.
 
 This avoids duplication and keeps the editor focused on visual composition rather than copywriting.
 
@@ -37,8 +37,8 @@ Groups have `children`. Children can either be **named sub-layer overrides** (re
 - The Python pipeline (`apps/font-creation/pipeline/`) remains a standalone asset factory.
 - The melee-3 Vite editor app is folded into the scene editor as the glyph-group property inspector. One editor, not two.
 
-### 8. The scene-engine fully replaces `apps/frontend/`
-The previous hand-wired Vite multi-page app is retired. All pages — title, menu, projects, testimonials, links, about, guestbook — eventually rebuild as scenes. Shared infrastructure (vortex, CRT, audio, tweaks) becomes reusable assets, not page-bootstrapped scaffolding.
+### 8. The scene-engine owns the Codecaine site workspace
+The previous hand-wired Vite multi-page app is retired. Codecaine now lives as an external project workspace with its own repository. Current pages (`title`, `menu`) are scenes; future pages rebuild as scenes. Shared infrastructure (CRT, audio, menu components, media) becomes project assets/modules, not page-bootstrapped scaffolding.
 
 ---
 
@@ -48,5 +48,5 @@ The previous hand-wired Vite multi-page app is retired. All pages — title, men
 - **Single-file standalone HTML exports.** Media (videos) requires bundling.
 - **A general-purpose website builder.** Built for one author, with one taste.
 - **Scene-to-scene transitions or navigation in the editor.** Navigation is a rendered-website concern. The editor views one scene at a time.
-- **A defined production deployment pipeline on day one.** The priority is the authoring and composition model. Build/deploy come later.
+- **A hosted CMS runtime.** Exports are static bundles, and desktop packaging is for authoring the local workspace.
 - **Real-time multi-author collaboration.** The agent and the human are not editing simultaneously.

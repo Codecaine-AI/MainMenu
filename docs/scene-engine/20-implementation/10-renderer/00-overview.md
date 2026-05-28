@@ -42,7 +42,7 @@ The renderer is also copied into the standalone export bundle, with absolute pat
 The top-level loop in `scene-renderer.js`: stage sizing, scene-level appearance, mount vs. update, the `applyObjectStyles` pass, and `updateChildren` reconciliation.
 
 ### [20-asset-registry.md](20-asset-registry.md)
-`asset-registry.js`: merging `assets/registry.json` with `modules/registry.json`, manifest enrichment, `resolveAsset` semantics, and the `updateEntry` swap path.
+`asset-registry.js`: merging active project asset/module/font registries, manifest enrichment, `resolveAsset` semantics, and the optional `updateEntry` maintenance path.
 
 ### [30-asset-renderers.md](30-asset-renderers.md)
 The renderer registry (`registerRenderer` / `getRenderer`) and each per-type renderer. Includes the glyph-group slot-mounting algorithm and the manifest-driven component contract.

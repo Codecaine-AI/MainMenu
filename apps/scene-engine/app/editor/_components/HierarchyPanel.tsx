@@ -8,6 +8,7 @@ import type { Registry, SceneJson } from '@/types/scene'
 import { HierarchyRow } from './HierarchyRow'
 import { SceneSaveControls } from './SceneSection'
 import { AddLayerDialog } from './AddLayerDialog'
+import { PiAgentChatPanel } from './PiAgentChatPanel'
 
 interface Props {
   projectId: string | null
@@ -171,46 +172,49 @@ export function HierarchyPanel({ projectId, sceneId, scenesHref }: Props) {
   }
 
   return (
-    <section className="bg-[#1a1a1a] overflow-auto p-2" style={{ gridArea: 'hierarchy' }}>
+    <section className="flex min-h-0 flex-col overflow-hidden bg-[#1a1a1a] p-2" style={{ gridArea: 'hierarchy' }}>
       <SidebarHeader title={scene.name ?? sceneId} scenesHref={scenesHref} />
-      <div className="mt-3 mb-2 flex items-center justify-between gap-2">
-        <h3 className="m-0 text-[13px] uppercase tracking-wide text-gray-100 font-bold">Hierarchy</h3>
-        <button
-          type="button"
-          onClick={openTopLevelAdd}
-          className="h-5 w-5 border border-[#4a4a4a] bg-[#242424] text-sm leading-none text-gray-100 hover:bg-[#303030] active:translate-y-px"
-          aria-label="Add top-level layer"
-        >
-          +
-        </button>
+      <div className="min-h-0 flex-1 overflow-auto pr-1">
+        <div className="mb-2 flex items-center justify-between gap-2">
+          <h3 className="m-0 text-[13px] uppercase tracking-wide text-gray-100 font-bold">Hierarchy</h3>
+          <button
+            type="button"
+            onClick={openTopLevelAdd}
+            className="h-5 w-5 border border-[#4a4a4a] bg-[#242424] text-sm leading-none text-gray-100 hover:bg-[#303030] active:translate-y-px"
+            aria-label="Add top-level layer"
+          >
+            +
+          </button>
+        </div>
+        <ul className="list-none p-0 m-0">
+          {(scene.objects as unknown as Record<string, unknown>[]).map((layer, i) => {
+            const path = String(i)
+            return (
+              <HierarchyRow
+                key={path}
+                layer={layer}
+                path={path}
+                depth={0}
+                isSelected={selectedPath === path}
+                isCollapsed={collapsed.has(path)}
+                onSelect={setSelectedPath}
+                onToggle={handleToggle}
+                onAddChild={openChildAdd}
+                onToggleLock={handleToggleLock}
+                collapsedSet={collapsed}
+                selectedPath={selectedPath}
+                onDragStart={handleDragStart}
+                onDragOver={handleDragOver}
+                onDragLeave={handleDragLeave}
+                onDrop={handleDrop}
+                dropIndicator={dropIndicator}
+              />
+            )
+          })}
+        </ul>
+        <SceneSaveControls projectId={projectId} sceneId={sceneId} />
       </div>
-      <ul className="list-none p-0 m-0">
-        {(scene.objects as unknown as Record<string, unknown>[]).map((layer, i) => {
-          const path = String(i)
-          return (
-            <HierarchyRow
-              key={path}
-              layer={layer}
-              path={path}
-              depth={0}
-              isSelected={selectedPath === path}
-              isCollapsed={collapsed.has(path)}
-              onSelect={setSelectedPath}
-              onToggle={handleToggle}
-              onAddChild={openChildAdd}
-              onToggleLock={handleToggleLock}
-              collapsedSet={collapsed}
-              selectedPath={selectedPath}
-              onDragStart={handleDragStart}
-              onDragOver={handleDragOver}
-              onDragLeave={handleDragLeave}
-              onDrop={handleDrop}
-              dropIndicator={dropIndicator}
-            />
-          )
-        })}
-      </ul>
-      <SceneSaveControls projectId={projectId} sceneId={sceneId} />
+      <PiAgentChatPanel projectId={projectId} sceneId={sceneId} />
       {addTarget && (
         <AddLayerDialog
           scene={scene as SceneJson}

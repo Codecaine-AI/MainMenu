@@ -1,0 +1,80 @@
+{
+  "capturedAt": "2026-05-24T02:00:00Z",
+  "correction": "Replaced the misunderstood PI Object workspace with a classical Pi Agent chat panel backed by Electron-main Pi SDK integration.",
+  "commands": [
+    {
+      "command": "npm install --ignore-scripts @mariozechner/pi-coding-agent@0.73.1",
+      "cwd": "apps/scene-engine",
+      "exitCode": 0,
+      "summary": "Added the Pi SDK package compatible with Electron 30's Node 20 runtime."
+    },
+    {
+      "command": "npm run desktop:compile && npx tsc --noEmit",
+      "cwd": "apps/scene-engine",
+      "exitCode": 0,
+      "summary": "Electron main/preload and renderer TypeScript validation passed."
+    },
+    {
+      "command": "ELECTRON_RUN_AS_NODE=1 ./node_modules/.bin/electron -e \"import('@mariozechner/pi-coding-agent')...\"",
+      "cwd": "apps/scene-engine",
+      "exitCode": 0,
+      "summary": "Pi SDK imported under Electron Node 20.16.0."
+    },
+    {
+      "command": "Dev Electron Playwright smoke",
+      "cwd": "apps/pi-asset-loop",
+      "exitCode": 0,
+      "summary": "Verified Pi Agent panel, Message Pi input, no PI Object panel, window.mainMenu.agent present, window.mainMenu.project absent, and renderer require undefined.",
+      "screenshots": [
+        "objectives/main-menu-pi-object-sidebar/artifacts/screenshots/dev_pi_agent_chat_panel.png"
+      ]
+    },
+    {
+      "command": "npm run desktop:pack:mac",
+      "cwd": "apps/scene-engine",
+      "exitCode": 0,
+      "summary": "Fresh packaged mac app built at apps/scene-engine/dist/desktop/mac-arm64/Main Menu.app."
+    },
+    {
+      "command": "Packaged Electron Playwright smoke",
+      "cwd": "apps/pi-asset-loop",
+      "exitCode": 0,
+      "summary": "Packaged app launched without external localhost and showed the Pi Agent chat panel.",
+      "screenshots": [
+        "objectives/main-menu-pi-object-sidebar/artifacts/screenshots/packaged_pi_agent_chat_panel.png"
+      ]
+    },
+    {
+      "command": "Packaged app.asar SDK import check",
+      "cwd": ".",
+      "exitCode": 0,
+      "summary": "Imported @mariozechner/pi-coding-agent from packaged app.asar and found createAgentSession and SessionManager."
+    },
+    {
+      "command": "Source/security scan",
+      "cwd": ".",
+      "exitCode": 0,
+      "summary": "Pi SDK and native imports remain in Electron main/preload or server-side files; React chat uses only window.mainMenu.agent."
+    }
+  ],
+  "artifacts": {
+    "bridgeContract": "objectives/main-menu-pi-object-sidebar/artifacts/chat_bridge_contract.md",
+    "sdkEvidence": "objectives/main-menu-pi-object-sidebar/artifacts/pi_sdk_runtime_evidence.md",
+    "devScreenshot": "objectives/main-menu-pi-object-sidebar/artifacts/screenshots/dev_pi_agent_chat_panel.png",
+    "packagedScreenshot": "objectives/main-menu-pi-object-sidebar/artifacts/screenshots/packaged_pi_agent_chat_panel.png",
+    "macApp": "apps/scene-engine/dist/desktop/mac-arm64/Main Menu.app"
+  },
+  "validationVerdicts": {
+    "uiGate": "passed",
+    "bridgeGate": "passed",
+    "sdkImportGate": "passed",
+    "securityGate": "passed",
+    "packagedRuntimeGate": "passed",
+    "livePromptGate": "not run by design"
+  },
+  "residualRisks": [
+    "No live model prompt was sent during validation to avoid consuming credentials/tokens or making unreviewed edits.",
+    "The current package scope is deprecated but used for Electron Node 20 compatibility.",
+    "Structured diff/review UI for agent edits remains future work."
+  ]
+}

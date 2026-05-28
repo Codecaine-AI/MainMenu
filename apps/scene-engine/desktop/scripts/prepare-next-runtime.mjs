@@ -31,8 +31,11 @@ await copyDirectory(standaloneDir, runtimeDir)
 await fs.rm(path.join(runtimeDir, 'public'), { recursive: true, force: true })
 await fs.rm(path.join(runtimeDir, 'projects'), { recursive: true, force: true })
 await copyDirectory(staticDir, path.join(runtimeDir, '.next/static'))
-await copyDirectory(path.join(projectRoot, 'public'), path.join(seedDir, 'public'))
-await copyDirectory(path.join(projectRoot, 'projects'), path.join(seedDir, 'projects'))
+await fs.mkdir(seedDir, { recursive: true })
+await fs.copyFile(
+  path.join(projectRoot, 'workspace.catalog.example.json'),
+  path.join(seedDir, 'workspace.catalog.example.json'),
+)
 
 const packageJson = JSON.parse(await fs.readFile(path.join(projectRoot, 'package.json'), 'utf-8'))
 await fs.writeFile(
@@ -43,7 +46,8 @@ await fs.writeFile(
       version: packageJson.version,
       generatedAt: new Date().toISOString(),
       runtime: 'Next standalone server',
-      writableSeedDirectories: ['public', 'projects'],
+      writableSeedDirectories: [],
+      workspaceCatalog: 'workspace/workspace.catalog.json',
     },
     null,
     2,

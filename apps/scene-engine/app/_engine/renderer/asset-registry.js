@@ -1,7 +1,9 @@
-import { resolveRuntimeUrl } from './runtime-url.js';
+import { projectRuntimeRootUrl, resolveRuntimeUrl } from './runtime-url.js';
 
 let mergedRegistry = null;
-let loadPromise = null;
+let activeRegistryKey = null;
+const registryCache = new Map();
+const loadPromises = new Map();
 
 async function fetchManifest(url) {
   try {
@@ -51,14 +53,54 @@ function fontManifestUrls() {
   return ['/fonts/registry.json', '/api/fonts'];
 }
 
-export async function loadRegistry() {
-  if (mergedRegistry) return mergedRegistry;
-  if (loadPromise) return loadPromise;
-  loadPromise = (async () => {
+function projectIdFromOptions(options = {}) {
+  if (typeof options.projectId === 'string' && options.projectId.trim()) return options.projectId.trim();
+  if (typeof globalThis.MELEE_PROJECT_ID === 'string' && globalThis.MELEE_PROJECT_ID.trim()) {
+    return globalThis.MELEE_PROJECT_ID.trim();
+  }
+  return null;
+}
+
+function registryUrls(options = {}) {
+  if (globalThis.MELEE_BUNDLE_ROOT) {
+    return {
+      key: 'bundle',
+      assets: '/assets/registry.json',
+      modules: '/modules/registry.json',
+      fonts: ['/fonts/registry.json'],
+    };
+  }
+  const projectId = projectIdFromOptions(options);
+  const projectRoot = projectId ? `/api/projects/${encodeURIComponent(projectId)}` : projectRuntimeRootUrl();
+  if (projectRoot) {
+    return {
+      key: `project:${projectId ?? projectRoot}`,
+      assets: `${projectRoot}/registries/assets`,
+      modules: `${projectRoot}/registries/modules`,
+      fonts: [`${projectRoot}/registries/fonts`],
+    };
+  }
+  return {
+    key: 'legacy',
+    assets: '/assets/registry.json',
+    modules: '/modules/registry.json',
+    fonts: fontManifestUrls(),
+  };
+}
+
+export async function loadRegistry(options = {}) {
+  const urls = registryUrls(options);
+  if (registryCache.has(urls.key)) {
+    activeRegistryKey = urls.key;
+    mergedRegistry = registryCache.get(urls.key);
+    return mergedRegistry;
+  }
+  if (loadPromises.has(urls.key)) return loadPromises.get(urls.key);
+  const loadPromise = (async () => {
     const [assets, modules, ...fontRegistries] = await Promise.all([
-      fetchManifest('/assets/registry.json'),
-      fetchManifest('/modules/registry.json'),
-      ...fontManifestUrls().map((url) => fetchOptionalManifest(url)),
+      fetchManifest(urls.assets),
+      fetchManifest(urls.modules),
+      ...urls.fonts.map((url) => fetchOptionalManifest(url)),
     ]);
     const merged = { ...Object.assign({}, ...fontRegistries), ...assets };
     for (const [id, entry] of Object.entries(modules)) {
@@ -78,9 +120,13 @@ export async function loadRegistry() {
         if (manifest) entry.manifest = manifest;
       }),
     );
+    registryCache.set(urls.key, merged);
+    activeRegistryKey = urls.key;
     mergedRegistry = merged;
     return mergedRegistry;
   })();
+  loadPromises.set(urls.key, loadPromise);
+  loadPromise.finally(() => loadPromises.delete(urls.key));
   return loadPromise;
 }
 
@@ -98,6 +144,7 @@ export function resolveAsset(id) {
 }
 
 export function getRegistry() {
+  if (activeRegistryKey && registryCache.has(activeRegistryKey)) return registryCache.get(activeRegistryKey);
   return mergedRegistry;
 }
 

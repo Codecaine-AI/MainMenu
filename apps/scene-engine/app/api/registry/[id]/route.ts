@@ -1,9 +1,7 @@
-import { readFile, writeFile } from 'fs/promises'
-import path from 'path'
 import { NextResponse } from 'next/server'
+import { readAssetRegistry, writeAssetRegistry } from '@/lib/asset-library'
+import { defaultProjectId } from '@/lib/scenes'
 import type { AssetContainer } from '@/types/scene'
-
-const REGISTRY_PATH = path.join(process.cwd(), 'public', 'assets', 'registry.json')
 
 export async function PATCH(
   req: Request,
@@ -21,6 +19,15 @@ export async function PATCH(
     if (!body || typeof body !== 'object' || Array.isArray(body)) {
       return NextResponse.json({ error: 'Body must be a JSON object' }, { status: 400 })
     }
+    const url = new URL(req.url)
+    const bodyRecord = body as Record<string, unknown>
+    const projectRaw = url.searchParams.get('project') ?? bodyRecord.projectId
+    const projectId = typeof projectRaw === 'string' && projectRaw.trim()
+      ? projectRaw.trim()
+      : defaultProjectId()
+    if (!projectId) {
+      return NextResponse.json({ error: 'Missing projectId' }, { status: 400 })
+    }
     const file = (body as Record<string, unknown>).file
     if (typeof file !== 'string' || file === '') {
       return NextResponse.json(
@@ -29,14 +36,13 @@ export async function PATCH(
       )
     }
 
-    const text = await readFile(REGISTRY_PATH, 'utf-8')
-    const registry = JSON.parse(text) as Record<string, AssetContainer>
+    const registry = readAssetRegistry(projectId)
     const entry = registry[id]
     if (!entry) {
       return NextResponse.json({ error: `Unknown container id: ${id}` }, { status: 404 })
     }
 
-    const expectedPrefix = `/assets/${entry.type}/`
+    const expectedPrefix = entry.type === 'font' ? '/fonts/' : `/assets/${entry.type}/`
     if (!file.startsWith(expectedPrefix)) {
       return NextResponse.json(
         { error: `File path must be under ${expectedPrefix}` },
@@ -45,7 +51,7 @@ export async function PATCH(
     }
 
     registry[id] = { ...entry, file }
-    await writeFile(REGISTRY_PATH, JSON.stringify(registry, null, 2) + '\n', 'utf-8')
+    writeAssetRegistry(registry, projectId)
 
     return NextResponse.json({ id, type: entry.type, file })
   } catch (err) {

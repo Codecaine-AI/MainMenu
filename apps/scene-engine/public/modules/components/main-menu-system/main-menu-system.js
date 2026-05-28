@@ -747,9 +747,9 @@ function renderRecordsPreview() {
   return node;
 }
 
-function contributionLevel(index) {
-  const week = Math.floor(index / 7);
-  const day = index % 7;
+function contributionLevel(index, rows) {
+  const week = Math.floor(index / rows);
+  const day = index % rows;
   if ((week + day * 3) % 17 === 0) return 0;
   const score = (week * 11 + day * 7 + week * day * 3) % 23;
   if (score > 19) return 4;
@@ -758,20 +758,48 @@ function contributionLevel(index) {
   return 1;
 }
 
+function contributionPalette(preview) {
+  const palette = String(preview?.palette ?? 'green').trim().toLowerCase();
+  return ['green', 'rose'].includes(palette) ? palette : 'green';
+}
+
+function contributionMonths(preview) {
+  const months = Array.isArray(preview?.months) ? preview.months : [];
+  return months
+    .map((month) => String(month ?? '').trim())
+    .filter(Boolean)
+    .slice(0, 5);
+}
+
 function renderContributionGridPreview(preview) {
-  const weeks = clamp(Math.round(Number(preview?.weeks ?? 14)), 8, 20);
+  const weeks = clamp(Math.round(Number(preview?.weeks ?? 12)), 8, 18);
+  const rows = clamp(Math.round(Number(preview?.rows ?? 5)), 4, 7);
+  const months = contributionMonths(preview);
   const node = document.createElement('div');
   node.className = 'main-menu-system__records-detail main-menu-system__contribution-detail';
 
   const shell = document.createElement('div');
   shell.className = 'main-menu-system__contribution-shell';
 
+  if (months.length > 0) {
+    const monthRow = document.createElement('div');
+    monthRow.className = 'main-menu-system__contribution-months';
+    monthRow.style.setProperty('--main-menu-system-contribution-months', String(months.length));
+    for (const month of months) {
+      const label = document.createElement('span');
+      label.textContent = month;
+      monthRow.appendChild(label);
+    }
+    shell.appendChild(monthRow);
+  }
+
   const grid = document.createElement('div');
-  grid.className = 'main-menu-system__contribution-grid';
+  grid.className = `main-menu-system__contribution-grid is-palette-${contributionPalette(preview)}`;
   grid.style.setProperty('--main-menu-system-contribution-weeks', String(weeks));
-  for (let i = 0; i < weeks * 7; i += 1) {
+  grid.style.setProperty('--main-menu-system-contribution-rows', String(rows));
+  for (let i = 0; i < weeks * rows; i += 1) {
     const cell = document.createElement('span');
-    cell.className = `is-level-${contributionLevel(i)}`;
+    cell.className = `is-level-${contributionLevel(i, rows)}`;
     grid.appendChild(cell);
   }
   shell.appendChild(grid);

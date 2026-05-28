@@ -1,50 +1,17 @@
 @import "tailwindcss";
 
-@font-face {
-  font-family: 'FolkPro';
-  src: url('/fonts/FolkPro%20_Family/A-OTF-FolkPro-Regular.otf') format('opentype');
-  font-weight: 400;
-  font-style: normal;
-  font-display: swap;
-}
-@font-face {
-  font-family: 'FolkPro';
-  src: url('/fonts/FolkPro%20_Family/A-OTF-FolkPro-Medium.otf') format('opentype');
-  font-weight: 500;
-  font-style: normal;
-  font-display: swap;
-}
-@font-face {
-  font-family: 'FolkPro';
-  src: url('/fonts/FolkPro%20_Family/A-OTF-FolkPro-Bold.otf') format('opentype');
-  font-weight: 700;
-  font-style: normal;
-  font-display: swap;
-}
-@font-face {
-  font-family: 'FolkPro';
-  src: url('/fonts/FolkPro%20_Family/A-OTF-FolkPro-Heavy.otf') format('opentype');
-  font-weight: 900;
-  font-style: normal;
-  font-display: swap;
-}
-@font-face {
-  font-family: 'Impact';
-  src: url('/fonts/Impact/Impact-Wide.woff2') format('woff2'),
-       url('/fonts/Impact/Impact-Wide.ttf') format('truetype');
-  font-weight: 400 900;
-  font-style: normal;
-  font-display: swap;
-}
-
 :root {
   --amber: #f6c419;
+}
+
+nextjs-portal {
+  display: none !important;
 }
 
 .editor-shell {
   display: grid;
   height: 100vh;
-  grid-template-columns: 280px minmax(0, 1fr) 440px;
+  grid-template-columns: 440px minmax(0, 1fr) 440px;
   grid-template-rows: 1fr;
   grid-template-areas:
     'hierarchy canvas inspector';

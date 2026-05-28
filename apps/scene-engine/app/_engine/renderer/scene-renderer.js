@@ -256,7 +256,7 @@ async function updateChildren(parentEl, childArray, parentPath = '', options = {
 }
 
 export async function renderScene(scene, root, options = {}) {
-  const registry = await loadRegistry();
+  const registry = await loadRegistry({ projectId: options.projectId ?? options.runtime?.projectId });
   await loadFontAssets(registry);
 
   root.style.width = scene.stage.width + 'px';

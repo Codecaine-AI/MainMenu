@@ -1,0 +1,87 @@
+{
+  "generatedAt": "2026-05-28T15:35:00-05:00",
+  "routes": [
+    {
+      "route": "GET /api/scenes",
+      "helper": "discoverScenes -> resolveProjectPaths",
+      "target": "Assets/Scenes for catalog projects, scenes for legacy projects",
+      "status": "migrated"
+    },
+    {
+      "route": "GET /api/scenes/[id]",
+      "helper": "resolveProjectPaths.sceneFile",
+      "target": "selected project scene.json",
+      "status": "migrated"
+    },
+    {
+      "route": "PUT /api/scenes/[id]",
+      "helper": "resolveProjectPaths.sceneFile",
+      "target": "selected project scene.json",
+      "status": "migrated"
+    },
+    {
+      "route": "POST /api/upload",
+      "helper": "resolveProjectPaths.mediaDir + assetRegistryPath",
+      "target": "Assets/Media or Assets/Fonts plus ProjectSettings/registries/assets.json",
+      "status": "migrated"
+    },
+    {
+      "route": "GET /api/assets/[type]",
+      "helper": "resolveProjectPaths.mediaDir",
+      "target": "project-local media directory",
+      "status": "migrated"
+    },
+    {
+      "route": "PATCH /api/registry/[id]",
+      "helper": "readAssetRegistry/writeAssetRegistry",
+      "target": "ProjectSettings/registries/assets.json",
+      "status": "migrated"
+    },
+    {
+      "route": "GET /api/asset-library",
+      "helper": "listAssetLibrary -> readAssetRegistry",
+      "target": "selected/default project asset registry",
+      "status": "migrated"
+    },
+    {
+      "route": "GET /api/fonts",
+      "helper": "discoverProjectFontAssets",
+      "target": "Assets/Fonts",
+      "status": "migrated"
+    },
+    {
+      "route": "GET /api/projects/[projectId]/registries/[registry]",
+      "helper": "resolveProjectPaths + discoverProjectFontAssets",
+      "target": "project-local registries/font discovery",
+      "status": "added"
+    },
+    {
+      "route": "GET /api/projects/[projectId]/assets/[...path]",
+      "helper": "projectFileResponse -> safeResolveChild",
+      "target": "Assets/Media",
+      "status": "added"
+    },
+    {
+      "route": "GET /api/projects/[projectId]/modules/[...path]",
+      "helper": "projectFileResponse -> safeResolveChild",
+      "target": "Assets/Modules",
+      "status": "added"
+    },
+    {
+      "route": "GET /api/projects/[projectId]/fonts/[...path]",
+      "helper": "projectFileResponse -> safeResolveChild",
+      "target": "Assets/Fonts",
+      "status": "added"
+    },
+    {
+      "route": "POST /api/export",
+      "helper": "resolveProjectPaths + collectExportGraph(projectPaths)",
+      "target": "external project scenes, registries, media, modules, fonts",
+      "status": "migrated"
+    }
+  ],
+  "temporaryLegacyFallbacks": [
+    "Embedded apps/scene-engine/projects discovery remains as fallback when no catalog project is configured.",
+    "Legacy app-local public registry/media/module/font paths remain only for legacy project descriptors and old app-local files retained during copy-first validation."
+  ]
+}

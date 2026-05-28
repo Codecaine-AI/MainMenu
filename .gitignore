@@ -67,3 +67,6 @@ assets/
 objectives/*/artifacts/*.zip
 objectives/*/artifacts/extracted/
 objectives/*/artifacts/chrome-profile/
+
+# Scene Engine local workspace catalog
+apps/scene-engine/workspace.catalog.json

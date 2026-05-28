@@ -26,7 +26,7 @@ Selection: clicking inside the stage walks up to the nearest element with `datas
 
 ## Hierarchy (`HierarchyPanel.tsx` + `HierarchyRow.tsx`)
 
-Tree view of `scene.objects`. Renders one row per object, indented by depth, with disclosure triangles for objects that have `children`. Subscribes to `scene` and `selectedPath`.
+Tree view of `scene.objects`. Renders one row per object, indented by depth, with disclosure triangles for objects that have `children`. Subscribes to `scene` and `selectedPath`. The panel also hosts the desktop Pi Agent chat panel below the hierarchy controls.
 
 ### Object types and add menu
 
@@ -53,6 +53,12 @@ Tracked locally in the panel as a `Set<string>` of collapsed paths. Not part of 
 ### Scene Save Controls
 The hierarchy panel keeps global save controls below the layer tree. This keeps the top-left of the editor dedicated to navigation and layer structure.
 
+### Pi Agent Chat Panel
+
+`PiAgentChatPanel.tsx` is mounted at the bottom of the left sidebar. It reads the active project id, scene id, selected layer path, selected layer name, and selected layer type, then sends that context with user messages through `window.mainMenu.agent`.
+
+The panel renders in normal browser sessions too, but it reports the bridge as unavailable and disables agent actions when Electron preload has not exposed `window.mainMenu.agent`. Native authority and SDK state live in the desktop app, documented under [Desktop App / Pi Agent](../30-desktop-app/20-pi-agent.md).
+
 ## Inspector (`InspectorPanel.tsx` + `LayerForm.tsx`)
 
 Property editor for scene-level settings and the object at `selectedPath`. `SceneSettingsSection` is always mounted at the top and starts collapsed. The rest of the shell resolves the selected object via `resolveObject(scene, path)` and delegates to `LayerForm` keyed by `selectedPath` (so forms reset cleanly when selection changes).
@@ -62,7 +68,7 @@ Property editor for scene-level settings and the object at `selectedPath`. `Scen
 | Section      | When                                                                                  |
 |--------------|---------------------------------------------------------------------------------------|
 | Header       | Always — name, type chip, visibility toggle, delete.                                  |
-| Asset        | When `layer.asset` is set. Read-only id; `AssetSwapDropdown` for swappable container types (`audio`, `image`, `video`, `glyph`). |
+| Asset        | When `layer.asset` is set. Read-only id for modules; `AssetSwapDropdown` for file asset containers (`audio`, `image`, `video`, `glyph`, `font`). |
 | Transform    | Always (skipped for sub-layer overrides). Fill toggle. Fill mode → rotation + scale. Explicit → x, y, width, height, anchor, rotation, scale. |
 | Appearance   | Always (skipped for sub-layer overrides) — opacity, blend, hue. Adds `fit` for media types (`video`, `image`). |
 | Properties (schema) | For components and built-in layer types — one `PropertySection` per section in the resolved schema. Each section renders `PropertyField` entries with clickable label → `DescriptionPopover`, and can opt into collapse behavior through the schema. Orphan properties (saved but not in schema) render under an auto-generated "General" section with inferred inputs + console warning. |
@@ -130,7 +136,7 @@ Glyph-group slots editor. Lists each slot with its own asset selector and per-sl
 
 ### `AssetSwapDropdown.tsx`
 
-For container-typed assets (audio/image/video/glyph), shows a dropdown of files in `public/assets/<type>/` (fetched from `/api/assets/<type>`). Selecting a file calls `updateContainerFile(id, file)` — a registry-level swap, not a scene mutation.
+For file asset containers (audio/image/video/glyph/font), shows a dropdown of project-available registry entries from `/api/asset-library?project=<project-id>&type=<type>`. Selecting an entry calls `setObjectAssetAt` for object layers or `setSlotAssetAt` for glyph slots — a scene reference change, not a registry mutation.
 
 ## Loader (`useSceneLoader.ts`)
 
@@ -151,6 +157,7 @@ Custom hook that fetches the scene + merged registry on mount, calls `setScene` 
 - `apps/scene-engine/app/editor/_components/DescriptionPopover.tsx`
 - `apps/scene-engine/app/editor/_components/SlotsSection.tsx`
 - `apps/scene-engine/app/editor/_components/AssetSwapDropdown.tsx`
+- `apps/scene-engine/app/editor/_components/PiAgentChatPanel.tsx`
 - `apps/scene-engine/app/editor/_components/inputs/`
 - `apps/scene-engine/app/_engine/types/property-schema.ts`
 - `apps/scene-engine/app/_engine/lib/builtin-property-schemas.ts`

@@ -37,13 +37,16 @@ function SceneContent() {
         import('@/renderer/scene-renderer'),
         import('@/renderer/asset-registry'),
       ])
-      await loadRegistry()
+      if (projectId) (window as typeof window & { MELEE_PROJECT_ID?: string }).MELEE_PROJECT_ID = projectId
+      await loadRegistry({ projectId })
       const res = await fetch(`/api/scenes/${params.id}${projectQuery}`)
       if (!res.ok) return
       const scene = await res.json()
       if (!cancelled && stageRef.current) {
         await renderScene(scene, stageRef.current, {
+          projectId,
           runtime: {
+            projectId,
             navigate: (sceneId: string) => router.push(`/scenes/${sceneId}${sceneQuery}`),
           },
         })

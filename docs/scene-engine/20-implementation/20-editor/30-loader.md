@@ -11,7 +11,7 @@ concepts: [loader, hook, scene-fetch, registry-merge, race-guard, component-sche
 
 ## Flow
 
-1. **Load the registry first.** Dynamic-import `asset-registry.js` (browser-only, since it caches in module scope) and call `loadRegistry()`. It merges `public/assets/registry.json` and `public/modules/registry.json` and enriches each module entry with its `manifest.json`. Then `setRegistry(getRegistry())`.
+1. **Load the registry first.** Dynamic-import `asset-registry.js` (browser-only, since it caches in module scope), set `window.MELEE_PROJECT_ID` when a project id is active, and call `loadRegistry({ projectId })`. It fetches the selected project's asset, module, and font registries through project-aware dev routes and enriches each module entry with its `manifest.json`. Then `setRegistry(getRegistry())`.
 2. **Fetch the scene.** `GET /api/scenes/<id>?project=<project-id>` with `cache: 'no-store'` so reload always hits disk. Throw on non-OK.
 3. **Seed the store.** `setScene(scene)` and `markClean()`.
 4. **Errors are surfaced** via the returned `error` string. The editor shell renders the message rather than a blank panel — the same warn-and-explain ethos as the renderer.
@@ -30,7 +30,7 @@ The Blob URL import trick mirrors what the production renderer already does for 
 
 ## Why Registry First
 
-The add-layer dialog and the inspector both need the registry to render meaningful UI (asset names, manifest fields, swap dropdowns). Loading the registry before the scene means the very first paint can render a populated inspector when the scene also arrives, instead of flashing through an "asset unknown" state.
+The add-layer dialog and the inspector both need the registry to render meaningful UI (asset names, manifest fields, asset-selection dropdowns). Loading the registry before the scene means the very first paint can render a populated inspector when the scene also arrives, instead of flashing through an "asset unknown" state.
 
 ## Reload Semantics
 
@@ -43,4 +43,4 @@ This is also the handoff path from agent edits: after the agent edits `scene.jso
 - `apps/scene-engine/app/_engine/hooks/useSceneLoader.ts`
 - `apps/scene-engine/app/_engine/lib/component-schema-loader.ts` — `loadComponentSchema`, Blob URL import, cache.
 - `apps/scene-engine/app/_engine/renderer/asset-registry.js` — `loadRegistry`, `getRegistry`, `updateEntry`.
-- `apps/scene-engine/app/api/scenes/[id]/route.ts` — `GET` reads `projects/<project-id>/scenes/<id>/scene.json` from disk.
+- `apps/scene-engine/app/api/scenes/[id]/route.ts` — `GET` reads `Assets/Scenes/<id>/scene.json` through the project path adapter.

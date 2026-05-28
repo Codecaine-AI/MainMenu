@@ -5,7 +5,7 @@ type: overview
 
 # Documentation
 
-Three-layer documentation for the MELEE scene-engine — the Next.js app under `apps/scene-engine/` that authors and renders video-game-screen landing pages as composed scenes.
+Three-layer documentation for the MELEE scene-engine — the Next.js app and desktop shell under `apps/scene-engine/` that author, render, export, and package video-game-screen landing pages as composed scenes.
 
 Read in order. Each layer answers a different question.
 
@@ -17,10 +17,10 @@ Read in order. Each layer answers a different question.
 **Why and what.** The problem the scene-engine solves, the mental model behind it, and the principles that shape decisions.
 
 ### [10-system-design/](10-system-design/00-overview.md)
-**The blueprint.** System-agnostic description of how scenes, assets, layers, and the dual-surface authoring model fit together. Read before changing behavior.
+**The blueprint.** System-agnostic description of how scenes, assets, layers, project workspaces, export, and authoring surfaces fit together. Read before changing behavior.
 
 ### [20-implementation/](20-implementation/00-overview.md)
-**The codebase.** How `apps/scene-engine/` actually delivers the design — renderer, editor, dev server API, and appendix material.
+**The codebase.** How `apps/scene-engine/` actually delivers the design — renderer, editor, dev server API, desktop shell, Pi Agent bridge, and appendix material.
 
 ---
 

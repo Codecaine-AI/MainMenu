@@ -3,9 +3,10 @@ import { existsSync } from 'fs'
 import path from 'path'
 import { NextResponse } from 'next/server'
 import { isAssetType, validateUpload, slugifyFilename } from '@/lib/asset-types'
+import { assetRegistryPath, readAssetRegistry, writeAssetRegistry } from '@/lib/asset-library'
+import { defaultProjectId } from '@/lib/scenes'
+import { resolveProjectPaths } from '@/lib/project-paths'
 import type { AssetContainer, AssetScope, AssetType } from '@/types/scene'
-
-const REGISTRY_PATH = path.join(process.cwd(), 'public', 'assets', 'registry.json')
 
 function titleCaseFamily(slug: string): string {
   return slug
@@ -45,15 +46,21 @@ export async function POST(req: Request) {
     const labelRaw = form.get('label')
     const label = typeof labelRaw === 'string' && labelRaw.trim() ? labelRaw.trim() : undefined
     const projectRaw = form.get('projectId')
-    const projectId = typeof projectRaw === 'string' && projectRaw.trim() ? projectRaw.trim() : undefined
+    const projectId = typeof projectRaw === 'string' && projectRaw.trim() ? projectRaw.trim() : defaultProjectId()
+    if (!projectId) {
+      return NextResponse.json({ error: 'Missing projectId' }, { status: 400 })
+    }
+    const projectPaths = resolveProjectPaths(projectId)
+    if (!projectPaths) {
+      return NextResponse.json({ error: 'Project not found' }, { status: 404 })
+    }
     const scopeRaw = form.get('scope')
     const scope: AssetScope = scopeRaw === 'project' && projectId ? 'project' : 'global'
 
     const { slug, ext } = slugifyFilename(file.name)
-    const text = await readFile(REGISTRY_PATH, 'utf-8')
-    const registry = JSON.parse(text) as Record<string, AssetContainer>
+    const registry = readAssetRegistry(projectId)
     const id = uniqueSlug(slug, new Set(Object.keys(registry)))
-    const dir = path.join(process.cwd(), 'public', 'assets', type)
+    const dir = projectPaths.mediaDir(type)
     if (!existsSync(dir)) {
       await mkdir(dir, { recursive: true })
     }
@@ -61,10 +68,11 @@ export async function POST(req: Request) {
     const diskPath = path.join(dir, filename)
     await writeFile(diskPath, Buffer.from(await file.arrayBuffer()))
 
+    const logicalFile = type === 'font' ? `/fonts/${filename}` : `/assets/${type}/${filename}`
     const now = new Date().toISOString()
     registry[id] = {
       type,
-      file: `/assets/${type}/${filename}`,
+      file: logicalFile,
       label,
       scope,
       projectIds: scope === 'project' && projectId ? [projectId] : undefined,
@@ -76,7 +84,8 @@ export async function POST(req: Request) {
       registry[id].weight = 400
       registry[id].style = 'normal'
     }
-    await writeFile(REGISTRY_PATH, JSON.stringify(registry, null, 2) + '\n', 'utf-8')
+    await mkdir(path.dirname(assetRegistryPath(projectId)), { recursive: true })
+    writeAssetRegistry(registry, projectId)
 
     return NextResponse.json({ id, type, file: registry[id].file, label: registry[id].label, scope })
   } catch (err) {

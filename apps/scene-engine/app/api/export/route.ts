@@ -4,8 +4,9 @@ import { readFile, readdir, stat } from 'node:fs/promises'
 import { existsSync } from 'node:fs'
 import path from 'node:path'
 import { loadProject, projectRoot } from '@/lib/scenes'
-import { discoverFontAssets } from '@/lib/font-discovery'
+import { discoverProjectFontAssets } from '@/lib/font-discovery'
 import { collectExportGraph, moduleDirectoryForEntry } from '@/lib/export-reachability'
+import { resolveProjectPaths, type ProjectPaths } from '@/lib/project-paths'
 import type { AssetContainer, ModuleEntry, ProjectManifest } from '@/types/scene'
 
 const LEGACY_PUBLIC_PATH_REWRITES = new Map<string, string>([
@@ -132,9 +133,10 @@ function scriptString(value: string): string {
   return JSON.stringify(value).replace(/</g, '\\u003c')
 }
 
-function findSceneCss(projectDir: string, sceneId: string): string | null {
+function findSceneCss(projectPaths: ProjectPaths, sceneId: string): string | null {
+  const sceneDir = projectPaths.sceneDir(sceneId)
   for (const name of ['page.css', 'scene.css']) {
-    const abs = path.join(projectDir, 'scenes', sceneId, name)
+    const abs = path.join(sceneDir, name)
     if (existsSync(abs)) return abs
   }
   return null
@@ -222,14 +224,14 @@ ${cssLink}</head>
 
 async function addScenePageToZip(input: {
   zip: JSZip
-  projectDir: string
+  projectPaths: ProjectPaths
   project: ProjectManifest
   sceneId: string
   sceneName?: string
   routeDir: string
 }) {
-  const { zip, projectDir, project, sceneId, sceneName, routeDir } = input
-  const cssAbs = findSceneCss(projectDir, sceneId)
+  const { zip, projectPaths, project, sceneId, sceneName, routeDir } = input
+  const cssAbs = findSceneCss(projectPaths, sceneId)
   if (cssAbs) {
     zip.file(`${routeDir}scene.css`, await readFile(cssAbs))
   }
@@ -265,10 +267,11 @@ export async function POST(req: Request) {
     const selectedProjectId = new URL(req.url).searchParams.get('project')
     const project = loadProject(selectedProjectId)
     const selectedProjectRoot = projectRoot(selectedProjectId)
+    const selectedProjectPaths = resolveProjectPaths(selectedProjectId)
     if (!project) {
       return NextResponse.json({ error: 'project.json not found' }, { status: 400 })
     }
-    if (!selectedProjectRoot) {
+    if (!selectedProjectRoot || !selectedProjectPaths) {
       return NextResponse.json({ error: 'Project not found' }, { status: 404 })
     }
     if (!project.scenes.some((scene) => scene.id === project.entry)) {
@@ -282,15 +285,20 @@ export async function POST(req: Request) {
     const zip = new JSZip()
     const appRoot = process.cwd()
     const projectDir = selectedProjectRoot
-    const assetsRegRaw = await readFile(path.join(appRoot, 'public/assets/registry.json'), 'utf-8')
-    const modulesRegRaw = await readFile(path.join(appRoot, 'public/modules/registry.json'), 'utf-8')
-    const discoveredFonts = await discoverFontAssets(appRoot)
+    const assetsRegRaw = existsSync(selectedProjectPaths.assetRegistryFile)
+      ? await readFile(selectedProjectPaths.assetRegistryFile, 'utf-8')
+      : '{}'
+    const modulesRegRaw = existsSync(selectedProjectPaths.moduleRegistryFile)
+      ? await readFile(selectedProjectPaths.moduleRegistryFile, 'utf-8')
+      : '{}'
+    const discoveredFonts = await discoverProjectFontAssets(project.id, { urlMode: 'logical' })
     const assetsReg = JSON.parse(assetsRegRaw) as Record<string, AssetContainer>
     const modulesReg = JSON.parse(modulesRegRaw) as Record<string, ModuleEntry>
     const exportedProject: ProjectManifest = { ...project, scenes: activeSceneRefs }
     const graph = await collectExportGraph({
       appRoot,
       projectDir,
+      projectPaths: selectedProjectPaths,
       project: exportedProject,
       assetsRegistry: assetsReg,
       modulesRegistry: modulesReg,
@@ -313,7 +321,7 @@ export async function POST(req: Request) {
 
     await addScenePageToZip({
       zip,
-      projectDir,
+      projectPaths: selectedProjectPaths,
       project: exportedProject,
       sceneId: exportedProject.entry,
       sceneName: sceneNames.get(exportedProject.entry),
@@ -322,7 +330,7 @@ export async function POST(req: Request) {
     for (const ref of exportedProject.scenes) {
       await addScenePageToZip({
         zip,
-        projectDir,
+        projectPaths: selectedProjectPaths,
         project: exportedProject,
         sceneId: ref.id,
         sceneName: sceneNames.get(ref.id),
@@ -340,9 +348,11 @@ export async function POST(req: Request) {
       if (containingDir.startsWith('assets/audio/')) {
         if (copiedAssetDirs.has(containingDir)) continue
         copiedAssetDirs.add(containingDir)
-        await addDirToZip(zip, path.join(appRoot, 'public', containingDir), containingDir, { rewriteText: true })
+        const sourceDir = selectedProjectPaths.resolveLogicalFile(`/${containingDir}`)
+        if (sourceDir) await addDirToZip(zip, sourceDir, containingDir, { rewriteText: true })
       } else {
-        await addFileToZip(zip, path.join(appRoot, 'public', stripped), stripped, { rewriteText: true })
+        const sourceFile = selectedProjectPaths.resolveLogicalFile(entry.file)
+        if (sourceFile) await addFileToZip(zip, sourceFile, stripped, { rewriteText: true })
       }
     }
 
@@ -353,20 +363,21 @@ export async function POST(req: Request) {
       if (!containingDir) continue
       if (copiedModuleDirs.has(containingDir)) continue
       copiedModuleDirs.add(containingDir)
-      const moduleDir = path.join(appRoot, 'public', containingDir)
-      await addDirToZip(zip, moduleDir, containingDir, { rewriteText: true })
+      const moduleDir = selectedProjectPaths.resolveLogicalFile(`/${containingDir}`)
+      if (moduleDir) await addDirToZip(zip, moduleDir, containingDir, { rewriteText: true })
     }
 
     for (const entry of Object.values(graph.fontsRegistry)) {
       if (!entry.file?.startsWith('/')) continue
       const stripped = publicFilePath(entry.file)
-      await addFileToZip(zip, path.join(appRoot, 'public', stripped), stripped, { rewriteText: true })
+      const sourceFile = selectedProjectPaths.resolveLogicalFile(entry.file)
+      if (sourceFile) await addFileToZip(zip, sourceFile, stripped, { rewriteText: true })
     }
 
     for (const ref of graph.publicFiles) {
       const stripped = publicFilePath(ref)
-      const abs = path.join(appRoot, 'public', stripped)
-      if (!existsSync(abs)) continue
+      const abs = selectedProjectPaths.resolveLogicalFile(ref)
+      if (!abs || !existsSync(abs)) continue
       const info = await stat(abs)
       if (info.isDirectory()) {
         await addDirToZip(zip, abs, stripped, { rewriteText: true })

@@ -1,5 +1,6 @@
 import { readFile } from 'node:fs/promises'
 import path from 'node:path'
+import type { ProjectPaths } from '@/lib/project-paths'
 import type {
   AssetContainer,
   AssetType,
@@ -36,8 +37,12 @@ function toPosixPath(value: string) {
   return value.split(path.sep).join('/')
 }
 
-function deriveManifestPath(appRoot: string, entryPath: string): string | null {
+function deriveManifestPath(projectPaths: ProjectPaths | null | undefined, appRoot: string, entryPath: string): string | null {
   if (!entryPath.startsWith('/')) return null
+  if (projectPaths) {
+    const logicalManifest = entryPath.replace(/\/[^/]+$/, '/manifest.json')
+    return projectPaths.resolveLogicalFile(logicalManifest)
+  }
   const relative = entryPath.replace(/^\//, '').replace(/\/[^/]+$/, '/manifest.json')
   return path.join(appRoot, 'public', ...relative.split('/'))
 }
@@ -70,10 +75,14 @@ function collectTextFontFamilies(value: unknown, families: Set<string>) {
   }
 }
 
-async function readModuleManifest(appRoot: string, entry: ModuleEntry): Promise<Manifest | null> {
+async function readModuleManifest(
+  appRoot: string,
+  entry: ModuleEntry,
+  projectPaths?: ProjectPaths | null,
+): Promise<Manifest | null> {
   if (entry.manifest) return entry.manifest
   if (!entry.path) return null
-  const manifestPath = deriveManifestPath(appRoot, entry.path)
+  const manifestPath = deriveManifestPath(projectPaths, appRoot, entry.path)
   if (!manifestPath) return null
   try {
     return JSON.parse(await readFile(manifestPath, 'utf-8')) as Manifest
@@ -164,6 +173,7 @@ function flattenObjects(objects: SceneObject[] | undefined): SceneObject[] {
 export async function collectExportGraph(input: {
   appRoot: string
   projectDir: string
+  projectPaths?: ProjectPaths | null
   project: ProjectManifest
   assetsRegistry: Record<string, AssetContainer>
   modulesRegistry: Record<string, ModuleEntry>
@@ -179,7 +189,8 @@ export async function collectExportGraph(input: {
   const refs = activeSceneRefs(input.project)
 
   for (const ref of refs) {
-    const absPath = path.join(input.projectDir, 'scenes', ref.id, 'scene.json')
+    const absPath = input.projectPaths?.sceneFile(ref.id)
+      ?? path.join(input.projectDir, 'scenes', ref.id, 'scene.json')
     const raw = await readFile(absPath, 'utf-8')
     let scene: SceneJson | null = null
     try {
@@ -213,7 +224,7 @@ export async function collectExportGraph(input: {
     const entry = input.modulesRegistry[nextId]
     if (!entry) continue
     collectPublicReferences(entry, publicFiles)
-    const manifest = await readModuleManifest(input.appRoot, entry)
+    const manifest = await readModuleManifest(input.appRoot, entry, input.projectPaths)
     if (!manifest) {
       warnings.push(`Module '${nextId}' has no readable manifest`)
       continue
@@ -250,7 +261,7 @@ export async function collectExportGraph(input: {
       if (!object.asset) continue
       const moduleEntry = input.modulesRegistry[object.asset]
       if (!moduleEntry) continue
-      const manifest = await readModuleManifest(input.appRoot, moduleEntry)
+      const manifest = await readModuleManifest(input.appRoot, moduleEntry, input.projectPaths)
       if (!manifest) continue
       for (const [property, schema] of Object.entries(manifest.properties ?? {})) {
         if (schema.type !== 'string' || !schema.assetType) continue
