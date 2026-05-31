@@ -217,6 +217,7 @@
         "ui-forward-volume": 0.8,
         "ui-back-volume": 0.65,
         "back-target": "title",
+        "root-navigation-sound-delay-ms": 450,
         "menu-config": {
           "initial": "main",
           "menus": {

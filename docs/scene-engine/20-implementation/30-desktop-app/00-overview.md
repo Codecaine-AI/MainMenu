@@ -35,7 +35,8 @@ Related root files:
 apps/scene-engine/
 ├── package.json                          desktop scripts + electron-builder config
 ├── next.config.ts                        output: 'standalone'
-└── app/editor/_components/PiAgentChatPanel.tsx
+├── app/editor/_features/pi-agent/         renderer Pi Agent panel + controller
+└── desktop/main/pi-agent/                 Electron Pi SDK service + workspace resolver
 ```
 
 ## Child Nodes

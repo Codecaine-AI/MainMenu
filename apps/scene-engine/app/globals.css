@@ -10,10 +10,11 @@ nextjs-portal {
 
 .editor-shell {
   display: grid;
-  height: 100vh;
+  height: 100dvh;
   grid-template-columns: 440px minmax(0, 1fr) 440px;
-  grid-template-rows: 1fr;
+  grid-template-rows: 34px minmax(0, 1fr);
   grid-template-areas:
+    'topbar topbar topbar'
     'hierarchy canvas inspector';
   gap: 1px;
   background: #222;

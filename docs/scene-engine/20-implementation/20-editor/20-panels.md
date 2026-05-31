@@ -12,11 +12,11 @@ The editor lives under `apps/scene-engine/app/editor/` as a Next.js client app. 
 
 ## Scene Controls (`SceneSection.tsx`)
 
-Scene-level controls are split across the hierarchy and inspector so the layer tree stays visually primary.
+Scene-level controls are split across the top bar and inspector so the layer tree stays visually primary.
 
-- **SceneSaveControls**: rendered below the hierarchy list. Save calls `PUT /api/scenes/<id>?project=<project-id>` with the in-memory scene as the body. On success, `markClean()`. Disabled when `dirty === false`.
-- **SceneSettingsSection**: rendered at the top of the inspector, collapsed by default. Contains scene ID, stage dimensions, and global appearance controls.
-- **Dirty indicator**: shown with the save controls; the dot color toggles on `store.dirty`.
+- **EditorTopBar**: spans the top of the editor and shows the active project, scene, and clean/dirty state. The project crumb links back to the project/scenes page.
+- **SceneSettingsSection**: rendered at the top of the inspector, collapsed by default. Contains editable scene name, scene ID, stage dimensions, and global appearance controls.
+- **Dirty indicator**: shown in the top bar; the dot color toggles on `store.dirty`. Save is handled through editor commands rather than an in-panel button.
 
 ## Canvas (`CanvasPanel.tsx`)
 
@@ -50,12 +50,15 @@ A drop indicator (`{ path, region }`) is rendered as a styled border on the targ
 ### Group expansion
 Tracked locally in the panel as a `Set<string>` of collapsed paths. Not part of the store — refreshing the editor expands everything.
 
-### Scene Save Controls
-The hierarchy panel keeps global save controls below the layer tree. This keeps the top-left of the editor dedicated to navigation and layer structure.
+### Scene Save Status
+The editor top bar keeps scene save state visible without consuming hierarchy or Pi Agent space. Actual save is routed through the editor command hook, which handles the native menu command, keyboard shortcut, and shared save API.
+
+### Scene Name
+Scene name is edited in `SceneSettingsSection`, not in the hierarchy header. Changes mark the scene dirty and update the top-bar scene crumb immediately.
 
 ### Pi Agent Chat Panel
 
-`PiAgentChatPanel.tsx` is mounted at the bottom of the left sidebar. It reads the active project id, scene id, selected layer path, selected layer name, and selected layer type, then sends that context with user messages through `window.mainMenu.agent`.
+`app/editor/_features/pi-agent/PiAgentChatPanel.tsx` is mounted at the bottom of the left sidebar. Its colocated `usePiAgentController.ts` reads the active project id, scene id, selected layer path, selected layer name, and selected layer type, then sends that context with user messages through `window.mainMenu.agent`.
 
 The panel renders in normal browser sessions too, but it reports the bridge as unavailable and disables agent actions when Electron preload has not exposed `window.mainMenu.agent`. Native authority and SDK state live in the desktop app, documented under [Desktop App / Pi Agent](../30-desktop-app/20-pi-agent.md).
 
@@ -157,7 +160,8 @@ Custom hook that fetches the scene + merged registry on mount, calls `setScene` 
 - `apps/scene-engine/app/editor/_components/DescriptionPopover.tsx`
 - `apps/scene-engine/app/editor/_components/SlotsSection.tsx`
 - `apps/scene-engine/app/editor/_components/AssetSwapDropdown.tsx`
-- `apps/scene-engine/app/editor/_components/PiAgentChatPanel.tsx`
+- `apps/scene-engine/app/editor/_features/pi-agent/PiAgentChatPanel.tsx`
+- `apps/scene-engine/app/editor/_features/pi-agent/usePiAgentController.ts`
 - `apps/scene-engine/app/editor/_components/inputs/`
 - `apps/scene-engine/app/_engine/types/property-schema.ts`
 - `apps/scene-engine/app/_engine/lib/builtin-property-schemas.ts`

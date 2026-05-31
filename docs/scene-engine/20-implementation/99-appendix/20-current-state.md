@@ -102,5 +102,6 @@ The desktop app keeps `contextIsolation: true` and `nodeIntegration: false`. Pi 
 | Output | Command / Endpoint | Current behavior |
 | --- | --- | --- |
 | Standalone site zip | `POST /api/export?project=codecaine` | Exports active scenes, pruned active asset/module/font registries, `export-graph.json`, `Makefile`, and `server.mjs`. |
+| Git deploy trigger | `POST /api/projects/codecaine/deploy` | Writes `ProjectSettings/deployment.json`, commits all `codecaine-site` changes, and pushes the current branch for Railway. |
 | Local export preview | `make run` inside extracted zip | Serves the static export with Node. |
 | Desktop app | `npm run desktop:pack:mac` in `apps/scene-engine` | Builds Next standalone runtime and packages `Main Menu.app` for macOS directory output. |

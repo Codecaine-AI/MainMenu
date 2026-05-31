@@ -13,7 +13,7 @@ RUN_ID ?= first-pass
 RUN_DIR ?= $(RUNS_DIR)/$(RUN_ID)
 MAX_WORKERS ?= 4
 
-.PHONY: help frontend dev build preview clean install \
+.PHONY: help frontend dev desktop desktop-dev build preview clean install \
        font-effects-install font-effects-app font-effects-build font-effects-generate font-effects-generate-quick font-effects-bake \
        pipeline-ui pipeline-ui-install pipeline-help init dry-run run catalog extract extract-dry-run validate compile clean-runs
 
@@ -23,6 +23,7 @@ help:
 	@printf '%s\n' '── Frontend (apps/scene-engine) ──────────────'
 	@printf '%s\n' '  make frontend   Start Next.js dev server (hot reload)'
 	@printf '%s\n' '  make dev        Start Next.js dev server (hot reload)'
+	@printf '%s\n' '  make desktop    Start Main Menu Electron shell in dev mode'
 	@printf '%s\n' '  make build      Production build → apps/scene-engine/.next/'
 	@printf '%s\n' '  make preview    Build and serve the Next.js app locally'
 	@printf '%s\n' '  make install    Install npm dependencies'
@@ -69,6 +70,11 @@ frontend: dev
 
 dev:
 	cd $(FRONTEND_DIR) && npm run dev
+
+desktop: desktop-dev
+
+desktop-dev:
+	cd $(FRONTEND_DIR) && npm run desktop:dev
 
 build:
 	cd $(FRONTEND_DIR) && npm run build

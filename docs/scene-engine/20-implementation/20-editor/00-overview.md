@@ -18,6 +18,14 @@ The design rationale is in [System Design / Authoring Surfaces](../../10-system-
 ```
 apps/scene-engine/app/editor/
 ├── page.tsx                            shell — 3-panel grid, useSceneLoader
+├── _features/
+│   ├── pi-agent/
+│   │   ├── PiAgentChatPanel.tsx        desktop bridge chat panel for Pi Agent
+│   │   └── usePiAgentController.ts     bridge subscription + send/abort/reset logic
+│   └── desktop-menu/
+│       ├── EditorTopBar.tsx            project/scene title + clean/dirty status
+│       ├── sceneActions.ts             shared save/export actions
+│       └── useDesktopMenuCommands.ts   keyboard, native menu, and leave guards
 └── _components/
     ├── CanvasPanel.tsx                 live preview using the production renderer
     ├── HierarchyPanel.tsx              object tree, drag reorder, add menu, Pi panel host
@@ -25,13 +33,12 @@ apps/scene-engine/app/editor/
     ├── InspectorPanel.tsx              shell that resolves selected object
     ├── LayerForm.tsx                   always-present sections + schema-driven properties
     ├── MainMenuConfigEditor.tsx        bespoke main-menu graph and tuning editor
-    ├── PiAgentChatPanel.tsx            desktop bridge chat panel for Pi Agent
     ├── PropertySection.tsx             section header + nested properties + nested sections
     ├── PropertyField.tsx               clickable label + input dispatch by schema type
     ├── DescriptionPopover.tsx          floating popover (anchored, click-away/Esc dismiss)
     ├── SlotsSection.tsx                glyph-group slot editor
     ├── AssetSwapDropdown.tsx           project asset selector for layers/slots
-    ├── SceneSection.tsx                collapsed scene settings + hierarchy save controls
+    ├── SceneSection.tsx                collapsed scene settings
     └── inputs/
         ├── RangedInput.tsx             slider + numeric, debounced
         ├── BlendSelect.tsx             blend-mode dropdown
@@ -79,5 +86,5 @@ The React components — Toolbar, Canvas, Hierarchy, Inspector — including alw
 | Manifest-driven field       | Property field generated from the asset's `manifest.json` descriptor. Used only for effects. |
 | Slot                        | Glyph-group sub-surface edited under the parent object, not as a separate hierarchy entry. |
 | Event binding               | Trigger → action → target row stored on the object's `events[]`. |
-| Dirty                       | A boolean toggled by mutations and reset on save. Drives the toolbar's dirty indicator and Save button. |
+| Dirty                       | A boolean toggled by mutations and reset on save. Drives scene status, save commands, and unsaved-change prompts. |
 | Pi Agent panel              | Desktop-only chat panel hosted below the hierarchy. Sends project/scene/selection context through `window.mainMenu.agent`. |

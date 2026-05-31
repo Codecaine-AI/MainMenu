@@ -45,7 +45,7 @@ Z-order is array position. Last entry renders on top.
 
 The same project data is edited by multiple authoring surfaces:
 
-1. **Visual editor** — browser UI with drag-and-drop, layer hierarchy, property inspector, save button, asset selection, and export action.
+1. **Visual editor** — browser UI with drag-and-drop, layer hierarchy, property inspector, deliberate save command, asset selection, and export action.
 2. **Main Menu desktop shell** — Electron app that opens the same editor and owns local native capabilities.
 3. **Pi Agent / file API** — desktop chat agent or external AI reads and writes project files directly, or PUTs to the Next API route.
 

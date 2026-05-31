@@ -70,7 +70,7 @@ Universal post-mount styling:
 | `play-audio` | Calls `options.runtime.playAudio(target)` when provided, otherwise resolves the audio asset and plays it through the audio renderer. |
 | `autoplay`   | Same audio path as `play-audio`, using `target` or the current layer's asset. |
 
-For a single trigger, non-navigation actions run before navigation. This lets a button play a cue and then navigate even if the JSON lists `navigate` first.
+For a single trigger, non-navigation actions run before navigation. This lets a button play a cue and then navigate even if the JSON lists `navigate` first. `play-audio` waits for the browser's playback-start promise; `navigate` can also honor `properties.navigationDelayMs` for page-mode exports where unloading immediately would cut off the cue.
 
 ## `updateChildren(parentEl, childArray)`
 

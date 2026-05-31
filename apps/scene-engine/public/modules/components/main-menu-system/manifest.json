@@ -183,6 +183,13 @@
     "back-target": {
       "type": "string",
       "default": "title"
+    },
+    "root-navigation-sound-delay-ms": {
+      "type": "number",
+      "default": 450,
+      "min": 0,
+      "max": 1000,
+      "step": 10
     }
   }
 }

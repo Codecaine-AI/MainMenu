@@ -8,6 +8,7 @@ concepts: [export, standalone-bundle, zip, active-export-graph, desktop-app, pat
 The scene-engine has two output paths:
 
 - **Site export** — `POST /api/export?project=<project-id>` returns a standalone zip for the selected project.
+- **Git deploy trigger** — `POST /api/projects/<project-id>/deploy` commits and pushes an external project workspace so GitHub-connected hosts can deploy it.
 - **Desktop authoring app** — Electron packages the Next standalone runtime as the Main Menu macOS app.
 
 The site export contains static pages, the same renderer code, scene JSON, and the active project files needed by those scenes. There is no framework runtime in the exported site, and no dependency on the Next.js dev server.
@@ -30,6 +31,18 @@ Trade-offs:
 `POST /api/export?project=<project-id>` returns `application/zip` with `Content-Disposition: attachment; filename="<project-id>.zip"`. The project page calls it with the active project and triggers a browser download.
 
 There is no streaming or progress reporting. The selected projects are small enough that synchronous zip generation is acceptable for the current tool.
+
+## Git Deploy Trigger
+
+External project workspaces can also deploy without generating a zip. The project page's Deploy button calls `POST /api/projects/<project-id>/deploy`. The route:
+
+1. Accepts localhost requests only, unless remote deploy is explicitly enabled.
+2. Resolves the external project through the workspace catalog.
+3. Requires the project root to be its own Git repository.
+4. Updates `ProjectSettings/deployment.json` with a monotonically increasing deploy marker.
+5. Runs `git add -A`, commits all project-repo changes, and pushes the current branch.
+
+This is the path for the Codecaine site Railway setup: the live host listens to the `codecaine-site` GitHub repository, so pushing the workspace repo is the deploy trigger.
 
 ## What The Bundle Contains
 

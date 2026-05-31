@@ -46,7 +46,7 @@ interface EditorStore {
 | `projectId` / `sceneId` | `setProjectContext` (loader/page) | Save/export controls, Pi Agent context      |
 | `selectedPath` | `setSelectedPath` (hierarchy / canvas) | Inspector (which object), highlight overlay      |
 | `drillCursor`  | `setDrillCursor`                    | Canvas drill/select affordances                  |
-| `dirty`        | `markDirty` / `markClean`            | SceneSaveControls (save button enabled, dirty indicator) |
+| `dirty`        | `markDirty` / `markClean`            | Scene status, save command, and navigation guard         |
 
 ## Object Paths
 

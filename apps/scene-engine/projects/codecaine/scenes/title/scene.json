@@ -237,7 +237,10 @@
         {
           "trigger": "click",
           "action": "navigate",
-          "target": "menu"
+          "target": "menu",
+          "properties": {
+            "navigationDelayMs": 650
+          }
         },
         {
           "trigger": "click",

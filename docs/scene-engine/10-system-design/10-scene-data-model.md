@@ -185,7 +185,7 @@ A small set of trigger → action pairs makes interactivity legible in the edito
 
 ```json
 "events": [
-  { "trigger": "click", "action": "navigate",   "target": "menu" },
+  { "trigger": "click", "action": "navigate",   "target": "menu", "properties": { "navigationDelayMs": 650 } },
   { "trigger": "click", "action": "play-audio", "target": "start-cue" }
 ]
 ```
@@ -197,7 +197,7 @@ A small set of trigger → action pairs makes interactivity legible in the edito
 | `hover` | (any)        | Triggered on mouseover.                     |
 | `load`  | `autoplay`   | Fires on scene boot.                        |
 
-The renderer maps these to DOM event listeners and the project navigator (`window.MELEE_navigate(sceneId)` in the export bundle).
+The renderer maps these to DOM event listeners and the project navigator (`window.MELEE_navigate(sceneId)` in the export bundle). For page-changing cues, a `navigate` binding can include `properties.navigationDelayMs` so preceding audio has time to start before the page changes.
 
 ## Children and Nesting
 

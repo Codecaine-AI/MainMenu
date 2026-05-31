@@ -216,6 +216,14 @@ function clamp(value, min, max) {
   return Math.max(min, Math.min(max, value));
 }
 
+function delay(ms) {
+  return new Promise((resolve) => window.setTimeout(resolve, ms));
+}
+
+function rootNavigationSoundDelayMs(properties) {
+  return clamp(numberProp(properties, 'root-navigation-sound-delay-ms', 450), 0, 1000);
+}
+
 function soundBinding(properties, volumeKey) {
   const masterVolume = numberProp(properties, 'sound-volume', 1);
   const cueVolume = volumeKey ? numberProp(properties, volumeKey, 1) : 1;
@@ -1021,6 +1029,7 @@ function createController(root, config, properties, parts, runtime) {
   const playAudio = resolveAudioPlayer(runtime);
   const navigate = resolveNavigator(runtime);
   const rootBackTarget = soundTarget(properties, 'back-target', 'title');
+  const rootBackAudioDelayMs = rootNavigationSoundDelayMs(properties);
   let renderSerial = 0;
   const state = {
     activeMenu: menuById(config, initial) ? initial : config.initial,
@@ -1036,8 +1045,8 @@ function createController(root, config, properties, parts, runtime) {
 
   const playSound = (key, fallback, volumeKey) => {
     const target = soundTarget(properties, key, fallback);
-    if (!target || !playAudio) return;
-    Promise.resolve(playAudio(target, soundBinding(properties, volumeKey))).catch((err) => {
+    if (!target || !playAudio) return Promise.resolve();
+    return Promise.resolve(playAudio(target, soundBinding(properties, volumeKey))).catch((err) => {
       console.warn(`[main-menu-system] Failed to play '${target}'`, err);
     });
   };
@@ -1078,7 +1087,7 @@ function createController(root, config, properties, parts, runtime) {
       state.direction = 'forward';
       controller.render({ animate: true, mode: 'forward' });
     },
-    back() {
+    async back() {
       if (state.busy) return;
       if (state.stack.length > 1) {
         playSound('ui-back-sound', 'ui-back', 'ui-back-volume');
@@ -1090,10 +1099,15 @@ function createController(root, config, properties, parts, runtime) {
         return;
       }
       if (!rootBackTarget || !navigate) return;
-      playSound('ui-back-sound', 'ui-back', 'ui-back-volume');
-      Promise.resolve(navigate(rootBackTarget)).catch((err) => {
+      state.busy = true;
+      try {
+        await playSound('ui-back-sound', 'ui-back', 'ui-back-volume');
+        if (rootBackAudioDelayMs > 0) await delay(rootBackAudioDelayMs);
+        await Promise.resolve(navigate(rootBackTarget));
+      } catch (err) {
         console.warn(`[main-menu-system] Failed to navigate back to '${rootBackTarget}'`, err);
-      });
+        state.busy = false;
+      }
     },
     canBack() {
       return state.stack.length > 1 || Boolean(rootBackTarget && navigate);
@@ -1673,6 +1687,15 @@ export const properties = {
               type: 'string',
               label: 'Root Back',
               description: 'Scene ID to navigate to when backing out from the root menu. Leave empty to disable root back navigation.',
+            },
+            'root-navigation-sound-delay-ms': {
+              type: 'number',
+              label: 'Root Sound Lead',
+              description: 'Milliseconds to wait after the root back sound starts before navigating to another scene.',
+              min: 0,
+              max: 1000,
+              step: 10,
+              default: 450,
             },
           },
         },

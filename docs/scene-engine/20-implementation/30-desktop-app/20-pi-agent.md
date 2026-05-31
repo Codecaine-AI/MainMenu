@@ -1,7 +1,7 @@
 ---
 covers: Pi Agent chat sidebar, preload bridge, Electron IPC handlers, SDK session lifecycle, and renderer security boundary.
 concepts: [pi-agent, chat-sidebar, ipc, preload-bridge, sdk-session, context-handoff]
-code-ref: [apps/scene-engine/app/editor/_components/PiAgentChatPanel.tsx, apps/scene-engine/app/editor/_components/HierarchyPanel.tsx, apps/scene-engine/desktop/main/index.ts, apps/scene-engine/desktop/preload/index.ts, apps/scene-engine/desktop/types/main-menu.ts]
+code-ref: [apps/scene-engine/app/editor/_features/pi-agent/PiAgentChatPanel.tsx, apps/scene-engine/app/editor/_features/pi-agent/usePiAgentController.ts, apps/scene-engine/app/editor/_components/HierarchyPanel.tsx, apps/scene-engine/desktop/main/pi-agent/service.ts, apps/scene-engine/desktop/main/pi-agent/project-workspace.ts, apps/scene-engine/desktop/preload/index.ts, apps/scene-engine/desktop/types/main-menu.ts]
 ---
 
 # Pi Agent
@@ -12,7 +12,7 @@ The renderer never imports the Pi SDK. Electron main owns the SDK session and se
 
 ## Renderer Surface
 
-`PiAgentChatPanel.tsx` renders:
+`app/editor/_features/pi-agent/PiAgentChatPanel.tsx` renders:
 
 - transcript
 - message input
@@ -32,6 +32,8 @@ Each send request includes:
 | `selectedLayerType` | Layer type used for prompt context. |
 
 The panel degrades gracefully in a normal browser tab. If `window.mainMenu?.agent` is unavailable, the UI reports that the desktop bridge is unavailable.
+
+Renderer-side operating logic lives beside the panel in `usePiAgentController.ts`, so the chat view, bridge subscription, send/abort/reset calls, and selected-layer context assembly stay in one vertical slice.
 
 ## Preload Bridge
 
@@ -65,12 +67,12 @@ The session is created with:
 
 ```ts
 createAgentSession({
-  cwd: editableWorkspaceRoot(),
+  cwd: workspace.cwd,
   sessionManager: SessionManager.create(cwd, sessionDir),
 })
 ```
 
-`editableWorkspaceRoot()` selects the writable workspace in packaged mode and the project package root in development mode. Session files live under the app user-data directory.
+`desktop/main/pi-agent/project-workspace.ts` resolves `workspace.cwd` from the same `workspace.catalog.json` project id that the editor uses. For an external Codecaine catalog entry, the Pi SDK session starts in the Codecaine project root, not the scene-engine app root. Session files live under the app user-data directory.
 
 ## State Flow
 

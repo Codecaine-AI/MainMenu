@@ -4,6 +4,27 @@ import { renderAudio } from './asset-renderers/audio.js';
 const EVENT_CLEANUP = Symbol('meleeEventCleanup');
 const audioElements = new Map();
 
+function delay(ms) {
+  return new Promise((resolve) => window.setTimeout(resolve, ms));
+}
+
+function numericProperty(properties, keys, fallback = 0) {
+  for (const key of keys) {
+    const value = properties?.[key];
+    const number = Number(value);
+    if (Number.isFinite(number)) return Math.max(0, number);
+  }
+  return fallback;
+}
+
+function navigationDelayMs(binding) {
+  return numericProperty(
+    binding?.properties,
+    ['navigationDelayMs', 'navigation-delay-ms', 'delayMs', 'delay-ms'],
+    0,
+  );
+}
+
 function eventsForTrigger(events, trigger) {
   if (!Array.isArray(events)) return [];
   return events.filter((event) => event?.trigger === trigger);
@@ -50,7 +71,16 @@ async function defaultPlayAudio(target, binding = {}) {
   } else if (typeof el.setAudioProperties === 'function') {
     el.setAudioProperties(properties);
   }
-  if (typeof el.play === 'function') el.play();
+  if (typeof el.play === 'function') {
+    const playback = el.play();
+    if (playback?.then) {
+      try {
+        await playback;
+      } catch {
+        // Audio modules already log meaningful playback errors. Navigation should not be blocked.
+      }
+    }
+  }
 }
 
 export async function playAudio(target, binding = {}) {
@@ -65,6 +95,8 @@ async function runBinding(binding, layer, runtime) {
   const target = binding?.target;
   if (binding?.action === 'navigate') {
     if (!target) return;
+    const delayMs = navigationDelayMs(binding);
+    if (delayMs > 0) await delay(delayMs);
     if (typeof runtime?.navigate === 'function') {
       await runtime.navigate(target, { binding, layer });
       return;

@@ -21,7 +21,8 @@ Three-panel layout in the browser, whether opened from the Next dev server or in
 
 | Panel | Role |
 | --- | --- |
-| Hierarchy | Object tree, drag-and-drop reorder, drag-into-group, add-layer dialog, scene save controls, and the desktop Pi Agent panel below the tree. |
+| Top bar | Active project link, scene name, and save state. |
+| Hierarchy | Object tree, drag-and-drop reorder, drag-into-group, add-layer dialog, and the desktop Pi Agent panel below the tree. |
 | Canvas | Live preview of the scene rendered by the same code path as production. |
 | Inspector | Collapsed scene globals at the top, then the property editor for the selected object. Always renders Transform and Appearance; conditionally renders Properties, Events, Slots, Text, and Asset selection. |
 
@@ -49,9 +50,9 @@ The always-present rule keeps authoring predictable: Transform and Appearance re
 
 ### Dirty Tracking And Save
 
-Edits set the dirty flag. Save writes the current scene back to disk via `PUT /api/scenes/<id>?project=<project-id>`. The post-save state is clean until the next mutation.
+Edits set the dirty flag. Save writes the current scene back to disk via `PUT /api/scenes/<id>?project=<project-id>`. Scene name is a normal editable scene field in Scene Settings. The post-save state is clean until the next mutation. In the desktop shell, native menu commands route save into the same editor command path used by browser keyboard handling.
 
-The dirty flag is not persisted. Refreshing the editor discards unsaved edits. This keeps the file as the source of truth and makes save deliberate.
+The dirty flag is not persisted. Refreshing or leaving the editor with unsaved edits is guarded before those edits are discarded. This keeps the file as the source of truth and makes save deliberate.
 
 ### Export
 

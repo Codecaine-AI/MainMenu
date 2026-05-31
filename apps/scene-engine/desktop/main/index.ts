@@ -5,17 +5,15 @@ import { get } from 'node:http'
 import { readFileSync } from 'node:fs'
 import fs from 'node:fs/promises'
 import path from 'node:path'
-import type {
-  MainMenuAgentContext,
-  MainMenuAgentMessage,
-  MainMenuAgentPromptRequest,
-  MainMenuAgentState,
-  MainMenuAppInfo,
-} from '../types/main-menu'
+import type { MainMenuAgentPromptRequest, MainMenuAppInfo, MainMenuCommand } from '../types/main-menu'
+import { createPiAgentService, type PiAgentService } from './pi-agent/service'
 
 const PRODUCT_NAME = 'Main Menu'
 const DEFAULT_START_PATH = '/editor?project=codecaine&scene=title'
 const DEV_RENDERER_URL = 'http://localhost:3000'
+
+app.commandLine.appendSwitch('autoplay-policy', 'no-user-gesture-required')
+app.setName(PRODUCT_NAME)
 
 interface RuntimeController {
   url: string
@@ -25,17 +23,7 @@ interface RuntimeController {
 
 let runtime: RuntimeController | null = null
 let mainWindow: BrowserWindow | null = null
-let agentSession: import('@mariozechner/pi-coding-agent').AgentSession | null = null
-let agentUnsubscribe: (() => void) | null = null
-let agentMessages: MainMenuAgentMessage[] = []
-let agentStatus: MainMenuAgentState['status'] = 'idle'
-let agentCwd: string | null = null
-let agentSessionId: string | null = null
-let agentSessionFile: string | null = null
-let activeTool: string | null = null
-let agentError: string | null = null
-let activeAssistantMessageId: string | null = null
-let messageSequence = 0
+let piAgentService: PiAgentService | null = null
 
 function packageRoot() {
   return path.resolve(__dirname, '../../..')
@@ -54,251 +42,27 @@ function packageVersion() {
   }
 }
 
-function editableWorkspaceRoot() {
-  if (app.isPackaged && runtime?.workspacePath) return runtime.workspacePath
-  return packageRoot()
-}
-
 function rendererUrlFromOrigin(origin: string) {
   const startPath = process.env.MAIN_MENU_START_PATH ?? DEFAULT_START_PATH
   return new URL(startPath, origin).toString()
 }
 
-function nextMessageId(prefix: string) {
-  messageSequence += 1
-  return `${prefix}-${Date.now().toString(36)}-${messageSequence.toString(36)}`
-}
-
-function normalizeError(error: unknown) {
-  return error instanceof Error ? error.message : String(error)
-}
-
-function textFromContent(content: unknown): string {
-  if (typeof content === 'string') return content
-  if (!Array.isArray(content)) return ''
-  return content
-    .map((part) => {
-      if (!part || typeof part !== 'object') return ''
-      const block = part as { type?: string; text?: string; thinking?: string; name?: string }
-      if (block.type === 'text') return block.text ?? ''
-      if (block.type === 'thinking') return block.thinking ? '[thinking]' : ''
-      if (block.type === 'toolCall') return block.name ? `[tool: ${block.name}]` : '[tool]'
-      if (block.type === 'image') return '[image]'
-      return ''
+function agentService() {
+  if (!piAgentService) {
+    piAgentService = createPiAgentService({
+      appRoot: packageRoot(),
+      sessionRoot: () => path.join(app.getPath('userData'), 'pi-agent-sessions'),
+      packagedWorkspacePath: () => (app.isPackaged ? runtime?.workspacePath ?? null : null),
+      publish: (event) => {
+        mainWindow?.webContents.send('main-menu:agent:event', event)
+      },
     })
-    .filter(Boolean)
-    .join('\n')
-}
-
-function textFromAgentMessage(message: unknown): string {
-  if (!message || typeof message !== 'object') return ''
-  const typed = message as { content?: unknown; errorMessage?: string }
-  return textFromContent(typed.content) || typed.errorMessage || ''
-}
-
-function addAgentMessage(role: MainMenuAgentMessage['role'], text: string) {
-  const message: MainMenuAgentMessage = {
-    id: nextMessageId(role),
-    role,
-    text,
-    timestamp: Date.now(),
   }
-  agentMessages = [...agentMessages, message].slice(-80)
-  return message
+  return piAgentService
 }
 
-function updateAgentMessage(id: string, text: string) {
-  agentMessages = agentMessages.map((message) => (message.id === id ? { ...message, text } : message))
-}
-
-function appendAgentMessageText(id: string, delta: string) {
-  agentMessages = agentMessages.map((message) =>
-    message.id === id ? { ...message, text: `${message.text}${delta}` } : message,
-  )
-}
-
-function agentState(): MainMenuAgentState {
-  return {
-    status: agentStatus,
-    messages: agentMessages,
-    cwd: agentCwd,
-    sessionId: agentSessionId,
-    sessionFile: agentSessionFile,
-    activeTool,
-    error: agentError,
-  }
-}
-
-function broadcastAgentState() {
-  mainWindow?.webContents.send('main-menu:agent:event', { type: 'state', state: agentState() })
-}
-
-function importPiSdk(): Promise<typeof import('@mariozechner/pi-coding-agent')> {
-  const dynamicImport = new Function('specifier', 'return import(specifier)') as (
-    specifier: string,
-  ) => Promise<typeof import('@mariozechner/pi-coding-agent')>
-  return dynamicImport('@mariozechner/pi-coding-agent')
-}
-
-function formatAgentPrompt(request: MainMenuAgentPromptRequest) {
-  const context: MainMenuAgentContext = request.context ?? {
-    projectId: null,
-    sceneId: 'unknown',
-    selectedPath: null,
-    selectedName: null,
-    selectedType: null,
-  }
-  return [
-    'You are Pi running inside the Main Menu desktop editor.',
-    `Working directory: ${agentCwd ?? editableWorkspaceRoot()}`,
-    `Project: ${context.projectId ?? 'default'}`,
-    `Scene: ${context.sceneId}`,
-    `Selected layer path: ${context.selectedPath ?? 'none'}`,
-    `Selected layer: ${context.selectedName ?? 'none'}`,
-    `Selected type: ${context.selectedType ?? 'none'}`,
-    '',
-    'Use the repository files and scene JSON to make requested edits. Keep changes scoped to the current Main Menu scene engine project, prefer existing APIs and file formats, and report the concrete files changed.',
-    '',
-    request.message.trim(),
-  ].join('\n')
-}
-
-function handlePiEvent(event: import('@mariozechner/pi-coding-agent').AgentSessionEvent) {
-  if (event.type === 'agent_start') {
-    agentStatus = 'running'
-    agentError = null
-    activeTool = null
-    activeAssistantMessageId = null
-  } else if (event.type === 'message_start') {
-    const message = event.message as { role?: string }
-    if (message.role === 'assistant') {
-      activeAssistantMessageId = addAgentMessage('assistant', '').id
-    }
-  } else if (event.type === 'message_update') {
-    if (event.assistantMessageEvent.type === 'text_delta') {
-      if (!activeAssistantMessageId) {
-        activeAssistantMessageId = addAgentMessage('assistant', '').id
-      }
-      appendAgentMessageText(activeAssistantMessageId, event.assistantMessageEvent.delta)
-    }
-  } else if (event.type === 'message_end') {
-    const message = event.message as { role?: string }
-    if (message.role === 'assistant') {
-      const text = textFromAgentMessage(event.message)
-      if (activeAssistantMessageId && text) updateAgentMessage(activeAssistantMessageId, text)
-      activeAssistantMessageId = null
-    }
-  } else if (event.type === 'tool_execution_start') {
-    activeTool = event.toolName
-    addAgentMessage('tool', `Running ${event.toolName}`)
-  } else if (event.type === 'tool_execution_end') {
-    addAgentMessage('tool', `${event.toolName} ${event.isError ? 'failed' : 'finished'}`)
-    activeTool = null
-  } else if (event.type === 'agent_end') {
-    agentStatus = 'idle'
-    activeTool = null
-    activeAssistantMessageId = null
-  } else if (event.type === 'compaction_start') {
-    addAgentMessage('system', 'Compacting session context')
-  } else if (event.type === 'compaction_end') {
-    if (event.errorMessage) addAgentMessage('error', event.errorMessage)
-  }
-
-  broadcastAgentState()
-}
-
-async function ensurePiAgentSession() {
-  if (agentSession) return agentSession
-
-  agentStatus = 'starting'
-  agentError = null
-  agentCwd = editableWorkspaceRoot()
-  broadcastAgentState()
-
-  try {
-    const sdk = await importPiSdk()
-    const sessionDir = path.join(app.getPath('userData'), 'pi-agent-sessions')
-    await fs.mkdir(sessionDir, { recursive: true })
-
-    const result = await sdk.createAgentSession({
-      cwd: agentCwd,
-      sessionManager: sdk.SessionManager.create(agentCwd, sessionDir),
-    })
-
-    agentSession = result.session
-    agentSessionId = result.session.sessionId
-    agentSessionFile = result.session.sessionFile ?? null
-    agentUnsubscribe = result.session.subscribe(handlePiEvent)
-
-    addAgentMessage('system', `Pi session ready in ${agentCwd}`)
-    if (result.modelFallbackMessage) addAgentMessage('system', result.modelFallbackMessage)
-    agentStatus = 'idle'
-    broadcastAgentState()
-    return result.session
-  } catch (error) {
-    agentStatus = 'error'
-    agentError = normalizeError(error)
-    addAgentMessage('error', agentError)
-    broadcastAgentState()
-    throw error
-  }
-}
-
-async function sendPiAgentMessage(request: MainMenuAgentPromptRequest): Promise<MainMenuAgentState> {
-  const message = typeof request?.message === 'string' ? request.message.trim() : ''
-  if (message.length === 0) throw new Error('Message is required')
-
-  addAgentMessage('user', message)
-  agentStatus = 'running'
-  agentError = null
-  broadcastAgentState()
-
-  try {
-    const session = await ensurePiAgentSession()
-    const prompt = formatAgentPrompt({ ...request, message })
-    const options = session.isStreaming ? { streamingBehavior: 'steer' as const } : undefined
-    void session.prompt(prompt, options).catch((error: unknown) => {
-      agentStatus = 'error'
-      agentError = normalizeError(error)
-      activeTool = null
-      activeAssistantMessageId = null
-      addAgentMessage('error', agentError)
-      broadcastAgentState()
-    })
-  } catch (error) {
-    agentStatus = 'error'
-    agentError = normalizeError(error)
-    addAgentMessage('error', agentError)
-    broadcastAgentState()
-  }
-
-  return agentState()
-}
-
-async function abortPiAgent(): Promise<MainMenuAgentState> {
-  if (agentSession) await agentSession.abort()
-  agentStatus = 'idle'
-  activeTool = null
-  addAgentMessage('system', 'Stopped')
-  broadcastAgentState()
-  return agentState()
-}
-
-async function resetPiAgent(): Promise<MainMenuAgentState> {
-  agentUnsubscribe?.()
-  agentSession?.dispose()
-  agentSession = null
-  agentUnsubscribe = null
-  agentMessages = []
-  agentStatus = 'idle'
-  agentCwd = null
-  agentSessionId = null
-  agentSessionFile = null
-  activeTool = null
-  agentError = null
-  activeAssistantMessageId = null
-  broadcastAgentState()
-  return agentState()
+function sendRendererCommand(command: MainMenuCommand) {
+  mainWindow?.webContents.send('main-menu:command', { command })
 }
 
 function buildApplicationMenu() {
@@ -307,6 +71,8 @@ function buildApplicationMenu() {
       label: PRODUCT_NAME,
       submenu: [
         { role: 'about', label: `About ${PRODUCT_NAME}` },
+        { type: 'separator' },
+        { label: 'Settings...', accelerator: 'CmdOrCtrl+,', enabled: false },
         { type: 'separator' },
         { role: 'services' },
         { type: 'separator' },
@@ -319,7 +85,26 @@ function buildApplicationMenu() {
     },
     {
       label: 'File',
-      submenu: [{ role: 'close' }],
+      submenu: [
+        {
+          label: 'Save Scene',
+          accelerator: 'CmdOrCtrl+S',
+          click: () => sendRendererCommand('save-scene'),
+        },
+        {
+          label: 'Export Project...',
+          accelerator: 'CmdOrCtrl+E',
+          click: () => sendRendererCommand('export-project'),
+        },
+        { type: 'separator' },
+        {
+          label: 'Open Project Page',
+          accelerator: 'CmdOrCtrl+Shift+P',
+          click: () => sendRendererCommand('open-project'),
+        },
+        { type: 'separator' },
+        { role: 'close', label: 'Close Window' },
+      ],
     },
     {
       label: 'Edit',
@@ -537,15 +322,19 @@ async function createMainWindow() {
 
 async function boot() {
   app.setName(PRODUCT_NAME)
+  app.setAboutPanelOptions({
+    applicationName: PRODUCT_NAME,
+    applicationVersion: packageVersion(),
+  })
   Menu.setApplicationMenu(buildApplicationMenu())
 
   ipcMain.handle('main-menu:app:get-info', () => appInfo())
-  ipcMain.handle('main-menu:agent:get-state', () => agentState())
+  ipcMain.handle('main-menu:agent:get-state', () => agentService().getState())
   ipcMain.handle('main-menu:agent:send-message', (_event, request) =>
-    sendPiAgentMessage(request as MainMenuAgentPromptRequest),
+    agentService().sendMessage(request as MainMenuAgentPromptRequest),
   )
-  ipcMain.handle('main-menu:agent:abort', () => abortPiAgent())
-  ipcMain.handle('main-menu:agent:reset', () => resetPiAgent())
+  ipcMain.handle('main-menu:agent:abort', () => agentService().abort())
+  ipcMain.handle('main-menu:agent:reset', () => agentService().reset())
 
   runtime = app.isPackaged ? await createPackagedRuntime() : createDevelopmentRuntime()
   await createMainWindow()
@@ -561,8 +350,7 @@ app.on('window-all-closed', () => {
 })
 
 app.on('before-quit', () => {
-  agentUnsubscribe?.()
-  agentSession?.dispose()
+  piAgentService?.dispose()
   runtime?.stop()
 })
 

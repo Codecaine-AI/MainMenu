@@ -4,6 +4,13 @@ import type { MainMenuBridge } from '../types/main-menu'
 const bridge: MainMenuBridge = {
   app: {
     getInfo: () => ipcRenderer.invoke('main-menu:app:get-info'),
+    onCommand: (listener) => {
+      const handler = (_event: Electron.IpcRendererEvent, event: unknown) => {
+        listener(event as Parameters<typeof listener>[0])
+      }
+      ipcRenderer.on('main-menu:command', handler)
+      return () => ipcRenderer.removeListener('main-menu:command', handler)
+    },
   },
   agent: {
     getState: () => ipcRenderer.invoke('main-menu:agent:get-state'),

@@ -6,18 +6,21 @@ import { useSceneLoader } from '@/hooks/useSceneLoader'
 import { CanvasPanel } from './_components/CanvasPanel'
 import { HierarchyPanel } from './_components/HierarchyPanel'
 import { InspectorPanel } from './_components/InspectorPanel'
+import { EditorTopBar } from './_features/desktop-menu/EditorTopBar'
+import { useDesktopMenuCommands } from './_features/desktop-menu/useDesktopMenuCommands'
 
 function EditorContent() {
   const params = useSearchParams()
   const projectId = params.get('project')
   const sceneId = params.get('scene') ?? 'title'
   const { loading, error } = useSceneLoader(projectId, sceneId)
-  const scenesHref = projectId ? `/projects/${encodeURIComponent(projectId)}` : '/'
+  useDesktopMenuCommands({ projectId, sceneId })
 
   return (
     <div className="editor-shell overflow-hidden bg-[#111] text-gray-300">
       {loading ? (
         <>
+          <EditorTopBar projectId={projectId} sceneId={sceneId} />
           <section className="bg-[#1a1a1a] overflow-auto p-2" style={{ gridArea: 'hierarchy' }}>
             <p className="text-gray-600 text-xs italic">Loading...</p>
           </section>
@@ -29,12 +32,16 @@ function EditorContent() {
           </section>
         </>
       ) : error ? (
-        <section className="bg-[#1a1a1a] p-4 col-span-3 row-span-2">
-          <p className="text-red-400 text-sm">{error}</p>
-        </section>
+        <>
+          <EditorTopBar projectId={projectId} sceneId={sceneId} />
+          <section className="bg-[#1a1a1a] p-4" style={{ gridColumn: '1 / -1', gridRow: 2 }}>
+            <p className="text-red-400 text-sm">{error}</p>
+          </section>
+        </>
       ) : (
         <>
-          <HierarchyPanel projectId={projectId} sceneId={sceneId} scenesHref={scenesHref} />
+          <EditorTopBar projectId={projectId} sceneId={sceneId} />
+          <HierarchyPanel projectId={projectId} sceneId={sceneId} />
           <CanvasPanel />
           <InspectorPanel />
         </>
@@ -45,7 +52,7 @@ function EditorContent() {
 
 export default function EditorPage() {
   return (
-    <Suspense fallback={<div className="h-screen bg-[#111] grid place-items-center text-gray-500 text-sm">Loading editor...</div>}>
+    <Suspense fallback={<div className="grid min-h-[100dvh] place-items-center bg-[#111] text-sm text-gray-500">Loading editor...</div>}>
       <EditorContent />
     </Suspense>
   )

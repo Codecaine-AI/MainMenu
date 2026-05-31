@@ -34,7 +34,7 @@ The add-layer dialog and the inspector both need the registry to render meaningf
 
 ## Reload Semantics
 
-`useSceneLoader` re-runs whenever `projectId` or `sceneId` changes (the `useCallback` dependency). There is no explicit Reload button in the current UI — refreshing the page or navigating between scenes triggers a fresh load. Any unsaved edits are discarded; the dirty flag is reset by `markClean()` on each successful load.
+`useSceneLoader` re-runs whenever `projectId` or `sceneId` changes (the `useCallback` dependency). There is no explicit Reload button in the current UI — refreshing the page or navigating between scenes triggers a fresh load. When the editor has unsaved edits, the command hook guards reload, close, and link navigation before those edits are discarded. The dirty flag is reset by `markClean()` on each successful load.
 
 This is also the handoff path from agent edits: after the agent edits `scene.json`, the human refreshes (or navigates to the scene) to see the change.
 

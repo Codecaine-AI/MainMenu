@@ -93,6 +93,7 @@ export interface EventBinding {
   trigger: EventTrigger
   action: EventAction
   target?: string
+  properties?: Record<string, unknown>
 }
 
 export type SceneObjectType =

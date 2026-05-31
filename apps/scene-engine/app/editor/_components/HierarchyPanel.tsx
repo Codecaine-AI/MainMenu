@@ -1,20 +1,24 @@
 'use client'
 
 import { useState, useCallback } from 'react'
-import Link from 'next/link'
 import { useEditorStore } from '@/store/editor-store'
 import { resolveObject } from '@/lib/path'
 import type { Registry, SceneJson } from '@/types/scene'
 import { HierarchyRow } from './HierarchyRow'
-import { SceneSaveControls } from './SceneSection'
 import { AddLayerDialog } from './AddLayerDialog'
-import { PiAgentChatPanel } from './PiAgentChatPanel'
+import { PiAgentChatPanel } from '../_features/pi-agent/PiAgentChatPanel'
 
 interface Props {
   projectId: string | null
   sceneId: string
-  scenesHref: string
 }
+
+type HierarchyPaneSize = 'quarter' | 'half'
+
+const HIERARCHY_PANE_OPTIONS: Array<{ id: HierarchyPaneSize; label: string; basis: string }> = [
+  { id: 'quarter', label: '25%', basis: '25%' },
+  { id: 'half', label: '50%', basis: '50%' },
+]
 
 function computeRegion(e: React.DragEvent, row: HTMLElement, isGroup: boolean): 'before' | 'after' | 'into' {
   const rect = row.getBoundingClientRect()
@@ -41,27 +45,7 @@ function regionToToPath(targetPath: string, region: string, scene: SceneJson): s
   return parts.join('.children.')
 }
 
-function SidebarHeader({ title, scenesHref }: { title: string; scenesHref: string }) {
-  return (
-    <div className="sticky top-0 z-10 -mx-2 -mt-2 mb-2 border-b border-[#2d2d2d] bg-[#181818]/95 px-2 py-2 shadow-[0_1px_0_rgba(255,255,255,0.03)] backdrop-blur">
-      <div className="flex items-center gap-2">
-        <Link
-          href={scenesHref}
-          aria-label="Back to scenes"
-          className="inline-flex h-7 shrink-0 items-center gap-1.5 rounded-sm border border-[#3c3c3c] bg-[#242424] px-2 text-[12px] font-semibold text-gray-200 no-underline hover:bg-[#303030] active:translate-y-px"
-        >
-          <span aria-hidden="true" className="text-[15px] leading-none text-gray-400">←</span>
-          <span>Scenes</span>
-        </Link>
-        <div className="min-w-0 flex-1 text-right">
-          <div className="truncate text-[13px] font-bold text-gray-100">{title}</div>
-        </div>
-      </div>
-    </div>
-  )
-}
-
-export function HierarchyPanel({ projectId, sceneId, scenesHref }: Props) {
+export function HierarchyPanel({ projectId, sceneId }: Props) {
   const scene = useEditorStore((s) => s.scene)
   const registry = useEditorStore((s) => s.registry) as Registry | null
   const selectedPath = useEditorStore((s) => s.selectedPath)
@@ -72,6 +56,7 @@ export function HierarchyPanel({ projectId, sceneId, scenesHref }: Props) {
   const [collapsed, setCollapsed] = useState<Set<string>>(new Set())
   const [dropIndicator, setDropIndicator] = useState<{ path: string; region: string } | null>(null)
   const [addTarget, setAddTarget] = useState<{ parentPath: string; insertIndex: number } | null>(null)
+  const [hierarchyPaneSize, setHierarchyPaneSize] = useState<HierarchyPaneSize>('quarter')
 
   const handleToggle = useCallback((path: string) => {
     setCollapsed((prev) => {
@@ -163,7 +148,6 @@ export function HierarchyPanel({ projectId, sceneId, scenesHref }: Props) {
   if (!scene) {
     return (
       <section className="bg-[#1a1a1a] overflow-auto p-2" style={{ gridArea: 'hierarchy' }}>
-        <SidebarHeader title="Loading" scenesHref={scenesHref} />
         <p className="text-gray-600 text-xs italic mb-3">Loading...</p>
         <h3 className="text-[13px] uppercase tracking-wide text-gray-100 font-bold mb-2">Hierarchy</h3>
         <p className="text-gray-600 text-xs italic">Loading...</p>
@@ -171,48 +155,76 @@ export function HierarchyPanel({ projectId, sceneId, scenesHref }: Props) {
     )
   }
 
+  const hierarchyPaneBasis =
+    HIERARCHY_PANE_OPTIONS.find((option) => option.id === hierarchyPaneSize)?.basis ?? '25%'
+
   return (
-    <section className="flex min-h-0 flex-col overflow-hidden bg-[#1a1a1a] p-2" style={{ gridArea: 'hierarchy' }}>
-      <SidebarHeader title={scene.name ?? sceneId} scenesHref={scenesHref} />
-      <div className="min-h-0 flex-1 overflow-auto pr-1">
-        <div className="mb-2 flex items-center justify-between gap-2">
-          <h3 className="m-0 text-[13px] uppercase tracking-wide text-gray-100 font-bold">Hierarchy</h3>
-          <button
-            type="button"
-            onClick={openTopLevelAdd}
-            className="h-5 w-5 border border-[#4a4a4a] bg-[#242424] text-sm leading-none text-gray-100 hover:bg-[#303030] active:translate-y-px"
-            aria-label="Add top-level layer"
-          >
-            +
-          </button>
+    <section className="flex min-h-0 flex-col gap-2 overflow-hidden bg-[#1a1a1a] p-2" style={{ gridArea: 'hierarchy' }}>
+      <div
+        className="flex min-h-[136px] shrink-0 flex-col overflow-hidden border border-[#262626] bg-[#181818] p-2"
+        style={{ flexBasis: hierarchyPaneBasis }}
+      >
+        <div className="mb-2 flex shrink-0 items-center justify-between gap-2">
+          <h3 className="m-0 text-[13px] font-bold uppercase tracking-wide text-gray-100">Hierarchy</h3>
+          <div className="flex shrink-0 items-center gap-1.5">
+            <div className="grid h-6 grid-cols-2 border border-[#333] bg-[#141414] p-0.5">
+              {HIERARCHY_PANE_OPTIONS.map((option) => {
+                const active = hierarchyPaneSize === option.id
+                return (
+                  <button
+                    key={option.id}
+                    type="button"
+                    aria-pressed={active}
+                    onClick={() => setHierarchyPaneSize(option.id)}
+                    className={`h-5 px-1.5 text-[10px] font-bold leading-none ${
+                      active
+                        ? 'bg-[#303844] text-gray-100'
+                        : 'text-gray-500 hover:bg-[#202020] hover:text-gray-300'
+                    }`}
+                  >
+                    {option.label}
+                  </button>
+                )
+              })}
+            </div>
+            <button
+              type="button"
+              onClick={openTopLevelAdd}
+              className="h-5 w-5 border border-[#4a4a4a] bg-[#242424] text-sm leading-none text-gray-100 hover:bg-[#303030] active:translate-y-px"
+              aria-label="Add top-level layer"
+            >
+              +
+            </button>
+          </div>
         </div>
-        <ul className="list-none p-0 m-0">
-          {(scene.objects as unknown as Record<string, unknown>[]).map((layer, i) => {
-            const path = String(i)
-            return (
-              <HierarchyRow
-                key={path}
-                layer={layer}
-                path={path}
-                depth={0}
-                isSelected={selectedPath === path}
-                isCollapsed={collapsed.has(path)}
-                onSelect={setSelectedPath}
-                onToggle={handleToggle}
-                onAddChild={openChildAdd}
-                onToggleLock={handleToggleLock}
-                collapsedSet={collapsed}
-                selectedPath={selectedPath}
-                onDragStart={handleDragStart}
-                onDragOver={handleDragOver}
-                onDragLeave={handleDragLeave}
-                onDrop={handleDrop}
-                dropIndicator={dropIndicator}
-              />
-            )
-          })}
-        </ul>
-        <SceneSaveControls projectId={projectId} sceneId={sceneId} />
+        <div className="min-h-0 flex-1 overflow-auto pr-1">
+          <ul className="m-0 list-none p-0">
+            {(scene.objects as unknown as Record<string, unknown>[]).map((layer, i) => {
+              const path = String(i)
+              return (
+                <HierarchyRow
+                  key={path}
+                  layer={layer}
+                  path={path}
+                  depth={0}
+                  isSelected={selectedPath === path}
+                  isCollapsed={collapsed.has(path)}
+                  onSelect={setSelectedPath}
+                  onToggle={handleToggle}
+                  onAddChild={openChildAdd}
+                  onToggleLock={handleToggleLock}
+                  collapsedSet={collapsed}
+                  selectedPath={selectedPath}
+                  onDragStart={handleDragStart}
+                  onDragOver={handleDragOver}
+                  onDragLeave={handleDragLeave}
+                  onDrop={handleDrop}
+                  dropIndicator={dropIndicator}
+                />
+              )
+            })}
+          </ul>
+        </div>
       </div>
       <PiAgentChatPanel projectId={projectId} sceneId={sceneId} />
       {addTarget && (

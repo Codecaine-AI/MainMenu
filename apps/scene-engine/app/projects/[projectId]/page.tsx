@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { projectAssetUsage } from '@/lib/asset-library'
 import { discoverScenes, loadProject } from '@/lib/scenes'
+import { ProjectDeployButton } from './ProjectDeployButton'
 import { ProjectExportButton } from './ProjectExportButton'
 
 export default async function ProjectPage({
@@ -32,6 +33,7 @@ export default async function ProjectPage({
             </p>
           </div>
           <div className="flex flex-wrap items-center gap-2">
+            <ProjectDeployButton projectId={projectId} />
             <ProjectExportButton projectId={projectId} />
             <Link
               href={`/asset-library?project=${encodeURIComponent(projectId)}`}

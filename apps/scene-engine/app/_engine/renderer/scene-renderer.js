@@ -43,12 +43,19 @@ function findMediaEl(el) {
 }
 
 function applyObjectStyles(el, obj, entry, options = {}) {
+  if (obj.type === 'audio' && typeof el.setAudioProperties === 'function') {
+    el.setAudioProperties(obj.properties || {});
+  }
+
   if (obj.visible === false) {
     el.style.display = 'none';
-    bindObjectEvents(el, obj, { ...options, events: false });
-    return;
+    if (obj.type !== 'audio') {
+      bindObjectEvents(el, obj, { ...options, events: false });
+      return;
+    }
+  } else {
+    el.style.display = '';
   }
-  el.style.display = '';
 
   applyTransform(el, obj.transform);
 
@@ -187,7 +194,7 @@ async function mountObject(parent, obj, beforeEl = null, path = '', options = {}
     console.warn(`[scene-renderer] Skipping object ${obj.id}: unknown asset ${obj.asset}`);
     return null;
   }
-  if (obj.visible === false) return null;
+  if (obj.visible === false && obj.type !== 'audio') return null;
 
   const wrapper = await getRenderer(obj.type)(obj, entry, options);
   wrapper.dataset.layerId = obj.id;

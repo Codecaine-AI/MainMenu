@@ -75,6 +75,7 @@ Signing, notarization, auto-update, and installer packaging are not part of the 
 | `http://localhost:3000/upload?project=<project-id>` | Project-scoped asset upload page        |
 | `http://localhost:3000/api/projects/<project-id>/registries/assets` | Project asset registry         |
 | `http://localhost:3000/api/projects/<project-id>/registries/modules` | Project module registry       |
+| `http://localhost:3000/api/projects/<project-id>/deploy` | `POST` — commit and push external project repo |
 | `http://localhost:3000/api/scenes?project=<project-id>` | `GET` — list scenes                    |
 | `http://localhost:3000/api/scenes/<id>?project=<project-id>` | `GET` / `PUT` scene JSON          |
 | `http://localhost:3000/api/export?project=<project-id>` | `POST` — standalone zip export         |
@@ -96,6 +97,16 @@ For the current Codecaine workspace, the catalog root resolves from `apps/scene-
 ```
 
 Use `SCENE_ENGINE_WORKSPACE_CATALOG=/absolute/or/relative/path.json` to point the server at another catalog file.
+
+## Deploy a project workspace
+
+The project page has a Deploy button for external catalog projects. It calls:
+
+```bash
+curl -fS -X POST "http://localhost:3000/api/projects/codecaine/deploy"
+```
+
+The route is localhost-only unless `SCENE_ENGINE_ALLOW_REMOTE_DEPLOY=1` is set. It resolves the project root from the workspace catalog, writes `ProjectSettings/deployment.json` as a deploy marker, stages all project-repo changes, commits them, and pushes the current branch. Railway then deploys from the Codecaine site GitHub repository.
 
 ## Adding a New Scene
 
