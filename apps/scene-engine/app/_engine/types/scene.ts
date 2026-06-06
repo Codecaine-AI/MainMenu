@@ -131,7 +131,7 @@ export interface SceneJson {
 
 export type AssetType = 'audio' | 'image' | 'video' | 'glyph' | 'font'
 export type ModuleType = 'effect' | 'component'
-export type AssetScope = 'global' | 'project'
+export type AssetScope = 'project'
 
 export interface AssetContainer {
   type: AssetType
@@ -233,12 +233,18 @@ export interface ProjectSceneRef {
   export?: boolean
 }
 
+export interface ProjectWebSettings {
+  title?: string
+  favicon?: string
+}
+
 export interface ProjectManifest {
   id: string
   name: string
   entry: string
   scenes: ProjectSceneRef[]
   stage: StageDef
+  web?: ProjectWebSettings
 }
 
 export interface ExportGraphSummary {

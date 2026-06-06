@@ -1,12 +1,11 @@
-import { writeFile, readFile, mkdir } from 'fs/promises'
+import { writeFile, mkdir } from 'fs/promises'
 import { existsSync } from 'fs'
 import path from 'path'
 import { NextResponse } from 'next/server'
 import { isAssetType, validateUpload, slugifyFilename } from '@/lib/asset-types'
 import { assetRegistryPath, readAssetRegistry, writeAssetRegistry } from '@/lib/asset-library'
-import { defaultProjectId } from '@/lib/scenes'
 import { resolveProjectPaths } from '@/lib/project-paths'
-import type { AssetContainer, AssetScope, AssetType } from '@/types/scene'
+import type { AssetType } from '@/types/scene'
 
 function titleCaseFamily(slug: string): string {
   return slug
@@ -46,7 +45,7 @@ export async function POST(req: Request) {
     const labelRaw = form.get('label')
     const label = typeof labelRaw === 'string' && labelRaw.trim() ? labelRaw.trim() : undefined
     const projectRaw = form.get('projectId')
-    const projectId = typeof projectRaw === 'string' && projectRaw.trim() ? projectRaw.trim() : defaultProjectId()
+    const projectId = typeof projectRaw === 'string' && projectRaw.trim() ? projectRaw.trim() : null
     if (!projectId) {
       return NextResponse.json({ error: 'Missing projectId' }, { status: 400 })
     }
@@ -54,8 +53,6 @@ export async function POST(req: Request) {
     if (!projectPaths) {
       return NextResponse.json({ error: 'Project not found' }, { status: 404 })
     }
-    const scopeRaw = form.get('scope')
-    const scope: AssetScope = scopeRaw === 'project' && projectId ? 'project' : 'global'
 
     const { slug, ext } = slugifyFilename(file.name)
     const registry = readAssetRegistry(projectId)
@@ -74,8 +71,8 @@ export async function POST(req: Request) {
       type,
       file: logicalFile,
       label,
-      scope,
-      projectIds: scope === 'project' && projectId ? [projectId] : undefined,
+      scope: 'project',
+      projectIds: [projectId],
       createdAt: now,
       updatedAt: now,
     }
@@ -87,7 +84,14 @@ export async function POST(req: Request) {
     await mkdir(path.dirname(assetRegistryPath(projectId)), { recursive: true })
     writeAssetRegistry(registry, projectId)
 
-    return NextResponse.json({ id, type, file: registry[id].file, label: registry[id].label, scope })
+    return NextResponse.json({
+      id,
+      type,
+      file: registry[id].file,
+      label: registry[id].label,
+      scope: 'project',
+      projectIds: [projectId],
+    })
   } catch (err) {
     return NextResponse.json(
       { error: err instanceof Error ? err.message : 'Upload failed' },

@@ -14,7 +14,7 @@ design_refs: [10-system-design/20-asset-registry.md, 10-system-design/60-asset-u
 
 | Export                  | Behavior                                                                                                  |
 |-------------------------|-----------------------------------------------------------------------------------------------------------|
-| `loadRegistry({ projectId? })` | Async. Resolves registry URLs for an export bundle, a project dev route, or the legacy fallback; fetches asset/module/font registries in parallel, merges into one map, and caches by registry key. Concurrent calls for the same key share one in-flight promise. |
+| `loadRegistry({ projectId? })` | Async. Resolves registry URLs for an export bundle or a catalog-backed project dev route; fetches asset/module/font registries in parallel, merges into one map, and caches by registry key. Concurrent calls for the same key share one in-flight promise. |
 | `resolveAsset(id)`      | Sync. Returns the merged entry for `id`, or `null` (with warning) if `loadRegistry` hasn't completed or the ID is unknown. |
 | `getRegistry()`         | Sync. Returns the full merged map, or `null` if not loaded. Used by the editor's add-layer dialog and inspector. |
 | `updateEntry(id, partial)` | Sync. Shallow-merges `partial` into the active in-memory entry. Kept for maintenance flows that patch a registry entry during an active session. |
@@ -31,11 +31,11 @@ The renderer cannot tell which manifest an entry came from after the merge — t
 ## State
 
 - `mergedRegistry: Record<string, entry> | null` — the active cached map for the page session.
-- `activeRegistryKey: string | null` — identifies whether the active map came from a bundle, project dev route, or legacy fallback.
+- `activeRegistryKey: string | null` — identifies whether the active map came from a bundle or project dev route.
 - `registryCache: Map<string, registry>` — caches merged registries by key.
 - `loadPromises: Map<string, Promise>` — guards against concurrent first-load races per key.
 
-The normal dev path is project-aware: `/api/projects/<project-id>/registries/assets`, `/modules`, and `/fonts`. Export bundles use `/assets/registry.json`, `/modules/registry.json`, and `/fonts/registry.json` resolved through `MELEE_BUNDLE_ROOT`. The root `/assets` and `/modules` URLs remain only as a documented no-project legacy fallback.
+The normal dev path is project-aware: `/api/projects/<project-id>/registries/assets`, `/modules`, and `/fonts`. Export bundles use `/assets/registry.json`, `/modules/registry.json`, and `/fonts/registry.json` resolved through `MELEE_BUNDLE_ROOT`. Outside an export bundle, callers must provide a project id.
 
 ## Why Lookups Don't Throw
 

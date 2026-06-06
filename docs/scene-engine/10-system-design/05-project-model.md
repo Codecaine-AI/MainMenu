@@ -80,9 +80,8 @@ The manifest stays minimal so projects don't accumulate global config that some 
 Project discovery starts with the workspace catalog:
 
 1. **Catalog projects**: enabled catalog entries point at external project roots. The manifest lives at `ProjectSettings/project.json`, and scene files live under `Assets/Scenes/<scene-id>/scene.json`.
-2. **Embedded compatibility fallback**: app-local `projects/<project-id>/project.json` folders remain discoverable when no catalog project with the same id is configured.
-3. **Legacy root fallback**: a root-level `project.json` remains discoverable for older local exports.
-4. **Filesystem-driven fallback inside a resolved project**: if there is no manifest, every directory under that project's scene folder containing a `scene.json` can be listed. No scene is marked as entry.
+2. **Manifest inventory**: `ProjectSettings/project.json` lists the scenes that the dashboard, editor, preview, and export surfaces should expose.
+3. **Diagnostics**: missing catalog roots or unreadable manifests are reported as workspace diagnostics rather than silently falling back to app-local data.
 
 `app/_engine/lib/scenes.ts` exposes `discoverProjects()`, `loadProject(projectId)`, `projectRoot(projectId)`, and `discoverScenes(projectId)` for the dashboard, project page, scene APIs, and export route.
 

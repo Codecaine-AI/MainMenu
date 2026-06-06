@@ -48,11 +48,6 @@ async function fetchModuleManifest(url) {
   }
 }
 
-function fontManifestUrls() {
-  if (globalThis.MELEE_BUNDLE_ROOT) return ['/fonts/registry.json'];
-  return ['/fonts/registry.json', '/api/fonts'];
-}
-
 function projectIdFromOptions(options = {}) {
   if (typeof options.projectId === 'string' && options.projectId.trim()) return options.projectId.trim();
   if (typeof globalThis.MELEE_PROJECT_ID === 'string' && globalThis.MELEE_PROJECT_ID.trim()) {
@@ -72,19 +67,12 @@ function registryUrls(options = {}) {
   }
   const projectId = projectIdFromOptions(options);
   const projectRoot = projectId ? `/api/projects/${encodeURIComponent(projectId)}` : projectRuntimeRootUrl();
-  if (projectRoot) {
-    return {
-      key: `project:${projectId ?? projectRoot}`,
-      assets: `${projectRoot}/registries/assets`,
-      modules: `${projectRoot}/registries/modules`,
-      fonts: [`${projectRoot}/registries/fonts`],
-    };
-  }
+  if (!projectRoot) throw new Error('[asset-registry] project id is required outside export bundles');
   return {
-    key: 'legacy',
-    assets: '/assets/registry.json',
-    modules: '/modules/registry.json',
-    fonts: fontManifestUrls(),
+    key: `project:${projectId ?? projectRoot}`,
+    assets: `${projectRoot}/registries/assets`,
+    modules: `${projectRoot}/registries/modules`,
+    fonts: [`${projectRoot}/registries/fonts`],
   };
 }
 

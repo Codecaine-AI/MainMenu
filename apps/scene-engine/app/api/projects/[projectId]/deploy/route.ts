@@ -117,12 +117,6 @@ export async function POST(
   if (!descriptor) {
     return NextResponse.json({ error: `Project not found: ${projectId}` }, { status: 404 })
   }
-  if (descriptor.layout !== 'external') {
-    return NextResponse.json(
-      { error: 'Deploy is only supported for external workspace projects.' },
-      { status: 400 },
-    )
-  }
 
   const projectPaths = createProjectPaths(descriptor)
   const body = await req.json().catch(() => ({})) as { message?: unknown }

@@ -96,6 +96,11 @@ function buildApplicationMenu() {
           accelerator: 'CmdOrCtrl+E',
           click: () => sendRendererCommand('export-project'),
         },
+        {
+          label: 'Deploy Project...',
+          accelerator: 'CmdOrCtrl+Shift+D',
+          click: () => sendRendererCommand('deploy-project'),
+        },
         { type: 'separator' },
         {
           label: 'Open Project Page',

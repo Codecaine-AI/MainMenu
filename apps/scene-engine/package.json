@@ -4,6 +4,7 @@
   "version": "1.0.0",
   "description": "Main Menu desktop scene authoring app.",
   "private": true,
+  "license": "MIT",
   "main": "desktop/dist/main/index.js",
   "scripts": {
     "dev": "next dev",

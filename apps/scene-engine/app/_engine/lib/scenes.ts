@@ -16,7 +16,6 @@ export interface ProjectDescriptor {
   name: string
   entry: string
   sceneCount: number
-  isLegacyRoot: boolean
   root: string
   source: ProjectSource
   layout: ProjectLayout
@@ -76,7 +75,6 @@ export function discoverProjectsWithDiagnostics(): ProjectDiscoveryWithDiagnosti
       name: project.name ?? descriptor.name ?? descriptor.id,
       entry: project.entry,
       sceneCount: Array.isArray(project.scenes) ? project.scenes.length : 0,
-      isLegacyRoot: descriptor.isLegacyRoot,
       root: descriptor.root,
       source: descriptor.source,
       layout: descriptor.layout,

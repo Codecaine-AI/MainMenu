@@ -56,12 +56,18 @@ apps/font-creation/font-studio/projects/*/outputs/
 assets/
 !apps/font-creation/generation/melee-3/inputs/assets/
 !apps/font-creation/generation/melee-3/inputs/assets/**
-!apps/scene-engine/public/assets/
-!apps/scene-engine/public/assets/**
-!apps/scene-engine/public/modules/
-!apps/scene-engine/public/modules/**
+
+# Scene Engine project payload belongs in external workspace repos.
+apps/scene-engine/public/assets/
+apps/scene-engine/public/modules/
+apps/scene-engine/public/fonts/
+
 !apps/scene-engine/app/api/assets/
 !apps/scene-engine/app/api/assets/**
+!apps/scene-engine/app/projects/\[projectId\]/assets/
+!apps/scene-engine/app/projects/\[projectId\]/assets/**
+!apps/scene-engine/app/projects/\[projectId\]/asset-workbench/assets/
+!apps/scene-engine/app/projects/\[projectId\]/asset-workbench/assets/**
 
 # Objective-local generated export bundles
 objectives/*/artifacts/*.zip

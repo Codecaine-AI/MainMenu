@@ -37,7 +37,7 @@ async function boot() {
 
   async function showScene(sceneId) {
     const scene = await fetchJson(`./scenes/${sceneId}/scene.json`)
-    document.title = scene.name ?? project.name ?? 'Scene'
+    document.title = project.web?.title ?? scene.name ?? project.name ?? 'Scene'
     await renderScene(scene, stage)
   }
 

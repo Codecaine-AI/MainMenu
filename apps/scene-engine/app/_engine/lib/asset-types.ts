@@ -10,8 +10,8 @@ export const ASSET_TYPE_RULES: Record<AssetType, { extensions: string[]; mimes: 
     mimes: ['audio/mpeg', 'audio/wav', 'audio/ogg'],
   },
   image: {
-    extensions: ['png', 'jpg', 'jpeg', 'webp', 'gif'],
-    mimes: ['image/png', 'image/jpeg', 'image/webp', 'image/gif'],
+    extensions: ['png', 'jpg', 'jpeg', 'webp', 'gif', 'ico'],
+    mimes: ['image/png', 'image/jpeg', 'image/webp', 'image/gif', 'image/x-icon', 'image/vnd.microsoft.icon'],
   },
   video: {
     extensions: ['mp4', 'webm'],

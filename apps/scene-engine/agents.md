@@ -203,7 +203,7 @@ Numeric `x`, `y`, `width`, and `height` values are percentages. Pin values like 
 
 There are two registries, merged at runtime by `app/_engine/renderer/asset-registry.js`.
 
-`public/assets/registry.json` is for uploadable file containers:
+`ProjectSettings/registries/assets.json` in the active workspace project is for uploadable file containers:
 
 ```json
 {
@@ -216,7 +216,7 @@ There are two registries, merged at runtime by `app/_engine/renderer/asset-regis
 
 Container types: `audio`, `image`, `video`, `glyph`.
 
-`public/modules/registry.json` is for authored code modules:
+`ProjectSettings/registries/modules.json` in the active workspace project is for authored code modules:
 
 ```json
 {
@@ -229,7 +229,7 @@ Container types: `audio`, `image`, `video`, `glyph`.
 
 Module types: `effect`, `component`.
 
-Layers/objects reference container IDs only. Swapping a file in a container updates every scene using that container. Prefer the `/upload` page for adding new file assets; it writes under `public/assets/{type}/` and registers the container automatically.
+Layers/objects reference container IDs only. Swapping a file in a container updates every scene using that container. Prefer the `/upload` page for adding new file assets; it writes under the selected project's `Assets/Media/{type}/` or `Assets/Fonts/` folder and registers the container automatically.
 
 ## API Endpoints
 
@@ -237,12 +237,12 @@ Layers/objects reference container IDs only. Swapping a file in a container upda
 - `GET /api/scenes/{id}` — read `scene.json`
 - `PUT /api/scenes/{id}` — save full scene JSON
 - `POST /api/upload` — multipart `file` + `type`; writes file and registers container
-- `GET /api/assets/{type}` — list files in `public/assets/{type}/`
+- `GET /api/assets/{type}` — list files in the selected project's asset type folder
 - `PATCH /api/registry/{id}` — body `{ "file": "..." }`; updates a container's file pointer
 
 ## Editing Scenes
 
-Edit `scenes/{id}/scene.json` directly. The editor picks up changes after Reload or browser refresh.
+Edit `Assets/Scenes/{id}/scene.json` in the external project workspace directly. The editor picks up changes after Reload or browser refresh.
 
 Scene IDs must match:
 
@@ -283,20 +283,20 @@ Module manifests may live next to component/effect modules as `manifest.json`. T
 
 ## Verification
 
-After editing a scene or public component/module, prefer lightweight validation against the hot-reloading dev server:
+After editing a scene or project component/module, prefer lightweight validation against the hot-reloading dev server:
 
 ```bash
-cat apps/scene-engine/scenes/title/scene.json | jq . > /dev/null && echo "valid"
-cat apps/scene-engine/public/modules/components/orbit-press-start/manifest.json | jq . > /dev/null && echo "manifest valid"
-curl -s -o /dev/null -w "%{http_code}" http://localhost:3000/api/scenes/title
+cat ../codecaine-site/Assets/Scenes/title/scene.json | jq . > /dev/null && echo "valid"
+cat ../codecaine-site/Assets/Modules/components/orbit-press-start/manifest.json | jq . > /dev/null && echo "manifest valid"
+curl -s -o /dev/null -w "%{http_code}" "http://localhost:3000/api/scenes/title?project=codecaine"
 ```
 
 Expected HTTP status: `200`.
 
 Always verify the visual result in the already-running browser/dev server:
 
-- Preview: http://localhost:3000/scenes/title
-- Editor: http://localhost:3000/editor?scene=title
+- Preview: http://localhost:3000/scenes/title?project=codecaine
+- Editor: http://localhost:3000/editor?project=codecaine&scene=title
 
 ## Current Scene
 

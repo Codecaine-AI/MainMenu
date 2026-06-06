@@ -7,7 +7,7 @@ export interface MainMenuAppInfo {
   rendererUrl: string
 }
 
-export type MainMenuCommand = 'save-scene' | 'export-project' | 'open-project'
+export type MainMenuCommand = 'save-scene' | 'export-project' | 'deploy-project' | 'open-project'
 
 export interface MainMenuCommandEvent {
   command: MainMenuCommand

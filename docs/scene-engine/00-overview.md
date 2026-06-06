@@ -26,6 +26,6 @@ Read in order. Each layer answers a different question.
 
 ## Scope
 
-This documentation covers the **scene-engine** (`apps/scene-engine/`). Other apps in the monorepo —
-`apps/asset-extraction-pipeline/`, `apps/pi-asset-loop/`, `apps/font-creation/` — feed assets into the
-scene-engine but are documented in their own READMEs and `SYSTEM_DESIGN.md` at the repository root.
+This documentation covers the **scene-engine** (`apps/scene-engine/`). Asset extraction and asset
+creation now live inside scene-engine project helper pages, with native/CLI support code under
+`apps/scene-engine/tools/`.

@@ -3,7 +3,7 @@ import JSZip from 'jszip'
 import { readFile, readdir, stat } from 'node:fs/promises'
 import { existsSync } from 'node:fs'
 import path from 'node:path'
-import { loadProject, projectRoot } from '@/lib/scenes'
+import { loadProject } from '@/lib/scenes'
 import { discoverProjectFontAssets } from '@/lib/font-discovery'
 import { collectExportGraph, moduleDirectoryForEntry } from '@/lib/export-reachability'
 import { resolveProjectPaths, type ProjectPaths } from '@/lib/project-paths'
@@ -129,6 +129,11 @@ function escapeHtml(value: unknown): string {
     .replace(/'/g, '&#39;')
 }
 
+function exportedPublicHref(webPath: string | undefined, assetPrefix: string): string | null {
+  if (!webPath?.startsWith('/assets/')) return null
+  return `${assetPrefix}${webPath.replace(/^\//, '')}`
+}
+
 function scriptString(value: string): string {
   return JSON.stringify(value).replace(/</g, '\\u003c')
 }
@@ -148,10 +153,14 @@ function renderPageHtml(input: {
   sceneName?: string
   scriptSrc: string
   assetPrefix: string
+  faviconHref: string | null
   hasSceneCss: boolean
 }): string {
-  const title = escapeHtml(input.sceneName ?? input.project.name)
+  const title = escapeHtml(input.project.web?.title ?? input.sceneName ?? input.project.name)
   const cssLink = input.hasSceneCss ? '  <link rel="stylesheet" href="./scene.css" />\n' : ''
+  const faviconLink = input.faviconHref
+    ? `  <link rel="icon" href="${escapeHtml(input.faviconHref)}" />`
+    : '  <link rel="icon" href="data:," />'
   const fontPrefix = input.assetPrefix
   return `<!DOCTYPE html>
 <html lang="en">
@@ -189,7 +198,7 @@ function renderPageHtml(input: {
       font-display: swap;
     }
     </style>
-  <link rel="icon" href="data:," />
+${faviconLink}
   <style>
     html, body { margin: 0; padding: 0; height: 100%; }
     body { background: #000; overflow: hidden; font-family: 'FolkPro', sans-serif; }
@@ -232,6 +241,8 @@ async function addScenePageToZip(input: {
 }) {
   const { zip, projectPaths, project, sceneId, sceneName, routeDir } = input
   const cssAbs = findSceneCss(projectPaths, sceneId)
+  const assetPrefix = routeDir ? '../' : './'
+  const faviconHref = exportedPublicHref(project.web?.favicon, assetPrefix)
   if (cssAbs) {
     zip.file(`${routeDir}scene.css`, await readFile(cssAbs))
   }
@@ -242,7 +253,8 @@ async function addScenePageToZip(input: {
       sceneId,
       sceneName,
       scriptSrc: routeDir ? '../boot.js' : './boot.js',
-      assetPrefix: routeDir ? '../' : './',
+      assetPrefix,
+      faviconHref,
       hasSceneCss: Boolean(cssAbs),
     }),
   )
@@ -266,12 +278,11 @@ export async function POST(req: Request) {
   try {
     const selectedProjectId = new URL(req.url).searchParams.get('project')
     const project = loadProject(selectedProjectId)
-    const selectedProjectRoot = projectRoot(selectedProjectId)
     const selectedProjectPaths = resolveProjectPaths(selectedProjectId)
     if (!project) {
       return NextResponse.json({ error: 'project.json not found' }, { status: 400 })
     }
-    if (!selectedProjectRoot || !selectedProjectPaths) {
+    if (!selectedProjectPaths) {
       return NextResponse.json({ error: 'Project not found' }, { status: 404 })
     }
     if (!project.scenes.some((scene) => scene.id === project.entry)) {
@@ -284,7 +295,6 @@ export async function POST(req: Request) {
 
     const zip = new JSZip()
     const appRoot = process.cwd()
-    const projectDir = selectedProjectRoot
     const assetsRegRaw = existsSync(selectedProjectPaths.assetRegistryFile)
       ? await readFile(selectedProjectPaths.assetRegistryFile, 'utf-8')
       : '{}'
@@ -296,8 +306,6 @@ export async function POST(req: Request) {
     const modulesReg = JSON.parse(modulesRegRaw) as Record<string, ModuleEntry>
     const exportedProject: ProjectManifest = { ...project, scenes: activeSceneRefs }
     const graph = await collectExportGraph({
-      appRoot,
-      projectDir,
       projectPaths: selectedProjectPaths,
       project: exportedProject,
       assetsRegistry: assetsReg,

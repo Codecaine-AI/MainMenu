@@ -4,7 +4,7 @@ import { useCallback, useEffect, useRef } from 'react'
 import { useEditorStore } from '@/store/editor-store'
 import type { SceneJson } from '@/types/scene'
 import type { MainMenuCommandEvent } from '../../../../desktop/types/main-menu'
-import { exportProject, saveScene } from './sceneActions'
+import { deployProject, exportProject, saveScene } from './sceneActions'
 
 interface Input {
   projectId: string | null
@@ -36,6 +36,14 @@ export function useDesktopMenuCommands({ projectId, sceneId }: Input) {
       await exportProject(projectId)
     } catch (err) {
       alert(err instanceof Error ? err.message : 'Export failed')
+    }
+  }, [projectId])
+
+  const deployActiveProject = useCallback(async () => {
+    try {
+      await deployProject(projectId)
+    } catch (err) {
+      alert(err instanceof Error ? err.message : 'Deploy failed')
     }
   }, [projectId])
 
@@ -73,13 +81,15 @@ export function useDesktopMenuCommands({ projectId, sceneId }: Input) {
         void saveActiveScene()
       } else if (event.command === 'export-project') {
         void exportActiveProject()
+      } else if (event.command === 'deploy-project') {
+        void deployActiveProject()
       } else if (event.command === 'open-project') {
         void navigateFromEditor(projectId ? `/projects/${encodeURIComponent(projectId)}` : '/')
       }
     }
 
     return bridge.onCommand(handleCommand)
-  }, [dirty, exportActiveProject, navigateFromEditor, projectId, saveActiveScene])
+  }, [deployActiveProject, dirty, exportActiveProject, navigateFromEditor, projectId, saveActiveScene])
 
   useEffect(() => {
     function handleKeyDown(event: KeyboardEvent) {

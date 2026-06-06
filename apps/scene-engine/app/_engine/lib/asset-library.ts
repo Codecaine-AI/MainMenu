@@ -18,8 +18,12 @@ function selectedProjectId(projectId?: string | null) {
 }
 
 export function assetRegistryPath(projectId?: string | null) {
-  const paths = resolveProjectPaths(selectedProjectId(projectId))
-  return paths?.assetRegistryFile ?? path.join(process.cwd(), 'public', 'assets', 'registry.json')
+  const selected = selectedProjectId(projectId)
+  const paths = resolveProjectPaths(selected)
+  if (!selected || !paths) {
+    throw new Error('A catalog-backed project is required to resolve the asset registry.')
+  }
+  return paths.assetRegistryFile
 }
 
 export function readAssetRegistry(projectId?: string | null): Record<string, AssetContainer> {
@@ -51,9 +55,14 @@ export function assetAvailableForProject(
   entry: AssetContainer,
   projectId?: string | null,
 ): boolean {
-  if (!projectId) return true
-  if (entry.scope !== 'project') return true
-  return Array.isArray(entry.projectIds) && entry.projectIds.includes(projectId)
+  if (!projectId) return false
+  if (!Array.isArray(entry.projectIds) || entry.projectIds.length === 0) return true
+  return entry.projectIds.includes(projectId)
+}
+
+function projectIdsForEntry(entry: AssetContainer, projectId: string): string[] {
+  if (Array.isArray(entry.projectIds) && entry.projectIds.length > 0) return entry.projectIds
+  return [projectId]
 }
 
 function readScene(projectPaths: ProjectPaths, sceneId: string): SceneJson | null {
@@ -177,6 +186,7 @@ export function listAssetLibrary(options: {
   includeUsage?: boolean
 } = {}): AssetLibraryRecord[] {
   const projectId = selectedProjectId(options.projectId)
+  if (!projectId) return []
   const registry = readAssetRegistry(projectId)
   const usage = options.includeUsage ? collectAssetUsage(registry, projectId) : new Map<string, AssetUsageLocation[]>()
 
@@ -189,7 +199,8 @@ export function listAssetLibrary(options: {
         ...entry,
         id,
         label: assetLabel(id, entry),
-        scope: entry.scope ?? 'global',
+        scope: 'project' as const,
+        projectIds: projectIdsForEntry(entry, projectId),
         usageCount: locations.length,
         usage: options.includeUsage ? locations : undefined,
       }

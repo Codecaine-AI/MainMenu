@@ -11,7 +11,7 @@ Snapshot of what's in the scene-engine right now. Update by re-reading the activ
 
 ## Workspace
 
-The active Codecaine project is an external workspace, not the app-local legacy project folder.
+The active Codecaine project is an external workspace. The scene-engine repo no longer keeps an app-local Codecaine project/media/module fallback.
 
 | Concern | Current value |
 | --- | --- |
@@ -20,7 +20,7 @@ The active Codecaine project is an external workspace, not the app-local legacy 
 | Active project root | `../codecaine-site/` from the MELEE repo root |
 | Project layout | `ProjectSettings/`, `Assets/Scenes/`, `Assets/Media/`, `Assets/Modules/`, `Assets/Fonts/` |
 
-Legacy app-local Codecaine files remain as fallback/source comparison data, but normal authoring and export resolve through the workspace catalog.
+Normal authoring and export resolve through the workspace catalog. If the catalog project root is missing, the app reports a workspace diagnostic instead of falling back to embedded data.
 
 ## Projects
 

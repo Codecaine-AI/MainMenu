@@ -38,3 +38,16 @@ export async function exportProject(projectId: string | null) {
   a.remove()
   URL.revokeObjectURL(url)
 }
+
+export async function deployProject(projectId: string | null) {
+  if (!projectId) throw new Error('No active project to deploy.')
+  if (!window.confirm('Commit and push the saved project workspace for deployment?')) return
+
+  const res = await fetch(`/api/projects/${encodeURIComponent(projectId)}/deploy`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({}),
+  })
+  const json = (await res.json().catch(() => ({}))) as { error?: string }
+  if (!res.ok) throw new Error(json.error ?? `Deploy failed: ${res.status}`)
+}

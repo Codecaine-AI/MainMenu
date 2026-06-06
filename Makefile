@@ -1,8 +1,7 @@
 SHELL := /bin/bash
 
 FRONTEND_DIR ?= apps/scene-engine
-PIPELINE_DIR ?= apps/asset-extraction-pipeline
-PIPELINE_UI_PORT ?= 3010
+PIPELINE_DIR ?= apps/scene-engine/tools/asset-extraction-pipeline
 FONT_EFFECTS_WEB_DIR ?= apps/font-creation/font-effects/web
 FONT_EFFECTS_RENDERER_DIR ?= apps/font-creation/font-effects/renderer
 FONT_EFFECTS_OUTPUTS_DIR ?= apps/font-creation/font-effects/outputs
@@ -37,9 +36,9 @@ help:
 	@printf '%s\n' '  make font-effects-generate-quick Regenerate dev subset (@,A,R,F,K,*) + word only'
 	@printf '%s\n' '  make font-effects-bake           Bake current word SVG to PNGs (requires dev server running)'
 	@printf '%s\n' ''
-	@printf '%s\n' '── Pipeline (apps/asset-extraction-pipeline) ──'
-	@printf '%s\n' '  make pipeline-ui                  Start extraction workspace UI'
-	@printf '%s\n' '  make pipeline-ui-install          Install extraction workspace UI dependencies'
+	@printf '%s\n' '── Pipeline (apps/scene-engine project helpers) ──'
+	@printf '%s\n' '  make pipeline-ui                  Start scene-engine UI with helper pages'
+	@printf '%s\n' '  make pipeline-ui-install          Install scene-engine dependencies'
 	@printf '%s\n' '  make dry-run IMAGE=assets/source.jpg RUN_ID=test'
 	@printf '%s\n' '  make run OPENAI_API_KEY=... ANTHROPIC_API_KEY=...'
 	@printf '%s\n' ''
@@ -59,7 +58,6 @@ help:
 	@printf '%s\n' '  RUN_ID=$(RUN_ID)'
 	@printf '%s\n' '  RUN_DIR=$(RUN_DIR)'
 	@printf '%s\n' '  MAX_WORKERS=$(MAX_WORKERS)'
-	@printf '%s\n' '  PIPELINE_UI_PORT=$(PIPELINE_UI_PORT)'
 	@printf '%s\n' '  FONT_EFFECTS_PORT=$(FONT_EFFECTS_PORT)'
 
 # ── Frontend ────────────────────────────────────────────────
@@ -106,34 +104,34 @@ font-effects-bake:
 
 # ── Pipeline ─────────────────────────────────────────────────
 pipeline-ui-install:
-	cd $(PIPELINE_DIR) && npm install
+	cd $(FRONTEND_DIR) && npm install
 
 pipeline-ui:
-	set -a; . ./.env; set +a; cd $(PIPELINE_DIR) && npm run dev -- --port $(PIPELINE_UI_PORT)
+	cd $(FRONTEND_DIR) && npm run dev
 
 pipeline-help:
 	@cd $(PIPELINE_DIR) && uv run extract-assets --help
 
 init:
-	@cd $(PIPELINE_DIR) && uv run extract-assets --runs-dir ../../$(RUNS_DIR) init ../../$(IMAGE) --run-id $(RUN_ID)
+	@cd $(PIPELINE_DIR) && uv run extract-assets --runs-dir "$(CURDIR)/$(RUNS_DIR)" init "$(CURDIR)/$(IMAGE)" --run-id $(RUN_ID)
 
 dry-run:
-	@cd $(PIPELINE_DIR) && uv run extract-assets --runs-dir ../../$(RUNS_DIR) run ../../$(IMAGE) --run-id $(RUN_ID) --max-workers $(MAX_WORKERS) --dry-run
+	@cd $(PIPELINE_DIR) && uv run extract-assets --runs-dir "$(CURDIR)/$(RUNS_DIR)" run "$(CURDIR)/$(IMAGE)" --run-id $(RUN_ID) --max-workers $(MAX_WORKERS) --dry-run
 
 run:
-	@cd $(PIPELINE_DIR) && uv run extract-assets --runs-dir ../../$(RUNS_DIR) run ../../$(IMAGE) --run-id $(RUN_ID) --max-workers $(MAX_WORKERS)
+	@cd $(PIPELINE_DIR) && uv run extract-assets --runs-dir "$(CURDIR)/$(RUNS_DIR)" run "$(CURDIR)/$(IMAGE)" --run-id $(RUN_ID) --max-workers $(MAX_WORKERS)
 
 catalog:
-	@cd $(PIPELINE_DIR) && uv run extract-assets catalog ../../$(RUN_DIR)
+	@cd $(PIPELINE_DIR) && uv run extract-assets catalog "$(CURDIR)/$(RUN_DIR)"
 
 extract:
-	@cd $(PIPELINE_DIR) && uv run extract-assets extract-assets ../../$(RUN_DIR) --max-workers $(MAX_WORKERS)
+	@cd $(PIPELINE_DIR) && uv run extract-assets extract-assets "$(CURDIR)/$(RUN_DIR)" --max-workers $(MAX_WORKERS)
 
 extract-dry-run:
-	@cd $(PIPELINE_DIR) && uv run extract-assets extract-assets ../../$(RUN_DIR) --max-workers $(MAX_WORKERS) --dry-run
+	@cd $(PIPELINE_DIR) && uv run extract-assets extract-assets "$(CURDIR)/$(RUN_DIR)" --max-workers $(MAX_WORKERS) --dry-run
 
 validate:
-	@cd $(PIPELINE_DIR) && uv run extract-assets validate ../../$(RUN_DIR)
+	@cd $(PIPELINE_DIR) && uv run extract-assets validate "$(CURDIR)/$(RUN_DIR)"
 
 compile:
 	@python3 -m compileall $(PIPELINE_DIR)/asset_extraction_pipeline

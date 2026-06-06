@@ -31,6 +31,7 @@
     "desktop/preload",
     "desktop/scripts",
     "desktop/dist",
-    "desktop/dist-next"
+    "desktop/dist-next",
+    "tools"
   ]
 }
