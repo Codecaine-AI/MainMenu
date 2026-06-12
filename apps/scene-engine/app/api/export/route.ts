@@ -31,20 +31,24 @@ async function addFileToZip(
   zip: JSZip,
   absPath: string,
   zipPath: string,
-  options: { rewriteText?: boolean } = {},
+  options: { rewriteText?: boolean; manifest?: Map<string, number> } = {},
 ) {
   if (options.rewriteText && isTextRewriteCandidate(absPath)) {
-    zip.file(zipPath, rewriteStandaloneTextAsset(await readFile(absPath, 'utf-8')))
+    const text = rewriteStandaloneTextAsset(await readFile(absPath, 'utf-8'))
+    zip.file(zipPath, text)
+    options.manifest?.set(zipPath, Buffer.byteLength(text))
     return
   }
-  zip.file(zipPath, await readFile(absPath))
+  const buf = await readFile(absPath)
+  zip.file(zipPath, buf)
+  options.manifest?.set(zipPath, buf.byteLength)
 }
 
 async function addDirToZip(
   zip: JSZip,
   absDir: string,
   zipDir: string,
-  options: { rewriteText?: boolean } = {},
+  options: { rewriteText?: boolean; manifest?: Map<string, number> } = {},
 ) {
   const entries = await readdir(absDir, { withFileTypes: true })
   for (const entry of entries) {
@@ -155,13 +159,13 @@ function renderPageHtml(input: {
   assetPrefix: string
   faviconHref: string | null
   hasSceneCss: boolean
+  sceneCssHref: string
 }): string {
   const title = escapeHtml(input.project.web?.title ?? input.sceneName ?? input.project.name)
-  const cssLink = input.hasSceneCss ? '  <link rel="stylesheet" href="./scene.css" />\n' : ''
+  const cssLink = input.hasSceneCss ? `  <link rel="stylesheet" href="${escapeHtml(input.sceneCssHref)}" />\n` : ''
   const faviconLink = input.faviconHref
     ? `  <link rel="icon" href="${escapeHtml(input.faviconHref)}" />`
     : '  <link rel="icon" href="data:," />'
-  const fontPrefix = input.assetPrefix
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -171,28 +175,28 @@ function renderPageHtml(input: {
   <style>
     @font-face {
       font-family: 'FolkPro';
-      src: url('${fontPrefix}fonts/FolkPro%20_Family/A-OTF-FolkPro-Regular.otf') format('opentype');
+      src: url('/fonts/FolkPro%20_Family/A-OTF-FolkPro-Regular.woff2') format('woff2');
       font-weight: 400;
       font-style: normal;
       font-display: swap;
     }
     @font-face {
       font-family: 'FolkPro';
-      src: url('${fontPrefix}fonts/FolkPro%20_Family/A-OTF-FolkPro-Medium.otf') format('opentype');
+      src: url('/fonts/FolkPro%20_Family/A-OTF-FolkPro-Medium.woff2') format('woff2');
       font-weight: 500;
       font-style: normal;
       font-display: swap;
     }
     @font-face {
       font-family: 'FolkPro';
-      src: url('${fontPrefix}fonts/FolkPro%20_Family/A-OTF-FolkPro-Bold.otf') format('opentype');
+      src: url('/fonts/FolkPro%20_Family/A-OTF-FolkPro-Bold.woff2') format('woff2');
       font-weight: 700;
       font-style: normal;
       font-display: swap;
     }
     @font-face {
       font-family: 'FolkPro';
-      src: url('${fontPrefix}fonts/FolkPro%20_Family/A-OTF-FolkPro-Heavy.otf') format('opentype');
+      src: url('/fonts/FolkPro%20_Family/A-OTF-FolkPro-Heavy.woff2') format('woff2');
       font-weight: 900;
       font-style: normal;
       font-display: swap;
@@ -223,7 +227,7 @@ ${cssLink}</head>
   <div id="stage-wrap"><div id="stage"></div></div>
   <script>
     window.MELEE_INITIAL_SCENE = ${scriptString(input.sceneId)};
-    window.MELEE_NAVIGATION_MODE = 'pages';
+    window.MELEE_NAVIGATION_MODE = 'spa';
   </script>
   <script type="module" src="${escapeHtml(input.scriptSrc)}"></script>
 </body>
@@ -238,13 +242,20 @@ async function addScenePageToZip(input: {
   sceneId: string
   sceneName?: string
   routeDir: string
+  manifest?: Map<string, number>
 }) {
-  const { zip, projectPaths, project, sceneId, sceneName, routeDir } = input
+  const { zip, projectPaths, project, sceneId, sceneName, routeDir, manifest } = input
   const cssAbs = findSceneCss(projectPaths, sceneId)
-  const assetPrefix = routeDir ? '../' : './'
+  // Use absolute paths so pages served at /sceneId (no trailing slash) resolve correctly
+  const assetPrefix = '/'
   const faviconHref = exportedPublicHref(project.web?.favicon, assetPrefix)
+  // scene.css is at /<sceneId>/scene.css for scene pages, /scene.css for entry at root
+  const sceneCssHref = routeDir ? `/${routeDir}scene.css` : '/scene.css'
   if (cssAbs) {
-    zip.file(`${routeDir}scene.css`, await readFile(cssAbs))
+    const cssBuf = await readFile(cssAbs)
+    const sceneCssZipPath = `${routeDir}scene.css`
+    zip.file(sceneCssZipPath, cssBuf)
+    manifest?.set(sceneCssZipPath, cssBuf.byteLength)
   }
   zip.file(
     `${routeDir}index.html`,
@@ -252,10 +263,11 @@ async function addScenePageToZip(input: {
       project,
       sceneId,
       sceneName,
-      scriptSrc: routeDir ? '../boot.js' : './boot.js',
+      scriptSrc: '/boot.js',
       assetPrefix,
       faviconHref,
       hasSceneCss: Boolean(cssAbs),
+      sceneCssHref,
     }),
   )
 }
@@ -294,6 +306,7 @@ export async function POST(req: Request) {
     }
 
     const zip = new JSZip()
+    const manifest = new Map<string, number>()
     const appRoot = process.cwd()
     const assetsRegRaw = existsSync(selectedProjectPaths.assetRegistryFile)
       ? await readFile(selectedProjectPaths.assetRegistryFile, 'utf-8')
@@ -317,7 +330,9 @@ export async function POST(req: Request) {
 
     const sceneNames = new Map<string, string | undefined>()
     for (const sceneFile of graph.scenes) {
-      zip.file(`scenes/${sceneFile.id}/scene.json`, sceneFile.raw)
+      const sceneJsonPath = `scenes/${sceneFile.id}/scene.json`
+      zip.file(sceneJsonPath, sceneFile.raw)
+      manifest.set(sceneJsonPath, Buffer.byteLength(sceneFile.raw))
       sceneNames.set(sceneFile.id, sceneFile.name)
     }
 
@@ -334,6 +349,7 @@ export async function POST(req: Request) {
       sceneId: exportedProject.entry,
       sceneName: sceneNames.get(exportedProject.entry),
       routeDir: '',
+      manifest,
     })
     for (const ref of exportedProject.scenes) {
       await addScenePageToZip({
@@ -343,6 +359,7 @@ export async function POST(req: Request) {
         sceneId: ref.id,
         sceneName: sceneNames.get(ref.id),
         routeDir: `${ref.id}/`,
+        manifest,
       })
     }
 
@@ -357,10 +374,10 @@ export async function POST(req: Request) {
         if (copiedAssetDirs.has(containingDir)) continue
         copiedAssetDirs.add(containingDir)
         const sourceDir = selectedProjectPaths.resolveLogicalFile(`/${containingDir}`)
-        if (sourceDir) await addDirToZip(zip, sourceDir, containingDir, { rewriteText: true })
+        if (sourceDir) await addDirToZip(zip, sourceDir, containingDir, { rewriteText: true, manifest })
       } else {
         const sourceFile = selectedProjectPaths.resolveLogicalFile(entry.file)
-        if (sourceFile) await addFileToZip(zip, sourceFile, stripped, { rewriteText: true })
+        if (sourceFile) await addFileToZip(zip, sourceFile, stripped, { rewriteText: true, manifest })
       }
     }
 
@@ -372,14 +389,14 @@ export async function POST(req: Request) {
       if (copiedModuleDirs.has(containingDir)) continue
       copiedModuleDirs.add(containingDir)
       const moduleDir = selectedProjectPaths.resolveLogicalFile(`/${containingDir}`)
-      if (moduleDir) await addDirToZip(zip, moduleDir, containingDir, { rewriteText: true })
+      if (moduleDir) await addDirToZip(zip, moduleDir, containingDir, { rewriteText: true, manifest })
     }
 
     for (const entry of Object.values(graph.fontsRegistry)) {
       if (!entry.file?.startsWith('/')) continue
       const stripped = publicFilePath(entry.file)
       const sourceFile = selectedProjectPaths.resolveLogicalFile(entry.file)
-      if (sourceFile) await addFileToZip(zip, sourceFile, stripped, { rewriteText: true })
+      if (sourceFile) await addFileToZip(zip, sourceFile, stripped, { rewriteText: true, manifest })
     }
 
     for (const ref of graph.publicFiles) {
@@ -388,11 +405,14 @@ export async function POST(req: Request) {
       if (!abs || !existsSync(abs)) continue
       const info = await stat(abs)
       if (info.isDirectory()) {
-        await addDirToZip(zip, abs, stripped, { rewriteText: true })
+        await addDirToZip(zip, abs, stripped, { rewriteText: true, manifest })
       } else if (info.isFile()) {
-        await addFileToZip(zip, abs, stripped, { rewriteText: true })
+        await addFileToZip(zip, abs, stripped, { rewriteText: true, manifest })
       }
     }
+
+    const prefetchFiles = Array.from(manifest.entries()).map(([p, bytes]) => ({ path: p, bytes }))
+    zip.file('prefetch-manifest.json', JSON.stringify({ version: 1, files: prefetchFiles }, null, 2) + '\n')
 
     zip.file('export-graph.json', JSON.stringify({
       projectId: graph.projectId,

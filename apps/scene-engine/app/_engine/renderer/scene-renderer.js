@@ -5,7 +5,7 @@ import { applyTransform, applyAppearance } from './positioning.js';
 import { applyCssEffectProperties } from './asset-renderers/css-effect.js';
 import { applyTextProperties } from './asset-renderers/text.js';
 import { loadFontAssets } from './font-registry.js';
-import { bindObjectEvents } from './event-runtime.js';
+import { bindObjectEvents, primeEventAudio } from './event-runtime.js';
 import { resolveRuntimeUrl } from './runtime-url.js';
 
 function isMediaType(type) {
@@ -265,6 +265,10 @@ async function updateChildren(parentEl, childArray, parentPath = '', options = {
 export async function renderScene(scene, root, options = {}) {
   const registry = await loadRegistry({ projectId: options.projectId ?? options.runtime?.projectId });
   await loadFontAssets(registry);
+  // Site runtimes (which set MELEE_BUNDLE_ROOT) prime event audio; the editor skips it.
+  if (typeof window !== 'undefined' && window.MELEE_BUNDLE_ROOT) {
+    primeEventAudio(registry);
+  }
 
   root.style.width = scene.stage.width + 'px';
   root.style.height = scene.stage.height + 'px';

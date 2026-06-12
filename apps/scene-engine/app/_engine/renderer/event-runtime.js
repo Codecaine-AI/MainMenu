@@ -48,27 +48,34 @@ function orderedBindings(bindings) {
   return [...other, ...navigate];
 }
 
+async function ensureAudioElement(target, properties = {}) {
+  const existing = audioElements.get(target);
+  if (existing && existing.isConnected) return existing;
+  const entry = resolveAsset(target);
+  if (!entry) return null;
+  const el = await renderAudio(
+    {
+      id: `event-audio-${target}`,
+      type: 'audio',
+      asset: target,
+      properties,
+    },
+    entry,
+  );
+  el.dataset.eventAudioId = target;
+  el.style.display = 'none';
+  document.body.appendChild(el);
+  audioElements.set(target, el);
+  return el;
+}
+
 async function defaultPlayAudio(target, binding = {}) {
   if (!target) return;
   const properties = { autoplay: false, ...(binding.properties ?? {}) };
-  let el = audioElements.get(target);
-  if (!el || !el.isConnected) {
-    const entry = resolveAsset(target);
-    if (!entry) return;
-    el = await renderAudio(
-      {
-        id: `event-audio-${target}`,
-        type: 'audio',
-        asset: target,
-        properties,
-      },
-      entry,
-    );
-    el.dataset.eventAudioId = target;
-    el.style.display = 'none';
-    document.body.appendChild(el);
-    audioElements.set(target, el);
-  } else if (typeof el.setAudioProperties === 'function') {
+  const existing = audioElements.get(target);
+  const el = await ensureAudioElement(target, properties);
+  if (!el) return;
+  if (el === existing && typeof el.setAudioProperties === 'function') {
     el.setAudioProperties(properties);
   }
   if (typeof el.play === 'function') {
@@ -89,6 +96,17 @@ export async function playAudio(target, binding = {}) {
 
 if (typeof window !== 'undefined' && typeof window.MELEE_playAudio !== 'function') {
   window.MELEE_playAudio = (target, binding = {}) => playAudio(target, binding);
+}
+
+// Building an audio element on first play costs a module fetch plus a media fetch,
+// so the first sound after a scene change lands audibly late. Priming builds the
+// elements up front so playback starts the moment it is requested.
+export function primeEventAudio(registry) {
+  if (typeof document === 'undefined' || !registry) return;
+  for (const [id, entry] of Object.entries(registry)) {
+    if (entry?.type !== 'audio') continue;
+    ensureAudioElement(id, { autoplay: false }).catch(() => {});
+  }
 }
 
 async function runBinding(binding, layer, runtime) {

@@ -2,6 +2,7 @@
 import { createServer } from 'node:http'
 import { createReadStream } from 'node:fs'
 import { stat } from 'node:fs/promises'
+import { createGzip } from 'node:zlib'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 
@@ -29,6 +30,31 @@ const MIME_TYPES = new Map([
   ['.woff', 'font/woff'],
   ['.woff2', 'font/woff2'],
   ['.wasm', 'application/wasm'],
+  ['.txt', 'text/plain; charset=utf-8'],
+  ['.xml', 'application/xml'],
+])
+
+// Types that benefit from gzip compression
+const COMPRESSIBLE_TYPES = new Set([
+  'text/html',
+  'text/javascript',
+  'text/css',
+  'application/json',
+  'image/svg+xml',
+  'text/plain',
+  'application/xml',
+  'application/wasm',
+])
+
+// Cache policy: fonts and media get long-lived cache; code and data get a short
+// cache with stale-while-revalidate so navigations use cached copies instantly
+// (revalidation happens in the background) instead of paying a 304 round trip per
+// file; HTML stays no-cache so new deploys are picked up on the next page load.
+const LONG_CACHE_EXTENSIONS = new Set([
+  '.woff2', '.woff', '.otf', '.ttf',
+  '.mp4', '.webm', '.mp3', '.wav',
+  '.png', '.jpg', '.jpeg', '.gif', '.webp', '.ico',
+  '.svg',
 ])
 
 function readOption(name, fallback) {
@@ -40,6 +66,26 @@ function readOption(name, fallback) {
 
 function contentType(filePath) {
   return MIME_TYPES.get(path.extname(filePath).toLowerCase()) || 'application/octet-stream'
+}
+
+function cacheControl(filePath) {
+  const ext = path.extname(filePath).toLowerCase()
+  if (LONG_CACHE_EXTENSIONS.has(ext)) {
+    return 'public, max-age=86400, stale-while-revalidate=604800'
+  }
+  if (ext === '.html') {
+    return 'no-cache'
+  }
+  return 'public, max-age=300, stale-while-revalidate=86400'
+}
+
+function isCompressible(mimeType) {
+  const base = mimeType.split(';')[0].trim()
+  return COMPRESSIBLE_TYPES.has(base)
+}
+
+function weakETag(size, mtimeMs) {
+  return `W/"${size}-${Math.floor(mtimeMs).toString(16)}"`
 }
 
 function displayHost(host) {
@@ -64,6 +110,18 @@ async function resolveFile(requestUrl) {
 
   if (pathname.includes('\0')) return { status: 400, message: 'Bad request' }
 
+  // Canonical redirect: strip trailing slash from non-root paths
+  if (pathname !== '/' && pathname.endsWith('/')) {
+    const canonical = pathname.slice(0, -1)
+    return { status: 301, location: `${canonical}${requestUrl.search}` }
+  }
+
+  // Canonical redirect: /dir/index.html → /dir, /index.html → /
+  if (pathname.endsWith('/index.html')) {
+    const canonical = pathname.slice(0, -'/index.html'.length) || '/'
+    return { status: 301, location: `${canonical}${requestUrl.search}` }
+  }
+
   let filePath = path.resolve(root, `.${pathname}`)
   if (filePath !== root && !filePath.startsWith(`${root}${path.sep}`)) {
     return { status: 403, message: 'Forbidden' }
@@ -77,22 +135,26 @@ async function resolveFile(requestUrl) {
   }
 
   if (info.isDirectory()) {
-    if (!pathname.endsWith('/')) {
-      return {
-        status: 301,
-        location: `${pathname}/${requestUrl.search}`,
-      }
-    }
-    filePath = path.join(filePath, 'index.html')
+    // Serve directory's index.html directly (no redirect, no trailing slash)
+    const indexPath = path.join(filePath, 'index.html')
     try {
-      info = await stat(filePath)
+      const indexInfo = await stat(indexPath)
+      if (indexInfo.isFile()) {
+        return {
+          status: 200,
+          filePath: indexPath,
+          size: indexInfo.size,
+          mtimeMs: indexInfo.mtimeMs,
+        }
+      }
     } catch {
-      return { status: 404, message: 'Not found' }
+      // fall through to 404
     }
+    return { status: 404, message: 'Not found' }
   }
 
   if (!info.isFile()) return { status: 404, message: 'Not found' }
-  return { status: 200, filePath, size: info.size }
+  return { status: 200, filePath, size: info.size, mtimeMs: info.mtimeMs }
 }
 
 const host = readOption('host', '127.0.0.1')
@@ -124,11 +186,67 @@ const server = createServer(async (req, res) => {
     return
   }
 
-  res.writeHead(200, {
-    'Content-Type': contentType(resolved.filePath),
-    'Content-Length': resolved.size,
-    'Cache-Control': 'no-cache',
-  })
+  const mime = contentType(resolved.filePath)
+  const etag = weakETag(resolved.size, resolved.mtimeMs)
+  const lastModified = new Date(resolved.mtimeMs).toUTCString()
+  const cache = cacheControl(resolved.filePath)
+  const compressible = isCompressible(mime)
+
+  // Conditional request handling
+  const ifNoneMatch = req.headers['if-none-match']
+  const ifModifiedSince = req.headers['if-modified-since']
+
+  if (ifNoneMatch) {
+    if (ifNoneMatch === etag || ifNoneMatch === '*') {
+      const headers = {
+        'ETag': etag,
+        'Last-Modified': lastModified,
+        'Cache-Control': cache,
+      }
+      if (compressible) headers['Vary'] = 'Accept-Encoding'
+      res.writeHead(304, headers)
+      res.end()
+      return
+    }
+  } else if (ifModifiedSince) {
+    const since = Date.parse(ifModifiedSince)
+    if (!Number.isNaN(since) && resolved.mtimeMs <= since + 999) {
+      const headers = {
+        'ETag': etag,
+        'Last-Modified': lastModified,
+        'Cache-Control': cache,
+      }
+      if (compressible) headers['Vary'] = 'Accept-Encoding'
+      res.writeHead(304, headers)
+      res.end()
+      return
+    }
+  }
+
+  // Determine if we should gzip this response
+  const acceptEncoding = req.headers['accept-encoding'] || ''
+  const wantsGzip = /\bgzip\b/.test(acceptEncoding)
+  const shouldGzip = compressible && wantsGzip && resolved.size > 1024
+
+  const responseHeaders = {
+    'Content-Type': mime,
+    'ETag': etag,
+    'Last-Modified': lastModified,
+    'Cache-Control': cache,
+  }
+
+  if (compressible) {
+    responseHeaders['Vary'] = 'Accept-Encoding'
+  }
+
+  if (shouldGzip) {
+    responseHeaders['Content-Encoding'] = 'gzip'
+    // Omit Content-Length since compressed size differs
+  } else {
+    responseHeaders['Content-Length'] = resolved.size
+  }
+
+  res.writeHead(200, responseHeaders)
 
   if (req.method === 'HEAD') {
     res.end()
@@ -140,7 +258,16 @@ const server = createServer(async (req, res) => {
     if (!res.headersSent) sendText(res, 500, 'Internal server error\n')
     else res.destroy()
   })
-  stream.pipe(res)
+
+  if (shouldGzip) {
+    const gzip = createGzip()
+    gzip.on('error', () => {
+      res.destroy()
+    })
+    stream.pipe(gzip).pipe(res)
+  } else {
+    stream.pipe(res)
+  }
 })
 
 server.on('error', (err) => {

@@ -24,8 +24,16 @@ function sceneExists(project, sceneId) {
   return Array.isArray(project.scenes) && project.scenes.some((scene) => scene.id === sceneId)
 }
 
-function pageUrlForScene(sceneId) {
-  return new URL(`${sceneId}/index.html`, BUNDLE_ROOT).href
+function spaPathForScene(sceneId, entryId) {
+  return sceneId === entryId ? '/' : '/' + sceneId
+}
+
+function sceneIdFromPathname(pathname, entryId) {
+  // Strip leading/trailing slashes and trailing index.html
+  const clean = pathname.replace(/^\/+|\/+$/g, '').replace(/\/index\.html$/, '').replace(/^index\.html$/, '')
+  if (!clean) return entryId
+  // Take first path segment as scene id
+  return clean.split('/')[0]
 }
 
 async function boot() {
@@ -41,17 +49,36 @@ async function boot() {
     await renderScene(scene, stage)
   }
 
+  // Determine navigation mode:
+  // - 'pages' only if explicitly set OR running on file:// (history API doesn't work there)
+  const isFileProtocol = typeof location !== 'undefined' && location.protocol === 'file:'
+  const usePagesMode = window.MELEE_NAVIGATION_MODE === 'pages' || isFileProtocol
+
   async function navigate(sceneId) {
     if (!sceneExists(project, sceneId)) {
       console.warn(`[boot] unknown scene '${sceneId}'`)
       return
     }
-    if (window.MELEE_NAVIGATION_MODE === 'pages') {
-      const nextUrl = pageUrlForScene(sceneId)
+    if (usePagesMode) {
+      const nextUrl = new URL(`${sceneId}/index.html`, BUNDLE_ROOT).href
       if (window.location.href !== nextUrl) window.location.href = nextUrl
       return
     }
+    // SPA mode: render in place and push history
+    const targetPath = spaPathForScene(sceneId, project.entry)
+    const currentPath = location.pathname
     await showScene(sceneId)
+    if (currentPath !== targetPath) {
+      history.pushState({ sceneId }, '', targetPath)
+    }
+  }
+
+  // Popstate listener for browser back/forward in SPA mode
+  if (!usePagesMode) {
+    window.addEventListener('popstate', (event) => {
+      const sceneId = event.state?.sceneId || sceneIdFromPathname(location.pathname, project.entry)
+      showScene(sceneId).catch(console.error)
+    })
   }
 
   window.MELEE_navigate = (sceneId) => navigate(sceneId).catch(console.error)
@@ -60,6 +87,71 @@ async function boot() {
   window.addEventListener('resize', fitStage)
 
   await showScene(window.MELEE_INITIAL_SCENE ?? project.entry)
+  schedulePrefetch()
 }
 
 boot().catch((err) => console.error('[boot] failed:', err))
+
+// ---------------------------------------------------------------------------
+// Idle prefetcher — warms the HTTP cache while the first scene is on screen
+// ---------------------------------------------------------------------------
+
+let prefetchStarted = false
+
+async function runPrefetch() {
+  if (navigator.connection?.saveData === true) return
+  if (location.protocol === 'file:') return
+
+  let manifest
+  try {
+    const res = await fetch(new URL('prefetch-manifest.json', BUNDLE_ROOT), { priority: 'low' })
+    if (!res.ok) return
+    manifest = await res.json()
+  } catch {
+    return
+  }
+
+  if (!Array.isArray(manifest?.files)) return
+
+  // Tiered ordering: scene data and code, then audio, fonts, images, video —
+  // sounds and navigation logic are ready long before the big media finishes.
+  const tierOf = (p) => {
+    if (/\.(json|js|mjs|css)$/i.test(p)) return 0
+    if (/\.(mp3|wav|ogg|m4a)$/i.test(p)) return 1
+    if (/\.(woff2?|otf|ttf)$/i.test(p)) return 2
+    if (/\.(png|jpe?g|webp|gif|svg|ico)$/i.test(p)) return 3
+    if (/\.(mp4|webm)$/i.test(p)) return 4
+    return 5
+  }
+  const files = [...manifest.files].sort(
+    (a, b) => tierOf(a.path) - tierOf(b.path) || (a.bytes ?? 0) - (b.bytes ?? 0),
+  )
+
+  // Fetch with a concurrency pool of 2
+  const pool = 2
+  let idx = 0
+  async function worker() {
+    while (idx < files.length) {
+      const file = files[idx++]
+      try {
+        const res = await fetch(new URL(file.path, BUNDLE_ROOT), { priority: 'low' })
+        if (res.ok) await res.arrayBuffer()
+      } catch {
+        // ignore individual failures
+      }
+    }
+  }
+  await Promise.all(Array.from({ length: pool }, worker))
+}
+
+function schedulePrefetch() {
+  if (prefetchStarted) return
+  prefetchStarted = true
+  setTimeout(() => {
+    if (typeof requestIdleCallback === 'function') {
+      requestIdleCallback(() => runPrefetch().catch(() => {}))
+    } else {
+      runPrefetch().catch(() => {})
+    }
+  }, 1500)
+}
