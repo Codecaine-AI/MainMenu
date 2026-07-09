@@ -21,6 +21,10 @@ export interface ExportSceneFile {
   absPath: string
   raw: string
   scene: SceneJson | null
+  referencedAssetIds?: string[]
+  referencedModuleIds?: string[]
+  referencedFontFamilies?: string[]
+  referencedPublicFiles?: string[]
 }
 
 export interface ExportGraph extends ExportGraphSummary {
@@ -182,15 +186,25 @@ export async function collectExportGraph(input: {
   const refs = activeSceneRefs(input.project)
   collectPublicReferences(input.project.web, publicFiles)
 
+  const sceneModuleMap = new Map<string, Set<string>>()
+
   for (const ref of refs) {
     const absPath = input.projectPaths.sceneFile(ref.id)
     const raw = await readFile(absPath, 'utf-8')
     let scene: SceneJson | null = null
+
+    const perSceneAssets = new Set<string>()
+    const perSceneModules = new Set<string>()
+    const perScenePublicFiles = new Set<string>()
+    const perSceneFontFamilies = new Set<string>()
+
     try {
       scene = JSON.parse(raw) as SceneJson
       collectPublicReferences(scene, publicFiles)
+      collectPublicReferences(scene, perScenePublicFiles)
       for (const object of scene.objects ?? []) {
         collectTextFontFamilies(object, requiredFontFamilies)
+        collectTextFontFamilies(object, perSceneFontFamilies)
         collectSceneObjectRefs({
           object,
           source: `${ref.id}.${object.id}`,
@@ -201,12 +215,34 @@ export async function collectExportGraph(input: {
           publicFiles,
           warnings,
         })
+        collectSceneObjectRefs({
+          object,
+          source: `${ref.id}.${object.id}`,
+          assetsRegistry: input.assetsRegistry,
+          modulesRegistry: input.modulesRegistry,
+          assetIds: perSceneAssets,
+          moduleIds: perSceneModules,
+          publicFiles: perScenePublicFiles,
+          warnings: [],
+        })
       }
     } catch {
       warnings.push(`Scene '${ref.id}' could not be parsed; falling back to literal public path collection only`)
       collectPublicReferences(raw, publicFiles)
     }
-    scenes.push({ id: ref.id, name: ref.name ?? scene?.name, absPath, raw, scene })
+
+    sceneModuleMap.set(ref.id, perSceneModules)
+    scenes.push({
+      id: ref.id,
+      name: ref.name ?? scene?.name,
+      absPath,
+      raw,
+      scene,
+      referencedAssetIds: Array.from(perSceneAssets).sort(),
+      referencedModuleIds: Array.from(perSceneModules).sort(),
+      referencedFontFamilies: Array.from(perSceneFontFamilies).sort(),
+      referencedPublicFiles: Array.from(perScenePublicFiles).sort(),
+    })
   }
 
   const processedModules = new Set<string>()
@@ -248,6 +284,43 @@ export async function collectExportGraph(input: {
     }
   }
 
+  // Expand per-scene module lists with transitive dependencies
+  for (const sceneFile of scenes) {
+    const perSceneMods = sceneModuleMap.get(sceneFile.id)
+    if (!perSceneMods) continue
+    const expanded = new Set(perSceneMods)
+    const visited = new Set<string>()
+    const queue = Array.from(perSceneMods)
+    while (queue.length > 0) {
+      const modId = queue.pop()!
+      if (visited.has(modId)) continue
+      visited.add(modId)
+      const entry = input.modulesRegistry[modId]
+      if (!entry) continue
+      const manifest = await readModuleManifest(entry, input.projectPaths)
+      if (!manifest) continue
+      for (const depId of manifest.dependencies?.modules ?? []) {
+        if (input.modulesRegistry[depId] && !expanded.has(depId)) {
+          expanded.add(depId)
+          queue.push(depId)
+        }
+      }
+      for (const assetId of manifest.dependencies?.assets ?? []) {
+        if (input.assetsRegistry[assetId]) {
+          const assetArr = sceneFile.referencedAssetIds ?? []
+          if (!assetArr.includes(assetId)) assetArr.push(assetId)
+          sceneFile.referencedAssetIds = assetArr
+        }
+      }
+      for (const font of manifest.dependencies?.fonts ?? []) {
+        const fontArr = sceneFile.referencedFontFamilies ?? []
+        if (!fontArr.includes(font)) fontArr.push(font)
+        sceneFile.referencedFontFamilies = fontArr
+      }
+    }
+    sceneFile.referencedModuleIds = Array.from(expanded).sort()
+  }
+
   for (const scene of scenes) {
     for (const object of flattenObjects(scene.scene?.objects)) {
       if (object.type !== 'component' && object.type !== 'effect') continue
@@ -267,6 +340,9 @@ export async function collectExportGraph(input: {
             warnings,
             source: `${scene.id}.${object.id}.properties.${property}`,
           })
+          const assetArr = scene.referencedAssetIds ?? []
+          if (!assetArr.includes(value)) assetArr.push(value)
+          scene.referencedAssetIds = assetArr
         }
       }
     }

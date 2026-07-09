@@ -1,5 +1,6 @@
 import { renderScene } from './renderer/scene-renderer.js'
 import { loadRegistry } from './renderer/asset-registry.js'
+import { preloadScene } from './renderer/scene-preloader.js'
 
 const STAGE_WIDTH = 1440
 const STAGE_HEIGHT = 1080
@@ -54,6 +55,42 @@ async function boot() {
   const isFileProtocol = typeof location !== 'undefined' && location.protocol === 'file:'
   const usePagesMode = window.MELEE_NAVIGATION_MODE === 'pages' || isFileProtocol
 
+  // Popstate listener for browser back/forward in SPA mode
+  if (!usePagesMode) {
+    window.addEventListener('popstate', (event) => {
+      const sceneId = event.state?.sceneId || sceneIdFromPathname(location.pathname, project.entry)
+      showScene(sceneId).catch(console.error)
+    })
+  }
+
+  function findSceneRef(sceneId) {
+    return project.scenes.find((s) => s.id === sceneId)
+  }
+
+  function findGateSceneFor(targetId) {
+    return project.scenes.find((s) => s.gates === targetId)
+  }
+
+  function findLoadingElement() {
+    return stage.querySelector('[data-layer-id="loading-dialog"]')
+        ?? stage.querySelector('.loading-dialog')
+  }
+
+  async function showWithGate(gateSceneId, targetSceneId) {
+    await showScene(gateSceneId)
+    const loadingEl = findLoadingElement()
+    try {
+      await preloadScene(targetSceneId, {
+        onProgress({ fraction }) {
+          if (loadingEl?.setProgress) loadingEl.setProgress(fraction)
+        },
+      })
+    } catch (err) {
+      console.warn('[boot] preload failed, transitioning anyway:', err)
+    }
+    await showScene(targetSceneId)
+  }
+
   async function navigate(sceneId) {
     if (!sceneExists(project, sceneId)) {
       console.warn(`[boot] unknown scene '${sceneId}'`)
@@ -64,21 +101,23 @@ async function boot() {
       if (window.location.href !== nextUrl) window.location.href = nextUrl
       return
     }
-    // SPA mode: render in place and push history
-    const targetPath = spaPathForScene(sceneId, project.entry)
-    const currentPath = location.pathname
-    await showScene(sceneId)
-    if (currentPath !== targetPath) {
-      history.pushState({ sceneId }, '', targetPath)
-    }
-  }
 
-  // Popstate listener for browser back/forward in SPA mode
-  if (!usePagesMode) {
-    window.addEventListener('popstate', (event) => {
-      const sceneId = event.state?.sceneId || sceneIdFromPathname(location.pathname, project.entry)
-      showScene(sceneId).catch(console.error)
-    })
+    const gateScene = findGateSceneFor(sceneId)
+    if (gateScene) {
+      const targetPath = spaPathForScene(sceneId, project.entry)
+      const currentPath = location.pathname
+      await showWithGate(gateScene.id, sceneId)
+      if (currentPath !== targetPath) {
+        history.pushState({ sceneId }, '', targetPath)
+      }
+    } else {
+      const targetPath = spaPathForScene(sceneId, project.entry)
+      const currentPath = location.pathname
+      await showScene(sceneId)
+      if (currentPath !== targetPath) {
+        history.pushState({ sceneId }, '', targetPath)
+      }
+    }
   }
 
   window.MELEE_navigate = (sceneId) => navigate(sceneId).catch(console.error)
@@ -86,7 +125,15 @@ async function boot() {
   fitStage()
   window.addEventListener('resize', fitStage)
 
-  await showScene(window.MELEE_INITIAL_SCENE ?? project.entry)
+  const initialScene = window.MELEE_INITIAL_SCENE ?? project.entry
+  const entryRef = findSceneRef(initialScene)
+
+  if (entryRef?.gates && sceneExists(project, entryRef.gates)) {
+    await showWithGate(initialScene, entryRef.gates)
+  } else {
+    await showScene(initialScene)
+  }
+
   schedulePrefetch()
 }
 

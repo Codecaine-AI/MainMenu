@@ -262,6 +262,53 @@ async function updateChildren(parentEl, childArray, parentPath = '', options = {
   reorderChildren(parentEl, childArray, parentPath);
 }
 
+function playEntrance(root, scene) {
+  const config = scene.entrance
+  const stagger = config.stagger ?? 200
+  const defaultDuration = config.duration ?? 600
+  const defaultType = config.type ?? 'fade-in'
+
+  const entries = []
+  for (let i = 0; i < scene.objects.length; i++) {
+    const obj = scene.objects[i]
+    if (obj.visible === false) continue
+    const objEntrance = obj.entrance ?? {}
+    const type = objEntrance.type ?? defaultType
+    if (type === 'none') continue
+
+    const el = root.querySelector(`[data-layer-id="${obj.id}"]`)
+    if (!el) continue
+
+    const duration = objEntrance.duration ?? defaultDuration
+    const delay = stagger * i + (objEntrance.delay ?? 0)
+    const targetOpacity = obj.appearance?.opacity ?? 1
+    entries.push({ el, duration, delay, targetOpacity })
+  }
+
+  if (entries.length === 0) return Promise.resolve()
+
+  for (const e of entries) {
+    e.el.style.opacity = '0'
+    e.el.style.transition = `opacity ${e.duration}ms ease-out ${e.delay}ms`
+  }
+
+  void root.offsetHeight
+
+  for (const e of entries) {
+    e.el.style.opacity = String(e.targetOpacity)
+  }
+
+  const maxEnd = Math.max(...entries.map(e => e.delay + e.duration))
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      for (const e of entries) {
+        e.el.style.transition = ''
+      }
+      resolve()
+    }, maxEnd + 50)
+  })
+}
+
 export async function renderScene(scene, root, options = {}) {
   const registry = await loadRegistry({ projectId: options.projectId ?? options.runtime?.projectId });
   await loadFontAssets(registry);
@@ -290,6 +337,10 @@ export async function renderScene(scene, root, options = {}) {
     await mountObject(root, scene.objects[i], null, String(i), options);
   }
   reorderChildren(root, scene.objects, '');
+
+  if (scene.entrance && !options.skipEntrance) {
+    await playEntrance(root, scene);
+  }
 }
 
 function reorderChildren(parentEl, childArray, parentPath = '') {

@@ -411,6 +411,61 @@ export async function POST(req: Request) {
       }
     }
 
+    for (const sceneFile of graph.scenes) {
+      const sceneAssetPaths: { path: string; bytes: number }[] = []
+      const seen = new Set<string>()
+      const add = (p: string, b: number) => { if (!seen.has(p)) { seen.add(p); sceneAssetPaths.push({ path: p, bytes: b }) } }
+
+      const sceneJsonPath = `scenes/${sceneFile.id}/scene.json`
+      const sceneJsonBytes = manifest.get(sceneJsonPath)
+      if (sceneJsonBytes !== undefined) add(sceneJsonPath, sceneJsonBytes)
+
+      for (const moduleId of sceneFile.referencedModuleIds ?? []) {
+        const entry = graph.modulesRegistry[moduleId]
+        if (!entry) continue
+        const dir = moduleDirectoryForEntry(entry)
+        if (!dir) continue
+        for (const [mp, mb] of manifest.entries()) {
+          if (mp.startsWith(dir + '/') || mp === dir) add(mp, mb)
+        }
+      }
+
+      for (const assetId of sceneFile.referencedAssetIds ?? []) {
+        const entry = graph.assetsRegistry[assetId]
+        if (!entry?.file?.startsWith('/')) continue
+        const stripped = publicFilePath(entry.file)
+        const containingDir = path.posix.dirname(stripped)
+        if (containingDir.startsWith('assets/audio/')) {
+          for (const [mp, mb] of manifest.entries()) {
+            if (mp.startsWith(containingDir + '/')) add(mp, mb)
+          }
+        } else {
+          const bytes = manifest.get(stripped)
+          if (bytes !== undefined) add(stripped, bytes)
+        }
+      }
+
+      for (const family of sceneFile.referencedFontFamilies ?? []) {
+        for (const [, fontEntry] of Object.entries(graph.fontsRegistry)) {
+          if (fontEntry.family !== family) continue
+          if (!fontEntry.file?.startsWith('/')) continue
+          const stripped = publicFilePath(fontEntry.file)
+          const bytes = manifest.get(stripped)
+          if (bytes !== undefined) add(stripped, bytes)
+        }
+      }
+
+      for (const file of sceneFile.referencedPublicFiles ?? []) {
+        const stripped = publicFilePath(file)
+        for (const [mp, mb] of manifest.entries()) {
+          if (mp === stripped || mp.startsWith(stripped + '/')) add(mp, mb)
+        }
+      }
+
+      sceneAssetPaths.sort((a, b) => a.path.localeCompare(b.path))
+      zip.file(`scenes/${sceneFile.id}/assets.json`, JSON.stringify({ version: 1, files: sceneAssetPaths }, null, 2) + '\n')
+    }
+
     const prefetchFiles = Array.from(manifest.entries()).map(([p, bytes]) => ({ path: p, bytes }))
     zip.file('prefetch-manifest.json', JSON.stringify({ version: 1, files: prefetchFiles }, null, 2) + '\n')
 
