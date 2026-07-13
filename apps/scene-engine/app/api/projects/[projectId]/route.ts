@@ -1,6 +1,7 @@
 import { existsSync } from 'node:fs'
 import { readFile, writeFile } from 'node:fs/promises'
 import { NextResponse } from 'next/server'
+import { normalizePostProcessing } from '@/lib/post-processing'
 import { PROJECT_ID_RE, resolveProjectPaths } from '@/lib/project-paths'
 import type { ProjectManifest, ProjectWebSettings } from '@/types/scene'
 
@@ -111,6 +112,13 @@ export async function PATCH(
     web,
   }
   if (Object.keys(web).length === 0) delete nextProject.web
+  if ('postProcessing' in body) {
+    if (body.postProcessing === null) {
+      delete nextProject.postProcessing
+    } else if (isRecord(body.postProcessing)) {
+      nextProject.postProcessing = normalizePostProcessing(body.postProcessing)
+    }
+  }
 
   await writeFile(paths.manifestFile, JSON.stringify(nextProject, null, 2) + '\n', 'utf-8')
   return NextResponse.json(nextProject)

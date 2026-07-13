@@ -38,13 +38,24 @@ function SceneContent() {
         import('@/renderer/asset-registry'),
       ])
       if (projectId) (window as typeof window & { MELEE_PROJECT_ID?: string }).MELEE_PROJECT_ID = projectId
-      await loadRegistry({ projectId })
-      const res = await fetch(`/api/scenes/${params.id}${projectQuery}`)
+      const projectPromise = projectId
+        ? fetch(`/api/projects/${encodeURIComponent(projectId)}`, { cache: 'no-store' })
+            .then((response) => response.ok ? response.json() : null)
+            .catch(() => null)
+        : Promise.resolve(null)
+      const scenePromise = fetch(`/api/scenes/${params.id}${projectQuery}`)
+
+      const [, res, project] = await Promise.all([
+        loadRegistry({ projectId }),
+        scenePromise,
+        projectPromise,
+      ])
       if (!res.ok) return
       const scene = await res.json()
       if (!cancelled && stageRef.current) {
         await renderScene(scene, stageRef.current, {
           projectId,
+          postProcessing: project?.postProcessing,
           runtime: {
             projectId,
             navigate: (sceneId: string) => router.push(`/scenes/${sceneId}${sceneQuery}`),
@@ -54,7 +65,7 @@ function SceneContent() {
     }
     run().catch(console.error)
     return () => { cancelled = true }
-  }, [params.id, projectQuery, router, sceneQuery])
+  }, [params.id, projectId, projectQuery, router, sceneQuery])
 
   useEffect(() => {
     function handleKeyDown(event: KeyboardEvent) {

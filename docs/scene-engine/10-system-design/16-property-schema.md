@@ -26,9 +26,12 @@ A property definition declares:
 - **type** — one of a locked set of input types.
 - **label** — the human-readable name shown in the inspector.
 - **description** — optional plain text explaining what the property does.
+- **default** — optional fallback value shown by the inspector when the scene has not saved that property yet.
 - Type-specific constraints (min, max, step for numbers; options for selects).
 
 Properties render in declaration order within their section. The author controls the reading flow.
+
+The editor treats `default` as a display/editing fallback only. It does not write default values into scene JSON until the user changes a field. Runtime components should still keep their own defensive fallbacks because exported or older scenes may omit properties.
 
 ## Type Taxonomy
 

@@ -32,6 +32,7 @@ function buildHitStack(path: string): string[] {
 
 export function CanvasPanel() {
   const scene = useEditorStore((s) => s.scene)
+  const project = useEditorStore((s) => s.project)
   const selectedPath = useEditorStore((s) => s.selectedPath)
   const registry = useEditorStore((s) => s.registry)
   const setSelectedPath = useEditorStore((s) => s.setSelectedPath)
@@ -51,11 +52,14 @@ export function CanvasPanel() {
     let cancelled = false
     import('@/renderer/scene-renderer').then(({ renderScene }) => {
       if (!cancelled && stageRef.current) {
-        renderScene(scene, stageRef.current, { events: false })
+        renderScene(scene, stageRef.current, {
+          events: false,
+          postProcessing: project?.postProcessing,
+        })
       }
     })
     return () => { cancelled = true }
-  }, [scene, registry])
+  }, [scene, registry, project?.postProcessing])
 
   const fitStage = useCallback(() => {
     if (!panelRef.current || !stageRef.current) return

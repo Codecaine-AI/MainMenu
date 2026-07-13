@@ -1,6 +1,6 @@
 ---
 covers: How a scene becomes DOM — registry lookup, type-dispatched renderers, transform/appearance application, glyph-group slot mounting, scene-level grading, mount/update reconciliation.
-concepts: [rendering, type-dispatch, transform, appearance, slots, foreignObject, scene-grading, reconciliation]
+concepts: [rendering, type-dispatch, transform, appearance, slots, foreignObject, scene-grading, reconciliation, entrance, visibility]
 ---
 
 # Rendering Pipeline
@@ -18,8 +18,9 @@ flowchart TD
     A[boot: load scene + project] --> B[loadRegistry]
     B --> C[Set stage size and apply scene.appearance filter]
     C --> D{First mount or update?}
-    D -->|first| E[For each object: mountObject]
+    D -->|first| R[Set stage visibility: hidden]
     D -->|update| F[updateChildren: reconcile by id]
+    R --> E[For each object: mountObject]
     E --> G[resolveAsset by id]
     F --> G
     G -->|missing| H[Warn and skip]
@@ -32,6 +33,12 @@ flowchart TD
     M -->|no| O[done]
     L --> P{glyph-group?}
     P -->|yes| Q[Mount slots into SVG]
+    E --> S[reorderChildren]
+    S --> T[Restore stage visibility: '']
+    T --> U{scene.entrance and not skipped?}
+    U -->|yes| V[playEntrance: staggered opacity fade-in]
+    U -->|no| O
+    V --> O
 ```
 
 ## Renderer Dispatch
@@ -104,12 +111,14 @@ After children are mounted, the renderer reorders the wrapper's child list to ma
 
 ## Mount vs. Update
 
-- **First call** to `renderScene`: clears the stage root, mounts every top-level object via `mountObject`, then `reorderChildren` to match the array.
+- **First call** to `renderScene`: hides the stage root, clears it, mounts every top-level object via `mountObject`, then `reorderChildren` to match the array before restoring visibility. Users never see a partial async mount.
 - **Subsequent calls** (editor edits): walks the stage root, builds an id-keyed map of existing wrappers, and runs `updateChildren`:
   - Wrappers whose ids are no longer in the new `objects` array are removed.
   - For each object in the new array: if a wrapper exists, re-apply transform/appearance and recurse into children. If not, `mountObject` it.
   - For `component` and `effect` types, the wrapper is **replaced**, not patched — components own their internal DOM, and re-running their render with new properties is the simplest correct update.
   - After reconciling, `reorderChildren` ensures DOM order matches array order.
+
+On the fresh-mount path only, after visibility is restored, `renderScene` checks `scene.entrance` unless `options.skipEntrance` is set. When enabled, `playEntrance(root, scene)` fades each visible top-level object whose effective entrance type is not `none` from `opacity: 0` to its target opacity with a staggered CSS transition. It forces a reflow between setting the zero opacity and the target opacity so the transition fires. The promise resolves after the last transition completes and inline transition styles are cleared. Updates never run this entrance step.
 
 This makes the editor's drag/drop, property edits, and add/remove all converge to a correct DOM through one entry point.
 

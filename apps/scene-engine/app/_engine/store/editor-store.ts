@@ -1,5 +1,5 @@
 import { create } from 'zustand'
-import type { SceneJson, Registry } from '@/types/scene'
+import type { ProjectManifest, SceneJson, Registry } from '@/types/scene'
 import type { PropertySchema } from '@/types/property-schema'
 
 export interface DrillCursor {
@@ -9,6 +9,7 @@ export interface DrillCursor {
 
 export interface EditorStore {
   scene: SceneJson | null
+  project: ProjectManifest | null
   registry: Registry | null
   componentSchemas: Record<string, PropertySchema | null>
   projectId: string | null
@@ -18,6 +19,7 @@ export interface EditorStore {
   dirty: boolean
 
   setProjectContext: (projectId: string | null, sceneId: string | null) => void
+  setProject: (project: ProjectManifest | null) => void
   setScene: (scene: SceneJson) => void
   setRegistry: (registry: Registry) => void
   setComponentSchema: (componentId: string, schema: PropertySchema | null) => void
@@ -25,6 +27,7 @@ export interface EditorStore {
   setDrillCursor: (cursor: DrillCursor | null) => void
   markDirty: () => void
   markClean: () => void
+  mutateProject: (patch: Partial<ProjectManifest>) => void
   mutateScene: (patch: Partial<SceneJson>) => void
   mutateObjectAt: (path: string, patch: Record<string, unknown>) => void
   setObjectPropertyAt: (path: string, dottedKey: string, value: unknown) => void
@@ -124,6 +127,7 @@ function setDottedValue(target: Record<string, unknown>, dottedKey: string, valu
 
 export const useEditorStore = create<EditorStore>((set, get) => ({
   scene: null,
+  project: null,
   registry: null,
   componentSchemas: {},
   projectId: null,
@@ -133,6 +137,7 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
   dirty: false,
 
   setProjectContext: (projectId, sceneId) => set({ projectId, sceneId }),
+  setProject: (project) => set({ project }),
   setScene: (scene) => set({ scene }),
   setRegistry: (registry) => set({ registry }),
   setComponentSchema: (componentId, schema) =>
@@ -143,6 +148,12 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
   setDrillCursor: (cursor) => set({ drillCursor: cursor }),
   markDirty: () => set({ dirty: true }),
   markClean: () => set({ dirty: false }),
+
+  mutateProject: (patch) => {
+    const { project } = get()
+    if (!project) return
+    set({ project: deepMerge(project, patch) as ProjectManifest })
+  },
 
   mutateScene: (patch) => {
     const { scene } = get()

@@ -27,6 +27,7 @@ A scene is a JSON document that declares a stage and an ordered tree of typed ob
 | `name`       | yes      | Human-readable label shown in dashboards and lists.                                         |
 | `stage`      | yes      | Fixed design canvas. Currently always 1440×1080. The renderer scales to viewport at runtime. |
 | `appearance` | no       | Scene-level color grading applied to the whole stage (`hue`, `saturation`).                 |
+| `entrance`   | no       | Optional staggered entrance animation played after all objects mount, before the scene is revealed. See [Entrance Animation](#entrance-animation). |
 | `objects`    | yes      | Ordered array of scene objects. Empty is valid.                                             |
 
 `objects` (not `layers`) is the canonical name. The renderer reads `scene.objects`.
@@ -210,6 +211,26 @@ Z-order within a `children` array is array order, same rule as the top-level `ob
 ## Z-Order
 
 Array position **is** the z-order. First entry is at the back, last is on top. There is no `zIndex` property. Reordering in the editor's hierarchy panel rewrites the array. The same rule applies recursively inside `children`.
+
+## Entrance Animation
+
+`entrance` is an optional top-level scene field that choreographs how objects appear when the scene first renders.
+
+```json
+"entrance": { "stagger": 250, "duration": 700, "type": "fade-in" }
+```
+
+| Field      | Notes                                                                     |
+|------------|---------------------------------------------------------------------------|
+| `stagger`  | Milliseconds between each object starting. Defaults to `200`.             |
+| `duration` | Milliseconds per object fade. Defaults to `600`.                          |
+| `type`     | One of `"fade-in"` or `"none"`. Defaults to `"fade-in"`.                  |
+
+The renderer hides the stage during mount (`visibility: hidden`), builds all objects invisibly, then reveals. If `entrance` is configured, objects fade in sequentially, staggered by array order. If it is not configured, everything appears at once.
+
+An object may include its own `"entrance": { "type": "none" }` to skip its entrance, or override `duration` / `delay` on that object's entrance block.
+
+Objects with `visible: false` are excluded from the entrance sequence. Each object's fade targets that object's `appearance.opacity`; an object at `0.5` opacity fades in to `0.5`, not `1`.
 
 ## Example: Title Scene
 

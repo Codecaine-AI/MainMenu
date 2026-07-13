@@ -24,11 +24,17 @@ function selectOptionLabel(option: SelectOption): string {
   return typeof option === 'string' ? option : option.label
 }
 
+function effectiveValue(def: PropertyDef, value: unknown): unknown {
+  return value !== undefined ? value : def.default
+}
+
 function renderInput(def: PropertyDef, value: unknown, onChange: (next: unknown) => void) {
+  const current = effectiveValue(def, value)
+
   if (def.type === 'number') {
     return (
       <RangedInput
-        value={Number(value ?? 0)}
+        value={Number(current ?? 0)}
         min={def.min ?? 0}
         max={def.max ?? 1}
         step={def.step ?? 0.01}
@@ -41,7 +47,7 @@ function renderInput(def: PropertyDef, value: unknown, onChange: (next: unknown)
     return (
       <input
         type="text"
-        value={String(value ?? '')}
+        value={String(current ?? '')}
         onChange={(e) => onChange(e.target.value)}
         className="w-full bg-[#222] border border-[#333] text-gray-300 text-[11px] font-mono px-1 py-[3px] rounded-sm focus:border-[#4a8fc2] focus:outline-none"
       />
@@ -49,7 +55,7 @@ function renderInput(def: PropertyDef, value: unknown, onChange: (next: unknown)
   }
 
   if (def.type === 'color') {
-    const raw = String(value ?? '').trim()
+    const raw = String(current ?? '').trim()
     const hex = /^#[0-9a-fA-F]{6}$/.test(raw)
       ? raw
       : /^#[0-9a-fA-F]{3}$/.test(raw)
@@ -65,7 +71,7 @@ function renderInput(def: PropertyDef, value: unknown, onChange: (next: unknown)
         />
         <input
           type="text"
-          value={String(value ?? hex)}
+          value={String(current ?? hex)}
           onChange={(e) => onChange(e.target.value)}
           className="min-w-0 flex-1 bg-[#222] border border-[#333] text-gray-300 text-[11px] font-mono px-1 py-[3px] rounded-sm focus:border-[#4a8fc2] focus:outline-none"
         />
@@ -77,7 +83,7 @@ function renderInput(def: PropertyDef, value: unknown, onChange: (next: unknown)
     return (
       <input
         type="checkbox"
-        checked={Boolean(value)}
+        checked={Boolean(current)}
         onChange={(e) => onChange(e.target.checked)}
         className="accent-[#4a8fc2]"
       />
@@ -89,7 +95,7 @@ function renderInput(def: PropertyDef, value: unknown, onChange: (next: unknown)
     const fallback = first === undefined ? '' : selectOptionValue(first)
     return (
       <select
-        value={String(value ?? fallback)}
+        value={String(current ?? fallback)}
         onChange={(e) => onChange(e.target.value)}
         className="w-full bg-[#222] border border-[#333] text-gray-300 text-[11px] font-mono px-1 py-[3px] rounded-sm focus:border-[#4a8fc2] focus:outline-none"
       >
@@ -106,19 +112,19 @@ function renderInput(def: PropertyDef, value: unknown, onChange: (next: unknown)
   }
 
   if (def.type === 'blend') {
-    return <BlendSelect value={String(value ?? 'normal')} onChange={onChange} />
+    return <BlendSelect value={String(current ?? 'normal')} onChange={onChange} />
   }
 
   if (def.type === 'fit') {
-    return <FitSelect value={String(value ?? 'cover')} onChange={onChange} />
+    return <FitSelect value={String(current ?? 'cover')} onChange={onChange} />
   }
 
   if (def.type === 'clip') {
-    return <ClipSelect value={String(value ?? '')} onChange={onChange} />
+    return <ClipSelect value={String(current ?? '')} onChange={onChange} />
   }
 
   if (def.type === 'anchor') {
-    return <AnchorSelect value={value as string | undefined} onChange={onChange} />
+    return <AnchorSelect value={current as string | undefined} onChange={onChange} />
   }
 
   return null

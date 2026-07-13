@@ -54,6 +54,7 @@ This is the path for the Codecaine site Railway setup: the live host listens to 
 ├── <scene-id>/index.html    one static page per active scene
 ├── <scene-id>/scene.css     optional per-scene page CSS
 ├── scenes/<id>/scene.json   one per active scene
+├── scenes/<id>/assets.json  one per active scene; files that scene needs, with byte sizes
 ├── renderer/                copied from app/_engine/renderer/, paths rewritten
 ├── assets/
 │   ├── registry.json        active assets only; /assets/... rewritten to ./assets/...
@@ -67,6 +68,7 @@ This is the path for the Codecaine site Railway setup: the live host listens to 
 │   └── components/<id>/...
 ├── fonts/
 │   └── registry.json        active font entries only
+├── prefetch-manifest.json   every copied file, with byte sizes, for idle prefetch
 ├── export-graph.json        included/excluded ids and warnings
 ├── Makefile                 `make run` helper
 └── server.mjs               static server for local preview
@@ -101,10 +103,22 @@ Anything not reached is left out of the exported registries. `export-graph.json`
 9. Generate root and per-scene HTML pages.
 10. Write pruned asset/module/font registries.
 11. Copy active asset files, active module directories, active fonts, and extra public files.
-12. Write `export-graph.json`.
-13. Generate the zip buffer and stream it as the response body.
+12. Write a per-scene asset manifest (`scenes/<id>/assets.json`) for each active scene, listing every module, asset, font, and public file that scene references, with byte sizes.
+13. Write `prefetch-manifest.json` listing every file copied into the bundle, with byte sizes.
+14. Write `export-graph.json`.
+15. Generate the zip buffer and stream it as the response body.
 
 Audio entries copy their containing directory because audio bundles often include sidecar JS or sprite metadata. Module entries copy their containing directory because JS, CSS, manifests, SVGs, and local config commonly live together.
+
+## Per-Scene Asset Manifests
+
+`scenes/<id>/assets.json` lists the files one scene needs to render, independent of the rest of the bundle:
+
+```json
+{ "version": 1, "files": [{ "path": "assets/image/bg.png", "bytes": 48213 }] }
+```
+
+The renderer's scene preloader (`renderer/scene-preloader.js`) fetches this file to preload a scene's assets before switching to it — see Boot Runtime below. For server-based deploys that skip the zip export, the server generates the same shape dynamically via `buildSceneAssetManifest(sceneId)`, so this manifest does not need to exist as a static file on disk.
 
 ## Path Rewriting
 
@@ -124,10 +138,12 @@ Each generated page contains a stage container, font declarations, optional scen
 1. sets the bundle root
 2. fetches `project.json`
 3. loads the merged asset/module/font registry
-4. fetches `scenes/<id>/scene.json`
-5. calls `renderScene(scene, stage)`
-6. exposes `window.MELEE_navigate(sceneId)`
-7. scales the fixed 1440x1080 stage to the viewport
+4. checks whether the initial scene has a `gates` target, or a gate scene exists for the initial scene (a scene ref whose `gates` field names it)
+5. if gated: renders the gate scene, waits for a browser paint, preloads the target scene's assets via `scenes/<id>/assets.json` with progress callbacks (the gate scene's loading dialog layer receives fraction updates), clears the stage, then renders the target scene
+6. if not gated: renders the scene directly
+7. exposes `window.MELEE_navigate(sceneId)` — gate-aware for subsequent navigations, same gate-check-then-preload flow as boot
+8. scales the fixed 1440x1080 stage to the viewport
+9. schedules an idle prefetch of all remaining bundle assets 1.5s after boot, via `prefetch-manifest.json`
 
 Page-mode exports perform real static-page navigation to `<scene-id>/index.html`.
 
@@ -154,6 +170,15 @@ node server.mjs --host 127.0.0.1 --port 4173
 ```
 
 The server makes module, media, font, and nested scene page loading behave like a normal static host.
+
+For server-based deploys (like Railway), you can test locally without exporting a zip at all:
+
+```bash
+cd codecaine-site
+node server.mjs --port 4173
+```
+
+This runs the deploy target's own server against the project files on disk. It generates asset manifests, font registries, and prefetch manifests dynamically, so the static bundle-generation steps above are not required for this deploy path.
 
 ## Desktop App Output
 

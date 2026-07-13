@@ -238,6 +238,29 @@ export interface ProjectWebSettings {
   favicon?: string
 }
 
+export type PostEffectBlend = 'screen' | 'overlay' | 'soft-light' | 'multiply' | 'normal'
+
+export interface GrainSettings {
+  enabled: boolean
+  opacity: number
+  frequency: number
+  contrast: number
+  blend: PostEffectBlend
+}
+
+export interface VignetteSettings {
+  enabled: boolean
+  intensity: number
+  size: number
+  color: string
+}
+
+export interface PostProcessingSettings {
+  enabled: boolean
+  grain: GrainSettings
+  vignette: VignetteSettings
+}
+
 export interface ProjectManifest {
   id: string
   name: string
@@ -245,6 +268,7 @@ export interface ProjectManifest {
   scenes: ProjectSceneRef[]
   stage: StageDef
   web?: ProjectWebSettings
+  postProcessing?: PostProcessingSettings
 }
 
 export interface ExportGraphSummary {

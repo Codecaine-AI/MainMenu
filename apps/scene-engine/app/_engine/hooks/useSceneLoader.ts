@@ -21,7 +21,7 @@ function collectComponentAssetIds(scene: SceneJson): string[] {
 }
 
 export function useSceneLoader(projectId: string | null, sceneId: string) {
-  const { setProjectContext, setScene, setRegistry, setComponentSchema, markClean } = useEditorStore()
+  const { setProjectContext, setProject, setScene, setRegistry, setComponentSchema, markClean } = useEditorStore()
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const loadCount = useRef(0)
@@ -30,19 +30,30 @@ export function useSceneLoader(projectId: string | null, sceneId: string) {
     setLoading(true)
     setError(null)
     const thisLoad = ++loadCount.current
+    setProject(null)
     try {
       const { loadRegistry, getRegistry } = await import('@/renderer/asset-registry')
       if (projectId) (window as typeof window & { MELEE_PROJECT_ID?: string }).MELEE_PROJECT_ID = projectId
-      await loadRegistry({ projectId })
-      setRegistry(getRegistry())
-
       const projectQuery = projectId ? `?project=${encodeURIComponent(projectId)}` : ''
-      const res = await fetch(`/api/scenes/${sceneId}${projectQuery}`, { cache: 'no-store' })
+      const projectPromise = projectId
+        ? fetch(`/api/projects/${encodeURIComponent(projectId)}`, { cache: 'no-store' })
+            .then((response) => response.ok ? response.json() : null)
+            .catch(() => null)
+        : Promise.resolve(null)
+      const scenePromise = fetch(`/api/scenes/${sceneId}${projectQuery}`, { cache: 'no-store' })
+
+      const [, res, project] = await Promise.all([
+        loadRegistry({ projectId }),
+        scenePromise,
+        projectPromise,
+      ])
+      setRegistry(getRegistry())
       if (!res.ok) throw new Error(`Failed to load scene '${sceneId}': ${res.status}`)
       const scene = await res.json()
 
       if (thisLoad === loadCount.current) {
         setProjectContext(projectId, sceneId)
+        setProject(project)
         setScene(scene)
         markClean()
 
@@ -70,7 +81,7 @@ export function useSceneLoader(projectId: string | null, sceneId: string) {
         setLoading(false)
       }
     }
-  }, [projectId, sceneId, setProjectContext, setScene, setRegistry, setComponentSchema, markClean])
+  }, [projectId, sceneId, setProjectContext, setProject, setScene, setRegistry, setComponentSchema, markClean])
 
   useEffect(() => { load() }, [load])
 

@@ -1,12 +1,15 @@
 'use client'
 
+import { useState } from 'react'
 import { useEditorStore } from '@/store/editor-store'
 import { resolveObject } from '@/lib/path'
 import type { SceneJson } from '@/types/scene'
+import { GlobalSettingsSection } from './GlobalSection'
 import { LayerForm } from './LayerForm'
 import { SceneSettingsSection } from './SceneSection'
 
 export function InspectorPanel() {
+  const [tab, setTab] = useState<'scene' | 'global'>('scene')
   const scene = useEditorStore((s) => s.scene)
   const selectedPath = useEditorStore((s) => s.selectedPath)
 
@@ -29,8 +32,30 @@ export function InspectorPanel() {
       <h3 className="text-[13px] uppercase tracking-wide text-gray-100 font-bold mb-2">
         Inspector
       </h3>
-      <SceneSettingsSection />
-      {content}
+      <div className="mb-2 flex border border-[#333] bg-[#1e1e1e] text-[11px] font-mono uppercase tracking-wide">
+        {(['scene', 'global'] as const).map((nextTab) => (
+          <button
+            key={nextTab}
+            type="button"
+            onClick={() => setTab(nextTab)}
+            className={`flex-1 border-b-2 px-2 py-1.5 ${
+              tab === nextTab
+                ? 'border-[#4a8fc2] bg-[#282828] text-gray-100'
+                : 'border-transparent text-gray-500 hover:bg-[#242424] hover:text-gray-300'
+            }`}
+          >
+            {nextTab}
+          </button>
+        ))}
+      </div>
+      {tab === 'scene' ? (
+        <>
+          <SceneSettingsSection />
+          {content}
+        </>
+      ) : (
+        <GlobalSettingsSection />
+      )}
     </section>
   )
 }

@@ -47,7 +47,8 @@ async function boot() {
   async function showScene(sceneId) {
     const scene = await fetchJson(`./scenes/${sceneId}/scene.json`)
     document.title = project.web?.title ?? scene.name ?? project.name ?? 'Scene'
-    await renderScene(scene, stage)
+    stage.innerHTML = ''
+    await renderScene(scene, stage, { postProcessing: project.postProcessing })
   }
 
   // Determine navigation mode:
@@ -76,8 +77,14 @@ async function boot() {
         ?? stage.querySelector('.loading-dialog')
   }
 
+  function waitForPaint() {
+    return new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)))
+  }
+
   async function showWithGate(gateSceneId, targetSceneId) {
     await showScene(gateSceneId)
+    await waitForPaint()
+
     const loadingEl = findLoadingElement()
     try {
       await preloadScene(targetSceneId, {
@@ -88,6 +95,8 @@ async function boot() {
     } catch (err) {
       console.warn('[boot] preload failed, transitioning anyway:', err)
     }
+
+    stage.innerHTML = ''
     await showScene(targetSceneId)
   }
 
@@ -131,7 +140,12 @@ async function boot() {
   if (entryRef?.gates && sceneExists(project, entryRef.gates)) {
     await showWithGate(initialScene, entryRef.gates)
   } else {
-    await showScene(initialScene)
+    const gateScene = findGateSceneFor(initialScene)
+    if (gateScene) {
+      await showWithGate(gateScene.id, initialScene)
+    } else {
+      await showScene(initialScene)
+    }
   }
 
   schedulePrefetch()

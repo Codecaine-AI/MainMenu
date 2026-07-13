@@ -48,24 +48,26 @@ The local catalog file is `workspace.catalog.json` beside the scene-engine app, 
 {
   "id": "codecaine",
   "name": "Codecaine",
-  "entry": "title",
+  "entry": "loading",
   "scenes": [
+    { "id": "loading", "name": "Loading Screen", "gates": "title" },
     { "id": "title", "name": "Title Screen" },
-    { "id": "menu",  "name": "Main Menu" }
+    { "id": "menu", "name": "Main Menu" }
   ],
   "stage": { "width": 1440, "height": 1080 }
 }
 ```
 
-| Field    | Required | Notes                                                                                       |
-|----------|----------|---------------------------------------------------------------------------------------------|
-| `id`     | yes      | Project identifier. Becomes the export zip filename (`<id>.zip`).                           |
-| `name`   | yes      | Human-readable display name.                                                                |
-| `entry`  | yes      | Scene `id` that loads first when the export boots. Must be present in `scenes`.             |
-| `scenes` | yes      | Ordered list of `{ id, name? }`. Determines order in the dashboard and the export bundle.   |
-| `stage`  | yes      | Design canvas size shared across scenes. Renderer scales to the viewport at runtime.        |
+| Field    | Required | Notes                                                                                                  |
+|----------|----------|--------------------------------------------------------------------------------------------------------|
+| `id`     | yes      | Project identifier. Becomes the export zip filename (`<id>.zip`).                                      |
+| `name`   | yes      | Human-readable display name.                                                                           |
+| `entry`  | yes      | Scene `id` that loads first when the export boots. Must be present in `scenes`.                        |
+| `scenes` | yes      | Ordered list of `{ id, name?, gates? }`. Determines order in the dashboard and the export bundle.      |
+| `stage`  | yes      | Design canvas size shared across scenes. Renderer scales to the viewport at runtime.                   |
 
 `name` on each scene reference is optional; if absent, the dashboard falls back to the scene's own `name` field, then to its `id`.
+`gates` on a scene reference is an optional scene id — the id of another scene that this scene gates (preloads before transitioning to). When present, boot renders this scene first, preloads the target scene's assets with progress reporting, then transitions to the target.
 
 ## What the Project Manifest Does Not Carry
 
@@ -90,6 +92,18 @@ Project discovery starts with the workspace catalog:
 Inside a scene, an event with `action: "navigate"` and `target: "<scene-id>"` navigates to another scene in the project. In the export bundle, the renderer registers `window.MELEE_navigate(sceneId)` and the click handler calls it. Page-mode exports perform real static-page navigation to `<scene-id>/index.html`; runtime scene re-rendering remains available as a fallback for single-page previews.
 
 The dev environment works the same way conceptually, but routing carries the active project in the query string: `/scenes/<scene-id>?project=<project-id>` for preview and `/editor?project=<project-id>&scene=<scene-id>` for editing. The editor still views one scene at a time and disables runtime events so clicks select layers instead of navigating.
+
+## Scene Gates
+
+A scene reference may include `"gates": "<target-scene-id>"` to declare that this scene is a loading gate for the target.
+
+When boot encounters the entry scene, or any scene navigated to that has a gate, it renders the gate scene first, preloads the target's assets via `/scenes/<id>/assets.json`, and transitions once loading completes.
+
+Gate scenes typically contain a loading dialog component with a progress bar that fills via `setProgress(fraction)`.
+
+The reverse lookup also works: if you navigate directly to `/title` and a gate exists for it, the gate is shown first.
+
+This is a one-level mechanism — gates don't chain.
 
 ## Export Surface
 

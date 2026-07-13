@@ -7,6 +7,7 @@ import { applyTextProperties } from './asset-renderers/text.js';
 import { loadFontAssets } from './font-registry.js';
 import { bindObjectEvents, primeEventAudio } from './event-runtime.js';
 import { resolveRuntimeUrl } from './runtime-url.js';
+import { applyPostProcessing } from './post-processing.js';
 
 function isMediaType(type) {
   return type === 'video' || type === 'image' || type === 'media';
@@ -329,18 +330,23 @@ export async function renderScene(scene, root, options = {}) {
 
   if (existingTopLevel.size > 0) {
     await updateChildren(root, scene.objects, '', options);
-    return;
+  } else {
+    root.style.visibility = 'hidden';
+    root.innerHTML = '';
+    for (let i = 0; i < scene.objects.length; i++) {
+      await mountObject(root, scene.objects[i], null, String(i), options);
+    }
+    reorderChildren(root, scene.objects, '');
+
+    if (scene.entrance && !options.skipEntrance) {
+      root.style.visibility = '';
+      await playEntrance(root, scene);
+    } else {
+      root.style.visibility = '';
+    }
   }
 
-  root.innerHTML = '';
-  for (let i = 0; i < scene.objects.length; i++) {
-    await mountObject(root, scene.objects[i], null, String(i), options);
-  }
-  reorderChildren(root, scene.objects, '');
-
-  if (scene.entrance && !options.skipEntrance) {
-    await playEntrance(root, scene);
-  }
+  applyPostProcessing(root, options.postProcessing);
 }
 
 function reorderChildren(parentEl, childArray, parentPath = '') {

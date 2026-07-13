@@ -1,0 +1,12 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "codecaine-site",
+      "runtimeExecutable": "node",
+      "runtimeArgs": ["../codecaine-site/server.mjs"],
+      "port": 4173,
+      "autoPort": true
+    }
+  ]
+}

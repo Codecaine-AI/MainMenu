@@ -15,45 +15,35 @@ const DEFAULT_THEMES: Record<string, MenuTheme> = {
     borderSoft: '#617bff',
     sidePanel: '#07515b',
     sideEdge: '#167783',
-    sideFrame: '#b8bbc2',
     sideText: '#dce0ee',
-    railText: '#aaaeb6',
   },
   red: {
     border: '#c24334',
     borderSoft: '#e47b65',
     sidePanel: '#5a2d1f',
     sideEdge: '#b85a2c',
-    sideFrame: '#d1a184',
     sideText: '#ffe0d1',
-    railText: '#dca78d',
   },
   yellow: {
     border: '#b4a64b',
     borderSoft: '#e2cf62',
     sidePanel: '#4a431c',
     sideEdge: '#c18c2f',
-    sideFrame: '#d5b967',
     sideText: '#fff1bc',
-    railText: '#d7bd6a',
   },
   green: {
     border: '#45a86b',
     borderSoft: '#7ee29b',
     sidePanel: '#194f46',
     sideEdge: '#2db38d',
-    sideFrame: '#93cfba',
     sideText: '#d9fff2',
-    railText: '#98d7c2',
   },
   purple: {
     border: '#7c32c8',
     borderSoft: '#b06aff',
     sidePanel: '#2f3267',
     sideEdge: '#5b62c9',
-    sideFrame: '#a8aee4',
     sideText: '#e3e7ff',
-    railText: '#aeb5e5',
   },
 }
 
@@ -69,7 +59,6 @@ const DEFAULT_MENU_THEMING: MenuTheming = {
   titleTextGlowOpacity: 0,
   captionTextColor: '#e4e7ff',
   sideTextColor: '#dce0ee',
-  railTextColor: '#aaaeb6',
   rowEdgeOpacity: 0.84,
   rowEdgeFeather: 0.7,
   rowEdgeGlowSize: 7,
@@ -158,6 +147,7 @@ const PREVIEW_OPTIONS = [
   { value: 'rows', label: 'Rows' },
   { value: 'empty', label: 'Empty' },
   { value: 'image', label: 'Image' },
+  { value: 'contribution-grid', label: 'Contribution Grid' },
   { value: 'controller', label: 'Controller' },
   { value: 'display-settings', label: 'Display' },
   { value: 'records-grid', label: 'Records' },
@@ -231,7 +221,6 @@ const DEFAULT_SIDE_PREVIEW = {
   sideScale: 1,
   sidePerspective: 1700,
   sidePanelOpacity: 0.53,
-  sideFrameVisible: true,
   sideRainDensity: 36,
   sideRainSpeed: 0.9,
   sideRainColorOffset: 0.36,
@@ -243,20 +232,12 @@ const DEFAULT_SIDE_PREVIEW = {
   sideLineHeight: 70,
   sideFontScale: 1,
   sideTextOpacity: 1,
-  sideRailVisible: true,
-  sideRailX: 919,
-  sideRailY: 565,
-  sideRailRotation: -90,
-  sideRailFontSize: 36,
+  sideFlashStreakOffset: -10,
+  sideFlashStreakTravel: 0,
+  sideFlashSparkOffset: -34,
 }
 
-const DEFAULT_DETAIL_PREVIEW = {
-  detailX: 910,
-  detailY: 318,
-  detailWidth: 388,
-  detailWideX: 730,
-  detailWideY: 238,
-  detailWideWidth: 574,
+const DEFAULT_BACK_BUTTON = {
   backButtonX: 150,
   backButtonY: 112,
 }
@@ -297,16 +278,27 @@ interface MenuPreview {
   rows?: string[]
   label?: string
   value?: string
-  railText?: string
-  railTextColor?: string
-  railColor?: string
-  railTextOpacity?: number
-  railOpacity?: number
   src?: string
   image?: string
   asset?: string
+  layout?: PreviewLayout
   sidePanel?: MenuPreview
   detail?: MenuPreview | null
+}
+
+interface PreviewLayout {
+  x?: number
+  y?: number
+  width?: number
+  height?: number
+  scale?: number
+  scaleX?: number
+  scaleY?: number
+  rotation?: number
+  originX?: number
+  originY?: number
+  opacity?: number
+  fit?: string
 }
 
 interface MenuItem {
@@ -537,15 +529,35 @@ function previewImageSource(preview: MenuPreview | undefined): string {
   return cleanString(content.src, cleanString(content.image, cleanString(content.asset)))
 }
 
-function previewRailText(preview: MenuPreview | undefined, fallback = ''): string {
-  const content = previewContent(preview)
-  return typeof content.railText === 'string' ? content.railText : fallback
+function previewLayoutDefaults(preview: MenuPreview | undefined): Required<Omit<PreviewLayout, 'fit'>> & { fit: string } {
+  const type = preview?.type ?? 'empty'
+  if (type === 'image') {
+    return { x: 990, y: 360, width: 278, height: 238, scale: 1, scaleX: 1, scaleY: 1, rotation: 0, originX: 0.5, originY: 0.5, opacity: 0.92, fit: 'contain' }
+  }
+  if (['controller', 'display-settings', 'records-grid', 'contribution-grid', 'toggles'].includes(type)) {
+    return { x: type === 'contribution-grid' ? 724 : 910, y: type === 'contribution-grid' ? 340 : 318, width: type === 'contribution-grid' ? 574 : 388, height: type === 'contribution-grid' ? 238 : 292, scale: 1, scaleX: 1, scaleY: 1, rotation: 0, originX: type === 'contribution-grid' ? 0 : 0.74, originY: 0.5, opacity: 1, fit: 'contain' }
+  }
+  return { x: 1027, y: 452, width: 250, height: 210, scale: 1, scaleX: 1, scaleY: 1, rotation: 0, originX: 0.5, originY: 0.5, opacity: 1, fit: 'contain' }
 }
 
-function previewRailTextOpacity(preview: MenuPreview | undefined, fallback = 1): number {
-  const content = previewContent(preview)
-  const value = Number(content.railTextOpacity ?? content.railOpacity ?? fallback)
-  return Number.isFinite(value) ? value : fallback
+function resolvedPreviewLayout(preview: MenuPreview | undefined) {
+  const defaults = previewLayoutDefaults(preview)
+  const layout = isRecord(preview?.layout) ? preview.layout as PreviewLayout : {}
+  const uniformScale = cleanNumber(layout.scale, defaults.scale)
+  return {
+    x: cleanNumber(layout.x, defaults.x),
+    y: cleanNumber(layout.y, defaults.y),
+    width: cleanNumber(layout.width, defaults.width),
+    height: cleanNumber(layout.height, defaults.height),
+    scale: uniformScale,
+    scaleX: cleanNumber(layout.scaleX, uniformScale),
+    scaleY: cleanNumber(layout.scaleY, uniformScale),
+    rotation: cleanNumber(layout.rotation, defaults.rotation),
+    originX: cleanNumber(layout.originX, defaults.originX),
+    originY: cleanNumber(layout.originY, defaults.originY),
+    opacity: cleanNumber(layout.opacity, defaults.opacity),
+    fit: cleanString(layout.fit, defaults.fit),
+  }
 }
 
 function rowsFromText(value: string): string[] {
@@ -708,7 +720,9 @@ export function MainMenuConfigEditor({ path, properties }: Props) {
   const configUrl = cleanString(properties.config, DEFAULT_CONFIG_URL)
   const [loadedConfig, setLoadedConfig] = useState<MenuConfig | null>(null)
   const [loadError, setLoadError] = useState<string | null>(null)
-  const [selectedMenu, setSelectedMenu] = useState('main')
+  const [selectedMenu, setSelectedMenu] = useState(() =>
+    cleanString(properties['initial-menu'], 'main'),
+  )
   const [selectedItemIndex, setSelectedItemIndex] = useState(0)
   const [selectedTheme, setSelectedTheme] = useState('blue')
   const [draftMenuId, setDraftMenuId] = useState('main')
@@ -960,20 +974,33 @@ export function MainMenuConfigEditor({ path, properties }: Props) {
   function setPreviewType(type: string) {
     updateItem((item) => {
       const current = previewContent(item.preview)
-      const railText = typeof current.railText === 'string' ? current.railText : undefined
-      const railTextOpacity = Number(current.railTextOpacity ?? current.railOpacity)
-      const railProps = {
-        ...(railText !== undefined ? { railText } : {}),
-        ...(Number.isFinite(railTextOpacity) ? { railTextOpacity } : {}),
-      }
+      const layout = isRecord(current.layout) ? current.layout as PreviewLayout : undefined
       if (type === 'rows') {
-        item.preview = { type, rows: previewRows(current), ...railProps }
+        item.preview = { type, rows: previewRows(current), ...(layout ? { layout } : {}) }
       } else if (type === 'image') {
-        item.preview = { type, src: previewImageSource(current), ...railProps }
+        item.preview = { type, src: previewImageSource(current), ...(layout ? { layout } : {}) }
       } else if (type === 'toggles') {
-        item.preview = { type, label: current.label ?? item.label ?? 'Option', value: current.value ?? 'ON', ...railProps }
+        item.preview = { type, label: current.label ?? item.label ?? 'Option', value: current.value ?? 'ON', ...(layout ? { layout } : {}) }
       } else {
-        item.preview = { type, ...railProps }
+        item.preview = { type, ...(layout ? { layout } : {}) }
+      }
+    })
+  }
+
+  function updatePreviewLayoutField(key: keyof PreviewLayout, value: string | number) {
+    updateItem((item) => {
+      const current = previewContent(item.preview)
+      const layout = {
+        ...(isRecord(current.layout) ? current.layout as PreviewLayout : {}),
+        [key]: value,
+      }
+      if (key === 'scale') {
+        delete layout.scaleX
+        delete layout.scaleY
+      }
+      item.preview = {
+        ...current,
+        layout,
       }
     })
   }
@@ -1023,6 +1050,7 @@ export function MainMenuConfigEditor({ path, properties }: Props) {
     return cleanNumber(layout.rowX?.[index], DEFAULT_LAYOUTS[layoutId]?.rowX?.[index] ?? 0)
   }
   const selectedPreview = selectedItem ? previewContent(selectedItem.preview) : { type: 'empty' }
+  const selectedPreviewLayout = resolvedPreviewLayout(selectedPreview)
   const selectedPreviewRows = previewRows(selectedPreview)
   const sideContentYFallback = selectedPreviewRows.length > 3 ? 404 : DEFAULT_SIDE_PREVIEW.sideContentY
   const sideLineHeightFallback = selectedPreviewRows.length > 4 ? 54 : DEFAULT_SIDE_PREVIEW.sideLineHeight
@@ -1257,25 +1285,29 @@ export function MainMenuConfigEditor({ path, properties }: Props) {
                     </FieldRow>
                   </>
                 )}
-                <FieldRow label="Rail Text">
-                  <TextInput
-                    value={previewRailText(selectedItem.preview, selectedItem.label ?? '')}
-                    onChange={(value) => updateItem((item) => {
-                      item.preview = { ...previewContent(item.preview), railText: value }
-                    })}
-                  />
-                </FieldRow>
-                <FieldRow label="Rail Opacity">
-                  <RangedInput
-                    value={previewRailTextOpacity(selectedItem.preview, 1)}
-                    min={0}
-                    max={1}
-                    step={0.01}
-                    onChange={(value) => updateItem((item) => {
-                      item.preview = { ...previewContent(item.preview), railTextOpacity: value }
-                    })}
-                  />
-                </FieldRow>
+                {!['empty', 'rows'].includes(selectedPreview.type ?? 'empty') && (
+                  <CollapsibleSubsection title="Object Layout" defaultOpen>
+                    <FieldRow label="X">
+                      <RangedInput value={selectedPreviewLayout.x} min={-400} max={1600} step={1} onChange={(value) => updatePreviewLayoutField('x', value)} />
+                    </FieldRow>
+                    <FieldRow label="Y">
+                      <RangedInput value={selectedPreviewLayout.y} min={-400} max={1200} step={1} onChange={(value) => updatePreviewLayoutField('y', value)} />
+                    </FieldRow>
+                    <FieldRow label="Scale">
+                      <RangedInput value={selectedPreviewLayout.scale} min={0.05} max={4} step={0.01} onChange={(value) => updatePreviewLayoutField('scale', value)} />
+                    </FieldRow>
+                    {selectedPreview.type === 'image' && (
+                      <>
+                        <FieldRow label="Rotation">
+                          <RangedInput value={selectedPreviewLayout.rotation} min={-180} max={180} step={0.5} onChange={(value) => updatePreviewLayoutField('rotation', value)} />
+                        </FieldRow>
+                        <FieldRow label="Opacity">
+                          <RangedInput value={selectedPreviewLayout.opacity} min={0} max={1} step={0.01} onChange={(value) => updatePreviewLayoutField('opacity', value)} />
+                        </FieldRow>
+                      </>
+                    )}
+                  </CollapsibleSubsection>
+                )}
               </CollapsibleSubsection>
             </>
           )}
@@ -1552,7 +1584,7 @@ export function MainMenuConfigEditor({ path, properties }: Props) {
         <CollapsibleSubsection title="Back Button">
           <FieldRow label="Back X">
             <RangedInput
-              value={systemNumber('back-button-x', DEFAULT_DETAIL_PREVIEW.backButtonX)}
+              value={systemNumber('back-button-x', DEFAULT_BACK_BUTTON.backButtonX)}
               min={0}
               max={1440}
               step={1}
@@ -1561,7 +1593,7 @@ export function MainMenuConfigEditor({ path, properties }: Props) {
           </FieldRow>
           <FieldRow label="Back Y">
             <RangedInput
-              value={systemNumber('back-button-y', DEFAULT_DETAIL_PREVIEW.backButtonY)}
+              value={systemNumber('back-button-y', DEFAULT_BACK_BUTTON.backButtonY)}
               min={0}
               max={1080}
               step={1}
@@ -2027,14 +2059,6 @@ export function MainMenuConfigEditor({ path, properties }: Props) {
               onChange={(value) => updateSystemProperty('side-panel-opacity', value)}
             />
           </FieldRow>
-          <FieldRow label="Gray Border">
-            <input
-              type="checkbox"
-              checked={systemBoolean('side-frame-visible', DEFAULT_SIDE_PREVIEW.sideFrameVisible)}
-              onChange={(event) => updateSystemProperty('side-frame-visible', event.target.checked)}
-              className="accent-[#4a8fc2]"
-            />
-          </FieldRow>
         </CollapsibleSubsection>
 
         <CollapsibleSubsection title="Rain">
@@ -2143,114 +2167,37 @@ export function MainMenuConfigEditor({ path, properties }: Props) {
               onChange={(value) => updateSystemProperty('side-text-opacity', value)}
             />
           </FieldRow>
+          <CollapsibleSubsection title="Text Animation">
+            <FieldRow label="Sweep Start X">
+              <RangedInput
+                value={systemNumber('side-flash-streak-offset', DEFAULT_SIDE_PREVIEW.sideFlashStreakOffset)}
+                min={-400}
+                max={400}
+                step={1}
+                onChange={(value) => updateSystemProperty('side-flash-streak-offset', value)}
+              />
+            </FieldRow>
+            <FieldRow label="Sweep Travel">
+              <RangedInput
+                value={systemNumber('side-flash-streak-travel', DEFAULT_SIDE_PREVIEW.sideFlashStreakTravel)}
+                min={0}
+                max={600}
+                step={1}
+                onChange={(value) => updateSystemProperty('side-flash-streak-travel', value)}
+              />
+            </FieldRow>
+            <FieldRow label="Left Bar X">
+              <RangedInput
+                value={systemNumber('side-flash-spark-offset', DEFAULT_SIDE_PREVIEW.sideFlashSparkOffset)}
+                min={-400}
+                max={400}
+                step={1}
+                onChange={(value) => updateSystemProperty('side-flash-spark-offset', value)}
+              />
+            </FieldRow>
+          </CollapsibleSubsection>
         </CollapsibleSubsection>
 
-        <CollapsibleSubsection title="Left Rail">
-          <FieldRow label="Visible">
-            <input
-              type="checkbox"
-              checked={systemBoolean('side-rail-visible', DEFAULT_SIDE_PREVIEW.sideRailVisible)}
-              onChange={(event) => updateSystemProperty('side-rail-visible', event.target.checked)}
-              className="accent-[#4a8fc2]"
-            />
-          </FieldRow>
-          <FieldRow label="Rail Color">
-            <ColorInput value={menuThemingString('railTextColor')} onChange={(value) => updateMenuThemingField('railTextColor', value)} />
-          </FieldRow>
-          <FieldRow label="Rail X">
-            <RangedInput
-              value={systemNumber('side-rail-x', DEFAULT_SIDE_PREVIEW.sideRailX)}
-              min={0}
-              max={1440}
-              step={1}
-              onChange={(value) => updateSystemProperty('side-rail-x', value)}
-            />
-          </FieldRow>
-          <FieldRow label="Rail Y">
-            <RangedInput
-              value={systemNumber('side-rail-y', DEFAULT_SIDE_PREVIEW.sideRailY)}
-              min={0}
-              max={1080}
-              step={1}
-              onChange={(value) => updateSystemProperty('side-rail-y', value)}
-            />
-          </FieldRow>
-          <FieldRow label="Rail Rotation">
-            <RangedInput
-              value={systemNumber('side-rail-rotation', DEFAULT_SIDE_PREVIEW.sideRailRotation)}
-              min={-180}
-              max={180}
-              step={1}
-              onChange={(value) => updateSystemProperty('side-rail-rotation', value)}
-            />
-          </FieldRow>
-          <FieldRow label="Rail Font">
-            <RangedInput
-              value={systemNumber('side-rail-font-size', DEFAULT_SIDE_PREVIEW.sideRailFontSize)}
-              min={12}
-              max={80}
-              step={1}
-              onChange={(value) => updateSystemProperty('side-rail-font-size', value)}
-            />
-          </FieldRow>
-        </CollapsibleSubsection>
-
-        <CollapsibleSubsection title="Detail Object">
-          <FieldRow label="Detail X">
-            <RangedInput
-              value={systemNumber('detail-x', DEFAULT_DETAIL_PREVIEW.detailX)}
-              min={0}
-              max={1440}
-              step={1}
-              onChange={(value) => updateSystemProperty('detail-x', value)}
-            />
-          </FieldRow>
-          <FieldRow label="Detail Y">
-            <RangedInput
-              value={systemNumber('detail-y', DEFAULT_DETAIL_PREVIEW.detailY)}
-              min={0}
-              max={1080}
-              step={1}
-              onChange={(value) => updateSystemProperty('detail-y', value)}
-            />
-          </FieldRow>
-          <FieldRow label="Detail W">
-            <RangedInput
-              value={systemNumber('detail-width', DEFAULT_DETAIL_PREVIEW.detailWidth)}
-              min={160}
-              max={900}
-              step={1}
-              onChange={(value) => updateSystemProperty('detail-width', value)}
-            />
-          </FieldRow>
-          <FieldRow label="Wide X">
-            <RangedInput
-              value={systemNumber('detail-wide-x', DEFAULT_DETAIL_PREVIEW.detailWideX)}
-              min={0}
-              max={1440}
-              step={1}
-              onChange={(value) => updateSystemProperty('detail-wide-x', value)}
-            />
-          </FieldRow>
-          <FieldRow label="Wide Y">
-            <RangedInput
-              value={systemNumber('detail-wide-y', DEFAULT_DETAIL_PREVIEW.detailWideY)}
-              min={0}
-              max={1080}
-              step={1}
-              onChange={(value) => updateSystemProperty('detail-wide-y', value)}
-            />
-          </FieldRow>
-          <FieldRow label="Wide W">
-            <RangedInput
-              value={systemNumber('detail-wide-width', DEFAULT_DETAIL_PREVIEW.detailWideWidth)}
-              min={240}
-              max={1000}
-              step={1}
-              onChange={(value) => updateSystemProperty('detail-wide-width', value)}
-            />
-          </FieldRow>
-        </CollapsibleSubsection>
       </InspectorSection>
 
       <InspectorSection title="Global Defaults" collapsible defaultOpen={false}>
@@ -2279,9 +2226,6 @@ export function MainMenuConfigEditor({ path, properties }: Props) {
             </FieldRow>
             <FieldRow label="Side Edge">
               <ColorInput value={activeTheme.sideEdge ?? ''} onChange={(value) => updateThemeField('sideEdge', value)} />
-            </FieldRow>
-            <FieldRow label="Side Frame">
-              <ColorInput value={activeTheme.sideFrame ?? ''} onChange={(value) => updateThemeField('sideFrame', value)} />
             </FieldRow>
           </CollapsibleSubsection>
         </CollapsibleSubsection>
