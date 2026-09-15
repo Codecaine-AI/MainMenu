@@ -2013,6 +2013,33 @@ export function MainMenuConfigEditor({ path, properties }: Props) {
       </InspectorSection>
 
       <InspectorSection title="Sidebar" collapsible defaultOpen={false}>
+        <CollapsibleSubsection title="Razor Numbers" defaultOpen>
+          <label className="flex items-center gap-2 text-xs">
+            <input
+              type="checkbox"
+              checked={systemBoolean('razor-digits-enabled', true)}
+              onChange={(event) => updateSystemProperty('razor-digits-enabled', event.target.checked)}
+            />
+            Animated Numbers
+          </label>
+          <label className="flex items-center gap-2 text-xs">
+            <input
+              type="checkbox"
+              checked={systemBoolean('razor-digits-escape', true)}
+              onChange={(event) => updateSystemProperty('razor-digits-escape', event.target.checked)}
+            />
+            Digits fall beyond drip tips
+          </label>
+          <FieldRow label="Speed">
+            <RangedInput
+              value={systemNumber('razor-digits-speed', 1)}
+              min={0.1}
+              max={5}
+              step={0.1}
+              onChange={(value) => updateSystemProperty('razor-digits-speed', value)}
+            />
+          </FieldRow>
+        </CollapsibleSubsection>
         <CollapsibleSubsection title="Panel" defaultOpen>
           <FieldRow label="Panel X">
             <RangedInput
