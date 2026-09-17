@@ -184,6 +184,12 @@ export interface ManifestColorProperty {
   description?: string
 }
 
+export interface ManifestFontProperty {
+  type: 'font'
+  default?: string
+  description?: string
+}
+
 export interface ManifestBooleanProperty {
   type: 'boolean'
   default?: boolean
@@ -201,6 +207,7 @@ export type ManifestProperty =
   | ManifestNumberProperty
   | ManifestStringProperty
   | ManifestColorProperty
+  | ManifestFontProperty
   | ManifestBooleanProperty
   | ManifestEnumProperty
 
@@ -242,6 +249,9 @@ export type PostEffectBlend = 'screen' | 'overlay' | 'soft-light' | 'multiply' |
 
 export interface GrainSettings {
   enabled: boolean
+  animated: boolean
+  speed: number
+  colored: boolean
   opacity: number
   frequency: number
   contrast: number

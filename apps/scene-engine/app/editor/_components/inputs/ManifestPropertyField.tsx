@@ -1,6 +1,7 @@
 'use client'
 
 import { RangedInput } from './RangedInput'
+import { FontSelect } from './FontSelect'
 import type { ManifestProperty } from '@/types/scene'
 
 interface Props {
@@ -75,6 +76,15 @@ export function ManifestPropertyField({ name: _name, schema, value, onChange }: 
         checked={Boolean(getEffectiveValue(value, schema))}
         onChange={(e) => onChange(e.target.checked)}
         className="accent-[#4a8fc2]"
+      />
+    )
+  }
+
+  if (schema.type === 'font') {
+    return (
+      <FontSelect
+        value={String(getEffectiveValue(value, schema) ?? '')}
+        onChange={onChange}
       />
     )
   }

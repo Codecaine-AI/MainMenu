@@ -3,6 +3,7 @@ export type PropertyType =
   | 'string'
   | 'boolean'
   | 'color'
+  | 'font'
   | 'select'
   | 'blend'
   | 'fit'
@@ -37,6 +38,13 @@ export interface BooleanPropertyDef {
 
 export interface ColorPropertyDef {
   type: 'color'
+  label: string
+  description?: string
+  default?: string
+}
+
+export interface FontPropertyDef {
+  type: 'font'
   label: string
   description?: string
   default?: string
@@ -83,6 +91,7 @@ export type PropertyDef =
   | StringPropertyDef
   | BooleanPropertyDef
   | ColorPropertyDef
+  | FontPropertyDef
   | SelectPropertyDef
   | BlendPropertyDef
   | FitPropertyDef

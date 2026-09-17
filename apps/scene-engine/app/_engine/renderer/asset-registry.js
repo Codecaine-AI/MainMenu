@@ -5,6 +5,13 @@ let activeRegistryKey = null;
 const registryCache = new Map();
 const loadPromises = new Map();
 
+function activateRegistryKey(key) {
+  if (!registryCache.has(key)) return null;
+  activeRegistryKey = key;
+  mergedRegistry = registryCache.get(key);
+  return mergedRegistry;
+}
+
 async function fetchManifest(url) {
   try {
     const res = await fetch(resolveRuntimeUrl(url));
@@ -78,13 +85,25 @@ function registryUrls(options = {}) {
 
 export async function loadRegistry(options = {}) {
   const urls = registryUrls(options);
-  if (registryCache.has(urls.key)) {
-    activeRegistryKey = urls.key;
-    mergedRegistry = registryCache.get(urls.key);
-    return mergedRegistry;
+  const force = options.force === true;
+  const activate = options.activate !== false;
+  if (!force && registryCache.has(urls.key)) {
+    return activate ? activateRegistryKey(urls.key) : registryCache.get(urls.key);
   }
-  if (loadPromises.has(urls.key)) return loadPromises.get(urls.key);
+  const previousLoad = loadPromises.get(urls.key);
+  if (!force && previousLoad) {
+    const loaded = await previousLoad;
+    return activate ? activateRegistryKey(urls.key) : loaded;
+  }
   const loadPromise = (async () => {
+    if (force && previousLoad) {
+      try {
+        await previousLoad;
+      } catch {
+        // A forced refresh should still retry after an earlier load failed.
+      }
+    }
+    if (force) registryCache.delete(urls.key);
     const [assets, modules, ...fontRegistries] = await Promise.all([
       fetchManifest(urls.assets),
       fetchManifest(urls.modules),
@@ -109,13 +128,24 @@ export async function loadRegistry(options = {}) {
       }),
     );
     registryCache.set(urls.key, merged);
-    activeRegistryKey = urls.key;
-    mergedRegistry = merged;
-    return mergedRegistry;
+    if (activate) activateRegistryKey(urls.key);
+    return merged;
   })();
   loadPromises.set(urls.key, loadPromise);
-  loadPromise.finally(() => loadPromises.delete(urls.key));
+  const clearLoad = () => {
+    if (loadPromises.get(urls.key) === loadPromise) loadPromises.delete(urls.key);
+  };
+  void loadPromise.then(clearLoad, clearLoad);
   return loadPromise;
+}
+
+export function activateRegistry(options = {}, registry) {
+  if (registry) {
+    activeRegistryKey = registryUrls(options).key;
+    mergedRegistry = registry;
+    return mergedRegistry;
+  }
+  return activateRegistryKey(registryUrls(options).key);
 }
 
 export function resolveAsset(id) {
@@ -132,7 +162,6 @@ export function resolveAsset(id) {
 }
 
 export function getRegistry() {
-  if (activeRegistryKey && registryCache.has(activeRegistryKey)) return registryCache.get(activeRegistryKey);
   return mergedRegistry;
 }
 

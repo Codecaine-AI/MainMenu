@@ -4,6 +4,9 @@ export const DEFAULT_POST_PROCESSING: PostProcessingSettings = {
   enabled: true,
   grain: {
     enabled: false,
+    animated: false,
+    speed: 12,
+    colored: false,
     opacity: 0.075,
     frequency: 0.8,
     contrast: 1.3,
@@ -59,7 +62,10 @@ export function normalizePostProcessing(input: unknown): PostProcessingSettings 
     enabled: booleanOrDefault(source.enabled, DEFAULT_POST_PROCESSING.enabled),
     grain: {
       enabled: booleanOrDefault(grain.enabled, DEFAULT_POST_PROCESSING.grain.enabled),
-      opacity: clampNumber(grain.opacity, 0, 0.35, DEFAULT_POST_PROCESSING.grain.opacity),
+      animated: booleanOrDefault(grain.animated, DEFAULT_POST_PROCESSING.grain.animated),
+      speed: clampNumber(grain.speed, 1, 60, DEFAULT_POST_PROCESSING.grain.speed),
+      colored: booleanOrDefault(grain.colored, DEFAULT_POST_PROCESSING.grain.colored),
+      opacity: clampNumber(grain.opacity, 0, 1, DEFAULT_POST_PROCESSING.grain.opacity),
       frequency: clampNumber(grain.frequency, 0.25, 1.6, DEFAULT_POST_PROCESSING.grain.frequency),
       contrast: clampNumber(grain.contrast, 0.55, 2.2, DEFAULT_POST_PROCESSING.grain.contrast),
       blend: blendOrDefault(grain.blend),

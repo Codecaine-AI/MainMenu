@@ -1,8 +1,7 @@
 'use client'
 
-import { useMemo } from 'react'
-import { fontEntriesFromRegistry } from '@/renderer/font-registry'
 import { RangedInput } from './inputs/RangedInput'
+import { FontSelect } from './inputs/FontSelect'
 import { InspectorSection, FieldRow } from './inputs/InspectorSection'
 import type { Registry } from '@/types/scene'
 
@@ -18,15 +17,7 @@ const LETTER_SPACING = { min: -20, max: 80, step: 0.5 }
 const FONT_WEIGHTS = [100, 200, 300, 400, 500, 600, 700, 800, 900]
 const TEXT_ALIGNS = ['left', 'center', 'right'] as const
 
-export function TextSection({ properties, registry, onChange }: Props) {
-  const fontFamilies = useMemo(() => {
-    const families = new Set(['FolkPro'])
-    for (const font of fontEntriesFromRegistry(registry)) {
-      families.add(font.family)
-    }
-    return [...families].sort((a, b) => a.localeCompare(b))
-  }, [registry])
-
+export function TextSection({ properties, onChange }: Props) {
   return (
     <InspectorSection title="Text">
       <FieldRow label="Text">
@@ -37,15 +28,10 @@ export function TextSection({ properties, registry, onChange }: Props) {
         />
       </FieldRow>
       <FieldRow label="Font">
-        <select
+        <FontSelect
           value={String(properties.fontFamily ?? 'FolkPro')}
-          onChange={(e) => onChange('fontFamily', e.target.value)}
-          className="w-full bg-[#222] border border-[#333] text-gray-300 text-[11px] font-mono px-1 py-[3px] rounded-sm focus:border-[#4a8fc2] focus:outline-none"
-        >
-          {fontFamilies.map((family) => (
-            <option key={family} value={family}>{family}</option>
-          ))}
-        </select>
+          onChange={(value) => onChange('fontFamily', value)}
+        />
       </FieldRow>
       <FieldRow label="Size">
         <RangedInput

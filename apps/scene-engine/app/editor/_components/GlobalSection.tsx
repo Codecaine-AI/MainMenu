@@ -128,11 +128,38 @@ export function GlobalSettingsSection() {
             className="accent-[#4a8fc2]"
           />
         </FieldRow>
+        <FieldRow label="Live Static">
+          <input
+            type="checkbox"
+            checked={settings.grain.animated}
+            onChange={(event) => updateGrain({ animated: event.target.checked })}
+            className="accent-[#4a8fc2]"
+          />
+        </FieldRow>
+        <FieldRow label="Colored">
+          <input
+            type="checkbox"
+            checked={settings.grain.colored}
+            onChange={(event) => updateGrain({ colored: event.target.checked })}
+            className="accent-[#4a8fc2]"
+          />
+        </FieldRow>
+        {settings.grain.animated && (
+          <FieldRow label="Speed">
+            <RangedInput
+              value={settings.grain.speed}
+              min={1}
+              max={60}
+              step={1}
+              onChange={(value) => updateGrain({ speed: value })}
+            />
+          </FieldRow>
+        )}
         <FieldRow label="Intensity">
           <RangedInput
             value={settings.grain.opacity}
             min={0}
-            max={0.35}
+            max={1}
             step={0.005}
             onChange={(value) => updateGrain({ opacity: value })}
           />

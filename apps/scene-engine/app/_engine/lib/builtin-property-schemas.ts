@@ -169,6 +169,9 @@ export function inferPropertyDef(key: string, value: unknown): PropertyDef {
   if (typeof value === 'boolean') {
     return { type: 'boolean', label: key }
   }
+  if (typeof value === 'string' && /font[-_ ]?family/i.test(key)) {
+    return { type: 'font', label: key }
+  }
   if (looksLikeColor(key, value)) {
     return { type: 'color', label: key }
   }

@@ -13,6 +13,7 @@ import { AnchorSelect } from './inputs/AnchorSelect'
 import { AssetSwapDropdown } from './AssetSwapDropdown'
 import { EventsSection } from './inputs/EventsSection'
 import { ManifestPropertyField } from './inputs/ManifestPropertyField'
+import { GlyphBakeSection } from './GlyphBakeSection'
 import { MainMenuConfigEditor } from './MainMenuConfigEditor'
 import { SlotsSection } from './SlotsSection'
 import { TextSection } from './TextSection'
@@ -222,6 +223,7 @@ export function LayerForm({ layer, path }: Props) {
 
   const assetId = layer.asset as string | undefined
   const isMainMenuSystem = layerType === 'component' && assetId === 'main-menu-system'
+  const isGlyphGroup = layerType === 'glyph-group'
   const containerEntry = assetId && registry ? registry[assetId] : undefined
   const containerType = containerEntry?.type
   const assetType = containerType && isAssetType(containerType) ? containerType : null
@@ -257,9 +259,10 @@ export function LayerForm({ layer, path }: Props) {
         ([k]) =>
           !declaredKeys.has(k) &&
           !(isText && TEXT_PROPERTY_KEYS.has(k)) &&
-          !(isMainMenuSystem && k === 'menu-config'),
+          !(isMainMenuSystem && k === 'menu-config') &&
+          !(isGlyphGroup && k === 'logo-bake'),
       ),
-    [props, declaredKeys, isText, isMainMenuSystem],
+    [props, declaredKeys, isText, isMainMenuSystem, isGlyphGroup],
   )
   const orphanKeySignature = orphans.map(([k]) => k).join(',')
   const visibleSchemaSections = useMemo(
@@ -582,7 +585,11 @@ export function LayerForm({ layer, path }: Props) {
         </InspectorSection>
       )}
 
-      {layerType === 'glyph-group' && Array.isArray(layer.slots) && (layer.slots as Slot[]).length > 0 && (
+      {isGlyphGroup && (
+        <GlyphBakeSection layer={layer} path={path} properties={props} />
+      )}
+
+      {isGlyphGroup && Array.isArray(layer.slots) && (layer.slots as Slot[]).length > 0 && (
         <SlotsSection slots={layer.slots as Slot[]} path={path} />
       )}
 

@@ -7,6 +7,12 @@
       "runtimeArgs": ["../codecaine-site/server.mjs"],
       "port": 4173,
       "autoPort": true
+    },
+    {
+      "name": "scene-engine",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "dev", "--prefix", "apps/scene-engine"],
+      "port": 3000
     }
   ]
 }

@@ -7,6 +7,7 @@ import { BlendSelect } from './inputs/BlendSelect'
 import { FitSelect } from './inputs/FitSelect'
 import { ClipSelect } from './inputs/ClipSelect'
 import { AnchorSelect } from './inputs/AnchorSelect'
+import { FontSelect } from './inputs/FontSelect'
 import { DescriptionPopover } from './DescriptionPopover'
 
 interface Props {
@@ -52,6 +53,10 @@ function renderInput(def: PropertyDef, value: unknown, onChange: (next: unknown)
         className="w-full bg-[#222] border border-[#333] text-gray-300 text-[11px] font-mono px-1 py-[3px] rounded-sm focus:border-[#4a8fc2] focus:outline-none"
       />
     )
+  }
+
+  if (def.type === 'font') {
+    return <FontSelect value={String(current ?? '')} onChange={onChange} />
   }
 
   if (def.type === 'color') {
