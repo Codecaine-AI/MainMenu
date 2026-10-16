@@ -1,0 +1,860 @@
+{
+  "schemaVersion": 1,
+  "id": "scene-engine-10-system-design-05-project-model",
+  "title": "Project Model",
+  "root": "b-05-project-model-root-34",
+  "blocks": {
+    "b-05-project-model-root-34": {
+      "id": "b-05-project-model-root-34",
+      "type": "paragraph",
+      "props": {
+        "concepts": [
+          "project-json",
+          "multi-scene",
+          "entry-scene",
+          "navigation",
+          "stage"
+        ],
+        "covers": "The project manifest — how multiple scenes form a deliverable site, entry scene, navigation between scenes."
+      },
+      "children": [
+        "b-05-project-model-a-project-is-a-colle-2",
+        "b-05-project-model-divider-3",
+        "b-05-project-model-layout-4",
+        "b-05-project-model-code-5",
+        "b-05-project-model-the-scene-engine-opens-p-6",
+        "b-05-project-model-the-local-catalog-file-i-7",
+        "b-05-project-model-project-json-8",
+        "b-05-project-model-json-9",
+        "b-05-project-model-field-required-10-tbl",
+        "b-05-project-model-name-on-each-scene-ref-11",
+        "b-05-project-model-what-the-project-manifes-12",
+        "b-05-project-model-no-global-appearance-c-13",
+        "b-05-project-model-no-asset-registry-asset-14",
+        "b-05-project-model-no-theme-no-styles-no-15",
+        "b-05-project-model-the-manifest-stays-minim-16",
+        "b-05-project-model-scene-discovery-17",
+        "b-05-project-model-project-discovery-starts-18",
+        "b-05-project-model-catalog-projects-en-19",
+        "b-05-project-model-manifest-inventory-20",
+        "b-05-project-model-diagnostics-missing-21",
+        "b-05-project-model-app-engine-lib-scenes-22",
+        "b-05-project-model-navigation-between-scene-23",
+        "b-05-project-model-inside-a-scene-an-event-24",
+        "b-05-project-model-the-dev-environment-work-25",
+        "b-05-project-model-scene-gates-26",
+        "b-05-project-model-a-scene-reference-may-in-27",
+        "b-05-project-model-when-boot-encounters-the-28",
+        "b-05-project-model-gate-scenes-typically-co-29",
+        "b-05-project-model-the-reverse-lookup-also-30",
+        "b-05-project-model-this-is-a-one-level-mech-31",
+        "b-05-project-model-export-surface-32",
+        "b-05-project-model-the-export-pipeline-50-33"
+      ]
+    },
+    "b-05-project-model-a-project-is-a-colle-2": {
+      "id": "b-05-project-model-a-project-is-a-colle-2",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "A "
+        },
+        {
+          "insert": "project",
+          "attributes": {
+            "bold": true
+          }
+        },
+        {
+          "insert": " is a collection of scenes (pages) that ship together as one site. Each scene is a single-viewport page; navigation events route between scenes the way clicking a link routes between pages on a normal website. The project manifest is intentionally thin: it ties scenes together and declares the shared stage, nothing more."
+        }
+      ],
+      "children": []
+    },
+    "b-05-project-model-divider-3": {
+      "id": "b-05-project-model-divider-3",
+      "type": "divider",
+      "props": {},
+      "children": []
+    },
+    "b-05-project-model-layout-4": {
+      "id": "b-05-project-model-layout-4",
+      "type": "heading",
+      "props": {
+        "level": 2
+      },
+      "text": [
+        {
+          "insert": "Layout"
+        }
+      ],
+      "children": []
+    },
+    "b-05-project-model-code-5": {
+      "id": "b-05-project-model-code-5",
+      "type": "code",
+      "props": {},
+      "text": [
+        {
+          "insert": "workspace.catalog.json\n└── projects[]                ← project ids and root folders\n\ncodecaine-site/\n├── ProjectSettings/\n│   ├── project.json          ← project manifest\n│   └── registries/\n│       ├── assets.json\n│       └── modules.json\n├── Assets/\n│   ├── Scenes/\n│   │   ├── title/scene.json\n│   │   └── menu/scene.json\n│   ├── Media/\n│   │   ├── audio/\n│   │   ├── image/\n│   │   ├── video/\n│   │   └── glyph/\n│   ├── Modules/\n│   │   ├── components/\n│   │   └── effects/\n│   └── Fonts/\n├── Library/\n└── Builds/"
+        }
+      ],
+      "children": []
+    },
+    "b-05-project-model-the-scene-engine-opens-p-6": {
+      "id": "b-05-project-model-the-scene-engine-opens-p-6",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "The scene engine opens project roots from a file-backed workspace catalog. A project owns the scenes, registries, media, modules, and fonts needed to author and export it. Engine-owned files are renderer/editor primitives and APIs that interpret the project data."
+        }
+      ],
+      "children": []
+    },
+    "b-05-project-model-the-local-catalog-file-i-7": {
+      "id": "b-05-project-model-the-local-catalog-file-i-7",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "The local catalog file is "
+        },
+        {
+          "insert": "workspace.catalog.json",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " beside the scene-engine app, with "
+        },
+        {
+          "insert": "SCENE_ENGINE_WORKSPACE_CATALOG",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " available for alternate locations. Relative project roots resolve relative to the catalog file, not the process working directory. "
+        },
+        {
+          "insert": "workspace.catalog.example.json",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " is committed; the local catalog is gitignored."
+        }
+      ],
+      "children": []
+    },
+    "b-05-project-model-project-json-8": {
+      "id": "b-05-project-model-project-json-8",
+      "type": "heading",
+      "props": {
+        "level": 2
+      },
+      "text": [
+        {
+          "insert": "project.json"
+        }
+      ],
+      "children": []
+    },
+    "b-05-project-model-json-9": {
+      "id": "b-05-project-model-json-9",
+      "type": "code",
+      "props": {
+        "language": "json"
+      },
+      "text": [
+        {
+          "insert": "{\n  \"id\": \"codecaine\",\n  \"name\": \"Codecaine\",\n  \"entry\": \"loading\",\n  \"scenes\": [\n    { \"id\": \"loading\", \"name\": \"Loading Screen\", \"gates\": \"title\" },\n    { \"id\": \"title\", \"name\": \"Title Screen\" },\n    { \"id\": \"menu\", \"name\": \"Main Menu\" }\n  ],\n  \"stage\": { \"width\": 1440, \"height\": 1080 }\n}"
+        }
+      ],
+      "children": []
+    },
+    "b-05-project-model-field-required-10-tbl": {
+      "id": "b-05-project-model-field-required-10-tbl",
+      "type": "structured-table",
+      "props": {
+        "columns": [
+          "Field",
+          "Required",
+          "Notes"
+        ],
+        "rows": [
+          [
+            [
+              {
+                "insert": "id",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ],
+            "yes",
+            [
+              {
+                "insert": "Project identifier. Becomes the export zip filename ("
+              },
+              {
+                "insert": "<id>.zip",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": ")."
+              }
+            ]
+          ],
+          [
+            [
+              {
+                "insert": "name",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ],
+            "yes",
+            "Human-readable display name."
+          ],
+          [
+            [
+              {
+                "insert": "entry",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ],
+            "yes",
+            [
+              {
+                "insert": "Scene "
+              },
+              {
+                "insert": "id",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": " that loads first when the export boots. Must be present in "
+              },
+              {
+                "insert": "scenes",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": "."
+              }
+            ]
+          ],
+          [
+            [
+              {
+                "insert": "scenes",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ],
+            "yes",
+            [
+              {
+                "insert": "Ordered list of "
+              },
+              {
+                "insert": "{ id, name?, gates? }",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": ". Determines order in the dashboard and the export bundle."
+              }
+            ]
+          ],
+          [
+            [
+              {
+                "insert": "stage",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ],
+            "yes",
+            "Design canvas size shared across scenes. Renderer scales to the viewport at runtime."
+          ]
+        ]
+      },
+      "children": []
+    },
+    "b-05-project-model-name-on-each-scene-ref-11": {
+      "id": "b-05-project-model-name-on-each-scene-ref-11",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "name",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " on each scene reference is optional; if absent, the dashboard falls back to the scene's own "
+        },
+        {
+          "insert": "name",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " field, then to its "
+        },
+        {
+          "insert": "id",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ".\n"
+        },
+        {
+          "insert": "gates",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " on a scene reference is an optional scene id: the id of another scene that this scene gates (preloads before transitioning to). When present, boot renders this scene first, preloads the target scene's assets with progress reporting, then transitions to the target."
+        }
+      ],
+      "children": []
+    },
+    "b-05-project-model-what-the-project-manifes-12": {
+      "id": "b-05-project-model-what-the-project-manifes-12",
+      "type": "heading",
+      "props": {
+        "level": 2
+      },
+      "text": [
+        {
+          "insert": "What the Project Manifest Does Not Carry"
+        }
+      ],
+      "children": []
+    },
+    "b-05-project-model-no-global-appearance-c-13": {
+      "id": "b-05-project-model-no-global-appearance-c-13",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "No global appearance / color grading. Color grading lives at the "
+        },
+        {
+          "insert": "scene level",
+          "attributes": {
+            "reference": {
+              "kind": "doc",
+              "path": "10-scene-engine/10-system-design/10-scene-data-model",
+              "section": "top-level-shape",
+              "label": "scene level"
+            }
+          }
+        },
+        {
+          "insert": " ("
+        },
+        {
+          "insert": "scene.appearance",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ") or per-object."
+        }
+      ],
+      "children": []
+    },
+    "b-05-project-model-no-asset-registry-asset-14": {
+      "id": "b-05-project-model-no-asset-registry-asset-14",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "No asset registry. Assets and modules are discovered from the project-local registries in "
+        },
+        {
+          "insert": "ProjectSettings/registries/",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": "."
+        }
+      ],
+      "children": []
+    },
+    "b-05-project-model-no-theme-no-styles-no-15": {
+      "id": "b-05-project-model-no-theme-no-styles-no-15",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "No theme, no styles, no shared layout. Scenes are independently composed."
+        }
+      ],
+      "children": []
+    },
+    "b-05-project-model-the-manifest-stays-minim-16": {
+      "id": "b-05-project-model-the-manifest-stays-minim-16",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "The manifest stays minimal so projects don't accumulate global config that some scenes use and others ignore."
+        }
+      ],
+      "children": []
+    },
+    "b-05-project-model-scene-discovery-17": {
+      "id": "b-05-project-model-scene-discovery-17",
+      "type": "heading",
+      "props": {
+        "level": 2
+      },
+      "text": [
+        {
+          "insert": "Scene Discovery"
+        }
+      ],
+      "children": []
+    },
+    "b-05-project-model-project-discovery-starts-18": {
+      "id": "b-05-project-model-project-discovery-starts-18",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "Project discovery starts with the workspace catalog:"
+        }
+      ],
+      "children": []
+    },
+    "b-05-project-model-catalog-projects-en-19": {
+      "id": "b-05-project-model-catalog-projects-en-19",
+      "type": "list-item",
+      "props": {
+        "ordered": true
+      },
+      "text": [
+        {
+          "insert": "Catalog projects",
+          "attributes": {
+            "bold": true
+          }
+        },
+        {
+          "insert": ": enabled catalog entries point at external project roots. The manifest lives at "
+        },
+        {
+          "insert": "ProjectSettings/project.json",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ", and scene files live under "
+        },
+        {
+          "insert": "Assets/Scenes/<scene-id>/scene.json",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": "."
+        }
+      ],
+      "children": []
+    },
+    "b-05-project-model-manifest-inventory-20": {
+      "id": "b-05-project-model-manifest-inventory-20",
+      "type": "list-item",
+      "props": {
+        "ordered": true
+      },
+      "text": [
+        {
+          "insert": "Manifest inventory",
+          "attributes": {
+            "bold": true
+          }
+        },
+        {
+          "insert": ": "
+        },
+        {
+          "insert": "ProjectSettings/project.json",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " lists the scenes that the dashboard, editor, preview, and export surfaces should expose."
+        }
+      ],
+      "children": []
+    },
+    "b-05-project-model-diagnostics-missing-21": {
+      "id": "b-05-project-model-diagnostics-missing-21",
+      "type": "list-item",
+      "props": {
+        "ordered": true
+      },
+      "text": [
+        {
+          "insert": "Diagnostics",
+          "attributes": {
+            "bold": true
+          }
+        },
+        {
+          "insert": ": missing catalog roots or unreadable manifests are reported as workspace diagnostics rather than silently falling back to app-local data."
+        }
+      ],
+      "children": []
+    },
+    "b-05-project-model-app-engine-lib-scenes-22": {
+      "id": "b-05-project-model-app-engine-lib-scenes-22",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "app/_engine/lib/scenes.ts",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " exposes "
+        },
+        {
+          "insert": "discoverProjects()",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ", "
+        },
+        {
+          "insert": "loadProject(projectId)",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ", "
+        },
+        {
+          "insert": "projectRoot(projectId)",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ", and "
+        },
+        {
+          "insert": "discoverScenes(projectId)",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " for the dashboard, project page, scene APIs, and export route."
+        }
+      ],
+      "children": []
+    },
+    "b-05-project-model-navigation-between-scene-23": {
+      "id": "b-05-project-model-navigation-between-scene-23",
+      "type": "heading",
+      "props": {
+        "level": 2
+      },
+      "text": [
+        {
+          "insert": "Navigation Between Scenes"
+        }
+      ],
+      "children": []
+    },
+    "b-05-project-model-inside-a-scene-an-event-24": {
+      "id": "b-05-project-model-inside-a-scene-an-event-24",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "Inside a scene, an event with "
+        },
+        {
+          "insert": "action: \"navigate\"",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " and "
+        },
+        {
+          "insert": "target: \"<scene-id>\"",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " navigates to another scene in the project. In the export bundle, the renderer registers "
+        },
+        {
+          "insert": "window.MELEE_navigate(sceneId)",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " and the click handler calls it. Page-mode exports perform real static-page navigation to "
+        },
+        {
+          "insert": "<scene-id>/index.html",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": "; runtime scene re-rendering remains available as a fallback for single-page previews."
+        }
+      ],
+      "children": []
+    },
+    "b-05-project-model-the-dev-environment-work-25": {
+      "id": "b-05-project-model-the-dev-environment-work-25",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "The dev environment works the same way conceptually, but routing carries the active project in the query string: "
+        },
+        {
+          "insert": "/scenes/<scene-id>?project=<project-id>",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " for preview and "
+        },
+        {
+          "insert": "/editor?project=<project-id>&scene=<scene-id>",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " for editing. The editor still views one scene at a time and disables runtime events so clicks select layers instead of navigating."
+        }
+      ],
+      "children": []
+    },
+    "b-05-project-model-scene-gates-26": {
+      "id": "b-05-project-model-scene-gates-26",
+      "type": "heading",
+      "props": {
+        "level": 2
+      },
+      "text": [
+        {
+          "insert": "Scene Gates"
+        }
+      ],
+      "children": []
+    },
+    "b-05-project-model-a-scene-reference-may-in-27": {
+      "id": "b-05-project-model-a-scene-reference-may-in-27",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "A scene reference may include "
+        },
+        {
+          "insert": "\"gates\": \"<target-scene-id>\"",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " to declare that this scene is a loading gate for the target."
+        }
+      ],
+      "children": []
+    },
+    "b-05-project-model-when-boot-encounters-the-28": {
+      "id": "b-05-project-model-when-boot-encounters-the-28",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "When boot encounters the entry scene, or any scene navigated to that has a gate, it renders the gate scene first, preloads the target's assets via "
+        },
+        {
+          "insert": "/scenes/<id>/assets.json",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ", and transitions once loading completes."
+        }
+      ],
+      "children": []
+    },
+    "b-05-project-model-gate-scenes-typically-co-29": {
+      "id": "b-05-project-model-gate-scenes-typically-co-29",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "Gate scenes typically contain a loading dialog component with a progress bar that fills via "
+        },
+        {
+          "insert": "setProgress(fraction)",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": "."
+        }
+      ],
+      "children": []
+    },
+    "b-05-project-model-the-reverse-lookup-also-30": {
+      "id": "b-05-project-model-the-reverse-lookup-also-30",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "The reverse lookup also works: if you navigate directly to "
+        },
+        {
+          "insert": "/title",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " and a gate exists for it, the gate is shown first."
+        }
+      ],
+      "children": []
+    },
+    "b-05-project-model-this-is-a-one-level-mech-31": {
+      "id": "b-05-project-model-this-is-a-one-level-mech-31",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "This is a one-level mechanism: gates don't chain."
+        }
+      ],
+      "children": []
+    },
+    "b-05-project-model-export-surface-32": {
+      "id": "b-05-project-model-export-surface-32",
+      "type": "heading",
+      "props": {
+        "level": 2
+      },
+      "text": [
+        {
+          "insert": "Export Surface"
+        }
+      ],
+      "children": []
+    },
+    "b-05-project-model-the-export-pipeline-50-33": {
+      "id": "b-05-project-model-the-export-pipeline-50-33",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "The "
+        },
+        {
+          "insert": "export pipeline",
+          "attributes": {
+            "reference": {
+              "kind": "doc",
+              "path": "10-scene-engine/10-system-design/50-build-output",
+              "label": "export pipeline"
+            }
+          }
+        },
+        {
+          "insert": " resolves "
+        },
+        {
+          "insert": "<project-id>",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " through the workspace catalog and reads "
+        },
+        {
+          "insert": "ProjectSettings/project.json",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " to decide which scenes go into the standalone bundle. Scenes not listed in "
+        },
+        {
+          "insert": "project.scenes",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " are excluded from the export even if they exist on disk. This makes the selected project's manifest the authoritative inventory of what ships."
+        }
+      ],
+      "children": []
+    }
+  }
+}

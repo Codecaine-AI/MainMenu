@@ -1,0 +1,1167 @@
+{
+  "schemaVersion": 1,
+  "id": "scene-engine-10-system-design-60-asset-uploads",
+  "title": "Asset Uploads & Asset Selection",
+  "root": "b-60-asset-uploads-root-43",
+  "blocks": {
+    "b-60-asset-uploads-root-43": {
+      "id": "b-60-asset-uploads-root-43",
+      "type": "paragraph",
+      "props": {
+        "concepts": [
+          "upload",
+          "container",
+          "selection",
+          "slug",
+          "mime-validation"
+        ],
+        "covers": "How new asset files enter a project and how scenes select existing containers — the upload page, the inspector asset dropdown, and the validation rules that gate both.",
+        "design_refs": []
+      },
+      "children": [
+        "b-60-asset-uploads-there-are-two-ways-a-fil-2",
+        "b-60-asset-uploads-upload-a-new-file-3",
+        "b-60-asset-uploads-selection-a-scene-4",
+        "b-60-asset-uploads-both-flows-are-scoped-to-5",
+        "b-60-asset-uploads-divider-6",
+        "b-60-asset-uploads-upload-flow-7",
+        "b-60-asset-uploads-upload-is-a-standalone-s-8",
+        "b-60-asset-uploads-code-9",
+        "b-60-asset-uploads-step-by-step-10",
+        "b-60-asset-uploads-pick-a-file-any-fil-11",
+        "b-60-asset-uploads-pre-fill-the-type-t-12",
+        "b-60-asset-uploads-confirm-and-submit-13",
+        "b-60-asset-uploads-server-validates-bo-14",
+        "b-60-asset-uploads-server-writes-the-file-15",
+        "b-60-asset-uploads-server-registers-the-c-16",
+        "b-60-asset-uploads-the-slug-is-the-source-o-17",
+        "b-60-asset-uploads-validation-rules-18",
+        "b-60-asset-uploads-rule-19-tbl",
+        "b-60-asset-uploads-there-is-no-size-limit-a-20",
+        "b-60-asset-uploads-asset-type-allowlists-21",
+        "b-60-asset-uploads-type-extensions-22-tbl",
+        "b-60-asset-uploads-selection-flow-23",
+        "b-60-asset-uploads-when-an-asset-type-layer-24",
+        "b-60-asset-uploads-mutates-the-selected-sce-25",
+        "b-60-asset-uploads-marks-the-editor-dirty-26",
+        "b-60-asset-uploads-leaves-registry-entries-27",
+        "b-60-asset-uploads-this-is-selection-by-id-28",
+        "b-60-asset-uploads-why-a-dropdown-rather-th-29",
+        "b-60-asset-uploads-upload-and-selection-are-30",
+        "b-60-asset-uploads-if-the-desired-file-isn-31",
+        "b-60-asset-uploads-what-this-buys-32",
+        "b-60-asset-uploads-authoring-without-file-33",
+        "b-60-asset-uploads-project-local-inventor-34",
+        "b-60-asset-uploads-registry-stays-canonic-35",
+        "b-60-asset-uploads-type-discipline-val-36",
+        "b-60-asset-uploads-what-s-out-of-scope-37",
+        "b-60-asset-uploads-cloud-storage-uploa-38",
+        "b-60-asset-uploads-batch-upload-one-fi-39",
+        "b-60-asset-uploads-custom-container-ids-a-40",
+        "b-60-asset-uploads-module-uploads-effe-41",
+        "b-60-asset-uploads-delete-rename-ui-re-42"
+      ]
+    },
+    "b-60-asset-uploads-there-are-two-ways-a-fil-2": {
+      "id": "b-60-asset-uploads-there-are-two-ways-a-fil-2",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "There are two ways a file enters or moves through the system:"
+        }
+      ],
+      "children": []
+    },
+    "b-60-asset-uploads-upload-a-new-file-3": {
+      "id": "b-60-asset-uploads-upload-a-new-file-3",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "Upload",
+          "attributes": {
+            "bold": true
+          }
+        },
+        {
+          "insert": ". A new file lands on disk and a new container is registered for it."
+        }
+      ],
+      "children": []
+    },
+    "b-60-asset-uploads-selection-a-scene-4": {
+      "id": "b-60-asset-uploads-selection-a-scene-4",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "Selection",
+          "attributes": {
+            "bold": true
+          }
+        },
+        {
+          "insert": ". A scene layer or glyph slot is pointed at a different existing container of the same asset type."
+        }
+      ],
+      "children": []
+    },
+    "b-60-asset-uploads-both-flows-are-scoped-to-5": {
+      "id": "b-60-asset-uploads-both-flows-are-scoped-to-5",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "Both flows are scoped to the five file asset types ("
+        },
+        {
+          "insert": "audio",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ", "
+        },
+        {
+          "insert": "image",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ", "
+        },
+        {
+          "insert": "video",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ", "
+        },
+        {
+          "insert": "glyph",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ", "
+        },
+        {
+          "insert": "font",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": "). Modules don't participate: they're hand-authored, not uploaded."
+        }
+      ],
+      "children": []
+    },
+    "b-60-asset-uploads-divider-6": {
+      "id": "b-60-asset-uploads-divider-6",
+      "type": "divider",
+      "props": {},
+      "children": []
+    },
+    "b-60-asset-uploads-upload-flow-7": {
+      "id": "b-60-asset-uploads-upload-flow-7",
+      "type": "heading",
+      "props": {
+        "level": 2
+      },
+      "text": [
+        {
+          "insert": "Upload Flow"
+        }
+      ],
+      "children": []
+    },
+    "b-60-asset-uploads-upload-is-a-standalone-s-8": {
+      "id": "b-60-asset-uploads-upload-is-a-standalone-s-8",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "Upload is a standalone surface ("
+        },
+        {
+          "insert": "/upload",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": "), separate from the editor. A user with no filesystem access can add an asset without opening a scene."
+        }
+      ],
+      "children": []
+    },
+    "b-60-asset-uploads-code-9": {
+      "id": "b-60-asset-uploads-code-9",
+      "type": "code",
+      "props": {},
+      "text": [
+        {
+          "insert": "file picked → type pre-filled from mime → user confirms → POST → server validates → write file → register container"
+        }
+      ],
+      "children": []
+    },
+    "b-60-asset-uploads-step-by-step-10": {
+      "id": "b-60-asset-uploads-step-by-step-10",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "Step by step:"
+        }
+      ],
+      "children": []
+    },
+    "b-60-asset-uploads-pick-a-file-any-fil-11": {
+      "id": "b-60-asset-uploads-pick-a-file-any-fil-11",
+      "type": "list-item",
+      "props": {
+        "ordered": true
+      },
+      "text": [
+        {
+          "insert": "Pick a file.",
+          "attributes": {
+            "bold": true
+          }
+        },
+        {
+          "insert": " Any file the OS will give the browser."
+        }
+      ],
+      "children": []
+    },
+    "b-60-asset-uploads-pre-fill-the-type-t-12": {
+      "id": "b-60-asset-uploads-pre-fill-the-type-t-12",
+      "type": "list-item",
+      "props": {
+        "ordered": true
+      },
+      "text": [
+        {
+          "insert": "Pre-fill the type.",
+          "attributes": {
+            "bold": true
+          }
+        },
+        {
+          "insert": " The page inspects the file's mime and suggests a type if it matches one allowlist (e.g. "
+        },
+        {
+          "insert": "video/mp4",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " → "
+        },
+        {
+          "insert": "video",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": "). The user can override."
+        }
+      ],
+      "children": []
+    },
+    "b-60-asset-uploads-confirm-and-submit-13": {
+      "id": "b-60-asset-uploads-confirm-and-submit-13",
+      "type": "list-item",
+      "props": {
+        "ordered": true
+      },
+      "text": [
+        {
+          "insert": "Confirm and submit.",
+          "attributes": {
+            "bold": true
+          }
+        },
+        {
+          "insert": " Multipart POST to the upload endpoint with the file and the chosen type."
+        }
+      ],
+      "children": []
+    },
+    "b-60-asset-uploads-server-validates-bo-14": {
+      "id": "b-60-asset-uploads-server-validates-bo-14",
+      "type": "list-item",
+      "props": {
+        "ordered": true
+      },
+      "text": [
+        {
+          "insert": "Server validates.",
+          "attributes": {
+            "bold": true
+          }
+        },
+        {
+          "insert": " Both the extension and the mime must be in the allowlist for the chosen type. Mismatches reject the upload."
+        }
+      ],
+      "children": []
+    },
+    "b-60-asset-uploads-server-writes-the-file-15": {
+      "id": "b-60-asset-uploads-server-writes-the-file-15",
+      "type": "list-item",
+      "props": {
+        "ordered": true
+      },
+      "text": [
+        {
+          "insert": "Server writes the file.",
+          "attributes": {
+            "bold": true
+          }
+        },
+        {
+          "insert": " Filename = a unique slug of the original filename + original extension. Media lands under the selected project root at "
+        },
+        {
+          "insert": "Assets/Media/{type}/{slug}.{ext}",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": "; fonts land under "
+        },
+        {
+          "insert": "Assets/Fonts/{slug}.{ext}",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": "."
+        }
+      ],
+      "children": []
+    },
+    "b-60-asset-uploads-server-registers-the-c-16": {
+      "id": "b-60-asset-uploads-server-registers-the-c-16",
+      "type": "list-item",
+      "props": {
+        "ordered": true
+      },
+      "text": [
+        {
+          "insert": "Server registers the container.",
+          "attributes": {
+            "bold": true
+          }
+        },
+        {
+          "insert": " A new entry is written into "
+        },
+        {
+          "insert": "ProjectSettings/registries/assets.json",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " keyed by the slug. Media entries keep logical "
+        },
+        {
+          "insert": "file",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " paths like "
+        },
+        {
+          "insert": "/assets/{type}/{slug}.{ext}",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": "; font entries use "
+        },
+        {
+          "insert": "/fonts/{slug}.{ext}",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " and include default font metadata."
+        }
+      ],
+      "children": []
+    },
+    "b-60-asset-uploads-the-slug-is-the-source-o-17": {
+      "id": "b-60-asset-uploads-the-slug-is-the-source-o-17",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "The slug is the source of identity. If an upload would collide with an existing container, the server appends a numeric suffix so both containers can coexist."
+        }
+      ],
+      "children": []
+    },
+    "b-60-asset-uploads-validation-rules-18": {
+      "id": "b-60-asset-uploads-validation-rules-18",
+      "type": "heading",
+      "props": {
+        "level": 3
+      },
+      "text": [
+        {
+          "insert": "Validation rules"
+        }
+      ],
+      "children": []
+    },
+    "b-60-asset-uploads-rule-19-tbl": {
+      "id": "b-60-asset-uploads-rule-19-tbl",
+      "type": "structured-table",
+      "props": {
+        "columns": [
+          "Rule",
+          "Why"
+        ],
+        "rows": [
+          [
+            "Type must be one of the five",
+            "Anything else isn't an uploadable file asset."
+          ],
+          [
+            "Extension must match type's list",
+            "Catches drag-into-wrong-bucket mistakes."
+          ],
+          [
+            "Mime must match type's list",
+            "Catches renamed-extension mistakes."
+          ],
+          [
+            "Filename slug must be non-empty",
+            [
+              {
+                "insert": "A file named "
+              },
+              {
+                "insert": ".png",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": " or "
+              },
+              {
+                "insert": "___",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": " has no usable identity."
+              }
+            ]
+          ]
+        ]
+      },
+      "children": []
+    },
+    "b-60-asset-uploads-there-is-no-size-limit-a-20": {
+      "id": "b-60-asset-uploads-there-is-no-size-limit-a-20",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "There is no size limit and no batch upload in this surface: single file at a time."
+        }
+      ],
+      "children": []
+    },
+    "b-60-asset-uploads-asset-type-allowlists-21": {
+      "id": "b-60-asset-uploads-asset-type-allowlists-21",
+      "type": "heading",
+      "props": {
+        "level": 3
+      },
+      "text": [
+        {
+          "insert": "Asset type allowlists"
+        }
+      ],
+      "children": []
+    },
+    "b-60-asset-uploads-type-extensions-22-tbl": {
+      "id": "b-60-asset-uploads-type-extensions-22-tbl",
+      "type": "structured-table",
+      "props": {
+        "columns": [
+          "Type",
+          "Extensions",
+          "Mimes"
+        ],
+        "rows": [
+          [
+            [
+              {
+                "insert": "audio",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ],
+            [
+              {
+                "insert": "mp3",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": ", "
+              },
+              {
+                "insert": "wav",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": ", "
+              },
+              {
+                "insert": "ogg",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ],
+            [
+              {
+                "insert": "audio/mpeg",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": ", "
+              },
+              {
+                "insert": "audio/wav",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": ", "
+              },
+              {
+                "insert": "audio/ogg",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ]
+          ],
+          [
+            [
+              {
+                "insert": "image",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ],
+            [
+              {
+                "insert": "png",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": ", "
+              },
+              {
+                "insert": "jpg/jpeg",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": ", "
+              },
+              {
+                "insert": "webp",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": ", "
+              },
+              {
+                "insert": "gif",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ],
+            [
+              {
+                "insert": "image/png",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": ", "
+              },
+              {
+                "insert": "image/jpeg",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": ", "
+              },
+              {
+                "insert": "image/webp",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": ", "
+              },
+              {
+                "insert": "image/gif",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ]
+          ],
+          [
+            [
+              {
+                "insert": "video",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ],
+            [
+              {
+                "insert": "mp4",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": ", "
+              },
+              {
+                "insert": "webm",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ],
+            [
+              {
+                "insert": "video/mp4",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": ", "
+              },
+              {
+                "insert": "video/webm",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ]
+          ],
+          [
+            [
+              {
+                "insert": "glyph",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ],
+            [
+              {
+                "insert": "svg",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ],
+            [
+              {
+                "insert": "image/svg+xml",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ]
+          ],
+          [
+            [
+              {
+                "insert": "font",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ],
+            [
+              {
+                "insert": "otf",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": ", "
+              },
+              {
+                "insert": "ttf",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": ", "
+              },
+              {
+                "insert": "woff",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": ", "
+              },
+              {
+                "insert": "woff2",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ],
+            "browser font mimes plus common local/octet-stream fallbacks"
+          ]
+        ]
+      },
+      "children": []
+    },
+    "b-60-asset-uploads-selection-flow-23": {
+      "id": "b-60-asset-uploads-selection-flow-23",
+      "type": "heading",
+      "props": {
+        "level": 2
+      },
+      "text": [
+        {
+          "insert": "Selection Flow"
+        }
+      ],
+      "children": []
+    },
+    "b-60-asset-uploads-when-an-asset-type-layer-24": {
+      "id": "b-60-asset-uploads-when-an-asset-type-layer-24",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "When an asset-type layer is selected in the editor, the inspector shows project-available containers of that same type from "
+        },
+        {
+          "insert": "/api/asset-library?project=<project-id>&type=<type>",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ". Picking a different entry:"
+        }
+      ],
+      "children": []
+    },
+    "b-60-asset-uploads-mutates-the-selected-sce-25": {
+      "id": "b-60-asset-uploads-mutates-the-selected-sce-25",
+      "type": "list-item",
+      "props": {
+        "ordered": true
+      },
+      "text": [
+        {
+          "insert": "Mutates the selected scene object or slot from "
+        },
+        {
+          "insert": "asset: oldId",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " to "
+        },
+        {
+          "insert": "asset: newId",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": "."
+        }
+      ],
+      "children": []
+    },
+    "b-60-asset-uploads-marks-the-editor-dirty-26": {
+      "id": "b-60-asset-uploads-marks-the-editor-dirty-26",
+      "type": "list-item",
+      "props": {
+        "ordered": true
+      },
+      "text": [
+        {
+          "insert": "Marks the editor dirty; Save writes the scene through "
+        },
+        {
+          "insert": "PUT /api/scenes/<id>?project=<project-id>",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": "."
+        }
+      ],
+      "children": []
+    },
+    "b-60-asset-uploads-leaves-registry-entries-27": {
+      "id": "b-60-asset-uploads-leaves-registry-entries-27",
+      "type": "list-item",
+      "props": {
+        "ordered": true
+      },
+      "text": [
+        {
+          "insert": "Leaves registry entries untouched. Containers remain stable inventory records; scenes decide which container they use."
+        }
+      ],
+      "children": []
+    },
+    "b-60-asset-uploads-this-is-selection-by-id-28": {
+      "id": "b-60-asset-uploads-this-is-selection-by-id-28",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "This is selection by ID, not a registry file-pointer mutation. Other scenes that reference the old container are unaffected."
+        }
+      ],
+      "children": []
+    },
+    "b-60-asset-uploads-why-a-dropdown-rather-th-29": {
+      "id": "b-60-asset-uploads-why-a-dropdown-rather-th-29",
+      "type": "heading",
+      "props": {
+        "level": 3
+      },
+      "text": [
+        {
+          "insert": "Why a dropdown rather than inline upload"
+        }
+      ],
+      "children": []
+    },
+    "b-60-asset-uploads-upload-and-selection-are-30": {
+      "id": "b-60-asset-uploads-upload-and-selection-are-30",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "Upload and selection are separate concerns. The inspector is for arranging containers in a scene; introducing an upload form there would couple authoring with file management. The dropdown is the smallest UI that supports the container indirection: point the layer at a different registered container without leaving the scene."
+        }
+      ],
+      "children": []
+    },
+    "b-60-asset-uploads-if-the-desired-file-isn-31": {
+      "id": "b-60-asset-uploads-if-the-desired-file-isn-31",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "If the desired file isn't yet in the project, the path is: go to "
+        },
+        {
+          "insert": "/upload?project=<project-id>",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ", upload it, come back, pick the new container from the dropdown."
+        }
+      ],
+      "children": []
+    },
+    "b-60-asset-uploads-what-this-buys-32": {
+      "id": "b-60-asset-uploads-what-this-buys-32",
+      "type": "heading",
+      "props": {
+        "level": 2
+      },
+      "text": [
+        {
+          "insert": "What This Buys"
+        }
+      ],
+      "children": []
+    },
+    "b-60-asset-uploads-authoring-without-file-33": {
+      "id": "b-60-asset-uploads-authoring-without-file-33",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "Authoring without filesystem access.",
+          "attributes": {
+            "bold": true
+          }
+        },
+        {
+          "insert": " A user who can't "
+        },
+        {
+          "insert": "cp",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " a file into a folder can still add a video."
+        }
+      ],
+      "children": []
+    },
+    "b-60-asset-uploads-project-local-inventor-34": {
+      "id": "b-60-asset-uploads-project-local-inventor-34",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "Project-local inventory.",
+          "attributes": {
+            "bold": true
+          }
+        },
+        {
+          "insert": " Uploads add containers under the selected project root; scenes select those containers by ID."
+        }
+      ],
+      "children": []
+    },
+    "b-60-asset-uploads-registry-stays-canonic-35": {
+      "id": "b-60-asset-uploads-registry-stays-canonic-35",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "Registry stays canonical.",
+          "attributes": {
+            "bold": true
+          }
+        },
+        {
+          "insert": " No hand-editing "
+        },
+        {
+          "insert": "registry.json",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " for normal flows: uploads write entries, and scene selection edits scene JSON."
+        }
+      ],
+      "children": []
+    },
+    "b-60-asset-uploads-type-discipline-val-36": {
+      "id": "b-60-asset-uploads-type-discipline-val-36",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "Type discipline.",
+          "attributes": {
+            "bold": true
+          }
+        },
+        {
+          "insert": " Validation rejects mismatches at the boundary; the renderer doesn't have to handle a "
+        },
+        {
+          "insert": "video",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " container pointing at a PNG."
+        }
+      ],
+      "children": []
+    },
+    "b-60-asset-uploads-what-s-out-of-scope-37": {
+      "id": "b-60-asset-uploads-what-s-out-of-scope-37",
+      "type": "heading",
+      "props": {
+        "level": 2
+      },
+      "text": [
+        {
+          "insert": "What's Out of Scope"
+        }
+      ],
+      "children": []
+    },
+    "b-60-asset-uploads-cloud-storage-uploa-38": {
+      "id": "b-60-asset-uploads-cloud-storage-uploa-38",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "Cloud storage.",
+          "attributes": {
+            "bold": true
+          }
+        },
+        {
+          "insert": " Uploads write to local disk only."
+        }
+      ],
+      "children": []
+    },
+    "b-60-asset-uploads-batch-upload-one-fi-39": {
+      "id": "b-60-asset-uploads-batch-upload-one-fi-39",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "Batch upload.",
+          "attributes": {
+            "bold": true
+          }
+        },
+        {
+          "insert": " One file per submission."
+        }
+      ],
+      "children": []
+    },
+    "b-60-asset-uploads-custom-container-ids-a-40": {
+      "id": "b-60-asset-uploads-custom-container-ids-a-40",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "Custom container IDs at upload time.",
+          "attributes": {
+            "bold": true
+          }
+        },
+        {
+          "insert": " IDs are derived from the filename slug; renaming a container is a separate manual registry edit."
+        }
+      ],
+      "children": []
+    },
+    "b-60-asset-uploads-module-uploads-effe-41": {
+      "id": "b-60-asset-uploads-module-uploads-effe-41",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "Module uploads.",
+          "attributes": {
+            "bold": true
+          }
+        },
+        {
+          "insert": " Effects and components are authored in code, not uploaded."
+        }
+      ],
+      "children": []
+    },
+    "b-60-asset-uploads-delete-rename-ui-re-42": {
+      "id": "b-60-asset-uploads-delete-rename-ui-re-42",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "Delete/rename UI.",
+          "attributes": {
+            "bold": true
+          }
+        },
+        {
+          "insert": " Removing a file or renaming a container is not yet a first-class operation."
+        }
+      ],
+      "children": []
+    }
+  }
+}

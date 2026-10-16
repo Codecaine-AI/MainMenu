@@ -1,0 +1,741 @@
+{
+  "schemaVersion": 1,
+  "id": "scene-engine-20-implementation-10-renderer-20-asset-registry",
+  "title": "Asset Registry (Implementation)",
+  "root": "b-20-asset-registry-root-28",
+  "blocks": {
+    "b-20-asset-registry-root-28": {
+      "id": "b-20-asset-registry-root-28",
+      "type": "paragraph",
+      "props": {
+        "concepts": [
+          "asset-registry",
+          "merged-cache",
+          "resolveAsset",
+          "loadRegistry",
+          "project-registry"
+        ],
+        "covers": "asset-registry.js — project-aware manifest fetch, single merged in-memory map, optional cache mutation, why missing IDs warn instead of throwing.",
+        "design_refs": [
+          "10-system-design/20-asset-registry.md",
+          "10-system-design/60-asset-uploads.md"
+        ]
+      },
+      "children": [
+        "b-20-asset-registry-apps-scene-engine-app-2",
+        "b-20-asset-registry-divider-3",
+        "b-20-asset-registry-public-api-4",
+        "b-20-asset-registry-export-5-tbl",
+        "b-20-asset-registry-merge-semantics-6",
+        "b-20-asset-registry-the-selected-manifest-ur-7",
+        "b-20-asset-registry-disjoint-ids-the-normal-8",
+        "b-20-asset-registry-an-id-that-appears-in-bo-9",
+        "b-20-asset-registry-the-renderer-cannot-tell-10",
+        "b-20-asset-registry-state-11",
+        "b-20-asset-registry-mergedregistry-record-12",
+        "b-20-asset-registry-activeregistrykey-stri-13",
+        "b-20-asset-registry-registrycache-map-stri-14",
+        "b-20-asset-registry-loadpromises-map-strin-15",
+        "b-20-asset-registry-the-normal-dev-path-is-p-16",
+        "b-20-asset-registry-why-lookups-don-t-throw-17",
+        "b-20-asset-registry-a-scene-with-one-missing-18",
+        "b-20-asset-registry-programmer-errors-that-19",
+        "b-20-asset-registry-why-an-empty-object-on-f-20",
+        "b-20-asset-registry-fetchmanifest-catches-21",
+        "b-20-asset-registry-optional-cache-mutation-22",
+        "b-20-asset-registry-updateentry-is-the-in-23",
+        "b-20-asset-registry-if-a-caller-patches-ap-24",
+        "b-20-asset-registry-without-that-explicit-ca-25",
+        "b-20-asset-registry-source-26",
+        "b-20-asset-registry-apps-scene-engine-app-27"
+      ]
+    },
+    "b-20-asset-registry-apps-scene-engine-app-2": {
+      "id": "b-20-asset-registry-apps-scene-engine-app-2",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "apps/scene-engine/app/_engine/renderer/asset-registry.js",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " loads the active project's asset, module, and font registries, merges them into a single module-level map, and answers ID lookups synchronously after that. It deliberately does not throw on misses. See the rationale in "
+        },
+        {
+          "insert": "System Design / Rendering Pipeline / Failure Modes",
+          "attributes": {
+            "reference": {
+              "kind": "doc",
+              "path": "10-scene-engine/10-system-design/30-rendering-pipeline",
+              "section": "failure-modes",
+              "label": "System Design / Rendering Pipeline / Failure Modes"
+            }
+          }
+        },
+        {
+          "insert": "."
+        }
+      ],
+      "children": []
+    },
+    "b-20-asset-registry-divider-3": {
+      "id": "b-20-asset-registry-divider-3",
+      "type": "divider",
+      "props": {},
+      "children": []
+    },
+    "b-20-asset-registry-public-api-4": {
+      "id": "b-20-asset-registry-public-api-4",
+      "type": "heading",
+      "props": {
+        "level": 2
+      },
+      "text": [
+        {
+          "insert": "Public API"
+        }
+      ],
+      "children": []
+    },
+    "b-20-asset-registry-export-5-tbl": {
+      "id": "b-20-asset-registry-export-5-tbl",
+      "type": "structured-table",
+      "props": {
+        "columns": [
+          "Export",
+          "Behavior"
+        ],
+        "rows": [
+          [
+            [
+              {
+                "insert": "loadRegistry({ projectId? })",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ],
+            "Async. Resolves registry URLs for an export bundle or a catalog-backed project dev route; fetches asset/module/font registries in parallel, merges into one map, and caches by registry key. Concurrent calls for the same key share one in-flight promise."
+          ],
+          [
+            [
+              {
+                "insert": "resolveAsset(id)",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ],
+            [
+              {
+                "insert": "Sync. Returns the merged entry for "
+              },
+              {
+                "insert": "id",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": ", or "
+              },
+              {
+                "insert": "null",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": " (with warning) if "
+              },
+              {
+                "insert": "loadRegistry",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": " hasn't completed or the ID is unknown."
+              }
+            ]
+          ],
+          [
+            [
+              {
+                "insert": "getRegistry()",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ],
+            [
+              {
+                "insert": "Sync. Returns the full merged map, or "
+              },
+              {
+                "insert": "null",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": " if not loaded. Used by the editor's add-layer dialog and inspector."
+              }
+            ]
+          ],
+          [
+            [
+              {
+                "insert": "updateEntry(id, partial)",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ],
+            [
+              {
+                "insert": "Sync. Shallow-merges "
+              },
+              {
+                "insert": "partial",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": " into the active in-memory entry. Kept for maintenance flows that patch a registry entry during an active session."
+              }
+            ]
+          ]
+        ]
+      },
+      "children": []
+    },
+    "b-20-asset-registry-merge-semantics-6": {
+      "id": "b-20-asset-registry-merge-semantics-6",
+      "type": "heading",
+      "props": {
+        "level": 2
+      },
+      "text": [
+        {
+          "insert": "Merge Semantics"
+        }
+      ],
+      "children": []
+    },
+    "b-20-asset-registry-the-selected-manifest-ur-7": {
+      "id": "b-20-asset-registry-the-selected-manifest-ur-7",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "The selected manifest URLs are fetched in parallel. The merge starts with font entries and asset entries, then adds every module entry on top:"
+        }
+      ],
+      "children": []
+    },
+    "b-20-asset-registry-disjoint-ids-the-normal-8": {
+      "id": "b-20-asset-registry-disjoint-ids-the-normal-8",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "Disjoint IDs (the normal case) end up in one flat map."
+        }
+      ],
+      "children": []
+    },
+    "b-20-asset-registry-an-id-that-appears-in-bo-9": {
+      "id": "b-20-asset-registry-an-id-that-appears-in-bo-9",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "An ID that appears in both manifests is logged as a collision and the "
+        },
+        {
+          "insert": "module entry wins",
+          "attributes": {
+            "bold": true
+          }
+        },
+        {
+          "insert": ". This is treated as a misconfiguration rather than a feature."
+        }
+      ],
+      "children": []
+    },
+    "b-20-asset-registry-the-renderer-cannot-tell-10": {
+      "id": "b-20-asset-registry-the-renderer-cannot-tell-10",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "The renderer cannot tell which manifest an entry came from after the merge. That's intentional. Layer dispatch is by "
+        },
+        {
+          "insert": "layer.type",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ", and the entry only needs to expose a "
+        },
+        {
+          "insert": "type",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " and a fetchable file pointer ("
+        },
+        {
+          "insert": "file",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " for assets, "
+        },
+        {
+          "insert": "path",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " for modules)."
+        }
+      ],
+      "children": []
+    },
+    "b-20-asset-registry-state-11": {
+      "id": "b-20-asset-registry-state-11",
+      "type": "heading",
+      "props": {
+        "level": 2
+      },
+      "text": [
+        {
+          "insert": "State"
+        }
+      ],
+      "children": []
+    },
+    "b-20-asset-registry-mergedregistry-record-12": {
+      "id": "b-20-asset-registry-mergedregistry-record-12",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "mergedRegistry: Record<string, entry> | null",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ": the active cached map for the page session."
+        }
+      ],
+      "children": []
+    },
+    "b-20-asset-registry-activeregistrykey-stri-13": {
+      "id": "b-20-asset-registry-activeregistrykey-stri-13",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "activeRegistryKey: string | null",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ": identifies whether the active map came from a bundle or project dev route."
+        }
+      ],
+      "children": []
+    },
+    "b-20-asset-registry-registrycache-map-stri-14": {
+      "id": "b-20-asset-registry-registrycache-map-stri-14",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "registryCache: Map<string, registry>",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ": caches merged registries by key."
+        }
+      ],
+      "children": []
+    },
+    "b-20-asset-registry-loadpromises-map-strin-15": {
+      "id": "b-20-asset-registry-loadpromises-map-strin-15",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "loadPromises: Map<string, Promise>",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ": guards against concurrent first-load races per key."
+        }
+      ],
+      "children": []
+    },
+    "b-20-asset-registry-the-normal-dev-path-is-p-16": {
+      "id": "b-20-asset-registry-the-normal-dev-path-is-p-16",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "The normal dev path is project-aware: "
+        },
+        {
+          "insert": "/api/projects/<project-id>/registries/assets",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ", "
+        },
+        {
+          "insert": "/modules",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ", and "
+        },
+        {
+          "insert": "/fonts",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ". Export bundles use "
+        },
+        {
+          "insert": "/assets/registry.json",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ", "
+        },
+        {
+          "insert": "/modules/registry.json",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ", and "
+        },
+        {
+          "insert": "/fonts/registry.json",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " resolved through "
+        },
+        {
+          "insert": "MELEE_BUNDLE_ROOT",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ". Outside an export bundle, callers must provide a project id."
+        }
+      ],
+      "children": []
+    },
+    "b-20-asset-registry-why-lookups-don-t-throw-17": {
+      "id": "b-20-asset-registry-why-lookups-don-t-throw-17",
+      "type": "heading",
+      "props": {
+        "level": 2
+      },
+      "text": [
+        {
+          "insert": "Why Lookups Don't Throw"
+        }
+      ],
+      "children": []
+    },
+    "b-20-asset-registry-a-scene-with-one-missing-18": {
+      "id": "b-20-asset-registry-a-scene-with-one-missing-18",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "A scene with one missing container should still render the rest of the scene. Throwing on "
+        },
+        {
+          "insert": "resolveAsset",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " would let one bad ID wipe out the whole stage. Returning "
+        },
+        {
+          "insert": "null",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " lets "
+        },
+        {
+          "insert": "scene-renderer.js",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " "
+        },
+        {
+          "insert": "console.warn",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " and skip that layer."
+        }
+      ],
+      "children": []
+    },
+    "b-20-asset-registry-programmer-errors-that-19": {
+      "id": "b-20-asset-registry-programmer-errors-that-19",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "Programmer errors that "
+        },
+        {
+          "insert": "should",
+          "attributes": {
+            "italic": true
+          }
+        },
+        {
+          "insert": " be loud, like an unregistered renderer type, do throw, in the asset-renderers index, not here."
+        }
+      ],
+      "children": []
+    },
+    "b-20-asset-registry-why-an-empty-object-on-f-20": {
+      "id": "b-20-asset-registry-why-an-empty-object-on-f-20",
+      "type": "heading",
+      "props": {
+        "level": 2
+      },
+      "text": [
+        {
+          "insert": "Why an Empty Object on Fetch Failure"
+        }
+      ],
+      "children": []
+    },
+    "b-20-asset-registry-fetchmanifest-catches-21": {
+      "id": "b-20-asset-registry-fetchmanifest-catches-21",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "fetchManifest",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " catches network/parse errors and returns "
+        },
+        {
+          "insert": "{}",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " for that manifest. The merge proceeds with whatever did load. This means a missing "
+        },
+        {
+          "insert": "modules/registry.json",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " doesn't take down asset rendering, and a missing "
+        },
+        {
+          "insert": "assets/registry.json",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " doesn't take down modules. Subsequent lookups warn but don't retry: avoids a thundering herd of failed fetches in a broken dev session."
+        }
+      ],
+      "children": []
+    },
+    "b-20-asset-registry-optional-cache-mutation-22": {
+      "id": "b-20-asset-registry-optional-cache-mutation-22",
+      "type": "heading",
+      "props": {
+        "level": 2
+      },
+      "text": [
+        {
+          "insert": "Optional Cache Mutation"
+        }
+      ],
+      "children": []
+    },
+    "b-20-asset-registry-updateentry-is-the-in-23": {
+      "id": "b-20-asset-registry-updateentry-is-the-in-23",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "updateEntry",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " is the in-memory side of direct registry-patch maintenance flows. The current inspector asset dropdown changes scene "
+        },
+        {
+          "insert": "asset",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " references, so it does not call "
+        },
+        {
+          "insert": "updateEntry",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": "."
+        }
+      ],
+      "children": []
+    },
+    "b-20-asset-registry-if-a-caller-patches-ap-24": {
+      "id": "b-20-asset-registry-if-a-caller-patches-ap-24",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "If a caller PATCHes "
+        },
+        {
+          "insert": "/api/registry/{id}",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " while the editor is open, it can call "
+        },
+        {
+          "insert": "updateEntry(id, { file })",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " after the server responds to keep the renderer cache aligned without a page reload."
+        }
+      ],
+      "children": []
+    },
+    "b-20-asset-registry-without-that-explicit-ca-25": {
+      "id": "b-20-asset-registry-without-that-explicit-ca-25",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "Without that explicit cache update, the next render uses the registry snapshot loaded at scene boot."
+        }
+      ],
+      "children": []
+    },
+    "b-20-asset-registry-source-26": {
+      "id": "b-20-asset-registry-source-26",
+      "type": "heading",
+      "props": {
+        "level": 2
+      },
+      "text": [
+        {
+          "insert": "Source"
+        }
+      ],
+      "children": []
+    },
+    "b-20-asset-registry-apps-scene-engine-app-27": {
+      "id": "b-20-asset-registry-apps-scene-engine-app-27",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "apps/scene-engine/app/_engine/renderer/asset-registry.js",
+          "attributes": {
+            "code": true
+          }
+        }
+      ],
+      "children": []
+    }
+  }
+}

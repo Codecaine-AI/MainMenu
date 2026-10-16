@@ -1,0 +1,767 @@
+{
+  "schemaVersion": 1,
+  "id": "scene-engine-20-implementation-30-desktop-app-20-pi-agent",
+  "title": "Pi Agent",
+  "root": "b-20-pi-agent-root-43",
+  "blocks": {
+    "b-20-pi-agent-root-43": {
+      "id": "b-20-pi-agent-root-43",
+      "type": "paragraph",
+      "props": {
+        "code-ref": [
+          "apps/scene-engine/app/editor/_features/pi-agent/PiAgentChatPanel.tsx",
+          "apps/scene-engine/app/editor/_features/pi-agent/usePiAgentController.ts",
+          "apps/scene-engine/app/editor/_components/HierarchyPanel.tsx",
+          "apps/scene-engine/desktop/main/pi-agent/service.ts",
+          "apps/scene-engine/desktop/main/pi-agent/project-workspace.ts",
+          "apps/scene-engine/desktop/preload/index.ts",
+          "apps/scene-engine/desktop/types/main-menu.ts"
+        ],
+        "concepts": [
+          "pi-agent",
+          "chat-sidebar",
+          "ipc",
+          "preload-bridge",
+          "sdk-session",
+          "context-handoff"
+        ],
+        "covers": "Pi Agent chat sidebar, preload bridge, Electron IPC handlers, SDK session lifecycle, and renderer security boundary."
+      },
+      "children": [
+        "b-20-pi-agent-the-pi-agent-is-a-deskto-2",
+        "b-20-pi-agent-the-renderer-never-impor-3",
+        "b-20-pi-agent-renderer-surface-4",
+        "b-20-pi-agent-app-editor-features-pi-5",
+        "b-20-pi-agent-transcript-6",
+        "b-20-pi-agent-message-input-7",
+        "b-20-pi-agent-send-8",
+        "b-20-pi-agent-stop-9",
+        "b-20-pi-agent-clear-10",
+        "b-20-pi-agent-current-status-and-sessi-11",
+        "b-20-pi-agent-each-send-request-includ-12",
+        "b-20-pi-agent-field-meaning-13-tbl",
+        "b-20-pi-agent-the-panel-degrades-grace-14",
+        "b-20-pi-agent-renderer-side-operating-15",
+        "b-20-pi-agent-preload-bridge-16",
+        "b-20-pi-agent-preload-exposes-17",
+        "b-20-pi-agent-ts-18",
+        "b-20-pi-agent-the-bridge-is-defined-in-19",
+        "b-20-pi-agent-main-process-session-20",
+        "b-20-pi-agent-electron-main-lazily-imp-21",
+        "b-20-pi-agent-text-22",
+        "b-20-pi-agent-the-pinned-package-line-23",
+        "b-20-pi-agent-text-24",
+        "b-20-pi-agent-the-session-is-created-w-25",
+        "b-20-pi-agent-ts-26",
+        "b-20-pi-agent-desktop-main-pi-agent-p-27",
+        "b-20-pi-agent-state-flow-28",
+        "b-20-pi-agent-the-main-process-keeps-t-29",
+        "b-20-pi-agent-status-30",
+        "b-20-pi-agent-transcript-messages-31",
+        "b-20-pi-agent-cwd-32",
+        "b-20-pi-agent-sessionid-33",
+        "b-20-pi-agent-sessionfile-34",
+        "b-20-pi-agent-last-error-35",
+        "b-20-pi-agent-sdk-events-update-this-s-36",
+        "b-20-pi-agent-abort-and-reset-37",
+        "b-20-pi-agent-abort-forwards-to-th-38",
+        "b-20-pi-agent-security-boundary-39",
+        "b-20-pi-agent-the-renderer-cannot-acce-40",
+        "b-20-pi-agent-validation-status-41",
+        "b-20-pi-agent-the-bridge-package-impo-42"
+      ]
+    },
+    "b-20-pi-agent-the-pi-agent-is-a-deskto-2": {
+      "id": "b-20-pi-agent-the-pi-agent-is-a-deskto-2",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "The Pi Agent is a desktop-only chat panel docked at the bottom of the editor's left sidebar. The hierarchy remains the primary layer-selection surface above it."
+        }
+      ],
+      "children": []
+    },
+    "b-20-pi-agent-the-renderer-never-impor-3": {
+      "id": "b-20-pi-agent-the-renderer-never-impor-3",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "The renderer never imports the Pi SDK. Electron main owns the SDK session and sends state snapshots back to the renderer through IPC."
+        }
+      ],
+      "children": []
+    },
+    "b-20-pi-agent-renderer-surface-4": {
+      "id": "b-20-pi-agent-renderer-surface-4",
+      "type": "heading",
+      "props": {
+        "level": 2
+      },
+      "text": [
+        {
+          "insert": "Renderer Surface"
+        }
+      ],
+      "children": []
+    },
+    "b-20-pi-agent-app-editor-features-pi-5": {
+      "id": "b-20-pi-agent-app-editor-features-pi-5",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "app/editor/_features/pi-agent/PiAgentChatPanel.tsx",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " renders:"
+        }
+      ],
+      "children": []
+    },
+    "b-20-pi-agent-transcript-6": {
+      "id": "b-20-pi-agent-transcript-6",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "transcript"
+        }
+      ],
+      "children": []
+    },
+    "b-20-pi-agent-message-input-7": {
+      "id": "b-20-pi-agent-message-input-7",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "message input"
+        }
+      ],
+      "children": []
+    },
+    "b-20-pi-agent-send-8": {
+      "id": "b-20-pi-agent-send-8",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "Send",
+          "attributes": {
+            "code": true
+          }
+        }
+      ],
+      "children": []
+    },
+    "b-20-pi-agent-stop-9": {
+      "id": "b-20-pi-agent-stop-9",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "Stop",
+          "attributes": {
+            "code": true
+          }
+        }
+      ],
+      "children": []
+    },
+    "b-20-pi-agent-clear-10": {
+      "id": "b-20-pi-agent-clear-10",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "Clear",
+          "attributes": {
+            "code": true
+          }
+        }
+      ],
+      "children": []
+    },
+    "b-20-pi-agent-current-status-and-sessi-11": {
+      "id": "b-20-pi-agent-current-status-and-sessi-11",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "current status and session details"
+        }
+      ],
+      "children": []
+    },
+    "b-20-pi-agent-each-send-request-includ-12": {
+      "id": "b-20-pi-agent-each-send-request-includ-12",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "Each send request includes:"
+        }
+      ],
+      "children": []
+    },
+    "b-20-pi-agent-field-meaning-13-tbl": {
+      "id": "b-20-pi-agent-field-meaning-13-tbl",
+      "type": "structured-table",
+      "props": {
+        "columns": [
+          "Field",
+          "Meaning"
+        ],
+        "rows": [
+          [
+            [
+              {
+                "insert": "projectId",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ],
+            "Active project from the editor route."
+          ],
+          [
+            [
+              {
+                "insert": "sceneId",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ],
+            "Active scene from the editor route."
+          ],
+          [
+            [
+              {
+                "insert": "selectedPath",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ],
+            "Dotted selected layer path from the hierarchy/editor store."
+          ],
+          [
+            [
+              {
+                "insert": "selectedLayerName",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ],
+            "Human-readable name for the selected layer."
+          ],
+          [
+            [
+              {
+                "insert": "selectedLayerType",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ],
+            "Layer type used for prompt context."
+          ]
+        ]
+      },
+      "children": []
+    },
+    "b-20-pi-agent-the-panel-degrades-grace-14": {
+      "id": "b-20-pi-agent-the-panel-degrades-grace-14",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "The panel degrades gracefully in a normal browser tab. If "
+        },
+        {
+          "insert": "window.mainMenu?.agent",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " is unavailable, the UI reports that the desktop bridge is unavailable."
+        }
+      ],
+      "children": []
+    },
+    "b-20-pi-agent-renderer-side-operating-15": {
+      "id": "b-20-pi-agent-renderer-side-operating-15",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "Renderer-side operating logic lives beside the panel in "
+        },
+        {
+          "insert": "usePiAgentController.ts",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ", so the chat view, bridge subscription, send/abort/reset calls, and selected-layer context assembly stay in one vertical slice."
+        }
+      ],
+      "children": []
+    },
+    "b-20-pi-agent-preload-bridge-16": {
+      "id": "b-20-pi-agent-preload-bridge-16",
+      "type": "heading",
+      "props": {
+        "level": 2
+      },
+      "text": [
+        {
+          "insert": "Preload Bridge"
+        }
+      ],
+      "children": []
+    },
+    "b-20-pi-agent-preload-exposes-17": {
+      "id": "b-20-pi-agent-preload-exposes-17",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "Preload exposes:"
+        }
+      ],
+      "children": []
+    },
+    "b-20-pi-agent-ts-18": {
+      "id": "b-20-pi-agent-ts-18",
+      "type": "code",
+      "props": {
+        "language": "ts"
+      },
+      "text": [
+        {
+          "insert": "window.mainMenu.agent.getState()\nwindow.mainMenu.agent.sendMessage(request)\nwindow.mainMenu.agent.abort()\nwindow.mainMenu.agent.reset()\nwindow.mainMenu.agent.onEvent(handler)"
+        }
+      ],
+      "children": []
+    },
+    "b-20-pi-agent-the-bridge-is-defined-in-19": {
+      "id": "b-20-pi-agent-the-bridge-is-defined-in-19",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "The bridge is defined in "
+        },
+        {
+          "insert": "desktop/types/main-menu.ts",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " and implemented in "
+        },
+        {
+          "insert": "desktop/preload/index.ts",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ". It is the only renderer-accessible native API surface for the agent."
+        }
+      ],
+      "children": []
+    },
+    "b-20-pi-agent-main-process-session-20": {
+      "id": "b-20-pi-agent-main-process-session-20",
+      "type": "heading",
+      "props": {
+        "level": 2
+      },
+      "text": [
+        {
+          "insert": "Main Process Session"
+        }
+      ],
+      "children": []
+    },
+    "b-20-pi-agent-electron-main-lazily-imp-21": {
+      "id": "b-20-pi-agent-electron-main-lazily-imp-21",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "Electron main lazily imports:"
+        }
+      ],
+      "children": []
+    },
+    "b-20-pi-agent-text-22": {
+      "id": "b-20-pi-agent-text-22",
+      "type": "code",
+      "props": {
+        "language": "text"
+      },
+      "text": [
+        {
+          "insert": "@mariozechner/pi-coding-agent"
+        }
+      ],
+      "children": []
+    },
+    "b-20-pi-agent-the-pinned-package-line-23": {
+      "id": "b-20-pi-agent-the-pinned-package-line-23",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "The pinned package line is currently:"
+        }
+      ],
+      "children": []
+    },
+    "b-20-pi-agent-text-24": {
+      "id": "b-20-pi-agent-text-24",
+      "type": "code",
+      "props": {
+        "language": "text"
+      },
+      "text": [
+        {
+          "insert": "@mariozechner/pi-coding-agent@^0.73.1"
+        }
+      ],
+      "children": []
+    },
+    "b-20-pi-agent-the-session-is-created-w-25": {
+      "id": "b-20-pi-agent-the-session-is-created-w-25",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "The session is created with:"
+        }
+      ],
+      "children": []
+    },
+    "b-20-pi-agent-ts-26": {
+      "id": "b-20-pi-agent-ts-26",
+      "type": "code",
+      "props": {
+        "language": "ts"
+      },
+      "text": [
+        {
+          "insert": "createAgentSession({\n  cwd: workspace.cwd,\n  sessionManager: SessionManager.create(cwd, sessionDir),\n})"
+        }
+      ],
+      "children": []
+    },
+    "b-20-pi-agent-desktop-main-pi-agent-p-27": {
+      "id": "b-20-pi-agent-desktop-main-pi-agent-p-27",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "desktop/main/pi-agent/project-workspace.ts",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " resolves "
+        },
+        {
+          "insert": "workspace.cwd",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " from the same "
+        },
+        {
+          "insert": "workspace.catalog.json",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " project id that the editor uses. For an external Codecaine catalog entry, the Pi SDK session starts in the Codecaine project root, not the scene-engine app root. Session files live under the app user-data directory."
+        }
+      ],
+      "children": []
+    },
+    "b-20-pi-agent-state-flow-28": {
+      "id": "b-20-pi-agent-state-flow-28",
+      "type": "heading",
+      "props": {
+        "level": 2
+      },
+      "text": [
+        {
+          "insert": "State Flow"
+        }
+      ],
+      "children": []
+    },
+    "b-20-pi-agent-the-main-process-keeps-t-29": {
+      "id": "b-20-pi-agent-the-main-process-keeps-t-29",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "The main process keeps the authoritative agent state:"
+        }
+      ],
+      "children": []
+    },
+    "b-20-pi-agent-status-30": {
+      "id": "b-20-pi-agent-status-30",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "status",
+          "attributes": {
+            "code": true
+          }
+        }
+      ],
+      "children": []
+    },
+    "b-20-pi-agent-transcript-messages-31": {
+      "id": "b-20-pi-agent-transcript-messages-31",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "transcript messages"
+        }
+      ],
+      "children": []
+    },
+    "b-20-pi-agent-cwd-32": {
+      "id": "b-20-pi-agent-cwd-32",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "cwd",
+          "attributes": {
+            "code": true
+          }
+        }
+      ],
+      "children": []
+    },
+    "b-20-pi-agent-sessionid-33": {
+      "id": "b-20-pi-agent-sessionid-33",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "sessionId",
+          "attributes": {
+            "code": true
+          }
+        }
+      ],
+      "children": []
+    },
+    "b-20-pi-agent-sessionfile-34": {
+      "id": "b-20-pi-agent-sessionfile-34",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "sessionFile",
+          "attributes": {
+            "code": true
+          }
+        }
+      ],
+      "children": []
+    },
+    "b-20-pi-agent-last-error-35": {
+      "id": "b-20-pi-agent-last-error-35",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "last error"
+        }
+      ],
+      "children": []
+    },
+    "b-20-pi-agent-sdk-events-update-this-s-36": {
+      "id": "b-20-pi-agent-sdk-events-update-this-s-36",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "SDK events update this state. The main process emits "
+        },
+        {
+          "insert": "main-menu:agent:event",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " to the renderer whenever state changes. The renderer uses "
+        },
+        {
+          "insert": "getState()",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " on mount and subscribes to events for live updates."
+        }
+      ],
+      "children": []
+    },
+    "b-20-pi-agent-abort-and-reset-37": {
+      "id": "b-20-pi-agent-abort-and-reset-37",
+      "type": "heading",
+      "props": {
+        "level": 2
+      },
+      "text": [
+        {
+          "insert": "Abort And Reset"
+        }
+      ],
+      "children": []
+    },
+    "b-20-pi-agent-abort-forwards-to-th-38": {
+      "id": "b-20-pi-agent-abort-forwards-to-th-38",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "abort()",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " forwards to the active SDK session and returns the latest state. "
+        },
+        {
+          "insert": "reset()",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " unsubscribes, disposes the session, clears transcript/status/session ids, and returns an idle state."
+        }
+      ],
+      "children": []
+    },
+    "b-20-pi-agent-security-boundary-39": {
+      "id": "b-20-pi-agent-security-boundary-39",
+      "type": "heading",
+      "props": {
+        "level": 2
+      },
+      "text": [
+        {
+          "insert": "Security Boundary"
+        }
+      ],
+      "children": []
+    },
+    "b-20-pi-agent-the-renderer-cannot-acce-40": {
+      "id": "b-20-pi-agent-the-renderer-cannot-acce-40",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "The renderer cannot access filesystem or shell primitives directly. It can only ask the native process to start/stop/reset the agent session through the typed bridge. This keeps project-editing authority in Electron main while preserving "
+        },
+        {
+          "insert": "contextIsolation",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " and "
+        },
+        {
+          "insert": "nodeIntegration: false",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": "."
+        }
+      ],
+      "children": []
+    },
+    "b-20-pi-agent-validation-status-41": {
+      "id": "b-20-pi-agent-validation-status-41",
+      "type": "heading",
+      "props": {
+        "level": 2
+      },
+      "text": [
+        {
+          "insert": "Validation Status"
+        }
+      ],
+      "children": []
+    },
+    "b-20-pi-agent-the-bridge-package-impo-42": {
+      "id": "b-20-pi-agent-the-bridge-package-impo-42",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "The bridge, package import, dev panel, packaged panel, and security scans have been validated. Live model prompts were intentionally left for manual testing so credentials/tokens and resulting file edits stay under user control."
+        }
+      ],
+      "children": []
+    }
+  }
+}

@@ -1,0 +1,525 @@
+{
+  "schemaVersion": 1,
+  "id": "scene-engine-20-implementation-10-renderer-00-overview",
+  "title": "Renderer",
+  "root": "b-00-overview-root-17",
+  "blocks": {
+    "b-00-overview-root-17": {
+      "id": "b-00-overview-root-17",
+      "type": "paragraph",
+      "props": {
+        "concepts": [
+          "renderer",
+          "registry",
+          "dispatch",
+          "glyph-group",
+          "slots",
+          "transform",
+          "foreignObject"
+        ],
+        "covers": "Production renderer — entry points, renderer registry, asset registry, per-type renderers, positioning helpers.",
+        "design_refs": [
+          "10-system-design/30-rendering-pipeline.md",
+          "10-system-design/20-asset-registry.md"
+        ],
+        "type": "overview"
+      },
+      "children": [
+        "b-00-overview-the-production-renderer-2",
+        "b-00-overview-the-design-rationale-and-3",
+        "b-00-overview-divider-4",
+        "b-00-overview-file-tree-5",
+        "b-00-overview-code-6",
+        "b-00-overview-the-renderer-is-also-cop-7",
+        "b-00-overview-contents-8",
+        "b-00-overview-10-scene-renderer-md-1-9",
+        "b-00-overview-the-top-level-loop-in-s-10",
+        "b-00-overview-20-asset-registry-md-2-11",
+        "b-00-overview-asset-registry-js-mer-12",
+        "b-00-overview-30-asset-renderers-md-13",
+        "b-00-overview-the-renderer-registry-14",
+        "b-00-overview-key-concepts-15",
+        "b-00-overview-concept-16-tbl"
+      ]
+    },
+    "b-00-overview-the-production-renderer-2": {
+      "id": "b-00-overview-the-production-renderer-2",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "The production renderer reads a "
+        },
+        {
+          "insert": "SceneJson",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " and turns it into DOM. It is plain JavaScript modules, no framework, so it works identically inside the Next.js editor (called from "
+        },
+        {
+          "insert": "useEffect",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": "), inside individual scene preview pages, and inside the standalone export bundle (called from "
+        },
+        {
+          "insert": "boot.js",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ")."
+        }
+      ],
+      "children": []
+    },
+    "b-00-overview-the-design-rationale-and-3": {
+      "id": "b-00-overview-the-design-rationale-and-3",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "The design rationale and failure semantics are in "
+        },
+        {
+          "insert": "System Design / Rendering Pipeline",
+          "attributes": {
+            "reference": {
+              "kind": "doc",
+              "path": "10-scene-engine/10-system-design/30-rendering-pipeline",
+              "label": "System Design / Rendering Pipeline"
+            }
+          }
+        },
+        {
+          "insert": ". This section describes the code layout."
+        }
+      ],
+      "children": []
+    },
+    "b-00-overview-divider-4": {
+      "id": "b-00-overview-divider-4",
+      "type": "divider",
+      "props": {},
+      "children": []
+    },
+    "b-00-overview-file-tree-5": {
+      "id": "b-00-overview-file-tree-5",
+      "type": "heading",
+      "props": {
+        "level": 2
+      },
+      "text": [
+        {
+          "insert": "File Tree"
+        }
+      ],
+      "children": []
+    },
+    "b-00-overview-code-6": {
+      "id": "b-00-overview-code-6",
+      "type": "code",
+      "props": {},
+      "text": [
+        {
+          "insert": "apps/scene-engine/app/_engine/renderer/\n├── scene-renderer.js               top-level loop: mount + update reconciliation\n├── asset-registry.js               registry load/merge/lookup with caching\n├── event-runtime.js                trigger/action event binding\n├── runtime-url.js                  bundle-root URL resolution\n├── positioning.js                  applyTransform, applyAppearance helpers\n└── asset-renderers/\n    ├── index.js                    register/getRenderer; type → fn map\n    ├── media.js                    video / image renderer\n    ├── css-effect.js               CSS effect renderer (manifest properties → CSS vars)\n    ├── glyph-group.js              layered SVG + slot mounting via <foreignObject>\n    ├── component.js                JS component renderer (Blob-URL import)\n    ├── audio.js                    Web Audio renderer\n    ├── text.js                     styled text renderer\n    ├── group.js                    empty positioned wrapper for nesting\n    └── stylesheet.js               shared stylesheet loader helper"
+        }
+      ],
+      "children": []
+    },
+    "b-00-overview-the-renderer-is-also-cop-7": {
+      "id": "b-00-overview-the-renderer-is-also-cop-7",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "The renderer is also copied into the standalone export bundle, with absolute paths rewritten to relative. See "
+        },
+        {
+          "insert": "build output",
+          "attributes": {
+            "reference": {
+              "kind": "doc",
+              "path": "10-scene-engine/10-system-design/50-build-output",
+              "label": "build output"
+            }
+          }
+        },
+        {
+          "insert": "."
+        }
+      ],
+      "children": []
+    },
+    "b-00-overview-contents-8": {
+      "id": "b-00-overview-contents-8",
+      "type": "heading",
+      "props": {
+        "level": 2
+      },
+      "text": [
+        {
+          "insert": "Contents"
+        }
+      ],
+      "children": []
+    },
+    "b-00-overview-10-scene-renderer-md-1-9": {
+      "id": "b-00-overview-10-scene-renderer-md-1-9",
+      "type": "heading",
+      "props": {
+        "level": 3
+      },
+      "text": [
+        {
+          "insert": "10-scene-renderer.md",
+          "attributes": {
+            "reference": {
+              "kind": "doc",
+              "path": "10-scene-engine/20-implementation/10-renderer/10-scene-renderer",
+              "label": "10-scene-renderer.md"
+            }
+          }
+        }
+      ],
+      "children": []
+    },
+    "b-00-overview-the-top-level-loop-in-s-10": {
+      "id": "b-00-overview-the-top-level-loop-in-s-10",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "The top-level loop in "
+        },
+        {
+          "insert": "scene-renderer.js",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ": stage sizing, scene-level appearance, mount vs. update, the "
+        },
+        {
+          "insert": "applyObjectStyles",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " pass, and "
+        },
+        {
+          "insert": "updateChildren",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " reconciliation."
+        }
+      ],
+      "children": []
+    },
+    "b-00-overview-20-asset-registry-md-2-11": {
+      "id": "b-00-overview-20-asset-registry-md-2-11",
+      "type": "heading",
+      "props": {
+        "level": 3
+      },
+      "text": [
+        {
+          "insert": "20-asset-registry.md",
+          "attributes": {
+            "reference": {
+              "kind": "doc",
+              "path": "10-scene-engine/20-implementation/10-renderer/20-asset-registry",
+              "label": "20-asset-registry.md"
+            }
+          }
+        }
+      ],
+      "children": []
+    },
+    "b-00-overview-asset-registry-js-mer-12": {
+      "id": "b-00-overview-asset-registry-js-mer-12",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "asset-registry.js",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ": merging active project asset/module/font registries, manifest enrichment, "
+        },
+        {
+          "insert": "resolveAsset",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " semantics, and the optional "
+        },
+        {
+          "insert": "updateEntry",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " maintenance path."
+        }
+      ],
+      "children": []
+    },
+    "b-00-overview-30-asset-renderers-md-13": {
+      "id": "b-00-overview-30-asset-renderers-md-13",
+      "type": "heading",
+      "props": {
+        "level": 3
+      },
+      "text": [
+        {
+          "insert": "30-asset-renderers.md",
+          "attributes": {
+            "reference": {
+              "kind": "doc",
+              "path": "10-scene-engine/20-implementation/10-renderer/30-asset-renderers",
+              "label": "30-asset-renderers.md"
+            }
+          }
+        }
+      ],
+      "children": []
+    },
+    "b-00-overview-the-renderer-registry-14": {
+      "id": "b-00-overview-the-renderer-registry-14",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "The renderer registry ("
+        },
+        {
+          "insert": "registerRenderer",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " / "
+        },
+        {
+          "insert": "getRenderer",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ") and each per-type renderer. Includes the glyph-group slot-mounting algorithm and the manifest-driven component contract."
+        }
+      ],
+      "children": []
+    },
+    "b-00-overview-key-concepts-15": {
+      "id": "b-00-overview-key-concepts-15",
+      "type": "heading",
+      "props": {
+        "level": 2
+      },
+      "text": [
+        {
+          "insert": "Key Concepts"
+        }
+      ],
+      "children": []
+    },
+    "b-00-overview-concept-16-tbl": {
+      "id": "b-00-overview-concept-16-tbl",
+      "type": "structured-table",
+      "props": {
+        "columns": [
+          "Concept",
+          "Description"
+        ],
+        "rows": [
+          [
+            "Scene root",
+            [
+              {
+                "insert": "The "
+              },
+              {
+                "insert": "#stage",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": " element; sized to "
+              },
+              {
+                "insert": "scene.stage.{width,height}",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": "."
+              }
+            ]
+          ],
+          [
+            "Object wrapper",
+            [
+              {
+                "insert": "DOM element returned by a renderer; gets "
+              },
+              {
+                "insert": "position: absolute",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": " and "
+              },
+              {
+                "insert": "data-layer-id",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": "."
+              }
+            ]
+          ],
+          [
+            "Renderer registry",
+            [
+              {
+                "insert": "A "
+              },
+              {
+                "insert": "Map<string, fn>",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": " populated at module load. Keyed by object "
+              },
+              {
+                "insert": "type",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": "."
+              }
+            ]
+          ],
+          [
+            "Asset registry",
+            "The merged in-memory map of asset containers + module entries (with manifests)."
+          ],
+          [
+            "Slot",
+            [
+              {
+                "insert": "An exposed editable sub-surface inside a glyph-group SVG, mounted via "
+              },
+              {
+                "insert": "<foreignObject>",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": "."
+              }
+            ]
+          ],
+          [
+            "Transform mode",
+            [
+              {
+                "insert": "fill",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": " (covers parent) or explicit ("
+              },
+              {
+                "insert": "x",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": ", "
+              },
+              {
+                "insert": "y",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": ", "
+              },
+              {
+                "insert": "width",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": ", "
+              },
+              {
+                "insert": "height",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": ", "
+              },
+              {
+                "insert": "anchor",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": ")."
+              }
+            ]
+          ],
+          [
+            "Reconciliation",
+            "id-keyed update pass that re-uses existing wrappers across re-renders."
+          ]
+        ]
+      },
+      "children": []
+    }
+  }
+}

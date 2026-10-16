@@ -1,0 +1,536 @@
+{
+  "schemaVersion": 1,
+  "id": "scene-engine-20-implementation-30-desktop-app-10-runtime",
+  "title": "Desktop Runtime",
+  "root": "b-10-runtime-root-30",
+  "blocks": {
+    "b-10-runtime-root-30": {
+      "id": "b-10-runtime-root-30",
+      "type": "paragraph",
+      "props": {
+        "code-ref": [
+          "apps/scene-engine/desktop/main/index.ts",
+          "apps/scene-engine/desktop/scripts/dev.mjs",
+          "apps/scene-engine/desktop/scripts/prepare-next-runtime.mjs",
+          "apps/scene-engine/package.json",
+          "apps/scene-engine/next.config.ts"
+        ],
+        "concepts": [
+          "electron-main",
+          "next-standalone",
+          "packaged-runtime",
+          "workspace-seeding",
+          "browser-window-security"
+        ],
+        "covers": "Main Menu desktop runtime startup, packaged Next standalone server, writable workspace seeding, and Electron window security."
+      },
+      "children": [
+        "b-10-runtime-main-menu-runs-the-scene-2",
+        "b-10-runtime-development-mode-3",
+        "b-10-runtime-npm-run-desktop-dev-co-4",
+        "b-10-runtime-checks-whether-http-l-5",
+        "b-10-runtime-reuses-that-server-when-6",
+        "b-10-runtime-starts-a-private-free-po-7",
+        "b-10-runtime-opens-editor-project-c-8",
+        "b-10-runtime-this-keeps-normal-browse-9",
+        "b-10-runtime-packaged-mode-10",
+        "b-10-runtime-the-package-flow-is-11",
+        "b-10-runtime-bash-12",
+        "b-10-runtime-that-expands-to-13",
+        "b-10-runtime-text-14",
+        "b-10-runtime-next-config-ts-sets-o-15",
+        "b-10-runtime-on-launch-electron-copi-16",
+        "b-10-runtime-workspace-handling-17",
+        "b-10-runtime-packaged-runtime-state-l-18",
+        "b-10-runtime-text-19",
+        "b-10-runtime-the-workspace-catalog-st-20",
+        "b-10-runtime-browserwindow-security-21",
+        "b-10-runtime-the-main-browserwindow-u-22",
+        "b-10-runtime-text-23",
+        "b-10-runtime-the-renderer-cannot-call-24",
+        "b-10-runtime-app-identity-25",
+        "b-10-runtime-current-packaged-app-met-26",
+        "b-10-runtime-field-value-27-tbl",
+        "b-10-runtime-the-local-macos-package-28",
+        "b-10-runtime-text-29"
+      ]
+    },
+    "b-10-runtime-main-menu-runs-the-scene-2": {
+      "id": "b-10-runtime-main-menu-runs-the-scene-2",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "Main Menu runs the Scene Engine editor inside Electron. The editor is still served by Next; Electron supplies the native shell and chooses which Next runtime to load."
+        }
+      ],
+      "children": []
+    },
+    "b-10-runtime-development-mode-3": {
+      "id": "b-10-runtime-development-mode-3",
+      "type": "heading",
+      "props": {
+        "level": 2
+      },
+      "text": [
+        {
+          "insert": "Development Mode"
+        }
+      ],
+      "children": []
+    },
+    "b-10-runtime-npm-run-desktop-dev-co-4": {
+      "id": "b-10-runtime-npm-run-desktop-dev-co-4",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "npm run desktop:dev",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " compiles desktop TypeScript and launches Electron. The dev script:"
+        }
+      ],
+      "children": []
+    },
+    "b-10-runtime-checks-whether-http-l-5": {
+      "id": "b-10-runtime-checks-whether-http-l-5",
+      "type": "list-item",
+      "props": {
+        "ordered": true
+      },
+      "text": [
+        {
+          "insert": "checks whether "
+        },
+        {
+          "insert": "http://localhost:3000/",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " is healthy"
+        }
+      ],
+      "children": []
+    },
+    "b-10-runtime-reuses-that-server-when-6": {
+      "id": "b-10-runtime-reuses-that-server-when-6",
+      "type": "list-item",
+      "props": {
+        "ordered": true
+      },
+      "text": [
+        {
+          "insert": "reuses that server when present"
+        }
+      ],
+      "children": []
+    },
+    "b-10-runtime-starts-a-private-free-po-7": {
+      "id": "b-10-runtime-starts-a-private-free-po-7",
+      "type": "list-item",
+      "props": {
+        "ordered": true
+      },
+      "text": [
+        {
+          "insert": "starts a private free-port Next dev server when the default server is unavailable"
+        }
+      ],
+      "children": []
+    },
+    "b-10-runtime-opens-editor-project-c-8": {
+      "id": "b-10-runtime-opens-editor-project-c-8",
+      "type": "list-item",
+      "props": {
+        "ordered": true
+      },
+      "text": [
+        {
+          "insert": "opens "
+        },
+        {
+          "insert": "/editor?project=codecaine&scene=title",
+          "attributes": {
+            "code": true
+          }
+        }
+      ],
+      "children": []
+    },
+    "b-10-runtime-this-keeps-normal-browse-9": {
+      "id": "b-10-runtime-this-keeps-normal-browse-9",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "This keeps normal browser development and desktop development aligned."
+        }
+      ],
+      "children": []
+    },
+    "b-10-runtime-packaged-mode-10": {
+      "id": "b-10-runtime-packaged-mode-10",
+      "type": "heading",
+      "props": {
+        "level": 2
+      },
+      "text": [
+        {
+          "insert": "Packaged Mode"
+        }
+      ],
+      "children": []
+    },
+    "b-10-runtime-the-package-flow-is-11": {
+      "id": "b-10-runtime-the-package-flow-is-11",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "The package flow is:"
+        }
+      ],
+      "children": []
+    },
+    "b-10-runtime-bash-12": {
+      "id": "b-10-runtime-bash-12",
+      "type": "code",
+      "props": {
+        "language": "bash"
+      },
+      "text": [
+        {
+          "insert": "npm run desktop:pack:mac"
+        }
+      ],
+      "children": []
+    },
+    "b-10-runtime-that-expands-to-13": {
+      "id": "b-10-runtime-that-expands-to-13",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "That expands to:"
+        }
+      ],
+      "children": []
+    },
+    "b-10-runtime-text-14": {
+      "id": "b-10-runtime-text-14",
+      "type": "code",
+      "props": {
+        "language": "text"
+      },
+      "text": [
+        {
+          "insert": "desktop:compile\ndesktop:build:next\nelectron-builder --mac dir"
+        }
+      ],
+      "children": []
+    },
+    "b-10-runtime-next-config-ts-sets-o-15": {
+      "id": "b-10-runtime-next-config-ts-sets-o-15",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "next.config.ts",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " sets "
+        },
+        {
+          "insert": "output: 'standalone'",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ". "
+        },
+        {
+          "insert": "desktop/scripts/prepare-next-runtime.mjs",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " copies the Next standalone output into "
+        },
+        {
+          "insert": "desktop/dist-next",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ", alongside a manifest consumed by Electron main. "
+        },
+        {
+          "insert": "electron-builder",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " ships that directory as "
+        },
+        {
+          "insert": "extraResources/next-runtime",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": "."
+        }
+      ],
+      "children": []
+    },
+    "b-10-runtime-on-launch-electron-copi-16": {
+      "id": "b-10-runtime-on-launch-electron-copi-16",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "On launch, Electron copies runtime resources into the user's application support directory and starts the local Next server from there. Runtime project data is writable, not stored inside read-only app resources."
+        }
+      ],
+      "children": []
+    },
+    "b-10-runtime-workspace-handling-17": {
+      "id": "b-10-runtime-workspace-handling-17",
+      "type": "heading",
+      "props": {
+        "level": 2
+      },
+      "text": [
+        {
+          "insert": "Workspace Handling"
+        }
+      ],
+      "children": []
+    },
+    "b-10-runtime-packaged-runtime-state-l-18": {
+      "id": "b-10-runtime-packaged-runtime-state-l-18",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "Packaged runtime state lives below the app user-data directory. Main Menu seeds a workspace directory and points "
+        },
+        {
+          "insert": "SCENE_ENGINE_WORKSPACE_CATALOG",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " at the packaged workspace catalog:"
+        }
+      ],
+      "children": []
+    },
+    "b-10-runtime-text-19": {
+      "id": "b-10-runtime-text-19",
+      "type": "code",
+      "props": {
+        "language": "text"
+      },
+      "text": [
+        {
+          "insert": "~/Library/Application Support/Main Menu/\n├── runtime/<version>/\n├── workspace/\n│   ├── workspace.catalog.example.json\n│   └── workspace.catalog.json\n└── pi-agent-sessions/"
+        }
+      ],
+      "children": []
+    },
+    "b-10-runtime-the-workspace-catalog-st-20": {
+      "id": "b-10-runtime-the-workspace-catalog-st-20",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "The workspace catalog still resolves projects through the same project path adapter as the browser dev server. The desktop app does not bypass the Scene Engine project model."
+        }
+      ],
+      "children": []
+    },
+    "b-10-runtime-browserwindow-security-21": {
+      "id": "b-10-runtime-browserwindow-security-21",
+      "type": "heading",
+      "props": {
+        "level": 2
+      },
+      "text": [
+        {
+          "insert": "BrowserWindow Security"
+        }
+      ],
+      "children": []
+    },
+    "b-10-runtime-the-main-browserwindow-u-22": {
+      "id": "b-10-runtime-the-main-browserwindow-u-22",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "The main BrowserWindow uses:"
+        }
+      ],
+      "children": []
+    },
+    "b-10-runtime-text-23": {
+      "id": "b-10-runtime-text-23",
+      "type": "code",
+      "props": {
+        "language": "text"
+      },
+      "text": [
+        {
+          "insert": "contextIsolation: true\nnodeIntegration: false"
+        }
+      ],
+      "children": []
+    },
+    "b-10-runtime-the-renderer-cannot-call-24": {
+      "id": "b-10-runtime-the-renderer-cannot-call-24",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "The renderer cannot call "
+        },
+        {
+          "insert": "require",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ", import Electron main modules, or touch the filesystem directly. Native capabilities are exposed only through preload's typed "
+        },
+        {
+          "insert": "window.mainMenu",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " bridge."
+        }
+      ],
+      "children": []
+    },
+    "b-10-runtime-app-identity-25": {
+      "id": "b-10-runtime-app-identity-25",
+      "type": "heading",
+      "props": {
+        "level": 2
+      },
+      "text": [
+        {
+          "insert": "App Identity"
+        }
+      ],
+      "children": []
+    },
+    "b-10-runtime-current-packaged-app-met-26": {
+      "id": "b-10-runtime-current-packaged-app-met-26",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "Current packaged app metadata:"
+        }
+      ],
+      "children": []
+    },
+    "b-10-runtime-field-value-27-tbl": {
+      "id": "b-10-runtime-field-value-27-tbl",
+      "type": "structured-table",
+      "props": {
+        "columns": [
+          "Field",
+          "Value"
+        ],
+        "rows": [
+          [
+            "Product name",
+            [
+              {
+                "insert": "Main Menu",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ]
+          ],
+          [
+            "Bundle identifier",
+            [
+              {
+                "insert": "com.codecaine.main-menu",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ]
+          ],
+          [
+            "Output target",
+            [
+              {
+                "insert": "mac "
+              },
+              {
+                "insert": "dir",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ]
+          ],
+          [
+            "Signing/notarization",
+            "skipped"
+          ]
+        ]
+      },
+      "children": []
+    },
+    "b-10-runtime-the-local-macos-package-28": {
+      "id": "b-10-runtime-the-local-macos-package-28",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "The local macOS package path is:"
+        }
+      ],
+      "children": []
+    },
+    "b-10-runtime-text-29": {
+      "id": "b-10-runtime-text-29",
+      "type": "code",
+      "props": {
+        "language": "text"
+      },
+      "text": [
+        {
+          "insert": "apps/scene-engine/dist/desktop/mac-arm64/Main Menu.app"
+        }
+      ],
+      "children": []
+    }
+  }
+}

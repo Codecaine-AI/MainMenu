@@ -1,0 +1,230 @@
+{
+  "schemaVersion": 1,
+  "id": "scene-engine-20-implementation-99-appendix-00-overview",
+  "title": "Appendix",
+  "root": "b-00-overview-root-13",
+  "blocks": {
+    "b-00-overview-root-13": {
+      "id": "b-00-overview-root-13",
+      "type": "paragraph",
+      "props": {
+        "covers": "Operational appendix — running the dev server, URLs that matter, current scenes and assets.",
+        "type": "overview"
+      },
+      "children": [
+        "b-00-overview-operational-reference-h-2",
+        "b-00-overview-divider-3",
+        "b-00-overview-contents-4",
+        "b-00-overview-10-running-md-10-runni-5",
+        "b-00-overview-how-to-start-the-dev-ser-6",
+        "b-00-overview-20-current-state-md-20-7",
+        "b-00-overview-the-scenes-and-assets-cu-8",
+        "b-00-overview-pointers-9",
+        "b-00-overview-agent-quick-start-10",
+        "b-00-overview-repository-instruction-11",
+        "b-00-overview-desktop-app-docs-d-12"
+      ]
+    },
+    "b-00-overview-operational-reference-h-2": {
+      "id": "b-00-overview-operational-reference-h-2",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "Operational reference. How to start the system, where things live, what URLs to hit."
+        }
+      ],
+      "children": []
+    },
+    "b-00-overview-divider-3": {
+      "id": "b-00-overview-divider-3",
+      "type": "divider",
+      "props": {},
+      "children": []
+    },
+    "b-00-overview-contents-4": {
+      "id": "b-00-overview-contents-4",
+      "type": "heading",
+      "props": {
+        "level": 2
+      },
+      "text": [
+        {
+          "insert": "Contents"
+        }
+      ],
+      "children": []
+    },
+    "b-00-overview-10-running-md-10-runni-5": {
+      "id": "b-00-overview-10-running-md-10-runni-5",
+      "type": "heading",
+      "props": {
+        "level": 3
+      },
+      "text": [
+        {
+          "insert": "10-running.md",
+          "attributes": {
+            "reference": {
+              "kind": "doc",
+              "path": "10-scene-engine/20-implementation/99-appendix/10-running",
+              "label": "10-running.md"
+            }
+          }
+        }
+      ],
+      "children": []
+    },
+    "b-00-overview-how-to-start-the-dev-ser-6": {
+      "id": "b-00-overview-how-to-start-the-dev-ser-6",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "How to start the dev server and desktop app, and what URLs serve which surface (dashboard, editor, scene preview, API)."
+        }
+      ],
+      "children": []
+    },
+    "b-00-overview-20-current-state-md-20-7": {
+      "id": "b-00-overview-20-current-state-md-20-7",
+      "type": "heading",
+      "props": {
+        "level": 3
+      },
+      "text": [
+        {
+          "insert": "20-current-state.md",
+          "attributes": {
+            "reference": {
+              "kind": "doc",
+              "path": "10-scene-engine/20-implementation/99-appendix/20-current-state",
+              "label": "20-current-state.md"
+            }
+          }
+        }
+      ],
+      "children": []
+    },
+    "b-00-overview-the-scenes-and-assets-cu-8": {
+      "id": "b-00-overview-the-scenes-and-assets-cu-8",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "The scenes and assets currently in the registry. Snapshot for quick orientation."
+        }
+      ],
+      "children": []
+    },
+    "b-00-overview-pointers-9": {
+      "id": "b-00-overview-pointers-9",
+      "type": "heading",
+      "props": {
+        "level": 2
+      },
+      "text": [
+        {
+          "insert": "Pointers"
+        }
+      ],
+      "children": []
+    },
+    "b-00-overview-agent-quick-start-10": {
+      "id": "b-00-overview-agent-quick-start-10",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "Agent quick-start",
+          "attributes": {
+            "bold": true
+          }
+        },
+        {
+          "insert": ": "
+        },
+        {
+          "insert": "`apps/scene-engine/agents.md`",
+          "attributes": {
+            "reference": {
+              "kind": "source",
+              "path": "apps/scene-engine/agents.md",
+              "label": "`apps/scene-engine/agents.md`"
+            }
+          }
+        },
+        {
+          "insert": ", how to read/write scenes from Claude Code."
+        }
+      ],
+      "children": []
+    },
+    "b-00-overview-repository-instruction-11": {
+      "id": "b-00-overview-repository-instruction-11",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "Repository instructions",
+          "attributes": {
+            "bold": true
+          }
+        },
+        {
+          "insert": ": "
+        },
+        {
+          "insert": "`AGENTS.md`",
+          "attributes": {
+            "reference": {
+              "kind": "source",
+              "path": "AGENTS.md",
+              "label": "`AGENTS.md`"
+            }
+          }
+        },
+        {
+          "insert": ", running assumptions and scene-engine conventions for agents."
+        }
+      ],
+      "children": []
+    },
+    "b-00-overview-desktop-app-docs-d-12": {
+      "id": "b-00-overview-desktop-app-docs-d-12",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "Desktop app docs",
+          "attributes": {
+            "bold": true
+          }
+        },
+        {
+          "insert": ": "
+        },
+        {
+          "insert": "Desktop App",
+          "attributes": {
+            "reference": {
+              "kind": "doc",
+              "path": "10-scene-engine/20-implementation/30-desktop-app",
+              "label": "Desktop App"
+            }
+          }
+        },
+        {
+          "insert": ", Electron runtime and Pi Agent bridge."
+        }
+      ],
+      "children": []
+    }
+  }
+}

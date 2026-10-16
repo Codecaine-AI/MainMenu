@@ -1,0 +1,741 @@
+{
+  "schemaVersion": 1,
+  "id": "scene-engine-10-system-design-00-overview",
+  "title": "System Design",
+  "root": "b-00-overview-root-30",
+  "blocks": {
+    "b-00-overview-root-30": {
+      "id": "b-00-overview-root-30",
+      "type": "paragraph",
+      "props": {
+        "covers": "System Design entry point — language-agnostic blueprints for how the scene-engine works.",
+        "type": "overview"
+      },
+      "children": [
+        "b-00-overview-how-the-scene-engine-wor-2",
+        "b-00-overview-if-a-description-here-wo-3",
+        "b-00-overview-divider-4",
+        "b-00-overview-file-tree-5",
+        "b-00-overview-code-6",
+        "b-00-overview-divider-7",
+        "b-00-overview-contents-8",
+        "b-00-overview-05-project-model-md-05-9",
+        "b-00-overview-the-project-manifest-ho-10",
+        "b-00-overview-10-scene-data-model-md-11",
+        "b-00-overview-the-canonical-scene-shap-12",
+        "b-00-overview-15-component-manifest-m-13",
+        "b-00-overview-the-manifest-convention-14",
+        "b-00-overview-16-property-schema-md-15",
+        "b-00-overview-the-property-schema-conv-16",
+        "b-00-overview-20-asset-registry-md-2-17",
+        "b-00-overview-the-container-indirectio-18",
+        "b-00-overview-30-rendering-pipeline-m-19",
+        "b-00-overview-how-a-scene-becomes-dom-20",
+        "b-00-overview-40-authoring-surfaces-m-21",
+        "b-00-overview-the-authoring-contract-22",
+        "b-00-overview-50-build-output-md-50-23",
+        "b-00-overview-how-a-project-becomes-a-24",
+        "b-00-overview-60-asset-uploads-md-60-25",
+        "b-00-overview-how-new-asset-files-ente-26",
+        "b-00-overview-divider-27",
+        "b-00-overview-key-concepts-28",
+        "b-00-overview-concept-29-tbl"
+      ]
+    },
+    "b-00-overview-how-the-scene-engine-wor-2": {
+      "id": "b-00-overview-how-the-scene-engine-wor-2",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "How the scene-engine works "
+        },
+        {
+          "insert": "as a system",
+          "attributes": {
+            "italic": true
+          }
+        },
+        {
+          "insert": ", independent of the framework and JavaScript specifics that implement it. Read this layer to understand intended behavior before changing it."
+        }
+      ],
+      "children": []
+    },
+    "b-00-overview-if-a-description-here-wo-3": {
+      "id": "b-00-overview-if-a-description-here-wo-3",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "If a description here would still hold true if the engine were rewritten in a different stack, it belongs here. If it depends on a specific module, file path, or framework, it belongs in "
+        },
+        {
+          "insert": "Implementation",
+          "attributes": {
+            "reference": {
+              "kind": "doc",
+              "path": "10-scene-engine/20-implementation",
+              "label": "Implementation"
+            }
+          }
+        },
+        {
+          "insert": "."
+        }
+      ],
+      "children": []
+    },
+    "b-00-overview-divider-4": {
+      "id": "b-00-overview-divider-4",
+      "type": "divider",
+      "props": {},
+      "children": []
+    },
+    "b-00-overview-file-tree-5": {
+      "id": "b-00-overview-file-tree-5",
+      "type": "heading",
+      "props": {
+        "level": 2
+      },
+      "text": [
+        {
+          "insert": "File Tree"
+        }
+      ],
+      "children": []
+    },
+    "b-00-overview-code-6": {
+      "id": "b-00-overview-code-6",
+      "type": "code",
+      "props": {},
+      "text": [
+        {
+          "insert": "docs/10-system-design/\n├── 00-overview.md            (this file)\n├── 05-project-model.md       Project manifest, scenes list, navigation\n├── 10-scene-data-model.md    Canonical SceneObject shape, transform, slots, events\n├── 15-component-manifest.md  manifest.json convention for effects/components\n├── 16-property-schema.md     Sectioned property schemas — labels, descriptions, type taxonomy\n├── 20-asset-registry.md      Containers, dual asset/module manifests, lookup\n├── 30-rendering-pipeline.md  Scene → DOM, dispatch, slots, scene-level grading\n├── 40-authoring-surfaces.md  Editor, desktop shell, Pi Agent — same project data\n├── 50-build-output.md        Standalone export + packaged desktop authoring app\n└── 60-asset-uploads.md       Upload flow + inspector asset-selection dropdown"
+        }
+      ],
+      "children": []
+    },
+    "b-00-overview-divider-7": {
+      "id": "b-00-overview-divider-7",
+      "type": "divider",
+      "props": {},
+      "children": []
+    },
+    "b-00-overview-contents-8": {
+      "id": "b-00-overview-contents-8",
+      "type": "heading",
+      "props": {
+        "level": 2
+      },
+      "text": [
+        {
+          "insert": "Contents"
+        }
+      ],
+      "children": []
+    },
+    "b-00-overview-05-project-model-md-05-9": {
+      "id": "b-00-overview-05-project-model-md-05-9",
+      "type": "heading",
+      "props": {
+        "level": 3
+      },
+      "text": [
+        {
+          "insert": "05-project-model.md",
+          "attributes": {
+            "reference": {
+              "kind": "doc",
+              "path": "10-scene-engine/10-system-design/05-project-model",
+              "label": "05-project-model.md"
+            }
+          }
+        }
+      ],
+      "children": []
+    },
+    "b-00-overview-the-project-manifest-ho-10": {
+      "id": "b-00-overview-the-project-manifest-ho-10",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "The project manifest: how multiple scenes form a deliverable site, the "
+        },
+        {
+          "insert": "entry",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " scene, navigation between scenes, and what intentionally does "
+        },
+        {
+          "insert": "not",
+          "attributes": {
+            "italic": true
+          }
+        },
+        {
+          "insert": " live at the project level."
+        }
+      ],
+      "children": []
+    },
+    "b-00-overview-10-scene-data-model-md-11": {
+      "id": "b-00-overview-10-scene-data-model-md-11",
+      "type": "heading",
+      "props": {
+        "level": 3
+      },
+      "text": [
+        {
+          "insert": "10-scene-data-model.md",
+          "attributes": {
+            "reference": {
+              "kind": "doc",
+              "path": "10-scene-engine/10-system-design/10-scene-data-model",
+              "label": "10-scene-data-model.md"
+            }
+          }
+        }
+      ],
+      "children": []
+    },
+    "b-00-overview-the-canonical-scene-shap-12": {
+      "id": "b-00-overview-the-canonical-scene-shap-12",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "The canonical scene shape: stage, scene-level appearance, the universal SceneObject (transform, appearance, properties, slots, events, children), the eight built-in object types, and z-order semantics."
+        }
+      ],
+      "children": []
+    },
+    "b-00-overview-15-component-manifest-m-13": {
+      "id": "b-00-overview-15-component-manifest-m-13",
+      "type": "heading",
+      "props": {
+        "level": 3
+      },
+      "text": [
+        {
+          "insert": "15-component-manifest.md",
+          "attributes": {
+            "reference": {
+              "kind": "doc",
+              "path": "10-scene-engine/10-system-design/15-component-manifest",
+              "label": "15-component-manifest.md"
+            }
+          }
+        }
+      ],
+      "children": []
+    },
+    "b-00-overview-the-manifest-convention-14": {
+      "id": "b-00-overview-the-manifest-convention-14",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "The manifest convention: a "
+        },
+        {
+          "insert": "manifest.json",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " declaring module-level metadata (name, type, sizing) and, for effects, editable property descriptors. Components use the property schema instead of manifest properties."
+        }
+      ],
+      "children": []
+    },
+    "b-00-overview-16-property-schema-md-15": {
+      "id": "b-00-overview-16-property-schema-md-15",
+      "type": "heading",
+      "props": {
+        "level": 3
+      },
+      "text": [
+        {
+          "insert": "16-property-schema.md",
+          "attributes": {
+            "reference": {
+              "kind": "doc",
+              "path": "10-scene-engine/10-system-design/16-property-schema",
+              "label": "16-property-schema.md"
+            }
+          }
+        }
+      ],
+      "children": []
+    },
+    "b-00-overview-the-property-schema-conv-16": {
+      "id": "b-00-overview-the-property-schema-conv-16",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "The property schema convention: sectioned property declarations with labels, descriptions, and a locked type taxonomy. Drives the inspector for components and built-in layer types. Defines the General fallback, orphan handling, and description popovers."
+        }
+      ],
+      "children": []
+    },
+    "b-00-overview-20-asset-registry-md-2-17": {
+      "id": "b-00-overview-20-asset-registry-md-2-17",
+      "type": "heading",
+      "props": {
+        "level": 3
+      },
+      "text": [
+        {
+          "insert": "20-asset-registry.md",
+          "attributes": {
+            "reference": {
+              "kind": "doc",
+              "path": "10-scene-engine/10-system-design/20-asset-registry",
+              "label": "20-asset-registry.md"
+            }
+          }
+        }
+      ],
+      "children": []
+    },
+    "b-00-overview-the-container-indirectio-18": {
+      "id": "b-00-overview-the-container-indirectio-18",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "The container indirection between scenes and files: dual asset/module manifests, the five file asset types, swap-by-id semantics, and how registry lookup affects renderer dispatch."
+        }
+      ],
+      "children": []
+    },
+    "b-00-overview-30-rendering-pipeline-m-19": {
+      "id": "b-00-overview-30-rendering-pipeline-m-19",
+      "type": "heading",
+      "props": {
+        "level": 3
+      },
+      "text": [
+        {
+          "insert": "30-rendering-pipeline.md",
+          "attributes": {
+            "reference": {
+              "kind": "doc",
+              "path": "10-scene-engine/10-system-design/30-rendering-pipeline",
+              "label": "30-rendering-pipeline.md"
+            }
+          }
+        }
+      ],
+      "children": []
+    },
+    "b-00-overview-how-a-scene-becomes-dom-20": {
+      "id": "b-00-overview-how-a-scene-becomes-dom-20",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "How a scene becomes DOM: registry load, type dispatch, transform/appearance application, glyph-group slot mounting, scene-level color grading, mount-vs-update reconciliation."
+        }
+      ],
+      "children": []
+    },
+    "b-00-overview-40-authoring-surfaces-m-21": {
+      "id": "b-00-overview-40-authoring-surfaces-m-21",
+      "type": "heading",
+      "props": {
+        "level": 3
+      },
+      "text": [
+        {
+          "insert": "40-authoring-surfaces.md",
+          "attributes": {
+            "reference": {
+              "kind": "doc",
+              "path": "10-scene-engine/10-system-design/40-authoring-surfaces",
+              "label": "40-authoring-surfaces.md"
+            }
+          }
+        }
+      ],
+      "children": []
+    },
+    "b-00-overview-the-authoring-contract-22": {
+      "id": "b-00-overview-the-authoring-contract-22",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "The authoring contract: visual editor, desktop shell, and Pi Agent all operate on the same project files. Always-present inspector sections, schema-driven property fields with sections and description popovers, dirty tracking, save semantics, and agent context handoff."
+        }
+      ],
+      "children": []
+    },
+    "b-00-overview-50-build-output-md-50-23": {
+      "id": "b-00-overview-50-build-output-md-50-23",
+      "type": "heading",
+      "props": {
+        "level": 3
+      },
+      "text": [
+        {
+          "insert": "50-build-output.md",
+          "attributes": {
+            "reference": {
+              "kind": "doc",
+              "path": "10-scene-engine/10-system-design/50-build-output",
+              "label": "50-build-output.md"
+            }
+          }
+        }
+      ],
+      "children": []
+    },
+    "b-00-overview-how-a-project-becomes-a-24": {
+      "id": "b-00-overview-how-a-project-becomes-a-24",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "How a project becomes a deployable site or authoring app: "
+        },
+        {
+          "insert": "/api/export",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " builds an active-dependency standalone zip, and the desktop app packages the Next standalone runtime for local editing."
+        }
+      ],
+      "children": []
+    },
+    "b-00-overview-60-asset-uploads-md-60-25": {
+      "id": "b-00-overview-60-asset-uploads-md-60-25",
+      "type": "heading",
+      "props": {
+        "level": 3
+      },
+      "text": [
+        {
+          "insert": "60-asset-uploads.md",
+          "attributes": {
+            "reference": {
+              "kind": "doc",
+              "path": "10-scene-engine/10-system-design/60-asset-uploads",
+              "label": "60-asset-uploads.md"
+            }
+          }
+        }
+      ],
+      "children": []
+    },
+    "b-00-overview-how-new-asset-files-ente-26": {
+      "id": "b-00-overview-how-new-asset-files-ente-26",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "How new asset files enter the system and how scenes select existing containers: the upload page, the inspector dropdown, and the validation rules that gate both."
+        }
+      ],
+      "children": []
+    },
+    "b-00-overview-divider-27": {
+      "id": "b-00-overview-divider-27",
+      "type": "divider",
+      "props": {},
+      "children": []
+    },
+    "b-00-overview-key-concepts-28": {
+      "id": "b-00-overview-key-concepts-28",
+      "type": "heading",
+      "props": {
+        "level": 2
+      },
+      "text": [
+        {
+          "insert": "Key Concepts"
+        }
+      ],
+      "children": []
+    },
+    "b-00-overview-concept-29-tbl": {
+      "id": "b-00-overview-concept-29-tbl",
+      "type": "structured-table",
+      "props": {
+        "columns": [
+          "Concept",
+          "Description"
+        ],
+        "rows": [
+          [
+            "Project",
+            [
+              {
+                "insert": "A "
+              },
+              {
+                "insert": "project.json",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": " plus a set of scenes. Ships as one bundle."
+              }
+            ]
+          ],
+          [
+            "Scene",
+            "A 1440×1080 stage with an ordered tree of typed objects. 1:1 with a page."
+          ],
+          [
+            "Scene object",
+            [
+              {
+                "insert": "The universal entry in a scene's tree. Always has "
+              },
+              {
+                "insert": "transform",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": "; optionally "
+              },
+              {
+                "insert": "appearance",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": ", "
+              },
+              {
+                "insert": "properties",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": ", "
+              },
+              {
+                "insert": "slots",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": ", "
+              },
+              {
+                "insert": "events",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": ", "
+              },
+              {
+                "insert": "children",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": "."
+              }
+            ]
+          ],
+          [
+            "Transform",
+            [
+              {
+                "insert": "Spatial section. Either explicit ("
+              },
+              {
+                "insert": "x",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": ", "
+              },
+              {
+                "insert": "y",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": ", "
+              },
+              {
+                "insert": "width",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": ", "
+              },
+              {
+                "insert": "height",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": ", "
+              },
+              {
+                "insert": "anchor",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": ") or "
+              },
+              {
+                "insert": "mode: \"fill\"",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": "."
+              }
+            ]
+          ],
+          [
+            "Appearance",
+            [
+              {
+                "insert": "Visual section: "
+              },
+              {
+                "insert": "opacity",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": ", "
+              },
+              {
+                "insert": "blend",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": ", "
+              },
+              {
+                "insert": "hue",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": ", "
+              },
+              {
+                "insert": "saturation",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": ", "
+              },
+              {
+                "insert": "fit",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": ". Available at scene and object level."
+              }
+            ]
+          ],
+          [
+            "Slot",
+            "An exposed editable sub-surface inside a glyph-group SVG. Replaces the legacy 40-child array."
+          ],
+          [
+            "Manifest",
+            [
+              {
+                "insert": "A "
+              },
+              {
+                "insert": "manifest.json",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": " next to a component or effect declaring module-level metadata and, for effects, property descriptors."
+              }
+            ]
+          ],
+          [
+            "Property schema",
+            "A sectioned property declaration (labels, descriptions, locked type taxonomy) that drives the inspector for components and built-in layer types."
+          ],
+          [
+            "Asset",
+            "An external file (audio, image, video, glyph, font) referenced by container ID."
+          ],
+          [
+            "Module",
+            "An authored code unit (effect, component) referenced by container ID."
+          ],
+          [
+            "Container",
+            "A typed registry entry that points at a file or module path. Scenes reference containers by ID."
+          ],
+          [
+            "Renderer (per type)",
+            "A function that turns an object plus its registry entry into a DOM wrapper."
+          ],
+          [
+            "Authoring surface",
+            "A way of editing a scene or project. Current surfaces are the browser editor, desktop shell, and Pi Agent."
+          ],
+          [
+            "Desktop shell",
+            "Native wrapper that opens the visual editor and owns privileged local capabilities."
+          ],
+          [
+            "Pi Agent",
+            "Desktop-only chat agent that receives project/scene/selection context and edits through the local workspace."
+          ],
+          [
+            "Stage",
+            "The fixed 1440×1080 box every scene renders into."
+          ]
+        ]
+      },
+      "children": []
+    }
+  }
+}

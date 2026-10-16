@@ -1,0 +1,562 @@
+{
+  "schemaVersion": 1,
+  "id": "scene-engine-00-foundation-30-principles",
+  "title": "Principles & Decisions",
+  "root": "b-30-principles-root-33",
+  "blocks": {
+    "b-30-principles-root-33": {
+      "id": "b-30-principles-root-33",
+      "type": "paragraph",
+      "props": {
+        "concepts": [
+          "principles",
+          "decisions",
+          "scope",
+          "non-goals"
+        ],
+        "covers": "The decisions that shape what does and doesn't belong in the scene-engine."
+      },
+      "children": [
+        "b-30-principles-the-decisions-below-were-2",
+        "b-30-principles-divider-3",
+        "b-30-principles-principles-4",
+        "b-30-principles-1-scene-page-1-1-5",
+        "b-30-principles-each-scene-corresponds-t-6",
+        "b-30-principles-2-composition-is-the-pr-7",
+        "b-30-principles-the-system-optimizes-for-8",
+        "b-30-principles-3-shared-file-authoring-9",
+        "b-30-principles-the-visual-editor-main-10",
+        "b-30-principles-4-content-separate-from-11",
+        "b-30-principles-assets-modules-in-pr-12",
+        "b-30-principles-component-defaults-l-13",
+        "b-30-principles-scenes-are-compositi-14",
+        "b-30-principles-this-avoids-duplication-15",
+        "b-30-principles-5-z-order-is-array-posi-16",
+        "b-30-principles-last-layer-in-the-array-17",
+        "b-30-principles-6-layers-form-a-tree-n-18",
+        "b-30-principles-groups-have-children-19",
+        "b-30-principles-7-the-font-pipeline-sta-20",
+        "b-30-principles-the-python-pipeline-ap-21",
+        "b-30-principles-the-melee-3-vite-editor-22",
+        "b-30-principles-8-the-scene-engine-owns-23",
+        "b-30-principles-the-previous-hand-wired-24",
+        "b-30-principles-divider-25",
+        "b-30-principles-non-goals-26",
+        "b-30-principles-interactive-web-applic-27",
+        "b-30-principles-single-file-standalone-28",
+        "b-30-principles-a-general-purpose-webs-29",
+        "b-30-principles-scene-to-scene-transit-30",
+        "b-30-principles-a-hosted-cms-runtime-31",
+        "b-30-principles-real-time-multi-author-32"
+      ]
+    },
+    "b-30-principles-the-decisions-below-were-2": {
+      "id": "b-30-principles-the-decisions-below-were-2",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "The decisions below were made deliberately during spec. They constrain what the scene-engine should and should not become."
+        }
+      ],
+      "children": []
+    },
+    "b-30-principles-divider-3": {
+      "id": "b-30-principles-divider-3",
+      "type": "divider",
+      "props": {},
+      "children": []
+    },
+    "b-30-principles-principles-4": {
+      "id": "b-30-principles-principles-4",
+      "type": "heading",
+      "props": {
+        "level": 2
+      },
+      "text": [
+        {
+          "insert": "Principles"
+        }
+      ],
+      "children": []
+    },
+    "b-30-principles-1-scene-page-1-1-5": {
+      "id": "b-30-principles-1-scene-page-1-1-5",
+      "type": "heading",
+      "props": {
+        "level": 3
+      },
+      "text": [
+        {
+          "insert": "1. Scene = Page, 1:1"
+        }
+      ],
+      "children": []
+    },
+    "b-30-principles-each-scene-corresponds-t-6": {
+      "id": "b-30-principles-each-scene-corresponds-t-6",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "Each scene corresponds to one full page. No multi-scene composition, no nested scenes, no scene-as-component. The Unity Scene model: one stage, one page."
+        }
+      ],
+      "children": []
+    },
+    "b-30-principles-2-composition-is-the-pr-7": {
+      "id": "b-30-principles-2-composition-is-the-pr-7",
+      "type": "heading",
+      "props": {
+        "level": 3
+      },
+      "text": [
+        {
+          "insert": "2. Composition is the primary authoring activity"
+        }
+      ],
+      "children": []
+    },
+    "b-30-principles-the-system-optimizes-for-8": {
+      "id": "b-30-principles-the-system-optimizes-for-8",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "The system optimizes for "
+        },
+        {
+          "insert": "placing existing assets into a stage",
+          "attributes": {
+            "italic": true
+          }
+        },
+        {
+          "insert": ", not for creating new assets. Asset creation (font pipeline, extraction pipeline) lives outside this app. The scene-engine only consumes registered assets."
+        }
+      ],
+      "children": []
+    },
+    "b-30-principles-3-shared-file-authoring-9": {
+      "id": "b-30-principles-3-shared-file-authoring-9",
+      "type": "heading",
+      "props": {
+        "level": 3
+      },
+      "text": [
+        {
+          "insert": "3. Shared-file authoring is symmetric"
+        }
+      ],
+      "children": []
+    },
+    "b-30-principles-the-visual-editor-main-10": {
+      "id": "b-30-principles-the-visual-editor-main-10",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "The visual editor, Main Menu desktop shell, and Pi Agent all operate on the same project files. None is the source of truth: the files are. No real-time collaboration protocol, no operational transform."
+        }
+      ],
+      "children": []
+    },
+    "b-30-principles-4-content-separate-from-11": {
+      "id": "b-30-principles-4-content-separate-from-11",
+      "type": "heading",
+      "props": {
+        "level": 3
+      },
+      "text": [
+        {
+          "insert": "4. Content separate from composition (Option A)"
+        }
+      ],
+      "children": []
+    },
+    "b-30-principles-assets-modules-in-pr-12": {
+      "id": "b-30-principles-assets-modules-in-pr-12",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "Assets/modules",
+          "attributes": {
+            "bold": true
+          }
+        },
+        {
+          "insert": " in project registries are reusable visual building blocks."
+        }
+      ],
+      "children": []
+    },
+    "b-30-principles-component-defaults-l-13": {
+      "id": "b-30-principles-component-defaults-l-13",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "Component defaults",
+          "attributes": {
+            "bold": true
+          }
+        },
+        {
+          "insert": " live with each component module."
+        }
+      ],
+      "children": []
+    },
+    "b-30-principles-scenes-are-compositi-14": {
+      "id": "b-30-principles-scenes-are-compositi-14",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "Scenes",
+          "attributes": {
+            "bold": true
+          }
+        },
+        {
+          "insert": " are composition manifests: they reference assets by ID, declare placement, and may carry instance-level properties for editor-owned state."
+        }
+      ],
+      "children": []
+    },
+    "b-30-principles-this-avoids-duplication-15": {
+      "id": "b-30-principles-this-avoids-duplication-15",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "This avoids duplication and keeps the editor focused on visual composition rather than copywriting."
+        }
+      ],
+      "children": []
+    },
+    "b-30-principles-5-z-order-is-array-posi-16": {
+      "id": "b-30-principles-5-z-order-is-array-posi-16",
+      "type": "heading",
+      "props": {
+        "level": 3
+      },
+      "text": [
+        {
+          "insert": "5. Z-order is array position"
+        }
+      ],
+      "children": []
+    },
+    "b-30-principles-last-layer-in-the-array-17": {
+      "id": "b-30-principles-last-layer-in-the-array-17",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "Last layer in the array renders on top. No z-index numbers, no separate ordering field. The data shape "
+        },
+        {
+          "insert": "is",
+          "attributes": {
+            "italic": true
+          }
+        },
+        {
+          "insert": " the order."
+        }
+      ],
+      "children": []
+    },
+    "b-30-principles-6-layers-form-a-tree-n-18": {
+      "id": "b-30-principles-6-layers-form-a-tree-n-18",
+      "type": "heading",
+      "props": {
+        "level": 3
+      },
+      "text": [
+        {
+          "insert": "6. Layers form a tree, not a flat stack"
+        }
+      ],
+      "children": []
+    },
+    "b-30-principles-groups-have-children-19": {
+      "id": "b-30-principles-groups-have-children-19",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "Groups have "
+        },
+        {
+          "insert": "children",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ". Children can either be "
+        },
+        {
+          "insert": "named sub-layer overrides",
+          "attributes": {
+            "bold": true
+          }
+        },
+        {
+          "insert": " (referencing an SVG "
+        },
+        {
+          "insert": "data-layer",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " attribute) or "
+        },
+        {
+          "insert": "foreign assets",
+          "attributes": {
+            "bold": true
+          }
+        },
+        {
+          "insert": " (full layers interleaved between sub-layers). This enables fine-grained z-depth control inside complex assets like the CODECAINE logo."
+        }
+      ],
+      "children": []
+    },
+    "b-30-principles-7-the-font-pipeline-sta-20": {
+      "id": "b-30-principles-7-the-font-pipeline-sta-20",
+      "type": "heading",
+      "props": {
+        "level": 3
+      },
+      "text": [
+        {
+          "insert": "7. The font pipeline stays separate; the editor app is absorbed"
+        }
+      ],
+      "children": []
+    },
+    "b-30-principles-the-python-pipeline-ap-21": {
+      "id": "b-30-principles-the-python-pipeline-ap-21",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "The Python pipeline ("
+        },
+        {
+          "insert": "apps/font-creation/pipeline/",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ") remains a standalone asset factory."
+        }
+      ],
+      "children": []
+    },
+    "b-30-principles-the-melee-3-vite-editor-22": {
+      "id": "b-30-principles-the-melee-3-vite-editor-22",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "The melee-3 Vite editor app is folded into the scene editor as the glyph-group property inspector. One editor, not two."
+        }
+      ],
+      "children": []
+    },
+    "b-30-principles-8-the-scene-engine-owns-23": {
+      "id": "b-30-principles-8-the-scene-engine-owns-23",
+      "type": "heading",
+      "props": {
+        "level": 3
+      },
+      "text": [
+        {
+          "insert": "8. The scene-engine owns the Codecaine site workspace"
+        }
+      ],
+      "children": []
+    },
+    "b-30-principles-the-previous-hand-wired-24": {
+      "id": "b-30-principles-the-previous-hand-wired-24",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "The previous hand-wired Vite multi-page app is retired. Codecaine now lives as an external project workspace with its own repository. Current pages ("
+        },
+        {
+          "insert": "title",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ", "
+        },
+        {
+          "insert": "menu",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ") are scenes; future pages rebuild as scenes. Shared infrastructure (CRT, audio, menu components, media) becomes project assets/modules, not page-bootstrapped scaffolding."
+        }
+      ],
+      "children": []
+    },
+    "b-30-principles-divider-25": {
+      "id": "b-30-principles-divider-25",
+      "type": "divider",
+      "props": {},
+      "children": []
+    },
+    "b-30-principles-non-goals-26": {
+      "id": "b-30-principles-non-goals-26",
+      "type": "heading",
+      "props": {
+        "level": 2
+      },
+      "text": [
+        {
+          "insert": "Non-Goals"
+        }
+      ],
+      "children": []
+    },
+    "b-30-principles-interactive-web-applic-27": {
+      "id": "b-30-principles-interactive-web-applic-27",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "Interactive web applications.",
+          "attributes": {
+            "bold": true
+          }
+        },
+        {
+          "insert": " This is for landing pages and static sites."
+        }
+      ],
+      "children": []
+    },
+    "b-30-principles-single-file-standalone-28": {
+      "id": "b-30-principles-single-file-standalone-28",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "Single-file standalone HTML exports.",
+          "attributes": {
+            "bold": true
+          }
+        },
+        {
+          "insert": " Media (videos) requires bundling."
+        }
+      ],
+      "children": []
+    },
+    "b-30-principles-a-general-purpose-webs-29": {
+      "id": "b-30-principles-a-general-purpose-webs-29",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "A general-purpose website builder.",
+          "attributes": {
+            "bold": true
+          }
+        },
+        {
+          "insert": " Built for one author, with one taste."
+        }
+      ],
+      "children": []
+    },
+    "b-30-principles-scene-to-scene-transit-30": {
+      "id": "b-30-principles-scene-to-scene-transit-30",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "Scene-to-scene transitions or navigation in the editor.",
+          "attributes": {
+            "bold": true
+          }
+        },
+        {
+          "insert": " Navigation is a rendered-website concern. The editor views one scene at a time."
+        }
+      ],
+      "children": []
+    },
+    "b-30-principles-a-hosted-cms-runtime-31": {
+      "id": "b-30-principles-a-hosted-cms-runtime-31",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "A hosted CMS runtime.",
+          "attributes": {
+            "bold": true
+          }
+        },
+        {
+          "insert": " Exports are static bundles, and desktop packaging is for authoring the local workspace."
+        }
+      ],
+      "children": []
+    },
+    "b-30-principles-real-time-multi-author-32": {
+      "id": "b-30-principles-real-time-multi-author-32",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "Real-time multi-author collaboration.",
+          "attributes": {
+            "bold": true
+          }
+        },
+        {
+          "insert": " The agent and the human are not editing simultaneously."
+        }
+      ],
+      "children": []
+    }
+  }
+}

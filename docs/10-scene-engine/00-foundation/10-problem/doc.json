@@ -1,0 +1,307 @@
+{
+  "schemaVersion": 1,
+  "id": "scene-engine-00-foundation-10-problem",
+  "title": "The Problem",
+  "root": "b-10-problem-root-18",
+  "blocks": {
+    "b-10-problem-root-18": {
+      "id": "b-10-problem-root-18",
+      "type": "paragraph",
+      "props": {
+        "concepts": [
+          "composition",
+          "friction",
+          "hand-wired",
+          "asset-library"
+        ],
+        "covers": "The composition friction that makes hand-wired pages the bottleneck once the asset library starts to grow."
+      },
+      "children": [
+        "b-10-problem-building-visually-rich-l-2",
+        "b-10-problem-divider-3",
+        "b-10-problem-what-hand-wiring-looks-l-4",
+        "b-10-problem-pages-share-a-fixed-scaf-5",
+        "b-10-problem-there-is-no-shared-notio-6",
+        "b-10-problem-why-it-doesn-t-scale-7",
+        "b-10-problem-the-library-of-producibl-8",
+        "b-10-problem-the-font-pipeline-emits-9",
+        "b-10-problem-media-inputs-include-v-10",
+        "b-10-problem-reusable-css-effects-11",
+        "b-10-problem-the-asset-extraction-pip-12",
+        "b-10-problem-every-new-combination-of-13",
+        "b-10-problem-the-authoring-bottleneck-14",
+        "b-10-problem-the-user-s-iterative-wor-15",
+        "b-10-problem-what-s-already-working-16",
+        "b-10-problem-the-font-creation-editor-17"
+      ]
+    },
+    "b-10-problem-building-visually-rich-l-2": {
+      "id": "b-10-problem-building-visually-rich-l-2",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "Building visually rich landing pages currently means hand-wiring every visual element directly in page-specific CSS and JavaScript. Each new page or visual variation requires bespoke code rather than composing existing pieces. As the asset library grows, chrome glyphs from the font pipeline, video loops, CSS effects, the upcoming CODECAINE-in-a-background scene, the friction of assembling assets into new compositions, not creating the assets themselves, is the bottleneck."
+        }
+      ],
+      "children": []
+    },
+    "b-10-problem-divider-3": {
+      "id": "b-10-problem-divider-3",
+      "type": "divider",
+      "props": {},
+      "children": []
+    },
+    "b-10-problem-what-hand-wiring-looks-l-4": {
+      "id": "b-10-problem-what-hand-wiring-looks-l-4",
+      "type": "heading",
+      "props": {
+        "level": 2
+      },
+      "text": [
+        {
+          "insert": "What Hand-Wiring Looks Like"
+        }
+      ],
+      "children": []
+    },
+    "b-10-problem-pages-share-a-fixed-scaf-5": {
+      "id": "b-10-problem-pages-share-a-fixed-scaf-5",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "Pages share a fixed scaffold (vortex + CRT overlay + audio) injected by a common bootstrapper, but the visual content of each page is per-page CSS/JS. Adding a new visual variant means writing new bespoke page code: importing the right asset, positioning it, layering it under or over the existing scaffold, wiring its animations."
+        }
+      ],
+      "children": []
+    },
+    "b-10-problem-there-is-no-shared-notio-6": {
+      "id": "b-10-problem-there-is-no-shared-notio-6",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "There is no shared notion of \"an asset placed at z-index N with these properties.\" There is only \"a page with this hand-coded markup.\""
+        }
+      ],
+      "children": []
+    },
+    "b-10-problem-why-it-doesn-t-scale-7": {
+      "id": "b-10-problem-why-it-doesn-t-scale-7",
+      "type": "heading",
+      "props": {
+        "level": 2
+      },
+      "text": [
+        {
+          "insert": "Why It Doesn't Scale"
+        }
+      ],
+      "children": []
+    },
+    "b-10-problem-the-library-of-producibl-8": {
+      "id": "b-10-problem-the-library-of-producibl-8",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "The library of producible visual material is growing faster than the library of pages."
+        }
+      ],
+      "children": []
+    },
+    "b-10-problem-the-font-pipeline-emits-9": {
+      "id": "b-10-problem-the-font-pipeline-emits-9",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "The font pipeline emits "
+        },
+        {
+          "insert": "layered SVG glyphs",
+          "attributes": {
+            "bold": true
+          }
+        },
+        {
+          "insert": " (~30 sub-layers each) such as "
+        },
+        {
+          "insert": "CODECAINE.css-layers.svg",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": "."
+        }
+      ],
+      "children": []
+    },
+    "b-10-problem-media-inputs-include-v-10": {
+      "id": "b-10-problem-media-inputs-include-v-10",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "Media inputs include "
+        },
+        {
+          "insert": "video loops",
+          "attributes": {
+            "bold": true
+          }
+        },
+        {
+          "insert": " ("
+        },
+        {
+          "insert": "test-fire-2.mp4",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ", "
+        },
+        {
+          "insert": "test-fire-3.mp4",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ")."
+        }
+      ],
+      "children": []
+    },
+    "b-10-problem-reusable-css-effects-11": {
+      "id": "b-10-problem-reusable-css-effects-11",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "Reusable "
+        },
+        {
+          "insert": "CSS effects",
+          "attributes": {
+            "bold": true
+          }
+        },
+        {
+          "insert": " (vortex, CRT overlay, chromatic aberration) drift across page-specific stylesheets."
+        }
+      ],
+      "children": []
+    },
+    "b-10-problem-the-asset-extraction-pip-12": {
+      "id": "b-10-problem-the-asset-extraction-pip-12",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "The asset-extraction pipeline produces additional reconstructed Melee assets."
+        }
+      ],
+      "children": []
+    },
+    "b-10-problem-every-new-combination-of-13": {
+      "id": "b-10-problem-every-new-combination-of-13",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "Every new combination of these into a stage requires writing rendering wiring from scratch, even though the rendering logic for \"show this video full-stage,\" \"show this CSS effect on top,\" \"place this glyph centered top-third\" repeats every time."
+        }
+      ],
+      "children": []
+    },
+    "b-10-problem-the-authoring-bottleneck-14": {
+      "id": "b-10-problem-the-authoring-bottleneck-14",
+      "type": "heading",
+      "props": {
+        "level": 2
+      },
+      "text": [
+        {
+          "insert": "The Authoring Bottleneck"
+        }
+      ],
+      "children": []
+    },
+    "b-10-problem-the-user-s-iterative-wor-15": {
+      "id": "b-10-problem-the-user-s-iterative-wor-15",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "The user's iterative work is on "
+        },
+        {
+          "insert": "composition",
+          "attributes": {
+            "bold": true
+          }
+        },
+        {
+          "insert": ": figuring out layer order, blend modes, normal mappings, where to interleave a video texture between two glyph sub-layers, not on rendering plumbing. The hand-wired model keeps reintroducing rendering plumbing as a tax on every composition decision."
+        }
+      ],
+      "children": []
+    },
+    "b-10-problem-what-s-already-working-16": {
+      "id": "b-10-problem-what-s-already-working-16",
+      "type": "heading",
+      "props": {
+        "level": 2
+      },
+      "text": [
+        {
+          "insert": "What's Already Working"
+        }
+      ],
+      "children": []
+    },
+    "b-10-problem-the-font-creation-editor-17": {
+      "id": "b-10-problem-the-font-creation-editor-17",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "The font-creation editor ("
+        },
+        {
+          "insert": "apps/font-creation/app/melee-3/",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ") proved a workable pattern at the glyph level: a "
+        },
+        {
+          "insert": "layer-recipe.json",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " is edited both by UI panels and by a backend regeneration API, and the rendered output reflects either source of edits. The scene-engine generalizes that proven pattern from one glyph to one full page."
+        }
+      ],
+      "children": []
+    }
+  }
+}

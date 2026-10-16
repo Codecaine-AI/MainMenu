@@ -1,0 +1,955 @@
+{
+  "schemaVersion": 1,
+  "id": "scene-engine-20-implementation-99-appendix-10-running",
+  "title": "Running",
+  "root": "b-10-running-root-47",
+  "blocks": {
+    "b-10-running-root-47": {
+      "id": "b-10-running-root-47",
+      "type": "paragraph",
+      "props": {
+        "concepts": [
+          "dev-server",
+          "urls",
+          "npm-scripts",
+          "makefile"
+        ],
+        "covers": "Dev server startup, build commands, the URLs the scene-engine serves."
+      },
+      "children": [
+        "b-10-running-two-ways-to-start-the-sc-2",
+        "b-10-running-divider-3",
+        "b-10-running-start-the-dev-server-4",
+        "b-10-running-from-the-scene-engine-di-5",
+        "b-10-running-bash-6",
+        "b-10-running-or-from-the-repo-root-7",
+        "b-10-running-bash-8",
+        "b-10-running-the-makefile-sets-front-9",
+        "b-10-running-the-dev-server-listens-o-10",
+        "b-10-running-production-build-11",
+        "b-10-running-bash-12",
+        "b-10-running-the-production-build-is-13",
+        "b-10-running-desktop-app-14",
+        "b-10-running-from-apps-scene-engine-15",
+        "b-10-running-bash-16",
+        "b-10-running-desktop-dev-opens-the-17",
+        "b-10-running-package-the-macos-app-di-18",
+        "b-10-running-bash-19",
+        "b-10-running-the-package-flow-compile-20",
+        "b-10-running-text-21",
+        "b-10-running-signing-notarization-a-22",
+        "b-10-running-urls-23",
+        "b-10-running-url-24-tbl",
+        "b-10-running-the-api-endpoints-a-25",
+        "b-10-running-workspace-catalog-26",
+        "b-10-running-the-engine-discovers-ext-27",
+        "b-10-running-text-28",
+        "b-10-running-for-the-current-codecain-29",
+        "b-10-running-text-30",
+        "b-10-running-use-scene-engine-worksp-31",
+        "b-10-running-deploy-a-project-workspa-32",
+        "b-10-running-the-project-page-has-a-d-33",
+        "b-10-running-bash-34",
+        "b-10-running-the-route-is-localhost-o-35",
+        "b-10-running-adding-a-new-scene-36",
+        "b-10-running-create-assets-scenes-i-37",
+        "b-10-running-add-the-scene-to-projec-38",
+        "b-10-running-the-new-scene-appears-on-39",
+        "b-10-running-export-a-standalone-site-40",
+        "b-10-running-from-any-running-scene-e-41",
+        "b-10-running-bash-42",
+        "b-10-running-after-extracting-the-zip-43",
+        "b-10-running-bash-44",
+        "b-10-running-or-45",
+        "b-10-running-bash-46"
+      ]
+    },
+    "b-10-running-two-ways-to-start-the-sc-2": {
+      "id": "b-10-running-two-ways-to-start-the-sc-2",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "Two ways to start the scene-engine: directly with npm, or via the repository-root Makefile."
+        }
+      ],
+      "children": []
+    },
+    "b-10-running-divider-3": {
+      "id": "b-10-running-divider-3",
+      "type": "divider",
+      "props": {},
+      "children": []
+    },
+    "b-10-running-start-the-dev-server-4": {
+      "id": "b-10-running-start-the-dev-server-4",
+      "type": "heading",
+      "props": {
+        "level": 2
+      },
+      "text": [
+        {
+          "insert": "Start the dev server"
+        }
+      ],
+      "children": []
+    },
+    "b-10-running-from-the-scene-engine-di-5": {
+      "id": "b-10-running-from-the-scene-engine-di-5",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "From the scene-engine directory:"
+        }
+      ],
+      "children": []
+    },
+    "b-10-running-bash-6": {
+      "id": "b-10-running-bash-6",
+      "type": "code",
+      "props": {
+        "language": "bash"
+      },
+      "text": [
+        {
+          "insert": "cd apps/scene-engine\nnpm install   # first time only\nnpm run dev"
+        }
+      ],
+      "children": []
+    },
+    "b-10-running-or-from-the-repo-root-7": {
+      "id": "b-10-running-or-from-the-repo-root-7",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "Or from the repo root:"
+        }
+      ],
+      "children": []
+    },
+    "b-10-running-bash-8": {
+      "id": "b-10-running-bash-8",
+      "type": "code",
+      "props": {
+        "language": "bash"
+      },
+      "text": [
+        {
+          "insert": "make dev"
+        }
+      ],
+      "children": []
+    },
+    "b-10-running-the-makefile-sets-front-9": {
+      "id": "b-10-running-the-makefile-sets-front-9",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "The Makefile sets "
+        },
+        {
+          "insert": "FRONTEND_DIR=apps/scene-engine",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " and forwards."
+        }
+      ],
+      "children": []
+    },
+    "b-10-running-the-dev-server-listens-o-10": {
+      "id": "b-10-running-the-dev-server-listens-o-10",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "The dev server listens on "
+        },
+        {
+          "insert": "http://localhost:3000",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": "."
+        }
+      ],
+      "children": []
+    },
+    "b-10-running-production-build-11": {
+      "id": "b-10-running-production-build-11",
+      "type": "heading",
+      "props": {
+        "level": 2
+      },
+      "text": [
+        {
+          "insert": "Production build"
+        }
+      ],
+      "children": []
+    },
+    "b-10-running-bash-12": {
+      "id": "b-10-running-bash-12",
+      "type": "code",
+      "props": {
+        "language": "bash"
+      },
+      "text": [
+        {
+          "insert": "npm run build       # outputs apps/scene-engine/.next/\nmake build          # same, from repo root"
+        }
+      ],
+      "children": []
+    },
+    "b-10-running-the-production-build-is-13": {
+      "id": "b-10-running-the-production-build-is-13",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "The production build is a Next.js app. Use "
+        },
+        {
+          "insert": "npm run start",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " or "
+        },
+        {
+          "insert": "make preview",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " after building to serve it locally."
+        }
+      ],
+      "children": []
+    },
+    "b-10-running-desktop-app-14": {
+      "id": "b-10-running-desktop-app-14",
+      "type": "heading",
+      "props": {
+        "level": 2
+      },
+      "text": [
+        {
+          "insert": "Desktop app"
+        }
+      ],
+      "children": []
+    },
+    "b-10-running-from-apps-scene-engine-15": {
+      "id": "b-10-running-from-apps-scene-engine-15",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "From "
+        },
+        {
+          "insert": "apps/scene-engine",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ":"
+        }
+      ],
+      "children": []
+    },
+    "b-10-running-bash-16": {
+      "id": "b-10-running-bash-16",
+      "type": "code",
+      "props": {
+        "language": "bash"
+      },
+      "text": [
+        {
+          "insert": "npm run desktop:compile\nnpm run desktop:dev"
+        }
+      ],
+      "children": []
+    },
+    "b-10-running-desktop-dev-opens-the-17": {
+      "id": "b-10-running-desktop-dev-opens-the-17",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "desktop:dev",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " opens the Main Menu Electron app. It reuses "
+        },
+        {
+          "insert": "http://localhost:3000/",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " when that server is already healthy; otherwise it starts a private free-port Next dev server and opens the editor route."
+        }
+      ],
+      "children": []
+    },
+    "b-10-running-package-the-macos-app-di-18": {
+      "id": "b-10-running-package-the-macos-app-di-18",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "Package the macOS app directory:"
+        }
+      ],
+      "children": []
+    },
+    "b-10-running-bash-19": {
+      "id": "b-10-running-bash-19",
+      "type": "code",
+      "props": {
+        "language": "bash"
+      },
+      "text": [
+        {
+          "insert": "npm run desktop:pack:mac"
+        }
+      ],
+      "children": []
+    },
+    "b-10-running-the-package-flow-compile-20": {
+      "id": "b-10-running-the-package-flow-compile-20",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "The package flow compiles Electron main/preload code, builds Next with "
+        },
+        {
+          "insert": "output: 'standalone'",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ", stages the runtime under "
+        },
+        {
+          "insert": "desktop/dist-next",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ", and writes the app directory under:"
+        }
+      ],
+      "children": []
+    },
+    "b-10-running-text-21": {
+      "id": "b-10-running-text-21",
+      "type": "code",
+      "props": {
+        "language": "text"
+      },
+      "text": [
+        {
+          "insert": "apps/scene-engine/dist/desktop/mac-arm64/Main Menu.app"
+        }
+      ],
+      "children": []
+    },
+    "b-10-running-signing-notarization-a-22": {
+      "id": "b-10-running-signing-notarization-a-22",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "Signing, notarization, auto-update, and installer packaging are not part of the current command set."
+        }
+      ],
+      "children": []
+    },
+    "b-10-running-urls-23": {
+      "id": "b-10-running-urls-23",
+      "type": "heading",
+      "props": {
+        "level": 2
+      },
+      "text": [
+        {
+          "insert": "URLs"
+        }
+      ],
+      "children": []
+    },
+    "b-10-running-url-24-tbl": {
+      "id": "b-10-running-url-24-tbl",
+      "type": "structured-table",
+      "props": {
+        "columns": [
+          "URL",
+          "What it serves"
+        ],
+        "rows": [
+          [
+            [
+              {
+                "insert": "http://localhost:3000/",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ],
+            "Dashboard: list of projects"
+          ],
+          [
+            [
+              {
+                "insert": "http://localhost:3000/projects/<project-id>",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ],
+            "Project page: list of scenes + links"
+          ],
+          [
+            [
+              {
+                "insert": "http://localhost:3000/scenes/<id>?project=<project-id>",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ],
+            "Preview of one project scene"
+          ],
+          [
+            [
+              {
+                "insert": "http://localhost:3000/editor?project=<project-id>&scene=<id>",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ],
+            "Visual editor for the named scene"
+          ],
+          [
+            [
+              {
+                "insert": "http://localhost:3000/upload",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ],
+            "Asset upload page"
+          ],
+          [
+            [
+              {
+                "insert": "http://localhost:3000/upload?project=<project-id>",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ],
+            "Project-scoped asset upload page"
+          ],
+          [
+            [
+              {
+                "insert": "http://localhost:3000/api/projects/<project-id>/registries/assets",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ],
+            "Project asset registry"
+          ],
+          [
+            [
+              {
+                "insert": "http://localhost:3000/api/projects/<project-id>/registries/modules",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ],
+            "Project module registry"
+          ],
+          [
+            [
+              {
+                "insert": "http://localhost:3000/api/projects/<project-id>/deploy",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ],
+            [
+              {
+                "insert": "POST",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": ": commit and push external project repo"
+              }
+            ]
+          ],
+          [
+            [
+              {
+                "insert": "http://localhost:3000/api/scenes?project=<project-id>",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ],
+            [
+              {
+                "insert": "GET",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": ": list scenes"
+              }
+            ]
+          ],
+          [
+            [
+              {
+                "insert": "http://localhost:3000/api/scenes/<id>?project=<project-id>",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ],
+            [
+              {
+                "insert": "GET",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": " / "
+              },
+              {
+                "insert": "PUT",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": " scene JSON"
+              }
+            ]
+          ],
+          [
+            [
+              {
+                "insert": "http://localhost:3000/api/export?project=<project-id>",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ],
+            [
+              {
+                "insert": "POST",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": ": standalone zip export"
+              }
+            ]
+          ]
+        ]
+      },
+      "children": []
+    },
+    "b-10-running-the-api-endpoints-a-25": {
+      "id": "b-10-running-the-api-endpoints-a-25",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "The "
+        },
+        {
+          "insert": "/api/*",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " endpoints are Next route handlers and are part of the app runtime."
+        }
+      ],
+      "children": []
+    },
+    "b-10-running-workspace-catalog-26": {
+      "id": "b-10-running-workspace-catalog-26",
+      "type": "heading",
+      "props": {
+        "level": 2
+      },
+      "text": [
+        {
+          "insert": "Workspace catalog"
+        }
+      ],
+      "children": []
+    },
+    "b-10-running-the-engine-discovers-ext-27": {
+      "id": "b-10-running-the-engine-discovers-ext-27",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "The engine discovers external projects through "
+        },
+        {
+          "insert": "apps/scene-engine/workspace.catalog.json",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ". That file is local and gitignored. Start from:"
+        }
+      ],
+      "children": []
+    },
+    "b-10-running-text-28": {
+      "id": "b-10-running-text-28",
+      "type": "code",
+      "props": {
+        "language": "text"
+      },
+      "text": [
+        {
+          "insert": "apps/scene-engine/workspace.catalog.example.json"
+        }
+      ],
+      "children": []
+    },
+    "b-10-running-for-the-current-codecain-29": {
+      "id": "b-10-running-for-the-current-codecain-29",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "For the current Codecaine workspace, the catalog root resolves from "
+        },
+        {
+          "insert": "apps/scene-engine",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " to:"
+        }
+      ],
+      "children": []
+    },
+    "b-10-running-text-30": {
+      "id": "b-10-running-text-30",
+      "type": "code",
+      "props": {
+        "language": "text"
+      },
+      "text": [
+        {
+          "insert": "../../../codecaine-site"
+        }
+      ],
+      "children": []
+    },
+    "b-10-running-use-scene-engine-worksp-31": {
+      "id": "b-10-running-use-scene-engine-worksp-31",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "Use "
+        },
+        {
+          "insert": "SCENE_ENGINE_WORKSPACE_CATALOG=/absolute/or/relative/path.json",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " to point the server at another catalog file."
+        }
+      ],
+      "children": []
+    },
+    "b-10-running-deploy-a-project-workspa-32": {
+      "id": "b-10-running-deploy-a-project-workspa-32",
+      "type": "heading",
+      "props": {
+        "level": 2
+      },
+      "text": [
+        {
+          "insert": "Deploy a project workspace"
+        }
+      ],
+      "children": []
+    },
+    "b-10-running-the-project-page-has-a-d-33": {
+      "id": "b-10-running-the-project-page-has-a-d-33",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "The project page has a Deploy button for external catalog projects. It calls:"
+        }
+      ],
+      "children": []
+    },
+    "b-10-running-bash-34": {
+      "id": "b-10-running-bash-34",
+      "type": "code",
+      "props": {
+        "language": "bash"
+      },
+      "text": [
+        {
+          "insert": "curl -fS -X POST \"http://localhost:3000/api/projects/codecaine/deploy\""
+        }
+      ],
+      "children": []
+    },
+    "b-10-running-the-route-is-localhost-o-35": {
+      "id": "b-10-running-the-route-is-localhost-o-35",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "The route is localhost-only unless "
+        },
+        {
+          "insert": "SCENE_ENGINE_ALLOW_REMOTE_DEPLOY=1",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " is set. It resolves the project root from the workspace catalog, writes "
+        },
+        {
+          "insert": "ProjectSettings/deployment.json",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " as a deploy marker, stages all project-repo changes, commits them, and pushes the current branch. Railway then deploys from the Codecaine site GitHub repository."
+        }
+      ],
+      "children": []
+    },
+    "b-10-running-adding-a-new-scene-36": {
+      "id": "b-10-running-adding-a-new-scene-36",
+      "type": "heading",
+      "props": {
+        "level": 2
+      },
+      "text": [
+        {
+          "insert": "Adding a New Scene"
+        }
+      ],
+      "children": []
+    },
+    "b-10-running-create-assets-scenes-i-37": {
+      "id": "b-10-running-create-assets-scenes-i-37",
+      "type": "list-item",
+      "props": {
+        "ordered": true
+      },
+      "text": [
+        {
+          "insert": "Create "
+        },
+        {
+          "insert": "Assets/Scenes/<id>/scene.json",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " under the catalog project root (kebab-case "
+        },
+        {
+          "insert": "id",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ")."
+        }
+      ],
+      "children": []
+    },
+    "b-10-running-add-the-scene-to-projec-38": {
+      "id": "b-10-running-add-the-scene-to-projec-38",
+      "type": "list-item",
+      "props": {
+        "ordered": true
+      },
+      "text": [
+        {
+          "insert": "Add the scene to "
+        },
+        {
+          "insert": "ProjectSettings/project.json",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": "."
+        }
+      ],
+      "children": []
+    },
+    "b-10-running-the-new-scene-appears-on-39": {
+      "id": "b-10-running-the-new-scene-appears-on-39",
+      "type": "list-item",
+      "props": {
+        "ordered": true
+      },
+      "text": [
+        {
+          "insert": "The new scene appears on the project page and is accessible at "
+        },
+        {
+          "insert": "/scenes/<id>?project=<project-id>",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": "."
+        }
+      ],
+      "children": []
+    },
+    "b-10-running-export-a-standalone-site-40": {
+      "id": "b-10-running-export-a-standalone-site-40",
+      "type": "heading",
+      "props": {
+        "level": 2
+      },
+      "text": [
+        {
+          "insert": "Export a standalone site"
+        }
+      ],
+      "children": []
+    },
+    "b-10-running-from-any-running-scene-e-41": {
+      "id": "b-10-running-from-any-running-scene-e-41",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "From any running Scene Engine server:"
+        }
+      ],
+      "children": []
+    },
+    "b-10-running-bash-42": {
+      "id": "b-10-running-bash-42",
+      "type": "code",
+      "props": {
+        "language": "bash"
+      },
+      "text": [
+        {
+          "insert": "curl -fS -X POST \"http://localhost:3000/api/export?project=codecaine\" -o codecaine.zip"
+        }
+      ],
+      "children": []
+    },
+    "b-10-running-after-extracting-the-zip-43": {
+      "id": "b-10-running-after-extracting-the-zip-43",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "After extracting the zip:"
+        }
+      ],
+      "children": []
+    },
+    "b-10-running-bash-44": {
+      "id": "b-10-running-bash-44",
+      "type": "code",
+      "props": {
+        "language": "bash"
+      },
+      "text": [
+        {
+          "insert": "make run"
+        }
+      ],
+      "children": []
+    },
+    "b-10-running-or-45": {
+      "id": "b-10-running-or-45",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "or:"
+        }
+      ],
+      "children": []
+    },
+    "b-10-running-bash-46": {
+      "id": "b-10-running-bash-46",
+      "type": "code",
+      "props": {
+        "language": "bash"
+      },
+      "text": [
+        {
+          "insert": "node server.mjs --host 127.0.0.1 --port 4173"
+        }
+      ],
+      "children": []
+    }
+  }
+}

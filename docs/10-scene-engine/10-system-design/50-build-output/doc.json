@@ -1,0 +1,2029 @@
+{
+  "schemaVersion": 1,
+  "id": "scene-engine-10-system-design-50-build-output",
+  "title": "Build And Distribution Output",
+  "root": "b-50-build-output-root-106",
+  "blocks": {
+    "b-50-build-output-root-106": {
+      "id": "b-50-build-output-root-106",
+      "type": "paragraph",
+      "props": {
+        "concepts": [
+          "export",
+          "standalone-bundle",
+          "zip",
+          "active-export-graph",
+          "desktop-app",
+          "path-rewriting"
+        ],
+        "covers": "How a project becomes a deployable standalone site or packaged desktop authoring app."
+      },
+      "children": [
+        "b-50-build-output-the-scene-engine-has-two-2",
+        "b-50-build-output-site-export-post-3",
+        "b-50-build-output-git-deploy-trigger-4",
+        "b-50-build-output-desktop-authoring-app-5",
+        "b-50-build-output-the-site-export-contains-6",
+        "b-50-build-output-divider-7",
+        "b-50-build-output-why-a-standalone-bundle-8",
+        "b-50-build-output-the-renderer-already-exi-9",
+        "b-50-build-output-trade-offs-10",
+        "b-50-build-output-pro-the-export-and-edit-11",
+        "b-50-build-output-pro-the-output-is-inspe-12",
+        "b-50-build-output-pro-the-active-dependen-13",
+        "b-50-build-output-con-modules-must-declar-14",
+        "b-50-build-output-trigger-and-endpoint-15",
+        "b-50-build-output-post-api-export-projec-16",
+        "b-50-build-output-there-is-no-streaming-or-17",
+        "b-50-build-output-git-deploy-trigger-18",
+        "b-50-build-output-external-project-workspa-19",
+        "b-50-build-output-accepts-localhost-reques-20",
+        "b-50-build-output-resolves-the-external-pr-21",
+        "b-50-build-output-requires-the-project-roo-22",
+        "b-50-build-output-updates-projectsettings-23",
+        "b-50-build-output-runs-git-add-a-commi-24",
+        "b-50-build-output-this-is-the-path-for-the-25",
+        "b-50-build-output-what-the-bundle-contains-26",
+        "b-50-build-output-code-27",
+        "b-50-build-output-active-export-graph-28",
+        "b-50-build-output-the-export-graph-is-buil-29",
+        "b-50-build-output-active-scenes-from-proj-30",
+        "b-50-build-output-direct-layer-asset-ref-31",
+        "b-50-build-output-glyph-slot-asset-referen-32",
+        "b-50-build-output-play-audio-event-targe-33",
+        "b-50-build-output-component-effect-module-34",
+        "b-50-build-output-module-dependencies-decl-35",
+        "b-50-build-output-public-file-references-f-36",
+        "b-50-build-output-string-schema-properties-37",
+        "b-50-build-output-discovered-project-fonts-38",
+        "b-50-build-output-anything-not-reached-is-39",
+        "b-50-build-output-assembly-flow-40",
+        "b-50-build-output-resolve-the-project-thro-41",
+        "b-50-build-output-validate-that-project-e-42",
+        "b-50-build-output-filter-scene-refs-with-43",
+        "b-50-build-output-collect-the-active-expor-44",
+        "b-50-build-output-write-project-json-usi-45",
+        "b-50-build-output-add-active-scene-json-fi-46",
+        "b-50-build-output-copy-app-engine-render-47",
+        "b-50-build-output-add-boot-js-makefile-48",
+        "b-50-build-output-generate-root-and-per-sc-49",
+        "b-50-build-output-write-pruned-asset-modul-50",
+        "b-50-build-output-copy-active-asset-files-51",
+        "b-50-build-output-write-a-per-scene-asset-52",
+        "b-50-build-output-write-prefetch-manifest-53",
+        "b-50-build-output-write-export-graph-json-54",
+        "b-50-build-output-generate-the-zip-buffer-55",
+        "b-50-build-output-audio-entries-copy-their-56",
+        "b-50-build-output-per-scene-asset-manifest-57",
+        "b-50-build-output-scenes-id-assets-json-58",
+        "b-50-build-output-json-59",
+        "b-50-build-output-the-renderer-s-scene-pre-60",
+        "b-50-build-output-path-rewriting-61",
+        "b-50-build-output-development-uses-logical-62",
+        "b-50-build-output-two-rewrite-passes-matte-63",
+        "b-50-build-output-renderer-code-and-text-64",
+        "b-50-build-output-registry-json-file-65",
+        "b-50-build-output-boot-js-sets-window-m-66",
+        "b-50-build-output-boot-runtime-67",
+        "b-50-build-output-each-generated-page-cont-68",
+        "b-50-build-output-sets-the-bundle-root-69",
+        "b-50-build-output-fetches-project-json-70",
+        "b-50-build-output-loads-the-merged-asset-m-71",
+        "b-50-build-output-checks-whether-the-initi-72",
+        "b-50-build-output-if-gated-renders-the-ga-73",
+        "b-50-build-output-if-not-gated-renders-th-74",
+        "b-50-build-output-exposes-window-melee-na-75",
+        "b-50-build-output-scales-the-fixed-1440x10-76",
+        "b-50-build-output-schedules-an-idle-prefet-77",
+        "b-50-build-output-page-mode-exports-perfor-78",
+        "b-50-build-output-what-s-excluded-from-the-79",
+        "b-50-build-output-the-next-js-editor-and-d-80",
+        "b-50-build-output-registered-assets-module-81",
+        "b-50-build-output-scenes-marked-active-f-82",
+        "b-50-build-output-session-spec-dev-notes-s-83",
+        "b-50-build-output-source-maps-unless-expli-84",
+        "b-50-build-output-local-export-preview-85",
+        "b-50-build-output-after-extracting-86",
+        "b-50-build-output-bash-87",
+        "b-50-build-output-or-88",
+        "b-50-build-output-bash-89",
+        "b-50-build-output-the-server-makes-module-90",
+        "b-50-build-output-for-server-based-deploys-91",
+        "b-50-build-output-bash-92",
+        "b-50-build-output-this-runs-the-deploy-tar-93",
+        "b-50-build-output-desktop-app-output-94",
+        "b-50-build-output-main-menu-is-the-package-95",
+        "b-50-build-output-builds-next-with-output-96",
+        "b-50-build-output-stages-next-standalone-97",
+        "b-50-build-output-packages-electron-main-p-98",
+        "b-50-build-output-seeds-a-writable-workspa-99",
+        "b-50-build-output-starts-a-local-next-serv-100",
+        "b-50-build-output-the-macos-directory-arti-101",
+        "b-50-build-output-text-102",
+        "b-50-build-output-signing-notarization-a-103",
+        "b-50-build-output-failure-modes-104",
+        "b-50-build-output-condition-response-105-tbl"
+      ]
+    },
+    "b-50-build-output-the-scene-engine-has-two-2": {
+      "id": "b-50-build-output-the-scene-engine-has-two-2",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "The scene-engine has two output paths:"
+        }
+      ],
+      "children": []
+    },
+    "b-50-build-output-site-export-post-3": {
+      "id": "b-50-build-output-site-export-post-3",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "Site export",
+          "attributes": {
+            "bold": true
+          }
+        },
+        {
+          "insert": ". "
+        },
+        {
+          "insert": "POST /api/export?project=<project-id>",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " returns a standalone zip for the selected project."
+        }
+      ],
+      "children": []
+    },
+    "b-50-build-output-git-deploy-trigger-4": {
+      "id": "b-50-build-output-git-deploy-trigger-4",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "Git deploy trigger",
+          "attributes": {
+            "bold": true
+          }
+        },
+        {
+          "insert": ". "
+        },
+        {
+          "insert": "POST /api/projects/<project-id>/deploy",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " commits and pushes an external project workspace so GitHub-connected hosts can deploy it."
+        }
+      ],
+      "children": []
+    },
+    "b-50-build-output-desktop-authoring-app-5": {
+      "id": "b-50-build-output-desktop-authoring-app-5",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "Desktop authoring app",
+          "attributes": {
+            "bold": true
+          }
+        },
+        {
+          "insert": ". Electron packages the Next standalone runtime as the Main Menu macOS app."
+        }
+      ],
+      "children": []
+    },
+    "b-50-build-output-the-site-export-contains-6": {
+      "id": "b-50-build-output-the-site-export-contains-6",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "The site export contains static pages, the same renderer code, scene JSON, and the active project files needed by those scenes. There is no framework runtime in the exported site, and no dependency on the Next.js dev server."
+        }
+      ],
+      "children": []
+    },
+    "b-50-build-output-divider-7": {
+      "id": "b-50-build-output-divider-7",
+      "type": "divider",
+      "props": {},
+      "children": []
+    },
+    "b-50-build-output-why-a-standalone-bundle-8": {
+      "id": "b-50-build-output-why-a-standalone-bundle-8",
+      "type": "heading",
+      "props": {
+        "level": 2
+      },
+      "text": [
+        {
+          "insert": "Why A Standalone Bundle, Not A Build"
+        }
+      ],
+      "children": []
+    },
+    "b-50-build-output-the-renderer-already-exi-9": {
+      "id": "b-50-build-output-the-renderer-already-exi-9",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "The renderer already exists as plain JS modules and works without bundling. The scene JSON is the source of truth in production; there is nothing to compile down to. Export is a copy with path rewrites and dependency pruning."
+        }
+      ],
+      "children": []
+    },
+    "b-50-build-output-trade-offs-10": {
+      "id": "b-50-build-output-trade-offs-10",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "Trade-offs:"
+        }
+      ],
+      "children": []
+    },
+    "b-50-build-output-pro-the-export-and-edit-11": {
+      "id": "b-50-build-output-pro-the-export-and-edit-11",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "Pro: the export and editor share one renderer."
+        }
+      ],
+      "children": []
+    },
+    "b-50-build-output-pro-the-output-is-inspe-12": {
+      "id": "b-50-build-output-pro-the-output-is-inspe-12",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "Pro: the output is inspectable; every file is the same kind of file the developer authored."
+        }
+      ],
+      "children": []
+    },
+    "b-50-build-output-pro-the-active-dependen-13": {
+      "id": "b-50-build-output-pro-the-active-dependen-13",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "Pro: the active dependency graph keeps unused registered media out of the zip."
+        }
+      ],
+      "children": []
+    },
+    "b-50-build-output-con-modules-must-declar-14": {
+      "id": "b-50-build-output-con-modules-must-declar-14",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "Con: modules must declare dependencies that are not visible from scene references."
+        }
+      ],
+      "children": []
+    },
+    "b-50-build-output-trigger-and-endpoint-15": {
+      "id": "b-50-build-output-trigger-and-endpoint-15",
+      "type": "heading",
+      "props": {
+        "level": 2
+      },
+      "text": [
+        {
+          "insert": "Trigger And Endpoint"
+        }
+      ],
+      "children": []
+    },
+    "b-50-build-output-post-api-export-projec-16": {
+      "id": "b-50-build-output-post-api-export-projec-16",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "POST /api/export?project=<project-id>",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " returns "
+        },
+        {
+          "insert": "application/zip",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " with "
+        },
+        {
+          "insert": "Content-Disposition: attachment; filename=\"<project-id>.zip\"",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ". The project page calls it with the active project and triggers a browser download."
+        }
+      ],
+      "children": []
+    },
+    "b-50-build-output-there-is-no-streaming-or-17": {
+      "id": "b-50-build-output-there-is-no-streaming-or-17",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "There is no streaming or progress reporting. The selected projects are small enough that synchronous zip generation is acceptable for the current tool."
+        }
+      ],
+      "children": []
+    },
+    "b-50-build-output-git-deploy-trigger-18": {
+      "id": "b-50-build-output-git-deploy-trigger-18",
+      "type": "heading",
+      "props": {
+        "level": 2
+      },
+      "text": [
+        {
+          "insert": "Git Deploy Trigger"
+        }
+      ],
+      "children": []
+    },
+    "b-50-build-output-external-project-workspa-19": {
+      "id": "b-50-build-output-external-project-workspa-19",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "External project workspaces can also deploy without generating a zip. The project page's Deploy button calls "
+        },
+        {
+          "insert": "POST /api/projects/<project-id>/deploy",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ". The route:"
+        }
+      ],
+      "children": []
+    },
+    "b-50-build-output-accepts-localhost-reques-20": {
+      "id": "b-50-build-output-accepts-localhost-reques-20",
+      "type": "list-item",
+      "props": {
+        "ordered": true
+      },
+      "text": [
+        {
+          "insert": "Accepts localhost requests only, unless remote deploy is explicitly enabled."
+        }
+      ],
+      "children": []
+    },
+    "b-50-build-output-resolves-the-external-pr-21": {
+      "id": "b-50-build-output-resolves-the-external-pr-21",
+      "type": "list-item",
+      "props": {
+        "ordered": true
+      },
+      "text": [
+        {
+          "insert": "Resolves the external project through the workspace catalog."
+        }
+      ],
+      "children": []
+    },
+    "b-50-build-output-requires-the-project-roo-22": {
+      "id": "b-50-build-output-requires-the-project-roo-22",
+      "type": "list-item",
+      "props": {
+        "ordered": true
+      },
+      "text": [
+        {
+          "insert": "Requires the project root to be its own Git repository."
+        }
+      ],
+      "children": []
+    },
+    "b-50-build-output-updates-projectsettings-23": {
+      "id": "b-50-build-output-updates-projectsettings-23",
+      "type": "list-item",
+      "props": {
+        "ordered": true
+      },
+      "text": [
+        {
+          "insert": "Updates "
+        },
+        {
+          "insert": "ProjectSettings/deployment.json",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " with a monotonically increasing deploy marker."
+        }
+      ],
+      "children": []
+    },
+    "b-50-build-output-runs-git-add-a-commi-24": {
+      "id": "b-50-build-output-runs-git-add-a-commi-24",
+      "type": "list-item",
+      "props": {
+        "ordered": true
+      },
+      "text": [
+        {
+          "insert": "Runs "
+        },
+        {
+          "insert": "git add -A",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ", commits all project-repo changes, and pushes the current branch."
+        }
+      ],
+      "children": []
+    },
+    "b-50-build-output-this-is-the-path-for-the-25": {
+      "id": "b-50-build-output-this-is-the-path-for-the-25",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "This is the path for the Codecaine site Railway setup: the live host listens to the "
+        },
+        {
+          "insert": "codecaine-site",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " GitHub repository, so pushing the workspace repo is the deploy trigger."
+        }
+      ],
+      "children": []
+    },
+    "b-50-build-output-what-the-bundle-contains-26": {
+      "id": "b-50-build-output-what-the-bundle-contains-26",
+      "type": "heading",
+      "props": {
+        "level": 2
+      },
+      "text": [
+        {
+          "insert": "What The Bundle Contains"
+        }
+      ],
+      "children": []
+    },
+    "b-50-build-output-code-27": {
+      "id": "b-50-build-output-code-27",
+      "type": "code",
+      "props": {},
+      "text": [
+        {
+          "insert": "<project-id>.zip\n├── index.html               entry scene page\n├── boot.js                  loads project.json, mounts renderer, exposes navigate()\n├── project.json             active project manifest copy\n├── <scene-id>/index.html    one static page per active scene\n├── <scene-id>/scene.css     optional per-scene page CSS\n├── scenes/<id>/scene.json   one per active scene\n├── scenes/<id>/assets.json  one per active scene; files that scene needs, with byte sizes\n├── renderer/                copied from app/_engine/renderer/, paths rewritten\n├── assets/\n│   ├── registry.json        active assets only; /assets/... rewritten to ./assets/...\n│   ├── audio/.../...\n│   ├── image/.../...\n│   ├── video/.../...\n│   └── glyph/.../...\n├── modules/\n│   ├── registry.json        active modules only; /modules/... rewritten to ./modules/...\n│   ├── effects/<id>/...\n│   └── components/<id>/...\n├── fonts/\n│   └── registry.json        active font entries only\n├── prefetch-manifest.json   every copied file, with byte sizes, for idle prefetch\n├── export-graph.json        included/excluded ids and warnings\n├── Makefile                 `make run` helper\n└── server.mjs               static server for local preview"
+        }
+      ],
+      "children": []
+    },
+    "b-50-build-output-active-export-graph-28": {
+      "id": "b-50-build-output-active-export-graph-28",
+      "type": "heading",
+      "props": {
+        "level": 2
+      },
+      "text": [
+        {
+          "insert": "Active Export Graph"
+        }
+      ],
+      "children": []
+    },
+    "b-50-build-output-the-export-graph-is-buil-29": {
+      "id": "b-50-build-output-the-export-graph-is-buil-29",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "The export graph is built before registries are written. It includes:"
+        }
+      ],
+      "children": []
+    },
+    "b-50-build-output-active-scenes-from-proj-30": {
+      "id": "b-50-build-output-active-scenes-from-proj-30",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "active scenes from "
+        },
+        {
+          "insert": "project.scenes",
+          "attributes": {
+            "code": true
+          }
+        }
+      ],
+      "children": []
+    },
+    "b-50-build-output-direct-layer-asset-ref-31": {
+      "id": "b-50-build-output-direct-layer-asset-ref-31",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "direct layer "
+        },
+        {
+          "insert": "asset",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " references"
+        }
+      ],
+      "children": []
+    },
+    "b-50-build-output-glyph-slot-asset-referen-32": {
+      "id": "b-50-build-output-glyph-slot-asset-referen-32",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "glyph slot asset references"
+        }
+      ],
+      "children": []
+    },
+    "b-50-build-output-play-audio-event-targe-33": {
+      "id": "b-50-build-output-play-audio-event-targe-33",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "play-audio",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " event targets"
+        }
+      ],
+      "children": []
+    },
+    "b-50-build-output-component-effect-module-34": {
+      "id": "b-50-build-output-component-effect-module-34",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "component/effect module references"
+        }
+      ],
+      "children": []
+    },
+    "b-50-build-output-module-dependencies-decl-35": {
+      "id": "b-50-build-output-module-dependencies-decl-35",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "module dependencies declared in "
+        },
+        {
+          "insert": "manifest.json",
+          "attributes": {
+            "code": true
+          }
+        }
+      ],
+      "children": []
+    },
+    "b-50-build-output-public-file-references-f-36": {
+      "id": "b-50-build-output-public-file-references-f-36",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "public file references found in scene/module JSON, JS, CSS, SVG, or HTML text"
+        }
+      ],
+      "children": []
+    },
+    "b-50-build-output-string-schema-properties-37": {
+      "id": "b-50-build-output-string-schema-properties-37",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "string schema properties marked with "
+        },
+        {
+          "insert": "assetType",
+          "attributes": {
+            "code": true
+          }
+        }
+      ],
+      "children": []
+    },
+    "b-50-build-output-discovered-project-fonts-38": {
+      "id": "b-50-build-output-discovered-project-fonts-38",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "discovered project fonts matching used font families"
+        }
+      ],
+      "children": []
+    },
+    "b-50-build-output-anything-not-reached-is-39": {
+      "id": "b-50-build-output-anything-not-reached-is-39",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "Anything not reached is left out of the exported registries. "
+        },
+        {
+          "insert": "export-graph.json",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " records included ids, excluded ids, warnings, and public files so a surprising omission can be diagnosed from the bundle."
+        }
+      ],
+      "children": []
+    },
+    "b-50-build-output-assembly-flow-40": {
+      "id": "b-50-build-output-assembly-flow-40",
+      "type": "heading",
+      "props": {
+        "level": 2
+      },
+      "text": [
+        {
+          "insert": "Assembly Flow"
+        }
+      ],
+      "children": []
+    },
+    "b-50-build-output-resolve-the-project-thro-41": {
+      "id": "b-50-build-output-resolve-the-project-thro-41",
+      "type": "list-item",
+      "props": {
+        "ordered": true
+      },
+      "text": [
+        {
+          "insert": "Resolve the project through the workspace catalog and read "
+        },
+        {
+          "insert": "ProjectSettings/project.json",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": "."
+        }
+      ],
+      "children": []
+    },
+    "b-50-build-output-validate-that-project-e-42": {
+      "id": "b-50-build-output-validate-that-project-e-42",
+      "type": "list-item",
+      "props": {
+        "ordered": true
+      },
+      "text": [
+        {
+          "insert": "Validate that "
+        },
+        {
+          "insert": "project.entry",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " exists and remains active for export."
+        }
+      ],
+      "children": []
+    },
+    "b-50-build-output-filter-scene-refs-with-43": {
+      "id": "b-50-build-output-filter-scene-refs-with-43",
+      "type": "list-item",
+      "props": {
+        "ordered": true
+      },
+      "text": [
+        {
+          "insert": "Filter scene refs with "
+        },
+        {
+          "insert": "active: false",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " or "
+        },
+        {
+          "insert": "export: false",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": "."
+        }
+      ],
+      "children": []
+    },
+    "b-50-build-output-collect-the-active-expor-44": {
+      "id": "b-50-build-output-collect-the-active-expor-44",
+      "type": "list-item",
+      "props": {
+        "ordered": true
+      },
+      "text": [
+        {
+          "insert": "Collect the active export graph."
+        }
+      ],
+      "children": []
+    },
+    "b-50-build-output-write-project-json-usi-45": {
+      "id": "b-50-build-output-write-project-json-usi-45",
+      "type": "list-item",
+      "props": {
+        "ordered": true
+      },
+      "text": [
+        {
+          "insert": "Write "
+        },
+        {
+          "insert": "project.json",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " using only active scene refs."
+        }
+      ],
+      "children": []
+    },
+    "b-50-build-output-add-active-scene-json-fi-46": {
+      "id": "b-50-build-output-add-active-scene-json-fi-46",
+      "type": "list-item",
+      "props": {
+        "ordered": true
+      },
+      "text": [
+        {
+          "insert": "Add active scene JSON files under "
+        },
+        {
+          "insert": "scenes/<id>/scene.json",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": "."
+        }
+      ],
+      "children": []
+    },
+    "b-50-build-output-copy-app-engine-render-47": {
+      "id": "b-50-build-output-copy-app-engine-render-47",
+      "type": "list-item",
+      "props": {
+        "ordered": true
+      },
+      "text": [
+        {
+          "insert": "Copy "
+        },
+        {
+          "insert": "app/_engine/renderer/",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " into "
+        },
+        {
+          "insert": "renderer/",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " with path rewrites."
+        }
+      ],
+      "children": []
+    },
+    "b-50-build-output-add-boot-js-makefile-48": {
+      "id": "b-50-build-output-add-boot-js-makefile-48",
+      "type": "list-item",
+      "props": {
+        "ordered": true
+      },
+      "text": [
+        {
+          "insert": "Add "
+        },
+        {
+          "insert": "boot.js",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ", "
+        },
+        {
+          "insert": "Makefile",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ", and "
+        },
+        {
+          "insert": "server.mjs",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " from "
+        },
+        {
+          "insert": "app/_engine/export/",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": "."
+        }
+      ],
+      "children": []
+    },
+    "b-50-build-output-generate-root-and-per-sc-49": {
+      "id": "b-50-build-output-generate-root-and-per-sc-49",
+      "type": "list-item",
+      "props": {
+        "ordered": true
+      },
+      "text": [
+        {
+          "insert": "Generate root and per-scene HTML pages."
+        }
+      ],
+      "children": []
+    },
+    "b-50-build-output-write-pruned-asset-modul-50": {
+      "id": "b-50-build-output-write-pruned-asset-modul-50",
+      "type": "list-item",
+      "props": {
+        "ordered": true
+      },
+      "text": [
+        {
+          "insert": "Write pruned asset/module/font registries."
+        }
+      ],
+      "children": []
+    },
+    "b-50-build-output-copy-active-asset-files-51": {
+      "id": "b-50-build-output-copy-active-asset-files-51",
+      "type": "list-item",
+      "props": {
+        "ordered": true
+      },
+      "text": [
+        {
+          "insert": "Copy active asset files, active module directories, active fonts, and extra public files."
+        }
+      ],
+      "children": []
+    },
+    "b-50-build-output-write-a-per-scene-asset-52": {
+      "id": "b-50-build-output-write-a-per-scene-asset-52",
+      "type": "list-item",
+      "props": {
+        "ordered": true
+      },
+      "text": [
+        {
+          "insert": "Write a per-scene asset manifest ("
+        },
+        {
+          "insert": "scenes/<id>/assets.json",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ") for each active scene, listing every module, asset, font, and public file that scene references, with byte sizes."
+        }
+      ],
+      "children": []
+    },
+    "b-50-build-output-write-prefetch-manifest-53": {
+      "id": "b-50-build-output-write-prefetch-manifest-53",
+      "type": "list-item",
+      "props": {
+        "ordered": true
+      },
+      "text": [
+        {
+          "insert": "Write "
+        },
+        {
+          "insert": "prefetch-manifest.json",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " listing every file copied into the bundle, with byte sizes."
+        }
+      ],
+      "children": []
+    },
+    "b-50-build-output-write-export-graph-json-54": {
+      "id": "b-50-build-output-write-export-graph-json-54",
+      "type": "list-item",
+      "props": {
+        "ordered": true
+      },
+      "text": [
+        {
+          "insert": "Write "
+        },
+        {
+          "insert": "export-graph.json",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": "."
+        }
+      ],
+      "children": []
+    },
+    "b-50-build-output-generate-the-zip-buffer-55": {
+      "id": "b-50-build-output-generate-the-zip-buffer-55",
+      "type": "list-item",
+      "props": {
+        "ordered": true
+      },
+      "text": [
+        {
+          "insert": "Generate the zip buffer and stream it as the response body."
+        }
+      ],
+      "children": []
+    },
+    "b-50-build-output-audio-entries-copy-their-56": {
+      "id": "b-50-build-output-audio-entries-copy-their-56",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "Audio entries copy their containing directory because audio bundles often include sidecar JS or sprite metadata. Module entries copy their containing directory because JS, CSS, manifests, SVGs, and local config commonly live together."
+        }
+      ],
+      "children": []
+    },
+    "b-50-build-output-per-scene-asset-manifest-57": {
+      "id": "b-50-build-output-per-scene-asset-manifest-57",
+      "type": "heading",
+      "props": {
+        "level": 2
+      },
+      "text": [
+        {
+          "insert": "Per-Scene Asset Manifests"
+        }
+      ],
+      "children": []
+    },
+    "b-50-build-output-scenes-id-assets-json-58": {
+      "id": "b-50-build-output-scenes-id-assets-json-58",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "scenes/<id>/assets.json",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " lists the files one scene needs to render, independent of the rest of the bundle:"
+        }
+      ],
+      "children": []
+    },
+    "b-50-build-output-json-59": {
+      "id": "b-50-build-output-json-59",
+      "type": "code",
+      "props": {
+        "language": "json"
+      },
+      "text": [
+        {
+          "insert": "{ \"version\": 1, \"files\": [{ \"path\": \"assets/image/bg.png\", \"bytes\": 48213 }] }"
+        }
+      ],
+      "children": []
+    },
+    "b-50-build-output-the-renderer-s-scene-pre-60": {
+      "id": "b-50-build-output-the-renderer-s-scene-pre-60",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "The renderer's scene preloader ("
+        },
+        {
+          "insert": "renderer/scene-preloader.js",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ") fetches this file to preload a scene's assets before switching to it. See Boot Runtime below. For server-based deploys that skip the zip export, the server generates the same shape dynamically via "
+        },
+        {
+          "insert": "buildSceneAssetManifest(sceneId)",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ", so this manifest does not need to exist as a static file on disk."
+        }
+      ],
+      "children": []
+    },
+    "b-50-build-output-path-rewriting-61": {
+      "id": "b-50-build-output-path-rewriting-61",
+      "type": "heading",
+      "props": {
+        "level": 2
+      },
+      "text": [
+        {
+          "insert": "Path Rewriting"
+        }
+      ],
+      "children": []
+    },
+    "b-50-build-output-development-uses-logical-62": {
+      "id": "b-50-build-output-development-uses-logical-62",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "Development uses logical paths such as "
+        },
+        {
+          "insert": "/assets/...",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ", "
+        },
+        {
+          "insert": "/modules/...",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ", and "
+        },
+        {
+          "insert": "/fonts/...",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ". The standalone bundle rewrites those to relative bundle-root paths."
+        }
+      ],
+      "children": []
+    },
+    "b-50-build-output-two-rewrite-passes-matte-63": {
+      "id": "b-50-build-output-two-rewrite-passes-matte-63",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "Two rewrite passes matter:"
+        }
+      ],
+      "children": []
+    },
+    "b-50-build-output-renderer-code-and-text-64": {
+      "id": "b-50-build-output-renderer-code-and-text-64",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "Renderer code and text assets",
+          "attributes": {
+            "bold": true
+          }
+        },
+        {
+          "insert": ": absolute logical paths are rewritten to relative paths where needed."
+        }
+      ],
+      "children": []
+    },
+    "b-50-build-output-registry-json-file-65": {
+      "id": "b-50-build-output-registry-json-file-65",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "Registry JSON",
+          "attributes": {
+            "bold": true
+          }
+        },
+        {
+          "insert": ": "
+        },
+        {
+          "insert": "file",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " and "
+        },
+        {
+          "insert": "path",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " fields move from "
+        },
+        {
+          "insert": "/...",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " to "
+        },
+        {
+          "insert": "./...",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": "."
+        }
+      ],
+      "children": []
+    },
+    "b-50-build-output-boot-js-sets-window-m-66": {
+      "id": "b-50-build-output-boot-js-sets-window-m-66",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "boot.js",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " sets "
+        },
+        {
+          "insert": "window.MELEE_BUNDLE_ROOT",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " from "
+        },
+        {
+          "insert": "import.meta.url",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ", so nested pages like "
+        },
+        {
+          "insert": "menu/index.html",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " still load assets, modules, fonts, and scenes from the bundle root."
+        }
+      ],
+      "children": []
+    },
+    "b-50-build-output-boot-runtime-67": {
+      "id": "b-50-build-output-boot-runtime-67",
+      "type": "heading",
+      "props": {
+        "level": 2
+      },
+      "text": [
+        {
+          "insert": "Boot Runtime"
+        }
+      ],
+      "children": []
+    },
+    "b-50-build-output-each-generated-page-cont-68": {
+      "id": "b-50-build-output-each-generated-page-cont-68",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "Each generated page contains a stage container, font declarations, optional scene CSS, and a boot script. "
+        },
+        {
+          "insert": "app/_engine/export/boot.js",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ":"
+        }
+      ],
+      "children": []
+    },
+    "b-50-build-output-sets-the-bundle-root-69": {
+      "id": "b-50-build-output-sets-the-bundle-root-69",
+      "type": "list-item",
+      "props": {
+        "ordered": true
+      },
+      "text": [
+        {
+          "insert": "sets the bundle root"
+        }
+      ],
+      "children": []
+    },
+    "b-50-build-output-fetches-project-json-70": {
+      "id": "b-50-build-output-fetches-project-json-70",
+      "type": "list-item",
+      "props": {
+        "ordered": true
+      },
+      "text": [
+        {
+          "insert": "fetches "
+        },
+        {
+          "insert": "project.json",
+          "attributes": {
+            "code": true
+          }
+        }
+      ],
+      "children": []
+    },
+    "b-50-build-output-loads-the-merged-asset-m-71": {
+      "id": "b-50-build-output-loads-the-merged-asset-m-71",
+      "type": "list-item",
+      "props": {
+        "ordered": true
+      },
+      "text": [
+        {
+          "insert": "loads the merged asset/module/font registry"
+        }
+      ],
+      "children": []
+    },
+    "b-50-build-output-checks-whether-the-initi-72": {
+      "id": "b-50-build-output-checks-whether-the-initi-72",
+      "type": "list-item",
+      "props": {
+        "ordered": true
+      },
+      "text": [
+        {
+          "insert": "checks whether the initial scene has a "
+        },
+        {
+          "insert": "gates",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " target, or a gate scene exists for the initial scene (a scene ref whose "
+        },
+        {
+          "insert": "gates",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " field names it)"
+        }
+      ],
+      "children": []
+    },
+    "b-50-build-output-if-gated-renders-the-ga-73": {
+      "id": "b-50-build-output-if-gated-renders-the-ga-73",
+      "type": "list-item",
+      "props": {
+        "ordered": true
+      },
+      "text": [
+        {
+          "insert": "if gated: renders the gate scene, waits for a browser paint, preloads the target scene's assets via "
+        },
+        {
+          "insert": "scenes/<id>/assets.json",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " with progress callbacks (the gate scene's loading dialog layer receives fraction updates), clears the stage, then renders the target scene"
+        }
+      ],
+      "children": []
+    },
+    "b-50-build-output-if-not-gated-renders-th-74": {
+      "id": "b-50-build-output-if-not-gated-renders-th-74",
+      "type": "list-item",
+      "props": {
+        "ordered": true
+      },
+      "text": [
+        {
+          "insert": "if not gated: renders the scene directly"
+        }
+      ],
+      "children": []
+    },
+    "b-50-build-output-exposes-window-melee-na-75": {
+      "id": "b-50-build-output-exposes-window-melee-na-75",
+      "type": "list-item",
+      "props": {
+        "ordered": true
+      },
+      "text": [
+        {
+          "insert": "exposes "
+        },
+        {
+          "insert": "window.MELEE_navigate(sceneId)",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ". Gate-aware for subsequent navigations, same gate-check-then-preload flow as boot"
+        }
+      ],
+      "children": []
+    },
+    "b-50-build-output-scales-the-fixed-1440x10-76": {
+      "id": "b-50-build-output-scales-the-fixed-1440x10-76",
+      "type": "list-item",
+      "props": {
+        "ordered": true
+      },
+      "text": [
+        {
+          "insert": "scales the fixed 1440x1080 stage to the viewport"
+        }
+      ],
+      "children": []
+    },
+    "b-50-build-output-schedules-an-idle-prefet-77": {
+      "id": "b-50-build-output-schedules-an-idle-prefet-77",
+      "type": "list-item",
+      "props": {
+        "ordered": true
+      },
+      "text": [
+        {
+          "insert": "schedules an idle prefetch of all remaining bundle assets 1.5s after boot, via "
+        },
+        {
+          "insert": "prefetch-manifest.json",
+          "attributes": {
+            "code": true
+          }
+        }
+      ],
+      "children": []
+    },
+    "b-50-build-output-page-mode-exports-perfor-78": {
+      "id": "b-50-build-output-page-mode-exports-perfor-78",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "Page-mode exports perform real static-page navigation to "
+        },
+        {
+          "insert": "<scene-id>/index.html",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": "."
+        }
+      ],
+      "children": []
+    },
+    "b-50-build-output-what-s-excluded-from-the-79": {
+      "id": "b-50-build-output-what-s-excluded-from-the-79",
+      "type": "heading",
+      "props": {
+        "level": 2
+      },
+      "text": [
+        {
+          "insert": "What's Excluded From The Site Export"
+        }
+      ],
+      "children": []
+    },
+    "b-50-build-output-the-next-js-editor-and-d-80": {
+      "id": "b-50-build-output-the-next-js-editor-and-d-80",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "The Next.js editor and dev API."
+        }
+      ],
+      "children": []
+    },
+    "b-50-build-output-registered-assets-module-81": {
+      "id": "b-50-build-output-registered-assets-module-81",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "Registered assets/modules/fonts that are not reached from the active export graph."
+        }
+      ],
+      "children": []
+    },
+    "b-50-build-output-scenes-marked-active-f-82": {
+      "id": "b-50-build-output-scenes-marked-active-f-82",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "Scenes marked "
+        },
+        {
+          "insert": "active: false",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " or "
+        },
+        {
+          "insert": "export: false",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": "."
+        }
+      ],
+      "children": []
+    },
+    "b-50-build-output-session-spec-dev-notes-s-83": {
+      "id": "b-50-build-output-session-spec-dev-notes-s-83",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "Session/spec/dev-notes scaffolding."
+        }
+      ],
+      "children": []
+    },
+    "b-50-build-output-source-maps-unless-expli-84": {
+      "id": "b-50-build-output-source-maps-unless-expli-84",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "Source maps unless explicitly opted in."
+        }
+      ],
+      "children": []
+    },
+    "b-50-build-output-local-export-preview-85": {
+      "id": "b-50-build-output-local-export-preview-85",
+      "type": "heading",
+      "props": {
+        "level": 2
+      },
+      "text": [
+        {
+          "insert": "Local Export Preview"
+        }
+      ],
+      "children": []
+    },
+    "b-50-build-output-after-extracting-86": {
+      "id": "b-50-build-output-after-extracting-86",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "After extracting:"
+        }
+      ],
+      "children": []
+    },
+    "b-50-build-output-bash-87": {
+      "id": "b-50-build-output-bash-87",
+      "type": "code",
+      "props": {
+        "language": "bash"
+      },
+      "text": [
+        {
+          "insert": "make run"
+        }
+      ],
+      "children": []
+    },
+    "b-50-build-output-or-88": {
+      "id": "b-50-build-output-or-88",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "or:"
+        }
+      ],
+      "children": []
+    },
+    "b-50-build-output-bash-89": {
+      "id": "b-50-build-output-bash-89",
+      "type": "code",
+      "props": {
+        "language": "bash"
+      },
+      "text": [
+        {
+          "insert": "node server.mjs --host 127.0.0.1 --port 4173"
+        }
+      ],
+      "children": []
+    },
+    "b-50-build-output-the-server-makes-module-90": {
+      "id": "b-50-build-output-the-server-makes-module-90",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "The server makes module, media, font, and nested scene page loading behave like a normal static host."
+        }
+      ],
+      "children": []
+    },
+    "b-50-build-output-for-server-based-deploys-91": {
+      "id": "b-50-build-output-for-server-based-deploys-91",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "For server-based deploys (like Railway), you can test locally without exporting a zip at all:"
+        }
+      ],
+      "children": []
+    },
+    "b-50-build-output-bash-92": {
+      "id": "b-50-build-output-bash-92",
+      "type": "code",
+      "props": {
+        "language": "bash"
+      },
+      "text": [
+        {
+          "insert": "cd codecaine-site\nnode server.mjs --port 4173"
+        }
+      ],
+      "children": []
+    },
+    "b-50-build-output-this-runs-the-deploy-tar-93": {
+      "id": "b-50-build-output-this-runs-the-deploy-tar-93",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "This runs the deploy target's own server against the project files on disk. It generates asset manifests, font registries, and prefetch manifests dynamically, so the static bundle-generation steps above are not required for this deploy path."
+        }
+      ],
+      "children": []
+    },
+    "b-50-build-output-desktop-app-output-94": {
+      "id": "b-50-build-output-desktop-app-output-94",
+      "type": "heading",
+      "props": {
+        "level": 2
+      },
+      "text": [
+        {
+          "insert": "Desktop App Output"
+        }
+      ],
+      "children": []
+    },
+    "b-50-build-output-main-menu-is-the-package-95": {
+      "id": "b-50-build-output-main-menu-is-the-package-95",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "Main Menu is the packaged authoring app, not the exported site. The desktop package:"
+        }
+      ],
+      "children": []
+    },
+    "b-50-build-output-builds-next-with-output-96": {
+      "id": "b-50-build-output-builds-next-with-output-96",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "builds Next with "
+        },
+        {
+          "insert": "output: 'standalone'",
+          "attributes": {
+            "code": true
+          }
+        }
+      ],
+      "children": []
+    },
+    "b-50-build-output-stages-next-standalone-97": {
+      "id": "b-50-build-output-stages-next-standalone-97",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "stages "
+        },
+        {
+          "insert": ".next/standalone",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " into "
+        },
+        {
+          "insert": "desktop/dist-next",
+          "attributes": {
+            "code": true
+          }
+        }
+      ],
+      "children": []
+    },
+    "b-50-build-output-packages-electron-main-p-98": {
+      "id": "b-50-build-output-packages-electron-main-p-98",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "packages Electron main/preload code and the standalone runtime"
+        }
+      ],
+      "children": []
+    },
+    "b-50-build-output-seeds-a-writable-workspa-99": {
+      "id": "b-50-build-output-seeds-a-writable-workspa-99",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "seeds a writable workspace under the user's application support directory"
+        }
+      ],
+      "children": []
+    },
+    "b-50-build-output-starts-a-local-next-serv-100": {
+      "id": "b-50-build-output-starts-a-local-next-serv-100",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "starts a local Next server and opens the editor route in an Electron window"
+        }
+      ],
+      "children": []
+    },
+    "b-50-build-output-the-macos-directory-arti-101": {
+      "id": "b-50-build-output-the-macos-directory-arti-101",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "The macOS directory artifact is:"
+        }
+      ],
+      "children": []
+    },
+    "b-50-build-output-text-102": {
+      "id": "b-50-build-output-text-102",
+      "type": "code",
+      "props": {
+        "language": "text"
+      },
+      "text": [
+        {
+          "insert": "apps/scene-engine/dist/desktop/mac-arm64/Main Menu.app"
+        }
+      ],
+      "children": []
+    },
+    "b-50-build-output-signing-notarization-a-103": {
+      "id": "b-50-build-output-signing-notarization-a-103",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "Signing, notarization, auto-update, and installer distribution are outside the current output contract."
+        }
+      ],
+      "children": []
+    },
+    "b-50-build-output-failure-modes-104": {
+      "id": "b-50-build-output-failure-modes-104",
+      "type": "heading",
+      "props": {
+        "level": 2
+      },
+      "text": [
+        {
+          "insert": "Failure Modes"
+        }
+      ],
+      "children": []
+    },
+    "b-50-build-output-condition-response-105-tbl": {
+      "id": "b-50-build-output-condition-response-105-tbl",
+      "type": "structured-table",
+      "props": {
+        "columns": [
+          "Condition",
+          "Response"
+        ],
+        "rows": [
+          [
+            [
+              {
+                "insert": "project.json",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": " missing for selected project"
+              }
+            ],
+            [
+              {
+                "insert": "400 "
+              },
+              {
+                "insert": "{ error: \"project.json not found\" }",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": "."
+              }
+            ]
+          ],
+          [
+            "Project root cannot be resolved",
+            [
+              {
+                "insert": "404 "
+              },
+              {
+                "insert": "{ error: \"Project not found\" }",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": "."
+              }
+            ]
+          ],
+          [
+            [
+              {
+                "insert": "project.entry",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": " not listed in "
+              },
+              {
+                "insert": "project.scenes",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ],
+            "400 with a manifest consistency error."
+          ],
+          [
+            [
+              {
+                "insert": "project.entry",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": " inactive for export"
+              }
+            ],
+            "400 with a manifest consistency error."
+          ],
+          [
+            "Asset/module/font file referenced by the active graph but missing on disk",
+            "500 with the underlying file-system error."
+          ],
+          [
+            "Any other read/zip failure",
+            [
+              {
+                "insert": "500 with "
+              },
+              {
+                "insert": "{ error: <message> }",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": "."
+              }
+            ]
+          ]
+        ]
+      },
+      "children": []
+    }
+  }
+}

@@ -1,0 +1,2522 @@
+{
+  "schemaVersion": 1,
+  "id": "scene-engine-10-system-design-10-scene-data-model",
+  "title": "Scene Data Model",
+  "root": "b-10-scene-data-model-root-63",
+  "blocks": {
+    "b-10-scene-data-model-root-63": {
+      "id": "b-10-scene-data-model-root-63",
+      "type": "paragraph",
+      "props": {
+        "concepts": [
+          "scene-json",
+          "scene-object",
+          "transform",
+          "appearance",
+          "properties",
+          "slots",
+          "events",
+          "children",
+          "z-order",
+          "anchor",
+          "fill-mode"
+        ],
+        "covers": "The canonical scene format — stage, object array, the universal object shape (transform, appearance, properties, slots, events, children), z-order semantics."
+      },
+      "children": [
+        "b-10-scene-data-model-a-scene-is-a-json-docume-2",
+        "b-10-scene-data-model-divider-3",
+        "b-10-scene-data-model-top-level-shape-4",
+        "b-10-scene-data-model-json-5",
+        "b-10-scene-data-model-field-require-6-tbl",
+        "b-10-scene-data-model-objects-not-layers-7",
+        "b-10-scene-data-model-canonical-object-shape-8",
+        "b-10-scene-data-model-every-scene-object-is-th-9",
+        "b-10-scene-data-model-json-10",
+        "b-10-scene-data-model-section-require-11-tbl",
+        "b-10-scene-data-model-the-inspector-treats-tr-12",
+        "b-10-scene-data-model-transform-13",
+        "b-10-scene-data-model-transform-has-two-mutual-14",
+        "b-10-scene-data-model-explicit-transform-15",
+        "b-10-scene-data-model-json-16",
+        "b-10-scene-data-model-x-y-percentages-o-17",
+        "b-10-scene-data-model-width-height-perc-18",
+        "b-10-scene-data-model-anchor-which-point-o-19",
+        "b-10-scene-data-model-rotation-degrees-ap-20",
+        "b-10-scene-data-model-scale-uniform-multip-21",
+        "b-10-scene-data-model-all-positioning-is-per-22",
+        "b-10-scene-data-model-fill-mode-23",
+        "b-10-scene-data-model-json-24",
+        "b-10-scene-data-model-mode-fill-means-co-25",
+        "b-10-scene-data-model-toggling-between-explici-26",
+        "b-10-scene-data-model-appearance-27",
+        "b-10-scene-data-model-json-28",
+        "b-10-scene-data-model-field-notes-29-tbl",
+        "b-10-scene-data-model-scene-level-appearance-30",
+        "b-10-scene-data-model-object-types-31",
+        "b-10-scene-data-model-type-what-i-32-tbl",
+        "b-10-scene-data-model-type-selects-the-rende-33",
+        "b-10-scene-data-model-properties-34",
+        "b-10-scene-data-model-properties-carries-com-35",
+        "b-10-scene-data-model-universal-concerns-visi-36",
+        "b-10-scene-data-model-slots-glyph-groups-37",
+        "b-10-scene-data-model-a-glyph-group-is-a-singl-38",
+        "b-10-scene-data-model-json-39",
+        "b-10-scene-data-model-slot-field-notes-40-tbl",
+        "b-10-scene-data-model-the-slot-s-clip-path-is-41",
+        "b-10-scene-data-model-events-42",
+        "b-10-scene-data-model-a-small-set-of-trigger-43",
+        "b-10-scene-data-model-json-44",
+        "b-10-scene-data-model-trigger-action-45-tbl",
+        "b-10-scene-data-model-the-renderer-maps-these-46",
+        "b-10-scene-data-model-children-and-nesting-47",
+        "b-10-scene-data-model-any-object-may-have-chi-48",
+        "b-10-scene-data-model-children-is-not-ho-49",
+        "b-10-scene-data-model-z-order-within-a-childr-50",
+        "b-10-scene-data-model-z-order-51",
+        "b-10-scene-data-model-array-position-is-th-52",
+        "b-10-scene-data-model-entrance-animation-53",
+        "b-10-scene-data-model-entrance-is-an-optiona-54",
+        "b-10-scene-data-model-json-55",
+        "b-10-scene-data-model-field-notes-56-tbl",
+        "b-10-scene-data-model-the-renderer-hides-the-s-57",
+        "b-10-scene-data-model-an-object-may-include-it-58",
+        "b-10-scene-data-model-objects-with-visible-f-59",
+        "b-10-scene-data-model-example-title-scene-60",
+        "b-10-scene-data-model-json-61",
+        "b-10-scene-data-model-bottom-to-top-hue-shift-62"
+      ]
+    },
+    "b-10-scene-data-model-a-scene-is-a-json-docume-2": {
+      "id": "b-10-scene-data-model-a-scene-is-a-json-docume-2",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "A scene is a JSON document that declares a stage and an ordered tree of typed objects. Every object follows the same canonical shape regardless of type; what differs is which sections it uses. Z-order is array order: index 0 is the back, last entry is on top, recursively, inside "
+        },
+        {
+          "insert": "children",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": "."
+        }
+      ],
+      "children": []
+    },
+    "b-10-scene-data-model-divider-3": {
+      "id": "b-10-scene-data-model-divider-3",
+      "type": "divider",
+      "props": {},
+      "children": []
+    },
+    "b-10-scene-data-model-top-level-shape-4": {
+      "id": "b-10-scene-data-model-top-level-shape-4",
+      "type": "heading",
+      "props": {
+        "level": 2
+      },
+      "text": [
+        {
+          "insert": "Top-Level Shape"
+        }
+      ],
+      "children": []
+    },
+    "b-10-scene-data-model-json-5": {
+      "id": "b-10-scene-data-model-json-5",
+      "type": "code",
+      "props": {
+        "language": "json"
+      },
+      "text": [
+        {
+          "insert": "{\n  \"id\": \"title\",\n  \"name\": \"Title Screen\",\n  \"stage\": { \"width\": 1440, \"height\": 1080 },\n  \"appearance\": { \"hue\": 0, \"saturation\": 1.4 },\n  \"objects\": [ ... ]\n}"
+        }
+      ],
+      "children": []
+    },
+    "b-10-scene-data-model-field-require-6-tbl": {
+      "id": "b-10-scene-data-model-field-require-6-tbl",
+      "type": "structured-table",
+      "props": {
+        "columns": [
+          "Field",
+          "Required",
+          "Notes"
+        ],
+        "rows": [
+          [
+            [
+              {
+                "insert": "id",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ],
+            "yes",
+            [
+              {
+                "insert": "Lowercase kebab-case ("
+              },
+              {
+                "insert": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": "). Matches the scene's directory name."
+              }
+            ]
+          ],
+          [
+            [
+              {
+                "insert": "name",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ],
+            "yes",
+            "Human-readable label shown in dashboards and lists."
+          ],
+          [
+            [
+              {
+                "insert": "stage",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ],
+            "yes",
+            "Fixed design canvas. Currently always 1440×1080. The renderer scales to viewport at runtime."
+          ],
+          [
+            [
+              {
+                "insert": "appearance",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ],
+            "no",
+            [
+              {
+                "insert": "Scene-level color grading applied to the whole stage ("
+              },
+              {
+                "insert": "hue",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": ", "
+              },
+              {
+                "insert": "saturation",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": ")."
+              }
+            ]
+          ],
+          [
+            [
+              {
+                "insert": "entrance",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ],
+            "no",
+            [
+              {
+                "insert": "Optional staggered entrance animation played after all objects mount, before the scene is revealed. See "
+              },
+              {
+                "insert": "Entrance Animation",
+                "attributes": {
+                  "link": "#entrance-animation"
+                }
+              },
+              {
+                "insert": "."
+              }
+            ]
+          ],
+          [
+            [
+              {
+                "insert": "objects",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ],
+            "yes",
+            "Ordered array of scene objects. Empty is valid."
+          ]
+        ]
+      },
+      "children": []
+    },
+    "b-10-scene-data-model-objects-not-layers-7": {
+      "id": "b-10-scene-data-model-objects-not-layers-7",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "objects",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " (not "
+        },
+        {
+          "insert": "layers",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ") is the canonical name. The renderer reads "
+        },
+        {
+          "insert": "scene.objects",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": "."
+        }
+      ],
+      "children": []
+    },
+    "b-10-scene-data-model-canonical-object-shape-8": {
+      "id": "b-10-scene-data-model-canonical-object-shape-8",
+      "type": "heading",
+      "props": {
+        "level": 2
+      },
+      "text": [
+        {
+          "insert": "Canonical Object Shape"
+        }
+      ],
+      "children": []
+    },
+    "b-10-scene-data-model-every-scene-object-is-th-9": {
+      "id": "b-10-scene-data-model-every-scene-object-is-th-9",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "Every scene object is the same fundamental thing: a positioned wrapper with a renderer type, a set of always-present spatial and visual sections, and optional component-specific properties, slots, events, and children."
+        }
+      ],
+      "children": []
+    },
+    "b-10-scene-data-model-json-10": {
+      "id": "b-10-scene-data-model-json-10",
+      "type": "code",
+      "props": {
+        "language": "json"
+      },
+      "text": [
+        {
+          "insert": "{\n  \"id\": \"press-start\",\n  \"name\": \"Press Start Button\",\n  \"type\": \"component\",\n  \"asset\": \"press-start\",\n  \"visible\": true,\n\n  \"transform\": {\n    \"x\": 30.5, \"y\": 63.5,\n    \"width\": \"auto\", \"height\": \"auto\",\n    \"anchor\": \"top-left\",\n    \"rotation\": 0, \"scale\": 1\n  },\n\n  \"appearance\": { \"opacity\": 1, \"blend\": \"hard-light\" },\n\n  \"properties\": { \"text\": \"PRESS  START\", \"blink-rate\": 1 },\n\n  \"events\": [\n    { \"trigger\": \"click\", \"action\": \"navigate\",   \"target\": \"menu\" },\n    { \"trigger\": \"click\", \"action\": \"play-audio\", \"target\": \"start-cue\" }\n  ],\n\n  \"children\": []\n}"
+        }
+      ],
+      "children": []
+    },
+    "b-10-scene-data-model-section-require-11-tbl": {
+      "id": "b-10-scene-data-model-section-require-11-tbl",
+      "type": "structured-table",
+      "props": {
+        "columns": [
+          "Section",
+          "Required",
+          "Contents"
+        ],
+        "rows": [
+          [
+            [
+              {
+                "insert": "id",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ],
+            "yes",
+            "Stable identifier within the scene (used for selection, reconciliation, debugging)."
+          ],
+          [
+            [
+              {
+                "insert": "name",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ],
+            "no",
+            "Human-readable display name shown in the hierarchy."
+          ],
+          [
+            [
+              {
+                "insert": "type",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ],
+            "yes",
+            [
+              {
+                "insert": "Renderer type. See "
+              },
+              {
+                "insert": "Object Types",
+                "attributes": {
+                  "link": "#object-types"
+                }
+              },
+              {
+                "insert": "."
+              }
+            ]
+          ],
+          [
+            [
+              {
+                "insert": "asset",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ],
+            "depends",
+            [
+              {
+                "insert": "Registry ID. Required for object types that render an asset. Omitted for "
+              },
+              {
+                "insert": "group",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": "."
+              }
+            ]
+          ],
+          [
+            [
+              {
+                "insert": "visible",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ],
+            "no",
+            [
+              {
+                "insert": "When "
+              },
+              {
+                "insert": "false",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": ", the renderer skips mounting / hides the element. Defaults to "
+              },
+              {
+                "insert": "true",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": "."
+              }
+            ]
+          ],
+          [
+            [
+              {
+                "insert": "transform",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ],
+            "yes",
+            "Spatial section: explicit or fill (see below)."
+          ],
+          [
+            [
+              {
+                "insert": "appearance",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ],
+            "no",
+            [
+              {
+                "insert": "Visual section: "
+              },
+              {
+                "insert": "opacity",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": ", "
+              },
+              {
+                "insert": "blend",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": ", "
+              },
+              {
+                "insert": "hue",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": ", "
+              },
+              {
+                "insert": "saturation",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": ", "
+              },
+              {
+                "insert": "fit",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": "."
+              }
+            ]
+          ],
+          [
+            [
+              {
+                "insert": "properties",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ],
+            "no",
+            [
+              {
+                "insert": "Component-specific knobs declared by the asset's manifest (see "
+              },
+              {
+                "insert": "component-manifest",
+                "attributes": {
+                  "link": "10-scene-engine/10-system-design/15-component-manifest"
+                }
+              },
+              {
+                "insert": ")."
+              }
+            ]
+          ],
+          [
+            [
+              {
+                "insert": "slots",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ],
+            "no",
+            [
+              {
+                "insert": "Glyph-group only: exposed editable sub-surfaces (see "
+              },
+              {
+                "insert": "Slots",
+                "attributes": {
+                  "link": "#slots-glyph-groups"
+                }
+              },
+              {
+                "insert": ")."
+              }
+            ]
+          ],
+          [
+            [
+              {
+                "insert": "events",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ],
+            "no",
+            "Trigger → action bindings for interactivity."
+          ],
+          [
+            [
+              {
+                "insert": "children",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ],
+            "no",
+            "Nested child objects (same shape, recursive). Children render inside the parent's wrapper."
+          ]
+        ]
+      },
+      "children": []
+    },
+    "b-10-scene-data-model-the-inspector-treats-tr-12": {
+      "id": "b-10-scene-data-model-the-inspector-treats-tr-12",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "The inspector treats "
+        },
+        {
+          "insert": "transform",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " and "
+        },
+        {
+          "insert": "appearance",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " as "
+        },
+        {
+          "insert": "always-present",
+          "attributes": {
+            "bold": true
+          }
+        },
+        {
+          "insert": ". Even if the JSON omits them, the editor renders the sections with defaults and writes them on first edit."
+        }
+      ],
+      "children": []
+    },
+    "b-10-scene-data-model-transform-13": {
+      "id": "b-10-scene-data-model-transform-13",
+      "type": "heading",
+      "props": {
+        "level": 2
+      },
+      "text": [
+        {
+          "insert": "Transform"
+        }
+      ],
+      "children": []
+    },
+    "b-10-scene-data-model-transform-has-two-mutual-14": {
+      "id": "b-10-scene-data-model-transform-has-two-mutual-14",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "Transform has two mutually exclusive modes: "
+        },
+        {
+          "insert": "explicit",
+          "attributes": {
+            "bold": true
+          }
+        },
+        {
+          "insert": " (positioned and sized) or "
+        },
+        {
+          "insert": "fill",
+          "attributes": {
+            "bold": true
+          }
+        },
+        {
+          "insert": " (covers the parent)."
+        }
+      ],
+      "children": []
+    },
+    "b-10-scene-data-model-explicit-transform-15": {
+      "id": "b-10-scene-data-model-explicit-transform-15",
+      "type": "heading",
+      "props": {
+        "level": 3
+      },
+      "text": [
+        {
+          "insert": "Explicit transform"
+        }
+      ],
+      "children": []
+    },
+    "b-10-scene-data-model-json-16": {
+      "id": "b-10-scene-data-model-json-16",
+      "type": "code",
+      "props": {
+        "language": "json"
+      },
+      "text": [
+        {
+          "insert": "\"transform\": {\n  \"x\": 50, \"y\": 75,\n  \"width\": 30, \"height\": \"auto\",\n  \"anchor\": \"center\",\n  \"rotation\": 0, \"scale\": 1\n}"
+        }
+      ],
+      "children": []
+    },
+    "b-10-scene-data-model-x-y-percentages-o-17": {
+      "id": "b-10-scene-data-model-x-y-percentages-o-17",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "x",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ", "
+        },
+        {
+          "insert": "y",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ". Percentages of the parent (number, no unit)."
+        }
+      ],
+      "children": []
+    },
+    "b-10-scene-data-model-width-height-perc-18": {
+      "id": "b-10-scene-data-model-width-height-perc-18",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "width",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ", "
+        },
+        {
+          "insert": "height",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ". Percentages of the parent, or "
+        },
+        {
+          "insert": "\"auto\"",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " to let intrinsic content / aspect ratio decide."
+        }
+      ],
+      "children": []
+    },
+    "b-10-scene-data-model-anchor-which-point-o-19": {
+      "id": "b-10-scene-data-model-anchor-which-point-o-19",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "anchor",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ": which point on the object aligns to "
+        },
+        {
+          "insert": "(x, y)",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ". One of "
+        },
+        {
+          "insert": "top-left",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ", "
+        },
+        {
+          "insert": "top",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ", "
+        },
+        {
+          "insert": "top-right",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ", "
+        },
+        {
+          "insert": "left",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ", "
+        },
+        {
+          "insert": "center",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ", "
+        },
+        {
+          "insert": "right",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ", "
+        },
+        {
+          "insert": "bottom-left",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ", "
+        },
+        {
+          "insert": "bottom",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ", "
+        },
+        {
+          "insert": "bottom-right",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ". Defaults to "
+        },
+        {
+          "insert": "top-left",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": "."
+        }
+      ],
+      "children": []
+    },
+    "b-10-scene-data-model-rotation-degrees-ap-20": {
+      "id": "b-10-scene-data-model-rotation-degrees-ap-20",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "rotation",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ": degrees, applied after anchor translation."
+        }
+      ],
+      "children": []
+    },
+    "b-10-scene-data-model-scale-uniform-multip-21": {
+      "id": "b-10-scene-data-model-scale-uniform-multip-21",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "scale",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ": uniform multiplier, applied last."
+        }
+      ],
+      "children": []
+    },
+    "b-10-scene-data-model-all-positioning-is-per-22": {
+      "id": "b-10-scene-data-model-all-positioning-is-per-22",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "All positioning is "
+        },
+        {
+          "insert": "percentage of the parent",
+          "attributes": {
+            "bold": true
+          }
+        },
+        {
+          "insert": ". Children of a group are percentages of the group's box, which is itself a percentage of the stage. Pages are single-viewport game-menu screens; percentages are the natural unit."
+        }
+      ],
+      "children": []
+    },
+    "b-10-scene-data-model-fill-mode-23": {
+      "id": "b-10-scene-data-model-fill-mode-23",
+      "type": "heading",
+      "props": {
+        "level": 3
+      },
+      "text": [
+        {
+          "insert": "Fill mode"
+        }
+      ],
+      "children": []
+    },
+    "b-10-scene-data-model-json-24": {
+      "id": "b-10-scene-data-model-json-24",
+      "type": "code",
+      "props": {
+        "language": "json"
+      },
+      "text": [
+        {
+          "insert": "\"transform\": { \"mode\": \"fill\", \"rotation\": 0, \"scale\": 1 }"
+        }
+      ],
+      "children": []
+    },
+    "b-10-scene-data-model-mode-fill-means-co-25": {
+      "id": "b-10-scene-data-model-mode-fill-means-co-25",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "mode: \"fill\"",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " means \"cover the parent\" ("
+        },
+        {
+          "insert": "inset: 0; width: 100%; height: 100%",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": "). Use it for backgrounds, full-screen video loops, full-screen effect overlays, and audio (which has no visual but still needs a transform field)."
+        }
+      ],
+      "children": []
+    },
+    "b-10-scene-data-model-toggling-between-explici-26": {
+      "id": "b-10-scene-data-model-toggling-between-explici-26",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "Toggling between explicit and fill in the inspector is a one-click operation; the unused fields are stripped."
+        }
+      ],
+      "children": []
+    },
+    "b-10-scene-data-model-appearance-27": {
+      "id": "b-10-scene-data-model-appearance-27",
+      "type": "heading",
+      "props": {
+        "level": 2
+      },
+      "text": [
+        {
+          "insert": "Appearance"
+        }
+      ],
+      "children": []
+    },
+    "b-10-scene-data-model-json-28": {
+      "id": "b-10-scene-data-model-json-28",
+      "type": "code",
+      "props": {
+        "language": "json"
+      },
+      "text": [
+        {
+          "insert": "\"appearance\": { \"opacity\": 1, \"blend\": \"hard-light\", \"hue\": 0, \"saturation\": 1, \"fit\": \"cover\" }"
+        }
+      ],
+      "children": []
+    },
+    "b-10-scene-data-model-field-notes-29-tbl": {
+      "id": "b-10-scene-data-model-field-notes-29-tbl",
+      "type": "structured-table",
+      "props": {
+        "columns": [
+          "Field",
+          "Notes"
+        ],
+        "rows": [
+          [
+            [
+              {
+                "insert": "opacity",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ],
+            [
+              {
+                "insert": "0..1",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": ". Maps to CSS "
+              },
+              {
+                "insert": "opacity",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": "."
+              }
+            ]
+          ],
+          [
+            [
+              {
+                "insert": "blend",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ],
+            [
+              {
+                "insert": "CSS "
+              },
+              {
+                "insert": "mix-blend-mode",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": " value ("
+              },
+              {
+                "insert": "normal",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": ", "
+              },
+              {
+                "insert": "multiply",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": ", "
+              },
+              {
+                "insert": "screen",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": ", "
+              },
+              {
+                "insert": "overlay",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": ", …)."
+              }
+            ]
+          ],
+          [
+            [
+              {
+                "insert": "hue",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ],
+            [
+              {
+                "insert": "Degrees. Maps to CSS "
+              },
+              {
+                "insert": "filter: hue-rotate(...)",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": "."
+              }
+            ]
+          ],
+          [
+            [
+              {
+                "insert": "saturation",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ],
+            "Multiplier. Used by the scene-level appearance filter; on object appearance, treated similarly."
+          ],
+          [
+            [
+              {
+                "insert": "fit",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ],
+            [
+              {
+                "insert": "Media-only: CSS "
+              },
+              {
+                "insert": "object-fit",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": " for the inner "
+              },
+              {
+                "insert": "<video>",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": " / "
+              },
+              {
+                "insert": "<img>",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": " ("
+              },
+              {
+                "insert": "cover",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": ", "
+              },
+              {
+                "insert": "contain",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": ", "
+              },
+              {
+                "insert": "fill",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": ", …)."
+              }
+            ]
+          ]
+        ]
+      },
+      "children": []
+    },
+    "b-10-scene-data-model-scene-level-appearance-30": {
+      "id": "b-10-scene-data-model-scene-level-appearance-30",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "Scene-level "
+        },
+        {
+          "insert": "appearance",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " (on the top-level scene object) applies as a CSS "
+        },
+        {
+          "insert": "filter",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " to the stage root, layered over the per-object filters."
+        }
+      ],
+      "children": []
+    },
+    "b-10-scene-data-model-object-types-31": {
+      "id": "b-10-scene-data-model-object-types-31",
+      "type": "heading",
+      "props": {
+        "level": 2
+      },
+      "text": [
+        {
+          "insert": "Object Types"
+        }
+      ],
+      "children": []
+    },
+    "b-10-scene-data-model-type-what-i-32-tbl": {
+      "id": "b-10-scene-data-model-type-what-i-32-tbl",
+      "type": "structured-table",
+      "props": {
+        "columns": [
+          [
+            {
+              "insert": "type",
+              "attributes": {
+                "code": true
+              }
+            }
+          ],
+          "What it renders",
+          "Asset registry kind",
+          [
+            {
+              "insert": "Typical "
+            },
+            {
+              "insert": "transform",
+              "attributes": {
+                "code": true
+              }
+            }
+          ]
+        ],
+        "rows": [
+          [
+            [
+              {
+                "insert": "video",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ],
+            [
+              {
+                "insert": "Looping "
+              },
+              {
+                "insert": "<video>",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ],
+            [
+              {
+                "insert": "video",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": " (asset)"
+              }
+            ],
+            [
+              {
+                "insert": "fill",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": " or explicit"
+              }
+            ]
+          ],
+          [
+            [
+              {
+                "insert": "image",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ],
+            [
+              {
+                "insert": "Static "
+              },
+              {
+                "insert": "<img>",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ],
+            [
+              {
+                "insert": "image",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": " (asset)"
+              }
+            ],
+            "explicit"
+          ],
+          [
+            [
+              {
+                "insert": "audio",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ],
+            "Web-audio playback (no visual)",
+            [
+              {
+                "insert": "audio",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": " (asset)"
+              }
+            ],
+            [
+              {
+                "insert": "fill",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": " (placeholder)"
+              }
+            ]
+          ],
+          [
+            [
+              {
+                "insert": "glyph-group",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ],
+            "Layered SVG with optional editable slots",
+            [
+              {
+                "insert": "glyph",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": " (asset)"
+              }
+            ],
+            "explicit"
+          ],
+          [
+            [
+              {
+                "insert": "text",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ],
+            "Editable text (font, size, color)",
+            "n/a",
+            "explicit"
+          ],
+          [
+            [
+              {
+                "insert": "effect",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ],
+            "CSS effect from a module (CRT, vortex, …)",
+            [
+              {
+                "insert": "effect",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": " (module)"
+              }
+            ],
+            [
+              {
+                "insert": "fill",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ]
+          ],
+          [
+            [
+              {
+                "insert": "component",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ],
+            "Custom JS component from a module",
+            [
+              {
+                "insert": "component",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": " (module)"
+              }
+            ],
+            "varies per manifest"
+          ],
+          [
+            [
+              {
+                "insert": "group",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ],
+            "Empty container for organizing children",
+            "n/a (no asset)",
+            "explicit or fill"
+          ]
+        ]
+      },
+      "children": []
+    },
+    "b-10-scene-data-model-type-selects-the-rende-33": {
+      "id": "b-10-scene-data-model-type-selects-the-rende-33",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "type",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " selects the renderer; "
+        },
+        {
+          "insert": "asset",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " resolves to a registry entry. Built-in types ("
+        },
+        {
+          "insert": "video",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ", "
+        },
+        {
+          "insert": "image",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ", "
+        },
+        {
+          "insert": "audio",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ", "
+        },
+        {
+          "insert": "glyph-group",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ", "
+        },
+        {
+          "insert": "text",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ", "
+        },
+        {
+          "insert": "group",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ") are first-class. "
+        },
+        {
+          "insert": "effect",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " and "
+        },
+        {
+          "insert": "component",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " types load module code and read property definitions from a "
+        },
+        {
+          "insert": "manifest",
+          "attributes": {
+            "reference": {
+              "kind": "doc",
+              "path": "10-scene-engine/10-system-design/15-component-manifest",
+              "label": "manifest"
+            }
+          }
+        },
+        {
+          "insert": "."
+        }
+      ],
+      "children": []
+    },
+    "b-10-scene-data-model-properties-34": {
+      "id": "b-10-scene-data-model-properties-34",
+      "type": "heading",
+      "props": {
+        "level": 2
+      },
+      "text": [
+        {
+          "insert": "Properties"
+        }
+      ],
+      "children": []
+    },
+    "b-10-scene-data-model-properties-carries-com-35": {
+      "id": "b-10-scene-data-model-properties-carries-com-35",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "properties",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " carries component-specific values. Text, blink rate, density, hue, etc. The keys and types are not fixed by the schema; they're declared by the asset's "
+        },
+        {
+          "insert": "manifest.json",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ". The editor reads the manifest to render property fields with the right input (slider, text, enum). The renderer passes "
+        },
+        {
+          "insert": "properties",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " straight to the component's render function."
+        }
+      ],
+      "children": []
+    },
+    "b-10-scene-data-model-universal-concerns-visi-36": {
+      "id": "b-10-scene-data-model-universal-concerns-visi-36",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "Universal concerns (visibility, transform, appearance) are "
+        },
+        {
+          "insert": "never",
+          "attributes": {
+            "bold": true
+          }
+        },
+        {
+          "insert": " in "
+        },
+        {
+          "insert": "properties",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ". That section is reserved for things only the component knows about."
+        }
+      ],
+      "children": []
+    },
+    "b-10-scene-data-model-slots-glyph-groups-37": {
+      "id": "b-10-scene-data-model-slots-glyph-groups-37",
+      "type": "heading",
+      "props": {
+        "level": 2
+      },
+      "text": [
+        {
+          "insert": "Slots (Glyph Groups)"
+        }
+      ],
+      "children": []
+    },
+    "b-10-scene-data-model-a-glyph-group-is-a-singl-38": {
+      "id": "b-10-scene-data-model-a-glyph-group-is-a-singl-38",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "A glyph-group is a single object in the hierarchy, not a 40-child tree. The SVG ships with internal sub-layers already finalized by the font-creation pipeline. The SVG author marks specific sub-layers as editable by tagging them with a "
+        },
+        {
+          "insert": "data-slot=\"<slot-id>\"",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " attribute. Those, and only those, appear as "
+        },
+        {
+          "insert": "slots",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " on the scene object."
+        }
+      ],
+      "children": []
+    },
+    "b-10-scene-data-model-json-39": {
+      "id": "b-10-scene-data-model-json-39",
+      "type": "code",
+      "props": {
+        "language": "json"
+      },
+      "text": [
+        {
+          "insert": "{\n  \"id\": \"codecaine-logo\",\n  \"type\": \"glyph-group\",\n  \"asset\": \"codecaine-logo\",\n  \"transform\": { \"x\": 40, \"y\": 12, \"width\": 22, \"height\": 5.5, \"anchor\": \"top-left\", \"scale\": 3.55 },\n  \"slots\": [\n    {\n      \"id\": \"in-text-fire\",\n      \"type\": \"video-fill\",\n      \"asset\": \"in-text-fire\",\n      \"appearance\": { \"blend\": \"screen\", \"opacity\": 1, \"fit\": \"cover\" }\n    }\n  ]\n}"
+        }
+      ],
+      "children": []
+    },
+    "b-10-scene-data-model-slot-field-notes-40-tbl": {
+      "id": "b-10-scene-data-model-slot-field-notes-40-tbl",
+      "type": "structured-table",
+      "props": {
+        "columns": [
+          "Slot field",
+          "Notes"
+        ],
+        "rows": [
+          [
+            [
+              {
+                "insert": "id",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ],
+            [
+              {
+                "insert": "Matches a "
+              },
+              {
+                "insert": "data-slot=\"...\"",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": " element inside the SVG."
+              }
+            ]
+          ],
+          [
+            [
+              {
+                "insert": "type",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ],
+            [
+              {
+                "insert": "Slot kind. Currently "
+              },
+              {
+                "insert": "video-fill",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": " (a video clipped to the slot shape)."
+              }
+            ]
+          ],
+          [
+            [
+              {
+                "insert": "asset",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ],
+            "Registry ID of the fill asset."
+          ],
+          [
+            [
+              {
+                "insert": "appearance",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ],
+            "Per-slot blend / opacity / fit / hue."
+          ]
+        ]
+      },
+      "children": []
+    },
+    "b-10-scene-data-model-the-slot-s-clip-path-is-41": {
+      "id": "b-10-scene-data-model-the-slot-s-clip-path-is-41",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "The slot's clip-path is inherited from the SVG anchor element, so the fill is constrained to the letter shape (or whatever the author exposed). Slots appear in the inspector under the glyph-group object, not as separate hierarchy entries."
+        }
+      ],
+      "children": []
+    },
+    "b-10-scene-data-model-events-42": {
+      "id": "b-10-scene-data-model-events-42",
+      "type": "heading",
+      "props": {
+        "level": 2
+      },
+      "text": [
+        {
+          "insert": "Events"
+        }
+      ],
+      "children": []
+    },
+    "b-10-scene-data-model-a-small-set-of-trigger-43": {
+      "id": "b-10-scene-data-model-a-small-set-of-trigger-43",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "A small set of trigger → action pairs makes interactivity legible in the editor without inventing a visual scripting language."
+        }
+      ],
+      "children": []
+    },
+    "b-10-scene-data-model-json-44": {
+      "id": "b-10-scene-data-model-json-44",
+      "type": "code",
+      "props": {
+        "language": "json"
+      },
+      "text": [
+        {
+          "insert": "\"events\": [\n  { \"trigger\": \"click\", \"action\": \"navigate\",   \"target\": \"menu\", \"properties\": { \"navigationDelayMs\": 650 } },\n  { \"trigger\": \"click\", \"action\": \"play-audio\", \"target\": \"start-cue\" }\n]"
+        }
+      ],
+      "children": []
+    },
+    "b-10-scene-data-model-trigger-action-45-tbl": {
+      "id": "b-10-scene-data-model-trigger-action-45-tbl",
+      "type": "structured-table",
+      "props": {
+        "columns": [
+          "Trigger",
+          "Action",
+          "Target meaning"
+        ],
+        "rows": [
+          [
+            [
+              {
+                "insert": "click",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ],
+            [
+              {
+                "insert": "navigate",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ],
+            "A scene ID in the project: switches pages."
+          ],
+          [
+            [
+              {
+                "insert": "click",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ],
+            [
+              {
+                "insert": "play-audio",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ],
+            "An asset ID of an audio container."
+          ],
+          [
+            [
+              {
+                "insert": "hover",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ],
+            "(any)",
+            "Triggered on mouseover."
+          ],
+          [
+            [
+              {
+                "insert": "load",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ],
+            [
+              {
+                "insert": "autoplay",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ],
+            "Fires on scene boot."
+          ]
+        ]
+      },
+      "children": []
+    },
+    "b-10-scene-data-model-the-renderer-maps-these-46": {
+      "id": "b-10-scene-data-model-the-renderer-maps-these-46",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "The renderer maps these to DOM event listeners and the project navigator ("
+        },
+        {
+          "insert": "window.MELEE_navigate(sceneId)",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " in the export bundle). For page-changing cues, a "
+        },
+        {
+          "insert": "navigate",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " binding can include "
+        },
+        {
+          "insert": "properties.navigationDelayMs",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " so preceding audio has time to start before the page changes."
+        }
+      ],
+      "children": []
+    },
+    "b-10-scene-data-model-children-and-nesting-47": {
+      "id": "b-10-scene-data-model-children-and-nesting-47",
+      "type": "heading",
+      "props": {
+        "level": 2
+      },
+      "text": [
+        {
+          "insert": "Children and Nesting"
+        }
+      ],
+      "children": []
+    },
+    "b-10-scene-data-model-any-object-may-have-chi-48": {
+      "id": "b-10-scene-data-model-any-object-may-have-chi-48",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "Any object may have "
+        },
+        {
+          "insert": "children",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ". Children render inside the parent's wrapper, with their "
+        },
+        {
+          "insert": "transform",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " percentages resolved against the parent's box. Moving a parent moves its children."
+        }
+      ],
+      "children": []
+    },
+    "b-10-scene-data-model-children-is-not-ho-49": {
+      "id": "b-10-scene-data-model-children-is-not-ho-49",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "children",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " is "
+        },
+        {
+          "insert": "not",
+          "attributes": {
+            "bold": true
+          }
+        },
+        {
+          "insert": " how glyph-group sub-layers are modeled. Those are "
+        },
+        {
+          "insert": "slots",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ". Children are for general scene composition: a "
+        },
+        {
+          "insert": "group",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " containing a logo + button, an "
+        },
+        {
+          "insert": "effect",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " nested inside a sub-region, etc."
+        }
+      ],
+      "children": []
+    },
+    "b-10-scene-data-model-z-order-within-a-childr-50": {
+      "id": "b-10-scene-data-model-z-order-within-a-childr-50",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "Z-order within a "
+        },
+        {
+          "insert": "children",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " array is array order, same rule as the top-level "
+        },
+        {
+          "insert": "objects",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " array."
+        }
+      ],
+      "children": []
+    },
+    "b-10-scene-data-model-z-order-51": {
+      "id": "b-10-scene-data-model-z-order-51",
+      "type": "heading",
+      "props": {
+        "level": 2
+      },
+      "text": [
+        {
+          "insert": "Z-Order"
+        }
+      ],
+      "children": []
+    },
+    "b-10-scene-data-model-array-position-is-th-52": {
+      "id": "b-10-scene-data-model-array-position-is-th-52",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "Array position "
+        },
+        {
+          "insert": "is",
+          "attributes": {
+            "bold": true
+          }
+        },
+        {
+          "insert": " the z-order. First entry is at the back, last is on top. There is no "
+        },
+        {
+          "insert": "zIndex",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " property. Reordering in the editor's hierarchy panel rewrites the array. The same rule applies recursively inside "
+        },
+        {
+          "insert": "children",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": "."
+        }
+      ],
+      "children": []
+    },
+    "b-10-scene-data-model-entrance-animation-53": {
+      "id": "b-10-scene-data-model-entrance-animation-53",
+      "type": "heading",
+      "props": {
+        "level": 2
+      },
+      "text": [
+        {
+          "insert": "Entrance Animation"
+        }
+      ],
+      "children": []
+    },
+    "b-10-scene-data-model-entrance-is-an-optiona-54": {
+      "id": "b-10-scene-data-model-entrance-is-an-optiona-54",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "entrance",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " is an optional top-level scene field that choreographs how objects appear when the scene first renders."
+        }
+      ],
+      "children": []
+    },
+    "b-10-scene-data-model-json-55": {
+      "id": "b-10-scene-data-model-json-55",
+      "type": "code",
+      "props": {
+        "language": "json"
+      },
+      "text": [
+        {
+          "insert": "\"entrance\": { \"stagger\": 250, \"duration\": 700, \"type\": \"fade-in\" }"
+        }
+      ],
+      "children": []
+    },
+    "b-10-scene-data-model-field-notes-56-tbl": {
+      "id": "b-10-scene-data-model-field-notes-56-tbl",
+      "type": "structured-table",
+      "props": {
+        "columns": [
+          "Field",
+          "Notes"
+        ],
+        "rows": [
+          [
+            [
+              {
+                "insert": "stagger",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ],
+            [
+              {
+                "insert": "Milliseconds between each object starting. Defaults to "
+              },
+              {
+                "insert": "200",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": "."
+              }
+            ]
+          ],
+          [
+            [
+              {
+                "insert": "duration",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ],
+            [
+              {
+                "insert": "Milliseconds per object fade. Defaults to "
+              },
+              {
+                "insert": "600",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": "."
+              }
+            ]
+          ],
+          [
+            [
+              {
+                "insert": "type",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ],
+            [
+              {
+                "insert": "One of "
+              },
+              {
+                "insert": "\"fade-in\"",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": " or "
+              },
+              {
+                "insert": "\"none\"",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": ". Defaults to "
+              },
+              {
+                "insert": "\"fade-in\"",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": "."
+              }
+            ]
+          ]
+        ]
+      },
+      "children": []
+    },
+    "b-10-scene-data-model-the-renderer-hides-the-s-57": {
+      "id": "b-10-scene-data-model-the-renderer-hides-the-s-57",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "The renderer hides the stage during mount ("
+        },
+        {
+          "insert": "visibility: hidden",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": "), builds all objects invisibly, then reveals. If "
+        },
+        {
+          "insert": "entrance",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " is configured, objects fade in sequentially, staggered by array order. If it is not configured, everything appears at once."
+        }
+      ],
+      "children": []
+    },
+    "b-10-scene-data-model-an-object-may-include-it-58": {
+      "id": "b-10-scene-data-model-an-object-may-include-it-58",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "An object may include its own "
+        },
+        {
+          "insert": "\"entrance\": { \"type\": \"none\" }",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " to skip its entrance, or override "
+        },
+        {
+          "insert": "duration",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " / "
+        },
+        {
+          "insert": "delay",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " on that object's entrance block."
+        }
+      ],
+      "children": []
+    },
+    "b-10-scene-data-model-objects-with-visible-f-59": {
+      "id": "b-10-scene-data-model-objects-with-visible-f-59",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "Objects with "
+        },
+        {
+          "insert": "visible: false",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " are excluded from the entrance sequence. Each object's fade targets that object's "
+        },
+        {
+          "insert": "appearance.opacity",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": "; an object at "
+        },
+        {
+          "insert": "0.5",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " opacity fades in to "
+        },
+        {
+          "insert": "0.5",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ", not "
+        },
+        {
+          "insert": "1",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": "."
+        }
+      ],
+      "children": []
+    },
+    "b-10-scene-data-model-example-title-scene-60": {
+      "id": "b-10-scene-data-model-example-title-scene-60",
+      "type": "heading",
+      "props": {
+        "level": 2
+      },
+      "text": [
+        {
+          "insert": "Example: Title Scene"
+        }
+      ],
+      "children": []
+    },
+    "b-10-scene-data-model-json-61": {
+      "id": "b-10-scene-data-model-json-61",
+      "type": "code",
+      "props": {
+        "language": "json"
+      },
+      "text": [
+        {
+          "insert": "{\n  \"id\": \"title\",\n  \"name\": \"Title Screen\",\n  \"stage\": { \"width\": 1440, \"height\": 1080 },\n  \"appearance\": { \"hue\": 0, \"saturation\": 1.4 },\n  \"objects\": [\n    {\n      \"id\": \"bg-video\",\n      \"type\": \"video\",\n      \"asset\": \"bg-video\",\n      \"transform\": { \"mode\": \"fill\" },\n      \"appearance\": { \"fit\": \"fill\", \"blend\": \"normal\", \"opacity\": 1, \"hue\": 109 }\n    },\n    {\n      \"id\": \"codecaine-logo\",\n      \"type\": \"glyph-group\",\n      \"asset\": \"codecaine-logo\",\n      \"transform\": { \"x\": 40, \"y\": 12, \"width\": 22, \"height\": 5.5, \"anchor\": \"top-left\", \"scale\": 3.55 },\n      \"properties\": { \"shimmer\": true },\n      \"slots\": [\n        {\n          \"id\": \"in-text-fire\",\n          \"type\": \"video-fill\",\n          \"asset\": \"in-text-fire\",\n          \"appearance\": { \"blend\": \"screen\", \"opacity\": 1, \"fit\": \"cover\" }\n        }\n      ]\n    },\n    {\n      \"id\": \"press-start\",\n      \"type\": \"component\",\n      \"asset\": \"press-start\",\n      \"transform\": { \"x\": 30.5, \"y\": 63.5, \"width\": \"auto\", \"height\": \"auto\", \"anchor\": \"top-left\" },\n      \"appearance\": { \"opacity\": 1, \"blend\": \"hard-light\" },\n      \"properties\": { \"text\": \"PRESS  START\", \"blink-rate\": 1 },\n      \"events\": [\n        { \"trigger\": \"click\", \"action\": \"navigate\",   \"target\": \"menu\" },\n        { \"trigger\": \"click\", \"action\": \"play-audio\", \"target\": \"start-cue\" }\n      ]\n    },\n    {\n      \"id\": \"crt\",\n      \"type\": \"effect\",\n      \"asset\": \"crt-overlay\",\n      \"visible\": false,\n      \"transform\": { \"mode\": \"fill\" },\n      \"appearance\": { \"opacity\": 1 },\n      \"properties\": { \"rgb-fringe\": 0.06 }\n    }\n  ]\n}"
+        }
+      ],
+      "children": []
+    },
+    "b-10-scene-data-model-bottom-to-top-hue-shift-62": {
+      "id": "b-10-scene-data-model-bottom-to-top-hue-shift-62",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "Bottom to top: hue-shifted background video, the CODECAINE logo with an in-text fire slot, the press-start button with click bindings, and a CRT overlay (currently hidden)."
+        }
+      ],
+      "children": []
+    }
+  }
+}

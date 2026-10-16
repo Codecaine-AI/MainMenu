@@ -1,0 +1,442 @@
+{
+  "schemaVersion": 1,
+  "id": "scene-engine-20-implementation-40-asset-pipeline-00-overview",
+  "title": "Asset Pipeline (Implementation)",
+  "root": "b-00-overview-root-18",
+  "blocks": {
+    "b-00-overview-root-18": {
+      "id": "b-00-overview-root-18",
+      "type": "paragraph",
+      "props": {
+        "concepts": [
+          "upload",
+          "asset-selection",
+          "validation",
+          "registry-mutation"
+        ],
+        "covers": "The server + client surfaces that move asset files into the system and point scenes at project-local containers.",
+        "design_refs": [
+          "10-system-design/60-asset-uploads.md"
+        ],
+        "type": "overview"
+      },
+      "children": [
+        "b-00-overview-the-next-js-routes-and-s-2",
+        "b-00-overview-this-section-covers-ever-3",
+        "b-00-overview-divider-4",
+        "b-00-overview-file-tree-5",
+        "b-00-overview-code-6",
+        "b-00-overview-contents-7",
+        "b-00-overview-10-asset-types-md-10-a-8",
+        "b-00-overview-the-shared-asset-types-9",
+        "b-00-overview-20-api-routes-md-20-ap-10",
+        "b-00-overview-the-asset-api-routes-u-11",
+        "b-00-overview-30-upload-page-md-30-u-12",
+        "b-00-overview-the-upload-page-fil-13",
+        "b-00-overview-40-swap-dropdown-md-40-14",
+        "b-00-overview-assetswapdropdown-tsx-15",
+        "b-00-overview-key-concepts-16",
+        "b-00-overview-concept-17-tbl"
+      ]
+    },
+    "b-00-overview-the-next-js-routes-and-s-2": {
+      "id": "b-00-overview-the-next-js-routes-and-s-2",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "The Next.js routes and shared validation library that implement the upload and asset-selection surfaces described in "
+        },
+        {
+          "insert": "System Design / Asset Uploads",
+          "attributes": {
+            "reference": {
+              "kind": "doc",
+              "path": "10-scene-engine/10-system-design/60-asset-uploads",
+              "label": "System Design / Asset Uploads"
+            }
+          }
+        },
+        {
+          "insert": "."
+        }
+      ],
+      "children": []
+    },
+    "b-00-overview-this-section-covers-ever-3": {
+      "id": "b-00-overview-this-section-covers-ever-3",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "This section covers everything between \"user picks a file\" and \"scene renders the new bytes.\" The inspector dropdown UI itself is documented under "
+        },
+        {
+          "insert": "editor / panels",
+          "attributes": {
+            "reference": {
+              "kind": "doc",
+              "path": "10-scene-engine/20-implementation/20-editor/20-panels",
+              "label": "editor / panels"
+            }
+          }
+        },
+        {
+          "insert": "."
+        }
+      ],
+      "children": []
+    },
+    "b-00-overview-divider-4": {
+      "id": "b-00-overview-divider-4",
+      "type": "divider",
+      "props": {},
+      "children": []
+    },
+    "b-00-overview-file-tree-5": {
+      "id": "b-00-overview-file-tree-5",
+      "type": "heading",
+      "props": {
+        "level": 2
+      },
+      "text": [
+        {
+          "insert": "File Tree"
+        }
+      ],
+      "children": []
+    },
+    "b-00-overview-code-6": {
+      "id": "b-00-overview-code-6",
+      "type": "code",
+      "props": {},
+      "text": [
+        {
+          "insert": "apps/scene-engine/\n├── app/_engine/lib/asset-types.ts            Validation + slug shared between client and server\n├── app/_engine/lib/asset-library.ts          Project-local library listing + usage counts\n├── app/_engine/lib/export-reachability.ts    Active export graph collector\n├── app/upload/page.tsx                       /upload — standalone upload form\n├── app/api/upload/route.ts                   POST — write file + register container\n├── app/api/assets/[type]/route.ts            GET  — list files in a project type folder\n├── app/api/asset-library/route.ts            GET  — list project-available containers + usage\n├── app/api/projects/[projectId]/...          GET  — project-local assets/modules/fonts/registries\n└── app/api/registry/[id]/route.ts            PATCH — update a container's file pointer"
+        }
+      ],
+      "children": []
+    },
+    "b-00-overview-contents-7": {
+      "id": "b-00-overview-contents-7",
+      "type": "heading",
+      "props": {
+        "level": 2
+      },
+      "text": [
+        {
+          "insert": "Contents"
+        }
+      ],
+      "children": []
+    },
+    "b-00-overview-10-asset-types-md-10-a-8": {
+      "id": "b-00-overview-10-asset-types-md-10-a-8",
+      "type": "heading",
+      "props": {
+        "level": 3
+      },
+      "text": [
+        {
+          "insert": "10-asset-types.md",
+          "attributes": {
+            "reference": {
+              "kind": "doc",
+              "path": "10-scene-engine/20-implementation/40-asset-pipeline/10-asset-types",
+              "label": "10-asset-types.md"
+            }
+          }
+        }
+      ],
+      "children": []
+    },
+    "b-00-overview-the-shared-asset-types-9": {
+      "id": "b-00-overview-the-shared-asset-types-9",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "The shared "
+        },
+        {
+          "insert": "asset-types",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " library. Type list, mime/extension allowlists, mime → type inference, filename slugification, and the "
+        },
+        {
+          "insert": "validateUpload",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " gate used by both the client and the upload route."
+        }
+      ],
+      "children": []
+    },
+    "b-00-overview-20-api-routes-md-20-ap-10": {
+      "id": "b-00-overview-20-api-routes-md-20-ap-10",
+      "type": "heading",
+      "props": {
+        "level": 3
+      },
+      "text": [
+        {
+          "insert": "20-api-routes.md",
+          "attributes": {
+            "reference": {
+              "kind": "doc",
+              "path": "10-scene-engine/20-implementation/40-asset-pipeline/20-api-routes",
+              "label": "20-api-routes.md"
+            }
+          }
+        }
+      ],
+      "children": []
+    },
+    "b-00-overview-the-asset-api-routes-u-11": {
+      "id": "b-00-overview-the-asset-api-routes-u-11",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "The asset API routes. Upload, project file listing, asset-library listing, and registry patch, including request/response shapes, validation behavior, and how they interact with the selected project's registries on disk."
+        }
+      ],
+      "children": []
+    },
+    "b-00-overview-30-upload-page-md-30-u-12": {
+      "id": "b-00-overview-30-upload-page-md-30-u-12",
+      "type": "heading",
+      "props": {
+        "level": 3
+      },
+      "text": [
+        {
+          "insert": "30-upload-page.md",
+          "attributes": {
+            "reference": {
+              "kind": "doc",
+              "path": "10-scene-engine/20-implementation/40-asset-pipeline/30-upload-page",
+              "label": "30-upload-page.md"
+            }
+          }
+        }
+      ],
+      "children": []
+    },
+    "b-00-overview-the-upload-page-fil-13": {
+      "id": "b-00-overview-the-upload-page-fil-13",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "The "
+        },
+        {
+          "insert": "/upload",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " page. File picker, mime-driven type pre-fill, submit flow, success/error rendering."
+        }
+      ],
+      "children": []
+    },
+    "b-00-overview-40-swap-dropdown-md-40-14": {
+      "id": "b-00-overview-40-swap-dropdown-md-40-14",
+      "type": "heading",
+      "props": {
+        "level": 3
+      },
+      "text": [
+        {
+          "insert": "40-swap-dropdown.md",
+          "attributes": {
+            "reference": {
+              "kind": "doc",
+              "path": "10-scene-engine/20-implementation/40-asset-pipeline/40-swap-dropdown",
+              "label": "40-swap-dropdown.md"
+            }
+          }
+        }
+      ],
+      "children": []
+    },
+    "b-00-overview-assetswapdropdown-tsx-15": {
+      "id": "b-00-overview-assetswapdropdown-tsx-15",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "AssetSwapDropdown.tsx",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ", its mounting in "
+        },
+        {
+          "insert": "LayerForm",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " and "
+        },
+        {
+          "insert": "SlotsSection",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ", and the store actions that point a layer or slot at another container."
+        }
+      ],
+      "children": []
+    },
+    "b-00-overview-key-concepts-16": {
+      "id": "b-00-overview-key-concepts-16",
+      "type": "heading",
+      "props": {
+        "level": 2
+      },
+      "text": [
+        {
+          "insert": "Key Concepts"
+        }
+      ],
+      "children": []
+    },
+    "b-00-overview-concept-17-tbl": {
+      "id": "b-00-overview-concept-17-tbl",
+      "type": "structured-table",
+      "props": {
+        "columns": [
+          "Concept",
+          "Description"
+        ],
+        "rows": [
+          [
+            "Container slug",
+            "The container ID, derived from the slugified filename at upload time. Stable across re-uploads."
+          ],
+          [
+            "Type allowlist",
+            "Per-type list of allowed extensions and mimes. Same constants on client (UI hints) and server (gate)."
+          ],
+          [
+            "Registry write",
+            [
+              {
+                "insert": "POST /api/upload",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": " writes "
+              },
+              {
+                "insert": "ProjectSettings/registries/assets.json",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": "; "
+              },
+              {
+                "insert": "PATCH /api/registry/[id]",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": " can still mutate a container file pointer for maintenance flows."
+              }
+            ]
+          ],
+          [
+            "Type folder",
+            [
+              {
+                "insert": "Media files live under "
+              },
+              {
+                "insert": "Assets/Media/{type}/",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": "; fonts live under "
+              },
+              {
+                "insert": "Assets/Fonts/",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": "; registry "
+              },
+              {
+                "insert": "file",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": " fields stay in logical "
+              },
+              {
+                "insert": "/assets/...",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": " or "
+              },
+              {
+                "insert": "/fonts/...",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": " form."
+              }
+            ]
+          ],
+          [
+            "Active export graph",
+            [
+              {
+                "insert": "export-reachability.ts",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": " prunes exported registries to scene-reachable assets/modules/fonts plus declared dependencies."
+              }
+            ]
+          ]
+        ]
+      },
+      "children": []
+    }
+  }
+}

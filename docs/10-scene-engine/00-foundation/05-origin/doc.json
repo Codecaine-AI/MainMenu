@@ -1,0 +1,221 @@
+{
+  "schemaVersion": 1,
+  "id": "scene-engine-00-foundation-05-origin",
+  "title": "Origin",
+  "root": "b-05-origin-root-15",
+  "blocks": {
+    "b-05-origin-root-15": {
+      "id": "b-05-origin-root-15",
+      "type": "paragraph",
+      "props": {
+        "concepts": [
+          "origin",
+          "melee",
+          "game-menus",
+          "fixed-viewport",
+          "figma",
+          "unity"
+        ],
+        "covers": "Where the project came from — the impulse, the gap in tooling, and what it grew into."
+      },
+      "children": [
+        "b-05-origin-this-project-started-as-2",
+        "b-05-origin-unity-handles-this-well-3",
+        "b-05-origin-there-s-nothing-that-sit-4",
+        "b-05-origin-divider-5",
+        "b-05-origin-the-gap-6",
+        "b-05-origin-game-menus-have-a-specif-7",
+        "b-05-origin-one-viewport-no-scrol-8",
+        "b-05-origin-layered-composition-9",
+        "b-05-origin-interactive-but-contai-10",
+        "b-05-origin-cinematic-polish-an-11",
+        "b-05-origin-traditional-web-tools-do-12",
+        "b-05-origin-what-it-grew-into-13",
+        "b-05-origin-what-started-as-a-melee-14"
+      ]
+    },
+    "b-05-origin-this-project-started-as-2": {
+      "id": "b-05-origin-this-project-started-as-2",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "This project started as an attempt to recreate the Super Smash Bros. Melee home screen in CSS and HTML, just to see if it could be a website. But the work kept compounding. Getting the layering right, trying different colors, adjusting blend modes, tweaking animations, every change meant hand-editing code and refreshing. The iteration loop was too slow for visual composition work."
+        }
+      ],
+      "children": []
+    },
+    "b-05-origin-unity-handles-this-well-3": {
+      "id": "b-05-origin-unity-handles-this-well-3",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "Unity handles this well for game design. You place assets in a scene, adjust properties in an inspector, and see the result immediately. Figma handles it well for web design, but for flat, scrolling layouts, not for the kind of fixed-viewport, layered, cinematic screens that game menus are."
+        }
+      ],
+      "children": []
+    },
+    "b-05-origin-there-s-nothing-that-sit-4": {
+      "id": "b-05-origin-there-s-nothing-that-sit-4",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "There's nothing that sits in the gap between them. No tool that blends Figma's web-native output with Unity's scene-composition model, specifically aimed at building websites that feel like video game screens."
+        }
+      ],
+      "children": []
+    },
+    "b-05-origin-divider-5": {
+      "id": "b-05-origin-divider-5",
+      "type": "divider",
+      "props": {},
+      "children": []
+    },
+    "b-05-origin-the-gap-6": {
+      "id": "b-05-origin-the-gap-6",
+      "type": "heading",
+      "props": {
+        "level": 2
+      },
+      "text": [
+        {
+          "insert": "The Gap"
+        }
+      ],
+      "children": []
+    },
+    "b-05-origin-game-menus-have-a-specif-7": {
+      "id": "b-05-origin-game-menus-have-a-specif-7",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "Game menus have a specific feel:"
+        }
+      ],
+      "children": []
+    },
+    "b-05-origin-one-viewport-no-scrol-8": {
+      "id": "b-05-origin-one-viewport-no-scrol-8",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "One viewport, no scrolling.",
+          "attributes": {
+            "bold": true
+          }
+        },
+        {
+          "insert": " Everything is composed within a fixed frame."
+        }
+      ],
+      "children": []
+    },
+    "b-05-origin-layered-composition-9": {
+      "id": "b-05-origin-layered-composition-9",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "Layered composition.",
+          "attributes": {
+            "bold": true
+          }
+        },
+        {
+          "insert": " Backgrounds, effects, UI elements, text, all stacked and blended at specific depths."
+        }
+      ],
+      "children": []
+    },
+    "b-05-origin-interactive-but-contai-10": {
+      "id": "b-05-origin-interactive-but-contai-10",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "Interactive but contained.",
+          "attributes": {
+            "bold": true
+          }
+        },
+        {
+          "insert": " You navigate with selections and transitions, not by scrolling a document."
+        }
+      ],
+      "children": []
+    },
+    "b-05-origin-cinematic-polish-an-11": {
+      "id": "b-05-origin-cinematic-polish-an-11",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "Cinematic polish.",
+          "attributes": {
+            "bold": true
+          }
+        },
+        {
+          "insert": " Animations, sound, lighting effects: the menu IS the experience."
+        }
+      ],
+      "children": []
+    },
+    "b-05-origin-traditional-web-tools-do-12": {
+      "id": "b-05-origin-traditional-web-tools-do-12",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "Traditional web tools don't target this. They're built for documents, dashboards, or marketing pages. Game engines target it but don't output web pages. Nothing exists for someone who wants to make a website that feels like a character select screen."
+        }
+      ],
+      "children": []
+    },
+    "b-05-origin-what-it-grew-into-13": {
+      "id": "b-05-origin-what-it-grew-into-13",
+      "type": "heading",
+      "props": {
+        "level": 2
+      },
+      "text": [
+        {
+          "insert": "What It Grew Into"
+        }
+      ],
+      "children": []
+    },
+    "b-05-origin-what-started-as-a-melee-14": {
+      "id": "b-05-origin-what-started-as-a-melee-14",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "What started as a Melee recreation became a broader tool: an editor and composition engine for building fixed-viewport, game-menu-style websites. The name "
+        },
+        {
+          "insert": "Main Menu",
+          "attributes": {
+            "bold": true
+          }
+        },
+        {
+          "insert": " captures what this is: a tool for making main menus. Not game engines, not scrolling websites. The specific experience of a game's main menu, delivered as a web page."
+        }
+      ],
+      "children": []
+    }
+  }
+}

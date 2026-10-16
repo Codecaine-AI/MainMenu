@@ -1,0 +1,295 @@
+{
+  "schemaVersion": 1,
+  "id": "scene-engine-20-implementation-30-desktop-app-00-overview",
+  "title": "Desktop App",
+  "root": "b-00-overview-root-20",
+  "blocks": {
+    "b-00-overview-root-20": {
+      "id": "b-00-overview-root-20",
+      "type": "paragraph",
+      "props": {
+        "code-ref": "apps/scene-engine/desktop",
+        "concepts": [
+          "desktop-app",
+          "electron",
+          "main-menu",
+          "next-standalone",
+          "preload-bridge",
+          "pi-agent"
+        ],
+        "covers": "Main Menu Electron desktop app — packaged authoring shell, Next runtime startup, preload bridge, and Pi Agent ownership.",
+        "type": "overview"
+      },
+      "children": [
+        "b-00-overview-main-menu-is-the-electro-2",
+        "b-00-overview-the-desktop-app-has-two-3",
+        "b-00-overview-start-or-locate-a-local-4",
+        "b-00-overview-expose-a-narrow-typed-br-5",
+        "b-00-overview-it-does-not-introduce-a-6",
+        "b-00-overview-file-tree-7",
+        "b-00-overview-code-8",
+        "b-00-overview-related-root-files-9",
+        "b-00-overview-code-10",
+        "b-00-overview-child-nodes-11",
+        "b-00-overview-10-runtime-md-10-runti-12",
+        "b-00-overview-how-electron-starts-in-d-13",
+        "b-00-overview-20-pi-agent-md-20-pi-a-14",
+        "b-00-overview-how-the-pi-agent-chat-pa-15",
+        "b-00-overview-boundaries-16",
+        "b-00-overview-electron-main-owns-nativ-17",
+        "b-00-overview-preload-exposes-a-typed-18",
+        "b-00-overview-the-renderer-remains-a-w-19"
+      ]
+    },
+    "b-00-overview-main-menu-is-the-electro-2": {
+      "id": "b-00-overview-main-menu-is-the-electro-2",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "Main Menu is the Electron desktop authoring app for "
+        },
+        {
+          "insert": "apps/scene-engine",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ". It opens the same Next editor that runs in the browser, but packages the runtime and owns native capabilities that should not be exposed to React."
+        }
+      ],
+      "children": []
+    },
+    "b-00-overview-the-desktop-app-has-two-3": {
+      "id": "b-00-overview-the-desktop-app-has-two-3",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "The desktop app has two responsibilities:"
+        }
+      ],
+      "children": []
+    },
+    "b-00-overview-start-or-locate-a-local-4": {
+      "id": "b-00-overview-start-or-locate-a-local-4",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "start or locate a local Next runtime and open the editor"
+        }
+      ],
+      "children": []
+    },
+    "b-00-overview-expose-a-narrow-typed-br-5": {
+      "id": "b-00-overview-expose-a-narrow-typed-br-5",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "expose a narrow typed bridge at "
+        },
+        {
+          "insert": "window.mainMenu",
+          "attributes": {
+            "code": true
+          }
+        }
+      ],
+      "children": []
+    },
+    "b-00-overview-it-does-not-introduce-a-6": {
+      "id": "b-00-overview-it-does-not-introduce-a-6",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "It does not introduce a second editor implementation or a separate scene data model."
+        }
+      ],
+      "children": []
+    },
+    "b-00-overview-file-tree-7": {
+      "id": "b-00-overview-file-tree-7",
+      "type": "heading",
+      "props": {
+        "level": 2
+      },
+      "text": [
+        {
+          "insert": "File Tree"
+        }
+      ],
+      "children": []
+    },
+    "b-00-overview-code-8": {
+      "id": "b-00-overview-code-8",
+      "type": "code",
+      "props": {},
+      "text": [
+        {
+          "insert": "apps/scene-engine/desktop/\n├── main/index.ts                         Electron main process\n├── preload/index.ts                      contextBridge surface\n├── types/main-menu.ts                    shared bridge and agent types\n├── scripts/dev.mjs                       desktop dev launcher\n├── scripts/prepare-next-runtime.mjs      stages Next standalone runtime\n├── scripts/run-with-compatible-node.mjs  build helper for compatible Node\n└── tsconfig.json"
+        }
+      ],
+      "children": []
+    },
+    "b-00-overview-related-root-files-9": {
+      "id": "b-00-overview-related-root-files-9",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "Related root files:"
+        }
+      ],
+      "children": []
+    },
+    "b-00-overview-code-10": {
+      "id": "b-00-overview-code-10",
+      "type": "code",
+      "props": {},
+      "text": [
+        {
+          "insert": "apps/scene-engine/\n├── package.json                          desktop scripts + electron-builder config\n├── next.config.ts                        output: 'standalone'\n├── app/editor/_features/pi-agent/         renderer Pi Agent panel + controller\n└── desktop/main/pi-agent/                 Electron Pi SDK service + workspace resolver"
+        }
+      ],
+      "children": []
+    },
+    "b-00-overview-child-nodes-11": {
+      "id": "b-00-overview-child-nodes-11",
+      "type": "heading",
+      "props": {
+        "level": 2
+      },
+      "text": [
+        {
+          "insert": "Child Nodes"
+        }
+      ],
+      "children": []
+    },
+    "b-00-overview-10-runtime-md-10-runti-12": {
+      "id": "b-00-overview-10-runtime-md-10-runti-12",
+      "type": "heading",
+      "props": {
+        "level": 3
+      },
+      "text": [
+        {
+          "insert": "10-runtime.md",
+          "attributes": {
+            "reference": {
+              "kind": "doc",
+              "path": "10-scene-engine/20-implementation/30-desktop-app/10-runtime",
+              "label": "10-runtime.md"
+            }
+          }
+        }
+      ],
+      "children": []
+    },
+    "b-00-overview-how-electron-starts-in-d-13": {
+      "id": "b-00-overview-how-electron-starts-in-d-13",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "How Electron starts in development and packaged modes, how the Next standalone runtime is staged, and where writable workspace files live."
+        }
+      ],
+      "children": []
+    },
+    "b-00-overview-20-pi-agent-md-20-pi-a-14": {
+      "id": "b-00-overview-20-pi-agent-md-20-pi-a-14",
+      "type": "heading",
+      "props": {
+        "level": 3
+      },
+      "text": [
+        {
+          "insert": "20-pi-agent.md",
+          "attributes": {
+            "reference": {
+              "kind": "doc",
+              "path": "10-scene-engine/20-implementation/30-desktop-app/20-pi-agent",
+              "label": "20-pi-agent.md"
+            }
+          }
+        }
+      ],
+      "children": []
+    },
+    "b-00-overview-how-the-pi-agent-chat-pa-15": {
+      "id": "b-00-overview-how-the-pi-agent-chat-pa-15",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "How the Pi Agent chat panel crosses the renderer/native boundary, starts SDK sessions, streams state, and preserves browser sandboxing."
+        }
+      ],
+      "children": []
+    },
+    "b-00-overview-boundaries-16": {
+      "id": "b-00-overview-boundaries-16",
+      "type": "heading",
+      "props": {
+        "level": 2
+      },
+      "text": [
+        {
+          "insert": "Boundaries"
+        }
+      ],
+      "children": []
+    },
+    "b-00-overview-electron-main-owns-nativ-17": {
+      "id": "b-00-overview-electron-main-owns-nativ-17",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "Electron main owns native state, runtime process management, application lifecycle, menus, shell opens, IPC handlers, and Pi SDK sessions."
+        }
+      ],
+      "children": []
+    },
+    "b-00-overview-preload-exposes-a-typed-18": {
+      "id": "b-00-overview-preload-exposes-a-typed-18",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "Preload exposes a typed bridge. It does not leak Node primitives into the renderer."
+        }
+      ],
+      "children": []
+    },
+    "b-00-overview-the-renderer-remains-a-w-19": {
+      "id": "b-00-overview-the-renderer-remains-a-w-19",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "The renderer remains a web app. It calls "
+        },
+        {
+          "insert": "window.mainMenu",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " when available and otherwise behaves like the normal browser editor."
+        }
+      ],
+      "children": []
+    }
+  }
+}

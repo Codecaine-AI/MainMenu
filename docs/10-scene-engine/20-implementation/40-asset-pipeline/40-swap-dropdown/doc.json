@@ -1,0 +1,726 @@
+{
+  "schemaVersion": 1,
+  "id": "scene-engine-20-implementation-40-asset-pipeline-40-swap-dropdown",
+  "title": "Inspector Asset Dropdown",
+  "root": "b-40-swap-dropdown-root-33",
+  "blocks": {
+    "b-40-swap-dropdown-root-33": {
+      "id": "b-40-swap-dropdown-root-33",
+      "type": "paragraph",
+      "props": {
+        "concepts": [
+          "asset-dropdown",
+          "asset-selection",
+          "store-mutation"
+        ],
+        "covers": "AssetSwapDropdown.tsx, LayerForm/SlotsSection integration, and editor-store asset selection actions — how the inspector points layers and slots at project-local containers.",
+        "design_refs": [
+          "10-system-design/60-asset-uploads.md"
+        ]
+      },
+      "children": [
+        "b-40-swap-dropdown-apps-scene-engine-app-e-2",
+        "b-40-swap-dropdown-three-pieces-cooperate-3",
+        "b-40-swap-dropdown-divider-4",
+        "b-40-swap-dropdown-component-assetswapdro-5",
+        "b-40-swap-dropdown-prop-type-6-tbl",
+        "b-40-swap-dropdown-behavior-7",
+        "b-40-swap-dropdown-mount-fetches-api-8",
+        "b-40-swap-dropdown-render-shows-a-se-9",
+        "b-40-swap-dropdown-change-on-selection-10",
+        "b-40-swap-dropdown-the-component-does-not-u-14",
+        "b-40-swap-dropdown-mounting-layerform-15",
+        "b-40-swap-dropdown-layerform-reads-the-se-16",
+        "b-40-swap-dropdown-the-container-exists-17",
+        "b-40-swap-dropdown-its-type-is-one-of-the-18",
+        "b-40-swap-dropdown-the-entry-has-a-file-f-19",
+        "b-40-swap-dropdown-slotssection-uses-the-20",
+        "b-40-swap-dropdown-store-mutations-21",
+        "b-40-swap-dropdown-apps-scene-engine-app-22",
+        "b-40-swap-dropdown-ts-23",
+        "b-40-swap-dropdown-both-clone-the-scene-up-24",
+        "b-40-swap-dropdown-why-selection-updates-sc-25",
+        "b-40-swap-dropdown-selection-and-registry-m-26",
+        "b-40-swap-dropdown-surface-27-tbl",
+        "b-40-swap-dropdown-that-split-keeps-a-local-28",
+        "b-40-swap-dropdown-sources-29",
+        "b-40-swap-dropdown-apps-scene-engine-app-e-30",
+        "b-40-swap-dropdown-apps-scene-engine-app-e-31",
+        "b-40-swap-dropdown-apps-scene-engine-app-32"
+      ]
+    },
+    "b-40-swap-dropdown-apps-scene-engine-app-e-2": {
+      "id": "b-40-swap-dropdown-apps-scene-engine-app-e-2",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "apps/scene-engine/app/editor/_components/AssetSwapDropdown.tsx",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " is the client side of asset selection. When an asset-type layer or glyph slot is selected in the inspector, the dropdown lists project-available registry containers of the same type and lets the user point that scene reference at another container."
+        }
+      ],
+      "children": []
+    },
+    "b-40-swap-dropdown-three-pieces-cooperate-3": {
+      "id": "b-40-swap-dropdown-three-pieces-cooperate-3",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "Three pieces cooperate: the dropdown component, the "
+        },
+        {
+          "insert": "LayerForm",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " or "
+        },
+        {
+          "insert": "SlotsSection",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " that mounts it, and the editor-store action that changes the selected scene reference."
+        }
+      ],
+      "children": []
+    },
+    "b-40-swap-dropdown-divider-4": {
+      "id": "b-40-swap-dropdown-divider-4",
+      "type": "divider",
+      "props": {},
+      "children": []
+    },
+    "b-40-swap-dropdown-component-assetswapdro-5": {
+      "id": "b-40-swap-dropdown-component-assetswapdro-5",
+      "type": "heading",
+      "props": {
+        "level": 2
+      },
+      "text": [
+        {
+          "insert": "Component: "
+        },
+        {
+          "insert": "AssetSwapDropdown",
+          "attributes": {
+            "code": true
+          }
+        }
+      ],
+      "children": []
+    },
+    "b-40-swap-dropdown-prop-type-6-tbl": {
+      "id": "b-40-swap-dropdown-prop-type-6-tbl",
+      "type": "structured-table",
+      "props": {
+        "columns": [
+          "Prop",
+          "Type",
+          "Notes"
+        ],
+        "rows": [
+          [
+            [
+              {
+                "insert": "assetId",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ],
+            "string",
+            "The container ID (registry key)."
+          ],
+          [
+            [
+              {
+                "insert": "assetType",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ],
+            [
+              {
+                "insert": "AssetType",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ],
+            "One of the file asset types: drives the listing fetch."
+          ],
+          [
+            [
+              {
+                "insert": "projectId",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ],
+            "string",
+            "Optional project filter for the asset-library request."
+          ],
+          [
+            [
+              {
+                "insert": "onSelect",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ],
+            "function",
+            "Receives the next asset id selected by the user."
+          ]
+        ]
+      },
+      "children": []
+    },
+    "b-40-swap-dropdown-behavior-7": {
+      "id": "b-40-swap-dropdown-behavior-7",
+      "type": "heading",
+      "props": {
+        "level": 3
+      },
+      "text": [
+        {
+          "insert": "Behavior"
+        }
+      ],
+      "children": []
+    },
+    "b-40-swap-dropdown-mount-fetches-api-8": {
+      "id": "b-40-swap-dropdown-mount-fetches-api-8",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "Mount.",
+          "attributes": {
+            "bold": true
+          }
+        },
+        {
+          "insert": " Fetches "
+        },
+        {
+          "insert": "/api/asset-library?type={type}&usage=0&project={projectId}",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " and stores "
+        },
+        {
+          "insert": "AssetLibraryRecord[]",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " in local state. Cancels stale fetches on "
+        },
+        {
+          "insert": "assetType",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " or "
+        },
+        {
+          "insert": "projectId",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " change."
+        }
+      ],
+      "children": []
+    },
+    "b-40-swap-dropdown-render-shows-a-se-9": {
+      "id": "b-40-swap-dropdown-render-shows-a-se-9",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "Render.",
+          "attributes": {
+            "bold": true
+          }
+        },
+        {
+          "insert": " Shows a "
+        },
+        {
+          "insert": "<select>",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " of matching containers by label. If the current asset id is not in the listing, it is prepended so the dropdown still reflects the saved scene."
+        }
+      ],
+      "children": []
+    },
+    "b-40-swap-dropdown-change-on-selection-10": {
+      "id": "b-40-swap-dropdown-change-on-selection-10",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "Change.",
+          "attributes": {
+            "bold": true
+          }
+        },
+        {
+          "insert": " On selection:"
+        }
+      ],
+      "children": [
+        "b-40-swap-dropdown-calls-onselect-nextasse-11",
+        "b-40-swap-dropdown-layerform-maps-that-to-12",
+        "b-40-swap-dropdown-slotssection-maps-it-t-13"
+      ]
+    },
+    "b-40-swap-dropdown-calls-onselect-nextasse-11": {
+      "id": "b-40-swap-dropdown-calls-onselect-nextasse-11",
+      "type": "list-item",
+      "props": {
+        "ordered": true
+      },
+      "text": [
+        {
+          "insert": "Calls "
+        },
+        {
+          "insert": "onSelect(nextAssetId)",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": "."
+        }
+      ],
+      "children": []
+    },
+    "b-40-swap-dropdown-layerform-maps-that-to-12": {
+      "id": "b-40-swap-dropdown-layerform-maps-that-to-12",
+      "type": "list-item",
+      "props": {
+        "ordered": true
+      },
+      "text": [
+        {
+          "insert": "LayerForm",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " maps that to "
+        },
+        {
+          "insert": "setObjectAssetAt(path, nextAssetId)",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": "."
+        }
+      ],
+      "children": []
+    },
+    "b-40-swap-dropdown-slotssection-maps-it-t-13": {
+      "id": "b-40-swap-dropdown-slotssection-maps-it-t-13",
+      "type": "list-item",
+      "props": {
+        "ordered": true
+      },
+      "text": [
+        {
+          "insert": "SlotsSection",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " maps it to "
+        },
+        {
+          "insert": "setSlotAssetAt(path, slotIndex, nextAssetId)",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": "."
+        }
+      ],
+      "children": []
+    },
+    "b-40-swap-dropdown-the-component-does-not-u-14": {
+      "id": "b-40-swap-dropdown-the-component-does-not-u-14",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "The component does not upload files and does not mutate registries. It assumes the container already exists in the selected project registry."
+        }
+      ],
+      "children": []
+    },
+    "b-40-swap-dropdown-mounting-layerform-15": {
+      "id": "b-40-swap-dropdown-mounting-layerform-15",
+      "type": "heading",
+      "props": {
+        "level": 2
+      },
+      "text": [
+        {
+          "insert": "Mounting: "
+        },
+        {
+          "insert": "LayerForm",
+          "attributes": {
+            "code": true
+          }
+        }
+      ],
+      "children": []
+    },
+    "b-40-swap-dropdown-layerform-reads-the-se-16": {
+      "id": "b-40-swap-dropdown-layerform-reads-the-se-16",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "LayerForm",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " reads the selected layer's "
+        },
+        {
+          "insert": "asset",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " ID, looks the container up in the in-memory registry, and mounts the dropdown only when:"
+        }
+      ],
+      "children": []
+    },
+    "b-40-swap-dropdown-the-container-exists-17": {
+      "id": "b-40-swap-dropdown-the-container-exists-17",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "The container exists."
+        }
+      ],
+      "children": []
+    },
+    "b-40-swap-dropdown-its-type-is-one-of-the-18": {
+      "id": "b-40-swap-dropdown-its-type-is-one-of-the-18",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "Its "
+        },
+        {
+          "insert": "type",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " is one of the file asset types ("
+        },
+        {
+          "insert": "isAssetType(...)",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": "): modules don't get a dropdown."
+        }
+      ],
+      "children": []
+    },
+    "b-40-swap-dropdown-the-entry-has-a-file-f-19": {
+      "id": "b-40-swap-dropdown-the-entry-has-a-file-f-19",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "The entry has a "
+        },
+        {
+          "insert": "file",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " field: narrows from the "
+        },
+        {
+          "insert": "AssetContainer | ModuleEntry",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " union."
+        }
+      ],
+      "children": []
+    },
+    "b-40-swap-dropdown-slotssection-uses-the-20": {
+      "id": "b-40-swap-dropdown-slotssection-uses-the-20",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "SlotsSection",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " uses the same component for glyph-group slots. Module-typed containers (effects, components) skip the dropdown silently."
+        }
+      ],
+      "children": []
+    },
+    "b-40-swap-dropdown-store-mutations-21": {
+      "id": "b-40-swap-dropdown-store-mutations-21",
+      "type": "heading",
+      "props": {
+        "level": 2
+      },
+      "text": [
+        {
+          "insert": "Store Mutations"
+        }
+      ],
+      "children": []
+    },
+    "b-40-swap-dropdown-apps-scene-engine-app-22": {
+      "id": "b-40-swap-dropdown-apps-scene-engine-app-22",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "apps/scene-engine/app/_engine/store/editor-store.ts",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " exposes two synchronous selection mutations:"
+        }
+      ],
+      "children": []
+    },
+    "b-40-swap-dropdown-ts-23": {
+      "id": "b-40-swap-dropdown-ts-23",
+      "type": "code",
+      "props": {
+        "language": "ts"
+      },
+      "text": [
+        {
+          "insert": "setObjectAssetAt(path, assetId)\nsetSlotAssetAt(path, slotIndex, assetId)"
+        }
+      ],
+      "children": []
+    },
+    "b-40-swap-dropdown-both-clone-the-scene-up-24": {
+      "id": "b-40-swap-dropdown-both-clone-the-scene-up-24",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "Both clone the scene, update only the selected "
+        },
+        {
+          "insert": "asset",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " field, and mark the store dirty. Save persists the changed scene JSON. The in-memory registry is not changed because the container did not change, only the scene's reference to it."
+        }
+      ],
+      "children": []
+    },
+    "b-40-swap-dropdown-why-selection-updates-sc-25": {
+      "id": "b-40-swap-dropdown-why-selection-updates-sc-25",
+      "type": "heading",
+      "props": {
+        "level": 2
+      },
+      "text": [
+        {
+          "insert": "Why Selection Updates Scene JSON"
+        }
+      ],
+      "children": []
+    },
+    "b-40-swap-dropdown-selection-and-registry-m-26": {
+      "id": "b-40-swap-dropdown-selection-and-registry-m-26",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "Selection and registry maintenance are intentionally separate:"
+        }
+      ],
+      "children": []
+    },
+    "b-40-swap-dropdown-surface-27-tbl": {
+      "id": "b-40-swap-dropdown-surface-27-tbl",
+      "type": "structured-table",
+      "props": {
+        "columns": [
+          "Surface",
+          "Persistent write",
+          "Effect"
+        ],
+        "rows": [
+          [
+            "Asset dropdown",
+            "scene JSON",
+            "This layer/slot points at another container."
+          ],
+          [
+            "Upload page",
+            "project asset registry",
+            "New bytes and a new container are added."
+          ],
+          [
+            "Registry PATCH API",
+            "project asset registry",
+            "Existing container's file pointer changes."
+          ]
+        ]
+      },
+      "children": []
+    },
+    "b-40-swap-dropdown-that-split-keeps-a-local-28": {
+      "id": "b-40-swap-dropdown-that-split-keeps-a-local-28",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "That split keeps a local scene selection from unexpectedly changing every other scene that references the same container."
+        }
+      ],
+      "children": []
+    },
+    "b-40-swap-dropdown-sources-29": {
+      "id": "b-40-swap-dropdown-sources-29",
+      "type": "heading",
+      "props": {
+        "level": 2
+      },
+      "text": [
+        {
+          "insert": "Sources"
+        }
+      ],
+      "children": []
+    },
+    "b-40-swap-dropdown-apps-scene-engine-app-e-30": {
+      "id": "b-40-swap-dropdown-apps-scene-engine-app-e-30",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "apps/scene-engine/app/editor/_components/AssetSwapDropdown.tsx",
+          "attributes": {
+            "code": true
+          }
+        }
+      ],
+      "children": []
+    },
+    "b-40-swap-dropdown-apps-scene-engine-app-e-31": {
+      "id": "b-40-swap-dropdown-apps-scene-engine-app-e-31",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "apps/scene-engine/app/editor/_components/LayerForm.tsx",
+          "attributes": {
+            "code": true
+          }
+        }
+      ],
+      "children": []
+    },
+    "b-40-swap-dropdown-apps-scene-engine-app-32": {
+      "id": "b-40-swap-dropdown-apps-scene-engine-app-32",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "apps/scene-engine/app/_engine/store/editor-store.ts",
+          "attributes": {
+            "code": true
+          }
+        }
+      ],
+      "children": []
+    }
+  }
+}

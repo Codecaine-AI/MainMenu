@@ -1,0 +1,575 @@
+{
+  "schemaVersion": 1,
+  "id": "scene-engine-20-implementation-40-asset-pipeline-30-upload-page",
+  "title": "Upload Page",
+  "root": "b-30-upload-page-root-17",
+  "blocks": {
+    "b-30-upload-page-root-17": {
+      "id": "b-30-upload-page-root-17",
+      "type": "paragraph",
+      "props": {
+        "concepts": [
+          "upload-form",
+          "mime-prefill",
+          "status-state"
+        ],
+        "covers": "app/upload/page.tsx — the standalone /upload page. File picker, mime-driven type pre-fill, submit flow, success/error rendering.",
+        "design_refs": [
+          "10-system-design/60-asset-uploads.md"
+        ]
+      },
+      "children": [
+        "b-30-upload-page-apps-scene-engine-app-u-2",
+        "b-30-upload-page-divider-3",
+        "b-30-upload-page-state-4",
+        "b-30-upload-page-state-type-5-tbl",
+        "b-30-upload-page-flow-6",
+        "b-30-upload-page-file-selected-onfi-7",
+        "b-30-upload-page-type-confirmed-the-8",
+        "b-30-upload-page-submit-builds-form-9",
+        "b-30-upload-page-success-sets-status-10",
+        "b-30-upload-page-failure-reads-erro-11",
+        "b-30-upload-page-the-button-is-disabled-w-12",
+        "b-30-upload-page-why-standalone-13",
+        "b-30-upload-page-upload-is-decoupled-from-14",
+        "b-30-upload-page-source-15",
+        "b-30-upload-page-apps-scene-engine-app-u-16"
+      ]
+    },
+    "b-30-upload-page-apps-scene-engine-app-u-2": {
+      "id": "b-30-upload-page-apps-scene-engine-app-u-2",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "apps/scene-engine/app/upload/page.tsx",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " is a small client-only page at "
+        },
+        {
+          "insert": "/upload",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ". With "
+        },
+        {
+          "insert": "?project=<project-id>",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ", it writes files and registry entries into the selected project workspace. The editor links to it but does not embed it."
+        }
+      ],
+      "children": []
+    },
+    "b-30-upload-page-divider-3": {
+      "id": "b-30-upload-page-divider-3",
+      "type": "divider",
+      "props": {},
+      "children": []
+    },
+    "b-30-upload-page-state-4": {
+      "id": "b-30-upload-page-state-4",
+      "type": "heading",
+      "props": {
+        "level": 2
+      },
+      "text": [
+        {
+          "insert": "State"
+        }
+      ],
+      "children": []
+    },
+    "b-30-upload-page-state-type-5-tbl": {
+      "id": "b-30-upload-page-state-type-5-tbl",
+      "type": "structured-table",
+      "props": {
+        "columns": [
+          "State",
+          "Type",
+          "Notes"
+        ],
+        "rows": [
+          [
+            [
+              {
+                "insert": "file",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ],
+            [
+              {
+                "insert": "File | null",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ],
+            "The picked file."
+          ],
+          [
+            [
+              {
+                "insert": "type",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ],
+            [
+              {
+                "insert": "AssetType | ''",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ],
+            "Pre-filled from mime, user-overridable."
+          ],
+          [
+            [
+              {
+                "insert": "label",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ],
+            [
+              {
+                "insert": "string",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ],
+            "Optional human-readable registry label."
+          ],
+          [
+            [
+              {
+                "insert": "scope",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ],
+            [
+              {
+                "insert": "AssetScope",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ],
+            [
+              {
+                "insert": "project",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": " when opened from a project, otherwise "
+              },
+              {
+                "insert": "global",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": "."
+              }
+            ]
+          ],
+          [
+            [
+              {
+                "insert": "status",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ],
+            [
+              {
+                "insert": "'idle' | 'submitting' | 'success' | 'error'",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ],
+            "Drives button label, message color."
+          ],
+          [
+            [
+              {
+                "insert": "message",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ],
+            [
+              {
+                "insert": "string",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ],
+            "Success summary or server error."
+          ]
+        ]
+      },
+      "children": []
+    },
+    "b-30-upload-page-flow-6": {
+      "id": "b-30-upload-page-flow-6",
+      "type": "heading",
+      "props": {
+        "level": 2
+      },
+      "text": [
+        {
+          "insert": "Flow"
+        }
+      ],
+      "children": []
+    },
+    "b-30-upload-page-file-selected-onfi-7": {
+      "id": "b-30-upload-page-file-selected-onfi-7",
+      "type": "list-item",
+      "props": {
+        "ordered": true
+      },
+      "text": [
+        {
+          "insert": "File selected.",
+          "attributes": {
+            "bold": true
+          }
+        },
+        {
+          "insert": " "
+        },
+        {
+          "insert": "onFileChange",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " stores the file and calls "
+        },
+        {
+          "insert": "getTypeFromMime(f.type)",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ". If a unique match exists, "
+        },
+        {
+          "insert": "type",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " is set to that suggestion; the user may override with the dropdown."
+        }
+      ],
+      "children": []
+    },
+    "b-30-upload-page-type-confirmed-the-8": {
+      "id": "b-30-upload-page-type-confirmed-the-8",
+      "type": "list-item",
+      "props": {
+        "ordered": true
+      },
+      "text": [
+        {
+          "insert": "Type confirmed.",
+          "attributes": {
+            "bold": true
+          }
+        },
+        {
+          "insert": " The dropdown lists "
+        },
+        {
+          "insert": "ASSET_TYPES",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " directly, same source as the server's allowlist."
+        }
+      ],
+      "children": []
+    },
+    "b-30-upload-page-submit-builds-form-9": {
+      "id": "b-30-upload-page-submit-builds-form-9",
+      "type": "list-item",
+      "props": {
+        "ordered": true
+      },
+      "text": [
+        {
+          "insert": "Submit.",
+          "attributes": {
+            "bold": true
+          }
+        },
+        {
+          "insert": " Builds "
+        },
+        {
+          "insert": "FormData",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " with "
+        },
+        {
+          "insert": "file",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ", "
+        },
+        {
+          "insert": "type",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ", "
+        },
+        {
+          "insert": "label",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ", "
+        },
+        {
+          "insert": "scope",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ", and "
+        },
+        {
+          "insert": "projectId",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " when present, then POSTs to "
+        },
+        {
+          "insert": "/api/upload",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": "."
+        }
+      ],
+      "children": []
+    },
+    "b-30-upload-page-success-sets-status-10": {
+      "id": "b-30-upload-page-success-sets-status-10",
+      "type": "list-item",
+      "props": {
+        "ordered": true
+      },
+      "text": [
+        {
+          "insert": "Success.",
+          "attributes": {
+            "bold": true
+          }
+        },
+        {
+          "insert": " Sets status to "
+        },
+        {
+          "insert": "success",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " and shows "
+        },
+        {
+          "insert": "Uploaded {id} as {scope}",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " with a link back to the asset library."
+        }
+      ],
+      "children": []
+    },
+    "b-30-upload-page-failure-reads-erro-11": {
+      "id": "b-30-upload-page-failure-reads-erro-11",
+      "type": "list-item",
+      "props": {
+        "ordered": true
+      },
+      "text": [
+        {
+          "insert": "Failure.",
+          "attributes": {
+            "bold": true
+          }
+        },
+        {
+          "insert": " Reads "
+        },
+        {
+          "insert": "error",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " from the JSON body and shows it."
+        }
+      ],
+      "children": []
+    },
+    "b-30-upload-page-the-button-is-disabled-w-12": {
+      "id": "b-30-upload-page-the-button-is-disabled-w-12",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "The button is disabled while "
+        },
+        {
+          "insert": "submitting",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ", while "
+        },
+        {
+          "insert": "file",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " is null, and while "
+        },
+        {
+          "insert": "type",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " is empty: all three preconditions for a useful submission."
+        }
+      ],
+      "children": []
+    },
+    "b-30-upload-page-why-standalone-13": {
+      "id": "b-30-upload-page-why-standalone-13",
+      "type": "heading",
+      "props": {
+        "level": 2
+      },
+      "text": [
+        {
+          "insert": "Why Standalone"
+        }
+      ],
+      "children": []
+    },
+    "b-30-upload-page-upload-is-decoupled-from-14": {
+      "id": "b-30-upload-page-upload-is-decoupled-from-14",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "Upload is decoupled from the editor on purpose. A user adding a new asset doesn't need a scene open, and embedding the form in the inspector would conflate \"arrange this scene\" with \"add new bytes to the project.\" The container model means the inspector only ever needs to "
+        },
+        {
+          "insert": "reference",
+          "attributes": {
+            "italic": true
+          }
+        },
+        {
+          "insert": " containers, not create them."
+        }
+      ],
+      "children": []
+    },
+    "b-30-upload-page-source-15": {
+      "id": "b-30-upload-page-source-15",
+      "type": "heading",
+      "props": {
+        "level": 2
+      },
+      "text": [
+        {
+          "insert": "Source"
+        }
+      ],
+      "children": []
+    },
+    "b-30-upload-page-apps-scene-engine-app-u-16": {
+      "id": "b-30-upload-page-apps-scene-engine-app-u-16",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "apps/scene-engine/app/upload/page.tsx",
+          "attributes": {
+            "code": true
+          }
+        }
+      ],
+      "children": []
+    }
+  }
+}

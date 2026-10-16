@@ -1,0 +1,1945 @@
+{
+  "schemaVersion": 1,
+  "id": "scene-engine-20-implementation-40-asset-pipeline-20-api-routes",
+  "title": "Asset API Routes",
+  "root": "b-20-api-routes-root-80",
+  "blocks": {
+    "b-20-api-routes-root-80": {
+      "id": "b-20-api-routes-root-80",
+      "type": "paragraph",
+      "props": {
+        "concepts": [
+          "api-route",
+          "multipart",
+          "registry-write",
+          "asset-library",
+          "file-listing"
+        ],
+        "covers": "The Next.js route handlers behind project-local asset uploads, file listings, asset-library reads, and container maintenance.",
+        "design_refs": [
+          "10-system-design/60-asset-uploads.md"
+        ]
+      },
+      "children": [
+        "b-20-api-routes-route-handlers-under-ap-2",
+        "b-20-api-routes-divider-3",
+        "b-20-api-routes-post-api-upload-4",
+        "b-20-api-routes-apps-scene-engine-app-a-5",
+        "b-20-api-routes-request-6",
+        "b-20-api-routes-form-field-type-7-tbl",
+        "b-20-api-routes-behavior-8",
+        "b-20-api-routes-validateupload-type-9",
+        "b-20-api-routes-slugifyfilename-file-na-10",
+        "b-20-api-routes-resolves-the-selected-pr-11",
+        "b-20-api-routes-reads-the-selected-proje-12",
+        "b-20-api-routes-ensures-assets-media-t-13",
+        "b-20-api-routes-writes-the-file-as-id-14",
+        "b-20-api-routes-writes-projectsettings-15",
+        "b-20-api-routes-responds-200-id-type-16",
+        "b-20-api-routes-notes-17",
+        "b-20-api-routes-the-slug-is-the-identity-18",
+        "b-20-api-routes-the-handler-does-not-cac-19",
+        "b-20-api-routes-the-registry-is-rewritte-20",
+        "b-20-api-routes-get-api-assets-type-21",
+        "b-20-api-routes-apps-scene-engine-app-a-22",
+        "b-20-api-routes-behavior-23",
+        "b-20-api-routes-isassettype-type-re-24",
+        "b-20-api-routes-resolves-project-proj-25",
+        "b-20-api-routes-returns-assets-from-l-26",
+        "b-20-api-routes-if-the-folder-doesn-t-ex-27",
+        "b-20-api-routes-reads-the-directory-fil-28",
+        "b-20-api-routes-notes-29",
+        "b-20-api-routes-the-name-field-is-the-30",
+        "b-20-api-routes-subdirectories-are-filte-31",
+        "b-20-api-routes-get-api-asset-library-32",
+        "b-20-api-routes-apps-scene-engine-app-a-33",
+        "b-20-api-routes-query-34",
+        "b-20-api-routes-query-required-35-tbl",
+        "b-20-api-routes-behavior-36",
+        "b-20-api-routes-validates-type-when-pr-37",
+        "b-20-api-routes-calls-listassetlibrary-38",
+        "b-20-api-routes-returns-200-assets-39",
+        "b-20-api-routes-get-api-projects-proj-40",
+        "b-20-api-routes-apps-scene-engine-app-a-41",
+        "b-20-api-routes-registry-source-42-tbl",
+        "b-20-api-routes-missing-asset-module-reg-43",
+        "b-20-api-routes-get-api-projects-proj-44",
+        "b-20-api-routes-these-routes-serve-proje-45",
+        "b-20-api-routes-the-shared-file-serving-46",
+        "b-20-api-routes-resolves-paths-through-t-47",
+        "b-20-api-routes-rejects-traversal-and-ma-48",
+        "b-20-api-routes-sets-content-types-for-j-49",
+        "b-20-api-routes-rewrites-logical-asset-50",
+        "b-20-api-routes-this-is-why-project-modu-51",
+        "b-20-api-routes-patch-api-registry-id-52",
+        "b-20-api-routes-apps-scene-engine-app-a-53",
+        "b-20-api-routes-request-54",
+        "b-20-api-routes-json-55",
+        "b-20-api-routes-behavior-56",
+        "b-20-api-routes-parses-the-json-body-no-57",
+        "b-20-api-routes-resolves-project-proj-58",
+        "b-20-api-routes-reads-that-project-s-ass-59",
+        "b-20-api-routes-verifies-the-new-file-60",
+        "b-20-api-routes-rewrites-registry-id-61",
+        "b-20-api-routes-responds-200-id-type-62",
+        "b-20-api-routes-notes-63",
+        "b-20-api-routes-only-file-is-patchable-64",
+        "b-20-api-routes-the-route-does-not-valid-65",
+        "b-20-api-routes-the-renderer-s-in-memory-66",
+        "b-20-api-routes-what-s-not-here-67",
+        "b-20-api-routes-no-delete-deleting-a-c-68",
+        "b-20-api-routes-no-bulk-endpoint-uploa-69",
+        "b-20-api-routes-no-module-registry-mutat-70",
+        "b-20-api-routes-sources-71",
+        "b-20-api-routes-apps-scene-engine-app-a-72",
+        "b-20-api-routes-apps-scene-engine-app-a-73",
+        "b-20-api-routes-apps-scene-engine-app-a-74",
+        "b-20-api-routes-apps-scene-engine-app-a-75",
+        "b-20-api-routes-apps-scene-engine-app-a-76",
+        "b-20-api-routes-apps-scene-engine-app-a-77",
+        "b-20-api-routes-apps-scene-engine-app-a-78",
+        "b-20-api-routes-apps-scene-engine-app-a-79"
+      ]
+    },
+    "b-20-api-routes-route-handlers-under-ap-2": {
+      "id": "b-20-api-routes-route-handlers-under-ap-2",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "Route handlers under "
+        },
+        {
+          "insert": "apps/scene-engine/app/api/",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " make upload, selection, project-file serving, and registry reads work. They resolve the active project through the shared project path adapter and operate against "
+        },
+        {
+          "insert": "ProjectSettings/registries/assets.json",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ", "
+        },
+        {
+          "insert": "ProjectSettings/registries/modules.json",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ", "
+        },
+        {
+          "insert": "Assets/Media/{type}/",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ", "
+        },
+        {
+          "insert": "Assets/Modules/",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ", and "
+        },
+        {
+          "insert": "Assets/Fonts/",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " on local disk. There is no database or storage abstraction."
+        }
+      ],
+      "children": []
+    },
+    "b-20-api-routes-divider-3": {
+      "id": "b-20-api-routes-divider-3",
+      "type": "divider",
+      "props": {},
+      "children": []
+    },
+    "b-20-api-routes-post-api-upload-4": {
+      "id": "b-20-api-routes-post-api-upload-4",
+      "type": "heading",
+      "props": {
+        "level": 2
+      },
+      "text": [
+        {
+          "insert": "POST /api/upload",
+          "attributes": {
+            "code": true
+          }
+        }
+      ],
+      "children": []
+    },
+    "b-20-api-routes-apps-scene-engine-app-a-5": {
+      "id": "b-20-api-routes-apps-scene-engine-app-a-5",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "apps/scene-engine/app/api/upload/route.ts",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ": accepts a multipart form, validates, writes the file to disk, and registers a container."
+        }
+      ],
+      "children": []
+    },
+    "b-20-api-routes-request-6": {
+      "id": "b-20-api-routes-request-6",
+      "type": "heading",
+      "props": {
+        "level": 3
+      },
+      "text": [
+        {
+          "insert": "Request"
+        }
+      ],
+      "children": []
+    },
+    "b-20-api-routes-form-field-type-7-tbl": {
+      "id": "b-20-api-routes-form-field-type-7-tbl",
+      "type": "structured-table",
+      "props": {
+        "columns": [
+          "Form field",
+          "Type",
+          "Required",
+          "Notes"
+        ],
+        "rows": [
+          [
+            [
+              {
+                "insert": "file",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ],
+            [
+              {
+                "insert": "File",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ],
+            "yes",
+            [
+              {
+                "insert": "Browser-uploaded file. The server reads "
+              },
+              {
+                "insert": "file.type",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": " and "
+              },
+              {
+                "insert": "file.name",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": "."
+              }
+            ]
+          ],
+          [
+            [
+              {
+                "insert": "type",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ],
+            "string",
+            "yes",
+            [
+              {
+                "insert": "One of "
+              },
+              {
+                "insert": "audio",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": ", "
+              },
+              {
+                "insert": "image",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": ", "
+              },
+              {
+                "insert": "video",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": ", "
+              },
+              {
+                "insert": "glyph",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": ", "
+              },
+              {
+                "insert": "font",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": "."
+              }
+            ]
+          ],
+          [
+            [
+              {
+                "insert": "projectId",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ],
+            "string",
+            "no",
+            "Selected project. Falls back to the default project when omitted."
+          ],
+          [
+            [
+              {
+                "insert": "label",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ],
+            "string",
+            "no",
+            "Human-readable label stored on the registry entry."
+          ],
+          [
+            [
+              {
+                "insert": "scope",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ],
+            "string",
+            "no",
+            [
+              {
+                "insert": "project",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": " restricts the entry to this project; otherwise it is global within the registry."
+              }
+            ]
+          ]
+        ]
+      },
+      "children": []
+    },
+    "b-20-api-routes-behavior-8": {
+      "id": "b-20-api-routes-behavior-8",
+      "type": "heading",
+      "props": {
+        "level": 3
+      },
+      "text": [
+        {
+          "insert": "Behavior"
+        }
+      ],
+      "children": []
+    },
+    "b-20-api-routes-validateupload-type-9": {
+      "id": "b-20-api-routes-validateupload-type-9",
+      "type": "list-item",
+      "props": {
+        "ordered": true
+      },
+      "text": [
+        {
+          "insert": "validateUpload({ type, mime: file.type, filename: file.name })",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ": rejects with 400 on type/extension/mime mismatch."
+        }
+      ],
+      "children": []
+    },
+    "b-20-api-routes-slugifyfilename-file-na-10": {
+      "id": "b-20-api-routes-slugifyfilename-file-na-10",
+      "type": "list-item",
+      "props": {
+        "ordered": true
+      },
+      "text": [
+        {
+          "insert": "slugifyFilename(file.name)",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " produces "
+        },
+        {
+          "insert": "{ slug, ext }",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ". An empty slug throws (returned as 500)."
+        }
+      ],
+      "children": []
+    },
+    "b-20-api-routes-resolves-the-selected-pr-11": {
+      "id": "b-20-api-routes-resolves-the-selected-pr-11",
+      "type": "list-item",
+      "props": {
+        "ordered": true
+      },
+      "text": [
+        {
+          "insert": "Resolves the selected project root. Missing project → 404."
+        }
+      ],
+      "children": []
+    },
+    "b-20-api-routes-reads-the-selected-proje-12": {
+      "id": "b-20-api-routes-reads-the-selected-proje-12",
+      "type": "list-item",
+      "props": {
+        "ordered": true
+      },
+      "text": [
+        {
+          "insert": "Reads the selected project's asset registry and chooses a unique id from the slugified filename."
+        }
+      ],
+      "children": []
+    },
+    "b-20-api-routes-ensures-assets-media-t-13": {
+      "id": "b-20-api-routes-ensures-assets-media-t-13",
+      "type": "list-item",
+      "props": {
+        "ordered": true
+      },
+      "text": [
+        {
+          "insert": "Ensures "
+        },
+        {
+          "insert": "Assets/Media/{type}/",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " or "
+        },
+        {
+          "insert": "Assets/Fonts/",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " exists ("
+        },
+        {
+          "insert": "mkdir -p",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ")."
+        }
+      ],
+      "children": []
+    },
+    "b-20-api-routes-writes-the-file-as-id-14": {
+      "id": "b-20-api-routes-writes-the-file-as-id-14",
+      "type": "list-item",
+      "props": {
+        "ordered": true
+      },
+      "text": [
+        {
+          "insert": "Writes the file as "
+        },
+        {
+          "insert": "{id}.{ext}",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " into that folder."
+        }
+      ],
+      "children": []
+    },
+    "b-20-api-routes-writes-projectsettings-15": {
+      "id": "b-20-api-routes-writes-projectsettings-15",
+      "type": "list-item",
+      "props": {
+        "ordered": true
+      },
+      "text": [
+        {
+          "insert": "Writes "
+        },
+        {
+          "insert": "ProjectSettings/registries/assets.json",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " with a logical file path ("
+        },
+        {
+          "insert": "/assets/{type}/{id}.{ext}",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " or "
+        },
+        {
+          "insert": "/fonts/{id}.{ext}",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": "), optional "
+        },
+        {
+          "insert": "label",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ", "
+        },
+        {
+          "insert": "scope",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ", "
+        },
+        {
+          "insert": "projectIds",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ", and timestamps."
+        }
+      ],
+      "children": []
+    },
+    "b-20-api-routes-responds-200-id-type-16": {
+      "id": "b-20-api-routes-responds-200-id-type-16",
+      "type": "list-item",
+      "props": {
+        "ordered": true
+      },
+      "text": [
+        {
+          "insert": "Responds "
+        },
+        {
+          "insert": "200 { id, type, file, label, scope }",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": "."
+        }
+      ],
+      "children": []
+    },
+    "b-20-api-routes-notes-17": {
+      "id": "b-20-api-routes-notes-17",
+      "type": "heading",
+      "props": {
+        "level": 3
+      },
+      "text": [
+        {
+          "insert": "Notes"
+        }
+      ],
+      "children": []
+    },
+    "b-20-api-routes-the-slug-is-the-identity-18": {
+      "id": "b-20-api-routes-the-slug-is-the-identity-18",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "The slug is the identity seed. If it collides with an existing registry id, the route appends "
+        },
+        {
+          "insert": "-2",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ", "
+        },
+        {
+          "insert": "-3",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ", etc. instead of overwriting the old container."
+        }
+      ],
+      "children": []
+    },
+    "b-20-api-routes-the-handler-does-not-cac-19": {
+      "id": "b-20-api-routes-the-handler-does-not-cac-19",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "The handler does not cache-bust scenes: a concurrent renderer would still hold the previous bytes for that URL until next reload."
+        }
+      ],
+      "children": []
+    },
+    "b-20-api-routes-the-registry-is-rewritte-20": {
+      "id": "b-20-api-routes-the-registry-is-rewritte-20",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "The registry is rewritten in-place with no concurrency guard. Acceptable for a single-author dev tool."
+        }
+      ],
+      "children": []
+    },
+    "b-20-api-routes-get-api-assets-type-21": {
+      "id": "b-20-api-routes-get-api-assets-type-21",
+      "type": "heading",
+      "props": {
+        "level": 2
+      },
+      "text": [
+        {
+          "insert": "GET /api/assets/[type]",
+          "attributes": {
+            "code": true
+          }
+        }
+      ],
+      "children": []
+    },
+    "b-20-api-routes-apps-scene-engine-app-a-22": {
+      "id": "b-20-api-routes-apps-scene-engine-app-a-22",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "apps/scene-engine/app/api/assets/[type]/route.ts",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ": lists files inside the selected project's type folder and returns matching asset-library records."
+        }
+      ],
+      "children": []
+    },
+    "b-20-api-routes-behavior-23": {
+      "id": "b-20-api-routes-behavior-23",
+      "type": "heading",
+      "props": {
+        "level": 3
+      },
+      "text": [
+        {
+          "insert": "Behavior"
+        }
+      ],
+      "children": []
+    },
+    "b-20-api-routes-isassettype-type-re-24": {
+      "id": "b-20-api-routes-isassettype-type-re-24",
+      "type": "list-item",
+      "props": {
+        "ordered": true
+      },
+      "text": [
+        {
+          "insert": "isAssetType(type)",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ": rejects with 400 if "
+        },
+        {
+          "insert": "type",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " isn't one of the five file asset types."
+        }
+      ],
+      "children": []
+    },
+    "b-20-api-routes-resolves-project-proj-25": {
+      "id": "b-20-api-routes-resolves-project-proj-25",
+      "type": "list-item",
+      "props": {
+        "ordered": true
+      },
+      "text": [
+        {
+          "insert": "Resolves "
+        },
+        {
+          "insert": "?project=<project-id>",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " through the project path adapter. Missing project → 404."
+        }
+      ],
+      "children": []
+    },
+    "b-20-api-routes-returns-assets-from-l-26": {
+      "id": "b-20-api-routes-returns-assets-from-l-26",
+      "type": "list-item",
+      "props": {
+        "ordered": true
+      },
+      "text": [
+        {
+          "insert": "Returns "
+        },
+        {
+          "insert": "assets",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " from "
+        },
+        {
+          "insert": "listAssetLibrary({ type, projectId, includeUsage: false })",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": "."
+        }
+      ],
+      "children": []
+    },
+    "b-20-api-routes-if-the-folder-doesn-t-ex-27": {
+      "id": "b-20-api-routes-if-the-folder-doesn-t-ex-27",
+      "type": "list-item",
+      "props": {
+        "ordered": true
+      },
+      "text": [
+        {
+          "insert": "If the folder doesn't exist, returns "
+        },
+        {
+          "insert": "200 { assets, files: [] }",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": "."
+        }
+      ],
+      "children": []
+    },
+    "b-20-api-routes-reads-the-directory-fil-28": {
+      "id": "b-20-api-routes-reads-the-directory-fil-28",
+      "type": "list-item",
+      "props": {
+        "ordered": true
+      },
+      "text": [
+        {
+          "insert": "Reads the directory, filters out subdirectories and dotfiles, and returns each file as "
+        },
+        {
+          "insert": "{ name, file }",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " using "
+        },
+        {
+          "insert": "/assets/{type}/{name}",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " for media and "
+        },
+        {
+          "insert": "/fonts/{name}",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " for fonts."
+        }
+      ],
+      "children": []
+    },
+    "b-20-api-routes-notes-29": {
+      "id": "b-20-api-routes-notes-29",
+      "type": "heading",
+      "props": {
+        "level": 3
+      },
+      "text": [
+        {
+          "insert": "Notes"
+        }
+      ],
+      "children": []
+    },
+    "b-20-api-routes-the-name-field-is-the-30": {
+      "id": "b-20-api-routes-the-name-field-is-the-30",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "The "
+        },
+        {
+          "insert": "name",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " field is the bare filename; "
+        },
+        {
+          "insert": "file",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " is the logical URL form."
+        }
+      ],
+      "children": []
+    },
+    "b-20-api-routes-subdirectories-are-filte-31": {
+      "id": "b-20-api-routes-subdirectories-are-filte-31",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "Subdirectories are filtered out. Files like "
+        },
+        {
+          "insert": "audio/start-cue/start-cue.js",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " (audio with a JS wrapper) sit in subfolders and won't appear in this listing, they remain registry-managed only."
+        }
+      ],
+      "children": []
+    },
+    "b-20-api-routes-get-api-asset-library-32": {
+      "id": "b-20-api-routes-get-api-asset-library-32",
+      "type": "heading",
+      "props": {
+        "level": 2
+      },
+      "text": [
+        {
+          "insert": "GET /api/asset-library",
+          "attributes": {
+            "code": true
+          }
+        }
+      ],
+      "children": []
+    },
+    "b-20-api-routes-apps-scene-engine-app-a-33": {
+      "id": "b-20-api-routes-apps-scene-engine-app-a-33",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "apps/scene-engine/app/api/asset-library/route.ts",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ": returns registry containers available to the selected project. This is what the inspector asset dropdown uses."
+        }
+      ],
+      "children": []
+    },
+    "b-20-api-routes-query-34": {
+      "id": "b-20-api-routes-query-34",
+      "type": "heading",
+      "props": {
+        "level": 3
+      },
+      "text": [
+        {
+          "insert": "Query"
+        }
+      ],
+      "children": []
+    },
+    "b-20-api-routes-query-required-35-tbl": {
+      "id": "b-20-api-routes-query-required-35-tbl",
+      "type": "structured-table",
+      "props": {
+        "columns": [
+          "Query",
+          "Required",
+          "Notes"
+        ],
+        "rows": [
+          [
+            [
+              {
+                "insert": "project",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ],
+            "no",
+            "Project availability filter."
+          ],
+          [
+            [
+              {
+                "insert": "type",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ],
+            "no",
+            "Optional asset type filter. Invalid values return 400."
+          ],
+          [
+            [
+              {
+                "insert": "usage",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ],
+            "no",
+            [
+              {
+                "insert": "Usage metadata is included unless "
+              },
+              {
+                "insert": "usage=0",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": "."
+              }
+            ]
+          ]
+        ]
+      },
+      "children": []
+    },
+    "b-20-api-routes-behavior-36": {
+      "id": "b-20-api-routes-behavior-36",
+      "type": "heading",
+      "props": {
+        "level": 3
+      },
+      "text": [
+        {
+          "insert": "Behavior"
+        }
+      ],
+      "children": []
+    },
+    "b-20-api-routes-validates-type-when-pr-37": {
+      "id": "b-20-api-routes-validates-type-when-pr-37",
+      "type": "list-item",
+      "props": {
+        "ordered": true
+      },
+      "text": [
+        {
+          "insert": "Validates "
+        },
+        {
+          "insert": "type",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " when present."
+        }
+      ],
+      "children": []
+    },
+    "b-20-api-routes-calls-listassetlibrary-38": {
+      "id": "b-20-api-routes-calls-listassetlibrary-38",
+      "type": "list-item",
+      "props": {
+        "ordered": true
+      },
+      "text": [
+        {
+          "insert": "Calls "
+        },
+        {
+          "insert": "listAssetLibrary({ type, projectId, includeUsage })",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": "."
+        }
+      ],
+      "children": []
+    },
+    "b-20-api-routes-returns-200-assets-39": {
+      "id": "b-20-api-routes-returns-200-assets-39",
+      "type": "list-item",
+      "props": {
+        "ordered": true
+      },
+      "text": [
+        {
+          "insert": "Returns "
+        },
+        {
+          "insert": "200 { assets }",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ", where each asset includes id, type, file, label, scope/project availability, and optional usage locations/count."
+        }
+      ],
+      "children": []
+    },
+    "b-20-api-routes-get-api-projects-proj-40": {
+      "id": "b-20-api-routes-get-api-projects-proj-40",
+      "type": "heading",
+      "props": {
+        "level": 2
+      },
+      "text": [
+        {
+          "insert": "GET /api/projects/[projectId]/registries/[registry]",
+          "attributes": {
+            "code": true
+          }
+        }
+      ],
+      "children": []
+    },
+    "b-20-api-routes-apps-scene-engine-app-a-41": {
+      "id": "b-20-api-routes-apps-scene-engine-app-a-41",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "apps/scene-engine/app/api/projects/[projectId]/registries/[registry]/route.ts",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ": returns project-local registries for renderer/editor consumption."
+        }
+      ],
+      "children": []
+    },
+    "b-20-api-routes-registry-source-42-tbl": {
+      "id": "b-20-api-routes-registry-source-42-tbl",
+      "type": "structured-table",
+      "props": {
+        "columns": [
+          "Registry",
+          "Source"
+        ],
+        "rows": [
+          [
+            [
+              {
+                "insert": "assets",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ],
+            [
+              {
+                "insert": "ProjectSettings/registries/assets.json",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ]
+          ],
+          [
+            [
+              {
+                "insert": "modules",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ],
+            [
+              {
+                "insert": "ProjectSettings/registries/modules.json",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ]
+          ],
+          [
+            [
+              {
+                "insert": "fonts",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ],
+            [
+              {
+                "insert": "discovered from "
+              },
+              {
+                "insert": "Assets/Fonts/",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ]
+          ]
+        ]
+      },
+      "children": []
+    },
+    "b-20-api-routes-missing-asset-module-reg-43": {
+      "id": "b-20-api-routes-missing-asset-module-reg-43",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "Missing asset/module registry files return "
+        },
+        {
+          "insert": "{}",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ". Unknown projects return 404."
+        }
+      ],
+      "children": []
+    },
+    "b-20-api-routes-get-api-projects-proj-44": {
+      "id": "b-20-api-routes-get-api-projects-proj-44",
+      "type": "heading",
+      "props": {
+        "level": 2
+      },
+      "text": [
+        {
+          "insert": "GET /api/projects/[projectId]/assets/[...path]",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ", "
+        },
+        {
+          "insert": "/modules/[...path]",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ", "
+        },
+        {
+          "insert": "/fonts/[...path]",
+          "attributes": {
+            "code": true
+          }
+        }
+      ],
+      "children": []
+    },
+    "b-20-api-routes-these-routes-serve-proje-45": {
+      "id": "b-20-api-routes-these-routes-serve-proje-45",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "These routes serve project-local files through the dev server. They are the browser-facing form of logical paths like "
+        },
+        {
+          "insert": "/assets/video/test-fire.mp4",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " and "
+        },
+        {
+          "insert": "/modules/components/main-menu-system/main-menu-system.js",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": "."
+        }
+      ],
+      "children": []
+    },
+    "b-20-api-routes-the-shared-file-serving-46": {
+      "id": "b-20-api-routes-the-shared-file-serving-46",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "The shared file serving helper:"
+        }
+      ],
+      "children": []
+    },
+    "b-20-api-routes-resolves-paths-through-t-47": {
+      "id": "b-20-api-routes-resolves-paths-through-t-47",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "resolves paths through the selected project's "
+        },
+        {
+          "insert": "ProjectPaths",
+          "attributes": {
+            "code": true
+          }
+        }
+      ],
+      "children": []
+    },
+    "b-20-api-routes-rejects-traversal-and-ma-48": {
+      "id": "b-20-api-routes-rejects-traversal-and-ma-48",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "rejects traversal and malformed child paths"
+        }
+      ],
+      "children": []
+    },
+    "b-20-api-routes-sets-content-types-for-j-49": {
+      "id": "b-20-api-routes-sets-content-types-for-j-49",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "sets content types for JS, CSS, JSON, SVG, media, and fonts"
+        }
+      ],
+      "children": []
+    },
+    "b-20-api-routes-rewrites-logical-asset-50": {
+      "id": "b-20-api-routes-rewrites-logical-asset-50",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "rewrites logical "
+        },
+        {
+          "insert": "/assets",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ", "
+        },
+        {
+          "insert": "/modules",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ", and "
+        },
+        {
+          "insert": "/fonts",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " references in text files to project API URLs"
+        }
+      ],
+      "children": []
+    },
+    "b-20-api-routes-this-is-why-project-modu-51": {
+      "id": "b-20-api-routes-this-is-why-project-modu-51",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "This is why project modules can keep authored logical paths while still loading correctly from external workspaces during dev."
+        }
+      ],
+      "children": []
+    },
+    "b-20-api-routes-patch-api-registry-id-52": {
+      "id": "b-20-api-routes-patch-api-registry-id-52",
+      "type": "heading",
+      "props": {
+        "level": 2
+      },
+      "text": [
+        {
+          "insert": "PATCH /api/registry/[id]",
+          "attributes": {
+            "code": true
+          }
+        }
+      ],
+      "children": []
+    },
+    "b-20-api-routes-apps-scene-engine-app-a-53": {
+      "id": "b-20-api-routes-apps-scene-engine-app-a-53",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "apps/scene-engine/app/api/registry/[id]/route.ts",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ": moves an existing container's file pointer to a different file. This is a maintenance/API surface; the current inspector selection dropdown changes scene "
+        },
+        {
+          "insert": "asset",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " ids instead of patching registry file pointers."
+        }
+      ],
+      "children": []
+    },
+    "b-20-api-routes-request-54": {
+      "id": "b-20-api-routes-request-54",
+      "type": "heading",
+      "props": {
+        "level": 3
+      },
+      "text": [
+        {
+          "insert": "Request"
+        }
+      ],
+      "children": []
+    },
+    "b-20-api-routes-json-55": {
+      "id": "b-20-api-routes-json-55",
+      "type": "code",
+      "props": {
+        "language": "json"
+      },
+      "text": [
+        {
+          "insert": "{ \"file\": \"/assets/video/test-fire-2.mp4\" }"
+        }
+      ],
+      "children": []
+    },
+    "b-20-api-routes-behavior-56": {
+      "id": "b-20-api-routes-behavior-56",
+      "type": "heading",
+      "props": {
+        "level": 3
+      },
+      "text": [
+        {
+          "insert": "Behavior"
+        }
+      ],
+      "children": []
+    },
+    "b-20-api-routes-parses-the-json-body-no-57": {
+      "id": "b-20-api-routes-parses-the-json-body-no-57",
+      "type": "list-item",
+      "props": {
+        "ordered": true
+      },
+      "text": [
+        {
+          "insert": "Parses the JSON body. Non-object or missing "
+        },
+        {
+          "insert": "file",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " → 400."
+        }
+      ],
+      "children": []
+    },
+    "b-20-api-routes-resolves-project-proj-58": {
+      "id": "b-20-api-routes-resolves-project-proj-58",
+      "type": "list-item",
+      "props": {
+        "ordered": true
+      },
+      "text": [
+        {
+          "insert": "Resolves "
+        },
+        {
+          "insert": "?project=<project-id>",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " or body "
+        },
+        {
+          "insert": "projectId",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ", falling back to the default project."
+        }
+      ],
+      "children": []
+    },
+    "b-20-api-routes-reads-that-project-s-ass-59": {
+      "id": "b-20-api-routes-reads-that-project-s-ass-59",
+      "type": "list-item",
+      "props": {
+        "ordered": true
+      },
+      "text": [
+        {
+          "insert": "Reads that project's asset registry and looks up "
+        },
+        {
+          "insert": "id",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ". Missing → 404."
+        }
+      ],
+      "children": []
+    },
+    "b-20-api-routes-verifies-the-new-file-60": {
+      "id": "b-20-api-routes-verifies-the-new-file-60",
+      "type": "list-item",
+      "props": {
+        "ordered": true
+      },
+      "text": [
+        {
+          "insert": "Verifies the new "
+        },
+        {
+          "insert": "file",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " starts with "
+        },
+        {
+          "insert": "/assets/{entry.type}/",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " or "
+        },
+        {
+          "insert": "/fonts/",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " for font entries. The endpoint will not let a "
+        },
+        {
+          "insert": "video",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " container point at a glyph file, etc. → 400 on mismatch."
+        }
+      ],
+      "children": []
+    },
+    "b-20-api-routes-rewrites-registry-id-61": {
+      "id": "b-20-api-routes-rewrites-registry-id-61",
+      "type": "list-item",
+      "props": {
+        "ordered": true
+      },
+      "text": [
+        {
+          "insert": "Rewrites "
+        },
+        {
+          "insert": "registry[id] = { ...entry, file }",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " and writes the registry back."
+        }
+      ],
+      "children": []
+    },
+    "b-20-api-routes-responds-200-id-type-62": {
+      "id": "b-20-api-routes-responds-200-id-type-62",
+      "type": "list-item",
+      "props": {
+        "ordered": true
+      },
+      "text": [
+        {
+          "insert": "Responds "
+        },
+        {
+          "insert": "200 { id, type, file }",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": "."
+        }
+      ],
+      "children": []
+    },
+    "b-20-api-routes-notes-63": {
+      "id": "b-20-api-routes-notes-63",
+      "type": "heading",
+      "props": {
+        "level": 3
+      },
+      "text": [
+        {
+          "insert": "Notes"
+        }
+      ],
+      "children": []
+    },
+    "b-20-api-routes-only-file-is-patchable-64": {
+      "id": "b-20-api-routes-only-file-is-patchable-64",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "Only "
+        },
+        {
+          "insert": "file",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " is patchable. The container "
+        },
+        {
+          "insert": "type",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " is invariant: changing it would invalidate every scene that references the container."
+        }
+      ],
+      "children": []
+    },
+    "b-20-api-routes-the-route-does-not-valid-65": {
+      "id": "b-20-api-routes-the-route-does-not-valid-65",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "The route does not validate that the file actually exists on disk; it trusts the listing endpoint."
+        }
+      ],
+      "children": []
+    },
+    "b-20-api-routes-the-renderer-s-in-memory-66": {
+      "id": "b-20-api-routes-the-renderer-s-in-memory-66",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "The renderer's in-memory cache must be updated separately if this route is used from an active editor session: the route only rewrites disk."
+        }
+      ],
+      "children": []
+    },
+    "b-20-api-routes-what-s-not-here-67": {
+      "id": "b-20-api-routes-what-s-not-here-67",
+      "type": "heading",
+      "props": {
+        "level": 2
+      },
+      "text": [
+        {
+          "insert": "What's Not Here"
+        }
+      ],
+      "children": []
+    },
+    "b-20-api-routes-no-delete-deleting-a-c-68": {
+      "id": "b-20-api-routes-no-delete-deleting-a-c-68",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "No DELETE. Deleting a container or its file is not a first-class flow yet."
+        }
+      ],
+      "children": []
+    },
+    "b-20-api-routes-no-bulk-endpoint-uploa-69": {
+      "id": "b-20-api-routes-no-bulk-endpoint-uploa-69",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "No bulk endpoint. Upload and registry patch are single-item operations."
+        }
+      ],
+      "children": []
+    },
+    "b-20-api-routes-no-module-registry-mutat-70": {
+      "id": "b-20-api-routes-no-module-registry-mutat-70",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "No module-registry mutation endpoint. Modules are authored in code, not edited through the API."
+        }
+      ],
+      "children": []
+    },
+    "b-20-api-routes-sources-71": {
+      "id": "b-20-api-routes-sources-71",
+      "type": "heading",
+      "props": {
+        "level": 2
+      },
+      "text": [
+        {
+          "insert": "Sources"
+        }
+      ],
+      "children": []
+    },
+    "b-20-api-routes-apps-scene-engine-app-a-72": {
+      "id": "b-20-api-routes-apps-scene-engine-app-a-72",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "apps/scene-engine/app/api/upload/route.ts",
+          "attributes": {
+            "code": true
+          }
+        }
+      ],
+      "children": []
+    },
+    "b-20-api-routes-apps-scene-engine-app-a-73": {
+      "id": "b-20-api-routes-apps-scene-engine-app-a-73",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "apps/scene-engine/app/api/assets/[type]/route.ts",
+          "attributes": {
+            "code": true
+          }
+        }
+      ],
+      "children": []
+    },
+    "b-20-api-routes-apps-scene-engine-app-a-74": {
+      "id": "b-20-api-routes-apps-scene-engine-app-a-74",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "apps/scene-engine/app/api/asset-library/route.ts",
+          "attributes": {
+            "code": true
+          }
+        }
+      ],
+      "children": []
+    },
+    "b-20-api-routes-apps-scene-engine-app-a-75": {
+      "id": "b-20-api-routes-apps-scene-engine-app-a-75",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "apps/scene-engine/app/api/projects/[projectId]/registries/[registry]/route.ts",
+          "attributes": {
+            "code": true
+          }
+        }
+      ],
+      "children": []
+    },
+    "b-20-api-routes-apps-scene-engine-app-a-76": {
+      "id": "b-20-api-routes-apps-scene-engine-app-a-76",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "apps/scene-engine/app/api/projects/[projectId]/assets/[...path]/route.ts",
+          "attributes": {
+            "code": true
+          }
+        }
+      ],
+      "children": []
+    },
+    "b-20-api-routes-apps-scene-engine-app-a-77": {
+      "id": "b-20-api-routes-apps-scene-engine-app-a-77",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "apps/scene-engine/app/api/projects/[projectId]/modules/[...path]/route.ts",
+          "attributes": {
+            "code": true
+          }
+        }
+      ],
+      "children": []
+    },
+    "b-20-api-routes-apps-scene-engine-app-a-78": {
+      "id": "b-20-api-routes-apps-scene-engine-app-a-78",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "apps/scene-engine/app/api/projects/[projectId]/fonts/[...path]/route.ts",
+          "attributes": {
+            "code": true
+          }
+        }
+      ],
+      "children": []
+    },
+    "b-20-api-routes-apps-scene-engine-app-a-79": {
+      "id": "b-20-api-routes-apps-scene-engine-app-a-79",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "apps/scene-engine/app/api/registry/[id]/route.ts",
+          "attributes": {
+            "code": true
+          }
+        }
+      ],
+      "children": []
+    }
+  }
+}

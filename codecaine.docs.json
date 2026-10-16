@@ -1,0 +1,9 @@
+{
+  "id": "ent_01M4F6XQRSWQ9G88DWC0B2FNH2",
+  "name": "MainMenu",
+  "kind": "app",
+  "docsRoot": "docs",
+  "products": [
+    "docs"
+  ]
+}

@@ -1,0 +1,2338 @@
+{
+  "schemaVersion": 1,
+  "id": "scene-engine-20-implementation-10-renderer-10-scene-renderer",
+  "title": "Scene Renderer",
+  "root": "b-10-scene-renderer-root-81",
+  "blocks": {
+    "b-10-scene-renderer-root-81": {
+      "id": "b-10-scene-renderer-root-81",
+      "type": "paragraph",
+      "props": {
+        "concepts": [
+          "scene-renderer",
+          "mount",
+          "update",
+          "reconciliation",
+          "transform",
+          "appearance"
+        ],
+        "covers": "The render loop in app/_engine/renderer/scene-renderer.js — mount, update reconciliation, transform/appearance application, recursive children.",
+        "design_refs": [
+          "10-system-design/30-rendering-pipeline.md"
+        ]
+      },
+      "children": [
+        "b-10-scene-renderer-apps-scene-engine-app-2",
+        "b-10-scene-renderer-the-renderer-is-plain-js-3",
+        "b-10-scene-renderer-divider-4",
+        "b-10-scene-renderer-public-surface-5",
+        "b-10-scene-renderer-js-6",
+        "b-10-scene-renderer-idempotent-calling-it-t-7",
+        "b-10-scene-renderer-options-events-fals-8",
+        "b-10-scene-renderer-the-loop-9",
+        "b-10-scene-renderer-renderscene-scene-root-10",
+        "b-10-scene-renderer-await-loadregistry-11",
+        "b-10-scene-renderer-set-the-stage-size-roo-12",
+        "b-10-scene-renderer-apply-scene-level-appear-13",
+        "b-10-scene-renderer-inspect-root-children-14",
+        "b-10-scene-renderer-mountobject-parent-obj-17",
+        "b-10-scene-renderer-resolveasset-obj-asset-18",
+        "b-10-scene-renderer-obj-visible-false-19",
+        "b-10-scene-renderer-await-getrenderer-obj-t-20",
+        "b-10-scene-renderer-tag-with-wrapper-datase-21",
+        "b-10-scene-renderer-applyobjectstyles-wrapp-22",
+        "b-10-scene-renderer-if-obj-type-glyph-23",
+        "b-10-scene-renderer-glyph-groups-handle-thei-24",
+        "b-10-scene-renderer-applyobjectstyles-el-o-25",
+        "b-10-scene-renderer-universal-post-mount-sty-26",
+        "b-10-scene-renderer-obj-visible-false-27",
+        "b-10-scene-renderer-applytransform-el-obj-28",
+        "b-10-scene-renderer-applyappearance-el-obj-29",
+        "b-10-scene-renderer-for-media-if-entry-fil-30",
+        "b-10-scene-renderer-obj-type-glyph-gro-31",
+        "b-10-scene-renderer-bindobjectevents-el-ob-32",
+        "b-10-scene-renderer-event-runtime-33",
+        "b-10-scene-renderer-event-runtime-js-is-re-34",
+        "b-10-scene-renderer-action-behavio-35-tbl",
+        "b-10-scene-renderer-for-a-single-trigger-no-36",
+        "b-10-scene-renderer-updatechildren-parentel-37",
+        "b-10-scene-renderer-the-reconciler-same-rul-38",
+        "b-10-scene-renderer-build-existing-map-id-39",
+        "b-10-scene-renderer-compute-wantedids-set-40",
+        "b-10-scene-renderer-for-each-id-el-in-41",
+        "b-10-scene-renderer-for-each-child-in-chi-42",
+        "b-10-scene-renderer-reorderchildren-parente-48",
+        "b-10-scene-renderer-the-id-keyed-reconciliat-49",
+        "b-10-scene-renderer-reorderchildren-parente-50",
+        "b-10-scene-renderer-walks-parentel-children-51",
+        "b-10-scene-renderer-untagged-children-anyth-52",
+        "b-10-scene-renderer-positioning-positionin-53",
+        "b-10-scene-renderer-applytransform-el-tran-54",
+        "b-10-scene-renderer-always-sets-position-a-55",
+        "b-10-scene-renderer-if-transform-mode-56",
+        "b-10-scene-renderer-otherwise-57",
+        "b-10-scene-renderer-applyappearance-el-app-63",
+        "b-10-scene-renderer-opacity-style-opaci-64",
+        "b-10-scene-renderer-blend-style-mixblen-65",
+        "b-10-scene-renderer-hue-style-filter-66",
+        "b-10-scene-renderer-fit-mediael-style-o-67",
+        "b-10-scene-renderer-saturation-is-currentl-68",
+        "b-10-scene-renderer-what-this-file-does-not-69",
+        "b-10-scene-renderer-does-not-import-the-70",
+        "b-10-scene-renderer-does-not-load-assets-71",
+        "b-10-scene-renderer-does-not-implement-p-72",
+        "b-10-scene-renderer-does-not-implement-s-73",
+        "b-10-scene-renderer-source-74",
+        "b-10-scene-renderer-apps-scene-engine-app-75",
+        "b-10-scene-renderer-apps-scene-engine-app-76",
+        "b-10-scene-renderer-apps-scene-engine-app-77",
+        "b-10-scene-renderer-apps-scene-engine-app-78",
+        "b-10-scene-renderer-apps-scene-engine-app-79",
+        "b-10-scene-renderer-apps-scene-engine-app-80"
+      ]
+    },
+    "b-10-scene-renderer-apps-scene-engine-app-2": {
+      "id": "b-10-scene-renderer-apps-scene-engine-app-2",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "apps/scene-engine/app/_engine/renderer/scene-renderer.js",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " is the imperative entry point that turns a "
+        },
+        {
+          "insert": "SceneJson",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " into populated DOM. It exposes one function, "
+        },
+        {
+          "insert": "renderScene(scene, root, options?)",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ", and is shared between the editor (called on every store change), scene preview pages, and the standalone export."
+        }
+      ],
+      "children": []
+    },
+    "b-10-scene-renderer-the-renderer-is-plain-js-3": {
+      "id": "b-10-scene-renderer-the-renderer-is-plain-js-3",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "The renderer is plain JS modules with no framework. The Next.js editor wraps it via "
+        },
+        {
+          "insert": "useEffect",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " + "
+        },
+        {
+          "insert": "useRef",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": "; the export bundle calls it from "
+        },
+        {
+          "insert": "boot.js",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": "."
+        }
+      ],
+      "children": []
+    },
+    "b-10-scene-renderer-divider-4": {
+      "id": "b-10-scene-renderer-divider-4",
+      "type": "divider",
+      "props": {},
+      "children": []
+    },
+    "b-10-scene-renderer-public-surface-5": {
+      "id": "b-10-scene-renderer-public-surface-5",
+      "type": "heading",
+      "props": {
+        "level": 2
+      },
+      "text": [
+        {
+          "insert": "Public Surface"
+        }
+      ],
+      "children": []
+    },
+    "b-10-scene-renderer-js-6": {
+      "id": "b-10-scene-renderer-js-6",
+      "type": "code",
+      "props": {
+        "language": "js"
+      },
+      "text": [
+        {
+          "insert": "import { renderScene } from './renderer/scene-renderer.js'\nawait renderScene(scene, document.getElementById('stage'), {\n  runtime: {\n    navigate: (sceneId) => window.MELEE_navigate(sceneId),\n  },\n})"
+        }
+      ],
+      "children": []
+    },
+    "b-10-scene-renderer-idempotent-calling-it-t-7": {
+      "id": "b-10-scene-renderer-idempotent-calling-it-t-7",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "Idempotent: calling it twice with the same scene reconciles instead of re-mounting. Calling it with a different scene reuses any objects whose "
+        },
+        {
+          "insert": "id",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " matches."
+        }
+      ],
+      "children": []
+    },
+    "b-10-scene-renderer-options-events-fals-8": {
+      "id": "b-10-scene-renderer-options-events-fals-8",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "options.events === false",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " disables event binding. The editor uses this so canvas clicks select layers instead of following scene navigation events."
+        }
+      ],
+      "children": []
+    },
+    "b-10-scene-renderer-the-loop-9": {
+      "id": "b-10-scene-renderer-the-loop-9",
+      "type": "heading",
+      "props": {
+        "level": 2
+      },
+      "text": [
+        {
+          "insert": "The Loop"
+        }
+      ],
+      "children": []
+    },
+    "b-10-scene-renderer-renderscene-scene-root-10": {
+      "id": "b-10-scene-renderer-renderscene-scene-root-10",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "renderScene(scene, root, options?)",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ":"
+        }
+      ],
+      "children": []
+    },
+    "b-10-scene-renderer-await-loadregistry-11": {
+      "id": "b-10-scene-renderer-await-loadregistry-11",
+      "type": "list-item",
+      "props": {
+        "ordered": true
+      },
+      "text": [
+        {
+          "insert": "await loadRegistry()",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ": populates the asset/module registry caches (idempotent)."
+        }
+      ],
+      "children": []
+    },
+    "b-10-scene-renderer-set-the-stage-size-roo-12": {
+      "id": "b-10-scene-renderer-set-the-stage-size-roo-12",
+      "type": "list-item",
+      "props": {
+        "ordered": true
+      },
+      "text": [
+        {
+          "insert": "Set the stage size: "
+        },
+        {
+          "insert": "root.style.width = stage.width + 'px'",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ", same for height."
+        }
+      ],
+      "children": []
+    },
+    "b-10-scene-renderer-apply-scene-level-appear-13": {
+      "id": "b-10-scene-renderer-apply-scene-level-appear-13",
+      "type": "list-item",
+      "props": {
+        "ordered": true
+      },
+      "text": [
+        {
+          "insert": "Apply scene-level appearance as a CSS "
+        },
+        {
+          "insert": "filter",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " on the root ("
+        },
+        {
+          "insert": "hue-rotate",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ", "
+        },
+        {
+          "insert": "saturate",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ")."
+        }
+      ],
+      "children": []
+    },
+    "b-10-scene-renderer-inspect-root-children-14": {
+      "id": "b-10-scene-renderer-inspect-root-children-14",
+      "type": "list-item",
+      "props": {
+        "ordered": true
+      },
+      "text": [
+        {
+          "insert": "Inspect "
+        },
+        {
+          "insert": "root.children",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " for elements bearing "
+        },
+        {
+          "insert": "dataset.layerId",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ". That decides mount vs. update:"
+        }
+      ],
+      "children": [
+        "b-10-scene-renderer-first-time-no-tagge-15",
+        "b-10-scene-renderer-subsequent-calls-u-16"
+      ]
+    },
+    "b-10-scene-renderer-first-time-no-tagge-15": {
+      "id": "b-10-scene-renderer-first-time-no-tagge-15",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "First time",
+          "attributes": {
+            "bold": true
+          }
+        },
+        {
+          "insert": " (no tagged children): wipe "
+        },
+        {
+          "insert": "root.innerHTML",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ", then "
+        },
+        {
+          "insert": "mountObject",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " each top-level entry, then "
+        },
+        {
+          "insert": "reorderChildren",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " to align DOM order with array order."
+        }
+      ],
+      "children": []
+    },
+    "b-10-scene-renderer-subsequent-calls-u-16": {
+      "id": "b-10-scene-renderer-subsequent-calls-u-16",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "Subsequent calls",
+          "attributes": {
+            "bold": true
+          }
+        },
+        {
+          "insert": ": "
+        },
+        {
+          "insert": "updateChildren(root, scene.objects)",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " to reconcile in place."
+        }
+      ],
+      "children": []
+    },
+    "b-10-scene-renderer-mountobject-parent-obj-17": {
+      "id": "b-10-scene-renderer-mountobject-parent-obj-17",
+      "type": "heading",
+      "props": {
+        "level": 2
+      },
+      "text": [
+        {
+          "insert": "mountObject(parent, obj)",
+          "attributes": {
+            "code": true
+          }
+        }
+      ],
+      "children": []
+    },
+    "b-10-scene-renderer-resolveasset-obj-asset-18": {
+      "id": "b-10-scene-renderer-resolveasset-obj-asset-18",
+      "type": "list-item",
+      "props": {
+        "ordered": true
+      },
+      "text": [
+        {
+          "insert": "resolveAsset(obj.asset)",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ": registry lookup. Missing → warn and return "
+        },
+        {
+          "insert": "null",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " (object is skipped)."
+        }
+      ],
+      "children": []
+    },
+    "b-10-scene-renderer-obj-visible-false-19": {
+      "id": "b-10-scene-renderer-obj-visible-false-19",
+      "type": "list-item",
+      "props": {
+        "ordered": true
+      },
+      "text": [
+        {
+          "insert": "obj.visible === false",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " → return "
+        },
+        {
+          "insert": "null",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " (object is not mounted at all on first render)."
+        }
+      ],
+      "children": []
+    },
+    "b-10-scene-renderer-await-getrenderer-obj-t-20": {
+      "id": "b-10-scene-renderer-await-getrenderer-obj-t-20",
+      "type": "list-item",
+      "props": {
+        "ordered": true
+      },
+      "text": [
+        {
+          "insert": "await getRenderer(obj.type)(obj, entry)",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ": type dispatch produces the wrapper."
+        }
+      ],
+      "children": []
+    },
+    "b-10-scene-renderer-tag-with-wrapper-datase-21": {
+      "id": "b-10-scene-renderer-tag-with-wrapper-datase-21",
+      "type": "list-item",
+      "props": {
+        "ordered": true
+      },
+      "text": [
+        {
+          "insert": "Tag with "
+        },
+        {
+          "insert": "wrapper.dataset.layerId = obj.id",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " and append to "
+        },
+        {
+          "insert": "parent",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": "."
+        }
+      ],
+      "children": []
+    },
+    "b-10-scene-renderer-applyobjectstyles-wrapp-22": {
+      "id": "b-10-scene-renderer-applyobjectstyles-wrapp-22",
+      "type": "list-item",
+      "props": {
+        "ordered": true
+      },
+      "text": [
+        {
+          "insert": "applyObjectStyles(wrapper, obj, entry, options)",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ": sets visibility, transform, appearance, media src, event bindings, and (for glyph-groups) updates slot-related child handling."
+        }
+      ],
+      "children": []
+    },
+    "b-10-scene-renderer-if-obj-type-glyph-23": {
+      "id": "b-10-scene-renderer-if-obj-type-glyph-23",
+      "type": "list-item",
+      "props": {
+        "ordered": true
+      },
+      "text": [
+        {
+          "insert": "If "
+        },
+        {
+          "insert": "obj.type !== 'glyph-group'",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " and "
+        },
+        {
+          "insert": "obj.children",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " is non-empty: ensure the wrapper has "
+        },
+        {
+          "insert": "position",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ", recurse "
+        },
+        {
+          "insert": "mountObject",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " for each child, then "
+        },
+        {
+          "insert": "reorderChildren",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": "."
+        }
+      ],
+      "children": []
+    },
+    "b-10-scene-renderer-glyph-groups-handle-thei-24": {
+      "id": "b-10-scene-renderer-glyph-groups-handle-thei-24",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "Glyph-groups handle their slots inside their renderer (see "
+        },
+        {
+          "insert": "asset renderers",
+          "attributes": {
+            "reference": {
+              "kind": "doc",
+              "path": "10-scene-engine/20-implementation/10-renderer/30-asset-renderers",
+              "label": "asset renderers"
+            }
+          }
+        },
+        {
+          "insert": "), so the scene-renderer doesn't recurse into them."
+        }
+      ],
+      "children": []
+    },
+    "b-10-scene-renderer-applyobjectstyles-el-o-25": {
+      "id": "b-10-scene-renderer-applyobjectstyles-el-o-25",
+      "type": "heading",
+      "props": {
+        "level": 2
+      },
+      "text": [
+        {
+          "insert": "applyObjectStyles(el, obj, entry)",
+          "attributes": {
+            "code": true
+          }
+        }
+      ],
+      "children": []
+    },
+    "b-10-scene-renderer-universal-post-mount-sty-26": {
+      "id": "b-10-scene-renderer-universal-post-mount-sty-26",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "Universal post-mount styling:"
+        }
+      ],
+      "children": []
+    },
+    "b-10-scene-renderer-obj-visible-false-27": {
+      "id": "b-10-scene-renderer-obj-visible-false-27",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "obj.visible === false",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " → "
+        },
+        {
+          "insert": "display: none",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " and bail. Otherwise clear "
+        },
+        {
+          "insert": "display",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": "."
+        }
+      ],
+      "children": []
+    },
+    "b-10-scene-renderer-applytransform-el-obj-28": {
+      "id": "b-10-scene-renderer-applytransform-el-obj-28",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "applyTransform(el, obj.transform)",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ": see "
+        },
+        {
+          "insert": "`positioning.js`",
+          "attributes": {
+            "link": "#positioning"
+          }
+        },
+        {
+          "insert": "."
+        }
+      ],
+      "children": []
+    },
+    "b-10-scene-renderer-applyappearance-el-obj-29": {
+      "id": "b-10-scene-renderer-applyappearance-el-obj-29",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "applyAppearance(el, obj.appearance, { isMedia, mediaEl })",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ": for media types, the inner "
+        },
+        {
+          "insert": "<video>",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " / "
+        },
+        {
+          "insert": "<img>",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " is found via "
+        },
+        {
+          "insert": "findMediaEl",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " so "
+        },
+        {
+          "insert": "object-fit",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " lands on the right element."
+        }
+      ],
+      "children": []
+    },
+    "b-10-scene-renderer-for-media-if-entry-fil-30": {
+      "id": "b-10-scene-renderer-for-media-if-entry-fil-30",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "For media: if "
+        },
+        {
+          "insert": "entry.file",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " doesn't match the existing media "
+        },
+        {
+          "insert": "src",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ", swap it. This is how registry container swaps propagate without re-mounting the wrapper."
+        }
+      ],
+      "children": []
+    },
+    "b-10-scene-renderer-obj-type-glyph-gro-31": {
+      "id": "b-10-scene-renderer-obj-type-glyph-gro-31",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "obj.type === 'glyph-group'",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " → "
+        },
+        {
+          "insert": "updateGlyphGroup(el, obj)",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " (legacy named-override / foreign-child handling for compatibility with older glyph-group children; new authoring uses "
+        },
+        {
+          "insert": "slots",
+          "attributes": {
+            "reference": {
+              "kind": "doc",
+              "path": "10-scene-engine/20-implementation/10-renderer/30-asset-renderers",
+              "section": "glyph-group",
+              "label": "slots"
+            }
+          }
+        },
+        {
+          "insert": ")."
+        }
+      ],
+      "children": []
+    },
+    "b-10-scene-renderer-bindobjectevents-el-ob-32": {
+      "id": "b-10-scene-renderer-bindobjectevents-el-ob-32",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "bindObjectEvents(el, obj, options)",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " wires "
+        },
+        {
+          "insert": "click",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ", "
+        },
+        {
+          "insert": "hover",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ", and "
+        },
+        {
+          "insert": "load",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " events when events are enabled. Non-interactive wrappers get "
+        },
+        {
+          "insert": "pointer-events: none",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " in preview/export mode so click targets are not blocked by visual overlays."
+        }
+      ],
+      "children": []
+    },
+    "b-10-scene-renderer-event-runtime-33": {
+      "id": "b-10-scene-renderer-event-runtime-33",
+      "type": "heading",
+      "props": {
+        "level": 2
+      },
+      "text": [
+        {
+          "insert": "Event Runtime"
+        }
+      ],
+      "children": []
+    },
+    "b-10-scene-renderer-event-runtime-js-is-re-34": {
+      "id": "b-10-scene-renderer-event-runtime-js-is-re-34",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "event-runtime.js",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " is renderer-level, not type-specific. Any object type can carry "
+        },
+        {
+          "insert": "events[]",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": "; the binder maps triggers to DOM listeners and dispatches actions:"
+        }
+      ],
+      "children": []
+    },
+    "b-10-scene-renderer-action-behavio-35-tbl": {
+      "id": "b-10-scene-renderer-action-behavio-35-tbl",
+      "type": "structured-table",
+      "props": {
+        "columns": [
+          "Action",
+          "Behavior"
+        ],
+        "rows": [
+          [
+            [
+              {
+                "insert": "navigate",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ],
+            [
+              {
+                "insert": "Calls "
+              },
+              {
+                "insert": "options.runtime.navigate(target)",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": " when provided, otherwise falls back to "
+              },
+              {
+                "insert": "window.MELEE_navigate(target)",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": "."
+              }
+            ]
+          ],
+          [
+            [
+              {
+                "insert": "play-audio",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ],
+            [
+              {
+                "insert": "Calls "
+              },
+              {
+                "insert": "options.runtime.playAudio(target)",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": " when provided, otherwise resolves the audio asset and plays it through the audio renderer."
+              }
+            ]
+          ],
+          [
+            [
+              {
+                "insert": "autoplay",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ],
+            [
+              {
+                "insert": "Same audio path as "
+              },
+              {
+                "insert": "play-audio",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": ", using "
+              },
+              {
+                "insert": "target",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": " or the current layer's asset."
+              }
+            ]
+          ]
+        ]
+      },
+      "children": []
+    },
+    "b-10-scene-renderer-for-a-single-trigger-no-36": {
+      "id": "b-10-scene-renderer-for-a-single-trigger-no-36",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "For a single trigger, non-navigation actions run before navigation. This lets a button play a cue and then navigate even if the JSON lists "
+        },
+        {
+          "insert": "navigate",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " first. "
+        },
+        {
+          "insert": "play-audio",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " waits for the browser's playback-start promise; "
+        },
+        {
+          "insert": "navigate",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " can also honor "
+        },
+        {
+          "insert": "properties.navigationDelayMs",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " for page-mode exports where unloading immediately would cut off the cue."
+        }
+      ],
+      "children": []
+    },
+    "b-10-scene-renderer-updatechildren-parentel-37": {
+      "id": "b-10-scene-renderer-updatechildren-parentel-37",
+      "type": "heading",
+      "props": {
+        "level": 2
+      },
+      "text": [
+        {
+          "insert": "updateChildren(parentEl, childArray)",
+          "attributes": {
+            "code": true
+          }
+        }
+      ],
+      "children": []
+    },
+    "b-10-scene-renderer-the-reconciler-same-rul-38": {
+      "id": "b-10-scene-renderer-the-reconciler-same-rul-38",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "The reconciler. Same rules at every level:"
+        }
+      ],
+      "children": []
+    },
+    "b-10-scene-renderer-build-existing-map-id-39": {
+      "id": "b-10-scene-renderer-build-existing-map-id-39",
+      "type": "list-item",
+      "props": {
+        "ordered": true
+      },
+      "text": [
+        {
+          "insert": "Build "
+        },
+        {
+          "insert": "existing: Map<id, element>",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " by reading "
+        },
+        {
+          "insert": "parentEl.children",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " "
+        },
+        {
+          "insert": "dataset.layerId",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": "."
+        }
+      ],
+      "children": []
+    },
+    "b-10-scene-renderer-compute-wantedids-set-40": {
+      "id": "b-10-scene-renderer-compute-wantedids-set-40",
+      "type": "list-item",
+      "props": {
+        "ordered": true
+      },
+      "text": [
+        {
+          "insert": "Compute "
+        },
+        {
+          "insert": "wantedIds: Set<id>",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " from "
+        },
+        {
+          "insert": "childArray",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": "."
+        }
+      ],
+      "children": []
+    },
+    "b-10-scene-renderer-for-each-id-el-in-41": {
+      "id": "b-10-scene-renderer-for-each-id-el-in-41",
+      "type": "list-item",
+      "props": {
+        "ordered": true
+      },
+      "text": [
+        {
+          "insert": "For each "
+        },
+        {
+          "insert": "(id, el)",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " in "
+        },
+        {
+          "insert": "existing",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " not in "
+        },
+        {
+          "insert": "wantedIds",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ": "
+        },
+        {
+          "insert": "el.remove()",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": "."
+        }
+      ],
+      "children": []
+    },
+    "b-10-scene-renderer-for-each-child-in-chi-42": {
+      "id": "b-10-scene-renderer-for-each-child-in-chi-42",
+      "type": "list-item",
+      "props": {
+        "ordered": true
+      },
+      "text": [
+        {
+          "insert": "For each "
+        },
+        {
+          "insert": "child",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " in "
+        },
+        {
+          "insert": "childArray",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ":"
+        }
+      ],
+      "children": [
+        "b-10-scene-renderer-resolve-its-asset-if-mi-43",
+        "b-10-scene-renderer-if-a-wrapper-already-exi-44",
+        "b-10-scene-renderer-if-no-wrapper-exists-m-47"
+      ]
+    },
+    "b-10-scene-renderer-resolve-its-asset-if-mi-43": {
+      "id": "b-10-scene-renderer-resolve-its-asset-if-mi-43",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "Resolve its asset; if missing, skip."
+        }
+      ],
+      "children": []
+    },
+    "b-10-scene-renderer-if-a-wrapper-already-exi-44": {
+      "id": "b-10-scene-renderer-if-a-wrapper-already-exi-44",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "If a wrapper already exists for "
+        },
+        {
+          "insert": "child.id",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ":"
+        }
+      ],
+      "children": [
+        "b-10-scene-renderer-for-component-and-eff-45",
+        "b-10-scene-renderer-otherwise-re-apply-styl-46"
+      ]
+    },
+    "b-10-scene-renderer-for-component-and-eff-45": {
+      "id": "b-10-scene-renderer-for-component-and-eff-45",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "For "
+        },
+        {
+          "insert": "component",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " and "
+        },
+        {
+          "insert": "effect",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " types: re-run the renderer and "
+        },
+        {
+          "insert": "replace",
+          "attributes": {
+            "bold": true
+          }
+        },
+        {
+          "insert": " the wrapper. Components own their internal DOM; replacing is the simplest correct update on property changes."
+        }
+      ],
+      "children": []
+    },
+    "b-10-scene-renderer-otherwise-re-apply-styl-46": {
+      "id": "b-10-scene-renderer-otherwise-re-apply-styl-46",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "Otherwise: re-apply styles, then recurse "
+        },
+        {
+          "insert": "updateChildren",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " if the object isn't a glyph-group and has its own children."
+        }
+      ],
+      "children": []
+    },
+    "b-10-scene-renderer-if-no-wrapper-exists-m-47": {
+      "id": "b-10-scene-renderer-if-no-wrapper-exists-m-47",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "If no wrapper exists: "
+        },
+        {
+          "insert": "mountObject",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " it."
+        }
+      ],
+      "children": []
+    },
+    "b-10-scene-renderer-reorderchildren-parente-48": {
+      "id": "b-10-scene-renderer-reorderchildren-parente-48",
+      "type": "list-item",
+      "props": {
+        "ordered": true
+      },
+      "text": [
+        {
+          "insert": "reorderChildren(parentEl, childArray)",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ": appendChild in array order to align DOM order. Skip if already aligned."
+        }
+      ],
+      "children": []
+    },
+    "b-10-scene-renderer-the-id-keyed-reconciliat-49": {
+      "id": "b-10-scene-renderer-the-id-keyed-reconciliat-49",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "The id-keyed reconciliation is what makes the editor smooth: dragging an object in the hierarchy shuffles DOM nodes rather than tearing them down, so videos keep playing and components keep their internal state."
+        }
+      ],
+      "children": []
+    },
+    "b-10-scene-renderer-reorderchildren-parente-50": {
+      "id": "b-10-scene-renderer-reorderchildren-parente-50",
+      "type": "heading",
+      "props": {
+        "level": 2
+      },
+      "text": [
+        {
+          "insert": "reorderChildren(parentEl, childArray)",
+          "attributes": {
+            "code": true
+          }
+        }
+      ],
+      "children": []
+    },
+    "b-10-scene-renderer-walks-parentel-children-51": {
+      "id": "b-10-scene-renderer-walks-parentel-children-51",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "Walks "
+        },
+        {
+          "insert": "parentEl.children",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " and "
+        },
+        {
+          "insert": "childArray",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " in lockstep; if any index disagrees, re-appendChild each tagged element in array order. "
+        },
+        {
+          "insert": "appendChild",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " of an existing node moves it without re-creating, so this is cheap."
+        }
+      ],
+      "children": []
+    },
+    "b-10-scene-renderer-untagged-children-anyth-52": {
+      "id": "b-10-scene-renderer-untagged-children-anyth-52",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "Untagged children (anything without "
+        },
+        {
+          "insert": "dataset.layerId",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ") are left in place. Currently nothing in the renderer creates such children, but the loop is defensive."
+        }
+      ],
+      "children": []
+    },
+    "b-10-scene-renderer-positioning-positionin-53": {
+      "id": "b-10-scene-renderer-positioning-positionin-53",
+      "type": "heading",
+      "props": {
+        "level": 2
+      },
+      "text": [
+        {
+          "insert": "Positioning ("
+        },
+        {
+          "insert": "positioning.js",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ")"
+        }
+      ],
+      "children": []
+    },
+    "b-10-scene-renderer-applytransform-el-tran-54": {
+      "id": "b-10-scene-renderer-applytransform-el-tran-54",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "applyTransform(el, transform)",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ":"
+        }
+      ],
+      "children": []
+    },
+    "b-10-scene-renderer-always-sets-position-a-55": {
+      "id": "b-10-scene-renderer-always-sets-position-a-55",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "Always sets "
+        },
+        {
+          "insert": "position: absolute",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": "."
+        }
+      ],
+      "children": []
+    },
+    "b-10-scene-renderer-if-transform-mode-56": {
+      "id": "b-10-scene-renderer-if-transform-mode-56",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "If "
+        },
+        {
+          "insert": "transform.mode === 'fill'",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ": "
+        },
+        {
+          "insert": "inset: 0",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ", "
+        },
+        {
+          "insert": "width: 100%",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ", "
+        },
+        {
+          "insert": "height: 100%",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ", optional rotation/scale via "
+        },
+        {
+          "insert": "transform-origin: center center",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": "."
+        }
+      ],
+      "children": []
+    },
+    "b-10-scene-renderer-otherwise-57": {
+      "id": "b-10-scene-renderer-otherwise-57",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "Otherwise:"
+        }
+      ],
+      "children": [
+        "b-10-scene-renderer-left-x-top-y-58",
+        "b-10-scene-renderer-width-and-height-fro-59",
+        "b-10-scene-renderer-anchor-translate-offse-60",
+        "b-10-scene-renderer-concatenate-translate-61",
+        "b-10-scene-renderer-transform-origin-0-0-62"
+      ]
+    },
+    "b-10-scene-renderer-left-x-top-y-58": {
+      "id": "b-10-scene-renderer-left-x-top-y-58",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "left: <x>%",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ", "
+        },
+        {
+          "insert": "top: <y>%",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": "."
+        }
+      ],
+      "children": []
+    },
+    "b-10-scene-renderer-width-and-height-fro-59": {
+      "id": "b-10-scene-renderer-width-and-height-fro-59",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "width",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " and "
+        },
+        {
+          "insert": "height",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " from "
+        },
+        {
+          "insert": "sizeToCss",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " ("
+        },
+        {
+          "insert": "'auto'",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " passes through; numbers become "
+        },
+        {
+          "insert": "<n>%",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ")."
+        }
+      ],
+      "children": []
+    },
+    "b-10-scene-renderer-anchor-translate-offse-60": {
+      "id": "b-10-scene-renderer-anchor-translate-offse-60",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "Anchor → translate offsets via "
+        },
+        {
+          "insert": "ANCHOR_TRANSLATE",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " map (e.g. "
+        },
+        {
+          "insert": "center",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " → "
+        },
+        {
+          "insert": "-50%, -50%",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ")."
+        }
+      ],
+      "children": []
+    },
+    "b-10-scene-renderer-concatenate-translate-61": {
+      "id": "b-10-scene-renderer-concatenate-translate-61",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "Concatenate "
+        },
+        {
+          "insert": "translate(...) rotate(...) scale(...)",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " and set "
+        },
+        {
+          "insert": "transform",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": "."
+        }
+      ],
+      "children": []
+    },
+    "b-10-scene-renderer-transform-origin-0-0-62": {
+      "id": "b-10-scene-renderer-transform-origin-0-0-62",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "transform-origin: 0 0",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " when an anchor translation is present, so rotation pivots at the anchor."
+        }
+      ],
+      "children": []
+    },
+    "b-10-scene-renderer-applyappearance-el-app-63": {
+      "id": "b-10-scene-renderer-applyappearance-el-app-63",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "applyAppearance(el, appearance, { isMedia, mediaEl })",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ":"
+        }
+      ],
+      "children": []
+    },
+    "b-10-scene-renderer-opacity-style-opaci-64": {
+      "id": "b-10-scene-renderer-opacity-style-opaci-64",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "opacity",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " → "
+        },
+        {
+          "insert": "style.opacity",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": "."
+        }
+      ],
+      "children": []
+    },
+    "b-10-scene-renderer-blend-style-mixblen-65": {
+      "id": "b-10-scene-renderer-blend-style-mixblen-65",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "blend",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " → "
+        },
+        {
+          "insert": "style.mixBlendMode",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": "."
+        }
+      ],
+      "children": []
+    },
+    "b-10-scene-renderer-hue-style-filter-66": {
+      "id": "b-10-scene-renderer-hue-style-filter-66",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "hue",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " → "
+        },
+        {
+          "insert": "style.filter = 'hue-rotate(...)'",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " (or empty if 0)."
+        }
+      ],
+      "children": []
+    },
+    "b-10-scene-renderer-fit-mediael-style-o-67": {
+      "id": "b-10-scene-renderer-fit-mediael-style-o-67",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "fit",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " → "
+        },
+        {
+          "insert": "mediaEl.style.objectFit",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " (media types only)."
+        }
+      ],
+      "children": []
+    },
+    "b-10-scene-renderer-saturation-is-currentl-68": {
+      "id": "b-10-scene-renderer-saturation-is-currentl-68",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "saturation",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " is currently honored at the scene level (composed into the root filter); per-object saturation is not separately applied here."
+        }
+      ],
+      "children": []
+    },
+    "b-10-scene-renderer-what-this-file-does-not-69": {
+      "id": "b-10-scene-renderer-what-this-file-does-not-69",
+      "type": "heading",
+      "props": {
+        "level": 2
+      },
+      "text": [
+        {
+          "insert": "What This File Does Not Do"
+        }
+      ],
+      "children": []
+    },
+    "b-10-scene-renderer-does-not-import-the-70": {
+      "id": "b-10-scene-renderer-does-not-import-the-70",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "Does "
+        },
+        {
+          "insert": "not",
+          "attributes": {
+            "bold": true
+          }
+        },
+        {
+          "insert": " import the renderer dispatch table: that comes via "
+        },
+        {
+          "insert": "getRenderer",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " from "
+        },
+        {
+          "insert": "asset-renderers/index.js",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": "."
+        }
+      ],
+      "children": []
+    },
+    "b-10-scene-renderer-does-not-load-assets-71": {
+      "id": "b-10-scene-renderer-does-not-load-assets-71",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "Does "
+        },
+        {
+          "insert": "not",
+          "attributes": {
+            "bold": true
+          }
+        },
+        {
+          "insert": " load assets: the registry layer does ("
+        },
+        {
+          "insert": "asset-registry.js",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ")."
+        }
+      ],
+      "children": []
+    },
+    "b-10-scene-renderer-does-not-implement-p-72": {
+      "id": "b-10-scene-renderer-does-not-implement-p-72",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "Does "
+        },
+        {
+          "insert": "not",
+          "attributes": {
+            "bold": true
+          }
+        },
+        {
+          "insert": " implement project routing: it only dispatches "
+        },
+        {
+          "insert": "navigate",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " through the runtime callback or "
+        },
+        {
+          "insert": "window.MELEE_navigate",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": "."
+        }
+      ],
+      "children": []
+    },
+    "b-10-scene-renderer-does-not-implement-s-73": {
+      "id": "b-10-scene-renderer-does-not-implement-s-73",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "Does "
+        },
+        {
+          "insert": "not",
+          "attributes": {
+            "bold": true
+          }
+        },
+        {
+          "insert": " implement save / dirty / selection: those are editor concerns ("
+        },
+        {
+          "insert": "editor state",
+          "attributes": {
+            "reference": {
+              "kind": "doc",
+              "path": "10-scene-engine/20-implementation/20-editor/10-state",
+              "label": "editor state"
+            }
+          }
+        },
+        {
+          "insert": ")."
+        }
+      ],
+      "children": []
+    },
+    "b-10-scene-renderer-source-74": {
+      "id": "b-10-scene-renderer-source-74",
+      "type": "heading",
+      "props": {
+        "level": 2
+      },
+      "text": [
+        {
+          "insert": "Source"
+        }
+      ],
+      "children": []
+    },
+    "b-10-scene-renderer-apps-scene-engine-app-75": {
+      "id": "b-10-scene-renderer-apps-scene-engine-app-75",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "apps/scene-engine/app/_engine/renderer/scene-renderer.js",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ": the loop."
+        }
+      ],
+      "children": []
+    },
+    "b-10-scene-renderer-apps-scene-engine-app-76": {
+      "id": "b-10-scene-renderer-apps-scene-engine-app-76",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "apps/scene-engine/app/_engine/renderer/positioning.js",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ": "
+        },
+        {
+          "insert": "applyTransform",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ", "
+        },
+        {
+          "insert": "applyAppearance",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": "."
+        }
+      ],
+      "children": []
+    },
+    "b-10-scene-renderer-apps-scene-engine-app-77": {
+      "id": "b-10-scene-renderer-apps-scene-engine-app-77",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "apps/scene-engine/app/_engine/renderer/asset-registry.js",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ": see "
+        },
+        {
+          "insert": "20-asset-registry.md",
+          "attributes": {
+            "reference": {
+              "kind": "doc",
+              "path": "10-scene-engine/20-implementation/10-renderer/20-asset-registry",
+              "label": "20-asset-registry.md"
+            }
+          }
+        },
+        {
+          "insert": "."
+        }
+      ],
+      "children": []
+    },
+    "b-10-scene-renderer-apps-scene-engine-app-78": {
+      "id": "b-10-scene-renderer-apps-scene-engine-app-78",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "apps/scene-engine/app/_engine/renderer/event-runtime.js",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ": trigger/action binding."
+        }
+      ],
+      "children": []
+    },
+    "b-10-scene-renderer-apps-scene-engine-app-79": {
+      "id": "b-10-scene-renderer-apps-scene-engine-app-79",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "apps/scene-engine/app/_engine/renderer/runtime-url.js",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ": bundle-root URL resolution for nested static pages."
+        }
+      ],
+      "children": []
+    },
+    "b-10-scene-renderer-apps-scene-engine-app-80": {
+      "id": "b-10-scene-renderer-apps-scene-engine-app-80",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "apps/scene-engine/app/_engine/renderer/asset-renderers/",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ": see "
+        },
+        {
+          "insert": "30-asset-renderers.md",
+          "attributes": {
+            "reference": {
+              "kind": "doc",
+              "path": "10-scene-engine/20-implementation/10-renderer/30-asset-renderers",
+              "label": "30-asset-renderers.md"
+            }
+          }
+        },
+        {
+          "insert": "."
+        }
+      ],
+      "children": []
+    }
+  }
+}

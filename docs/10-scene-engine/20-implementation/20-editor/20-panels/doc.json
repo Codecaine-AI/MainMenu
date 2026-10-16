@@ -1,0 +1,2866 @@
+{
+  "schemaVersion": 1,
+  "id": "scene-engine-20-implementation-20-editor-20-panels",
+  "title": "Editor Panels",
+  "root": "b-20-panels-root-86",
+  "blocks": {
+    "b-20-panels-root-86": {
+      "id": "b-20-panels-root-86",
+      "type": "paragraph",
+      "props": {
+        "concepts": [
+          "scene-section",
+          "canvas",
+          "hierarchy",
+          "inspector",
+          "layer-form",
+          "inspector-section",
+          "property-section",
+          "collapsible-section",
+          "property-field",
+          "description-popover",
+          "manifest-property-field",
+          "slots-section",
+          "events-section",
+          "drag-drop"
+        ],
+        "covers": "The editor's React components — Scene controls, Canvas, Hierarchy, Inspector. Always-present sections, collapsible editor sections, schema-driven property fields with sections and description popovers, slot/event editing.",
+        "design_refs": [
+          "10-system-design/40-authoring-surfaces.md",
+          "10-system-design/16-property-schema.md"
+        ]
+      },
+      "children": [
+        "b-20-panels-the-editor-lives-under-2",
+        "b-20-panels-divider-3",
+        "b-20-panels-scene-controls-scenese-4",
+        "b-20-panels-scene-level-controls-are-5",
+        "b-20-panels-editortopbar-spans-6",
+        "b-20-panels-scenesettingssection-7",
+        "b-20-panels-dirty-indicator-sho-8",
+        "b-20-panels-canvas-canvaspanel-tsx-9",
+        "b-20-panels-renders-the-scene-live-u-10",
+        "b-20-panels-selection-clicking-insi-11",
+        "b-20-panels-hierarchy-hierarchypan-12",
+        "b-20-panels-tree-view-of-scene-obje-13",
+        "b-20-panels-object-types-and-add-men-14",
+        "b-20-panels-addable-object-types-i-15",
+        "b-20-panels-new-objects-are-created-16",
+        "b-20-panels-click-select-17",
+        "b-20-panels-sets-selectedpath-to-t-18",
+        "b-20-panels-drag-and-drop-reorder-19",
+        "b-20-panels-native-html5-drag-and-dr-20",
+        "b-20-panels-for-non-group-rows-top-21",
+        "b-20-panels-for-group-rows-childre-22",
+        "b-20-panels-regiontotopath-transla-23",
+        "b-20-panels-a-drop-indicator-pat-24",
+        "b-20-panels-group-expansion-25",
+        "b-20-panels-tracked-locally-in-the-p-26",
+        "b-20-panels-scene-save-status-27",
+        "b-20-panels-the-editor-top-bar-keeps-28",
+        "b-20-panels-scene-name-29",
+        "b-20-panels-scene-name-is-edited-in-30",
+        "b-20-panels-pi-agent-chat-panel-31",
+        "b-20-panels-app-editor-features-pi-32",
+        "b-20-panels-the-panel-renders-in-nor-33",
+        "b-20-panels-inspector-inspectorpan-34",
+        "b-20-panels-property-editor-for-scen-35",
+        "b-20-panels-layerform-renders-al-36",
+        "b-20-panels-section-when-37-tbl",
+        "b-20-panels-each-field-s-onchange-di-38",
+        "b-20-panels-section-collapse-behavio-39",
+        "b-20-panels-there-are-two-collapse-l-40",
+        "b-20-panels-inspectorsection-is-th-41",
+        "b-20-panels-propertysection-is-sch-42",
+        "b-20-panels-the-local-open-closed-st-43",
+        "b-20-panels-schema-resolution-in-la-44",
+        "b-20-panels-layerform-resolves-the-45",
+        "b-20-panels-built-in-schema-g-46",
+        "b-20-panels-component-schema-i-47",
+        "b-20-panels-merge-layerschema-48",
+        "b-20-panels-orphan-detection-49",
+        "b-20-panels-when-no-schema-exists-e-50",
+        "b-20-panels-togglefill-nextfill-51",
+        "b-20-panels-switching-transform-mode-52",
+        "b-20-panels-fill-mode-fill-53",
+        "b-20-panels-explicit-mode-undefi-54",
+        "b-20-panels-the-fields-set-to-undef-55",
+        "b-20-panels-schema-driven-components-56",
+        "b-20-panels-component-57-tbl",
+        "b-20-panels-inputs-inputs-58",
+        "b-20-panels-component-59-tbl",
+        "b-20-panels-slotssection-tsx-60",
+        "b-20-panels-glyph-group-slots-editor-61",
+        "b-20-panels-assetswapdropdown-tsx-62",
+        "b-20-panels-for-file-asset-container-63",
+        "b-20-panels-loader-usesceneloader-64",
+        "b-20-panels-custom-hook-that-fetches-65",
+        "b-20-panels-source-66",
+        "b-20-panels-apps-scene-engine-app-e-67",
+        "b-20-panels-apps-scene-engine-app-e-68",
+        "b-20-panels-apps-scene-engine-app-e-69",
+        "b-20-panels-apps-scene-engine-app-e-70",
+        "b-20-panels-apps-scene-engine-app-e-71",
+        "b-20-panels-apps-scene-engine-app-e-72",
+        "b-20-panels-apps-scene-engine-app-e-73",
+        "b-20-panels-apps-scene-engine-app-e-74",
+        "b-20-panels-apps-scene-engine-app-e-75",
+        "b-20-panels-apps-scene-engine-app-e-76",
+        "b-20-panels-apps-scene-engine-app-e-77",
+        "b-20-panels-apps-scene-engine-app-e-78",
+        "b-20-panels-apps-scene-engine-app-e-79",
+        "b-20-panels-apps-scene-engine-app-e-80",
+        "b-20-panels-apps-scene-engine-app-e-81",
+        "b-20-panels-apps-scene-engine-app-e-82",
+        "b-20-panels-apps-scene-engine-app-83",
+        "b-20-panels-apps-scene-engine-app-84",
+        "b-20-panels-apps-scene-engine-app-85"
+      ]
+    },
+    "b-20-panels-the-editor-lives-under-2": {
+      "id": "b-20-panels-the-editor-lives-under-2",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "The editor lives under "
+        },
+        {
+          "insert": "apps/scene-engine/app/editor/",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " as a Next.js client app. Each panel is a React component that subscribes to the "
+        },
+        {
+          "insert": "Zustand store",
+          "attributes": {
+            "reference": {
+              "kind": "doc",
+              "path": "10-scene-engine/20-implementation/20-editor/10-state",
+              "label": "Zustand store"
+            }
+          }
+        },
+        {
+          "insert": " with selector-narrowed slices. Panels do not call each other directly; they communicate by mutating the store."
+        }
+      ],
+      "children": []
+    },
+    "b-20-panels-divider-3": {
+      "id": "b-20-panels-divider-3",
+      "type": "divider",
+      "props": {},
+      "children": []
+    },
+    "b-20-panels-scene-controls-scenese-4": {
+      "id": "b-20-panels-scene-controls-scenese-4",
+      "type": "heading",
+      "props": {
+        "level": 2
+      },
+      "text": [
+        {
+          "insert": "Scene Controls ("
+        },
+        {
+          "insert": "SceneSection.tsx",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ")"
+        }
+      ],
+      "children": []
+    },
+    "b-20-panels-scene-level-controls-are-5": {
+      "id": "b-20-panels-scene-level-controls-are-5",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "Scene-level controls are split across the top bar and inspector so the layer tree stays visually primary."
+        }
+      ],
+      "children": []
+    },
+    "b-20-panels-editortopbar-spans-6": {
+      "id": "b-20-panels-editortopbar-spans-6",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "EditorTopBar",
+          "attributes": {
+            "bold": true
+          }
+        },
+        {
+          "insert": ": spans the top of the editor and shows the active project, scene, and clean/dirty state. The project crumb links back to the project/scenes page."
+        }
+      ],
+      "children": []
+    },
+    "b-20-panels-scenesettingssection-7": {
+      "id": "b-20-panels-scenesettingssection-7",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "SceneSettingsSection",
+          "attributes": {
+            "bold": true
+          }
+        },
+        {
+          "insert": ": rendered at the top of the inspector, collapsed by default. Contains editable scene name, scene ID, stage dimensions, and global appearance controls."
+        }
+      ],
+      "children": []
+    },
+    "b-20-panels-dirty-indicator-sho-8": {
+      "id": "b-20-panels-dirty-indicator-sho-8",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "Dirty indicator",
+          "attributes": {
+            "bold": true
+          }
+        },
+        {
+          "insert": ": shown in the top bar; the dot color toggles on "
+        },
+        {
+          "insert": "store.dirty",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ". Save is handled through editor commands rather than an in-panel button."
+        }
+      ],
+      "children": []
+    },
+    "b-20-panels-canvas-canvaspanel-tsx-9": {
+      "id": "b-20-panels-canvas-canvaspanel-tsx-9",
+      "type": "heading",
+      "props": {
+        "level": 2
+      },
+      "text": [
+        {
+          "insert": "Canvas ("
+        },
+        {
+          "insert": "CanvasPanel.tsx",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ")"
+        }
+      ],
+      "children": []
+    },
+    "b-20-panels-renders-the-scene-live-u-10": {
+      "id": "b-20-panels-renders-the-scene-live-u-10",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "Renders the scene live using the "
+        },
+        {
+          "insert": "same renderer",
+          "attributes": {
+            "bold": true
+          }
+        },
+        {
+          "insert": " the production page uses ("
+        },
+        {
+          "insert": "renderScene",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " from "
+        },
+        {
+          "insert": "app/_engine/renderer/scene-renderer.js",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": "). On every store "
+        },
+        {
+          "insert": "scene",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " change, the canvas calls "
+        },
+        {
+          "insert": "renderScene(scene, container)",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ". Because the editor uses the production renderer, \"what you see in the canvas\" equals \"what ships\" by construction."
+        }
+      ],
+      "children": []
+    },
+    "b-20-panels-selection-clicking-insi-11": {
+      "id": "b-20-panels-selection-clicking-insi-11",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "Selection: clicking inside the stage walks up to the nearest element with "
+        },
+        {
+          "insert": "dataset.layerId",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " and calls "
+        },
+        {
+          "insert": "setSelectedPath",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " with the computed path."
+        }
+      ],
+      "children": []
+    },
+    "b-20-panels-hierarchy-hierarchypan-12": {
+      "id": "b-20-panels-hierarchy-hierarchypan-12",
+      "type": "heading",
+      "props": {
+        "level": 2
+      },
+      "text": [
+        {
+          "insert": "Hierarchy ("
+        },
+        {
+          "insert": "HierarchyPanel.tsx",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " + "
+        },
+        {
+          "insert": "HierarchyRow.tsx",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ")"
+        }
+      ],
+      "children": []
+    },
+    "b-20-panels-tree-view-of-scene-obje-13": {
+      "id": "b-20-panels-tree-view-of-scene-obje-13",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "Tree view of "
+        },
+        {
+          "insert": "scene.objects",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ". Renders one row per object, indented by depth, with disclosure triangles for objects that have "
+        },
+        {
+          "insert": "children",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ". Subscribes to "
+        },
+        {
+          "insert": "scene",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " and "
+        },
+        {
+          "insert": "selectedPath",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ". The panel also hosts the desktop Pi Agent chat panel below the hierarchy controls."
+        }
+      ],
+      "children": []
+    },
+    "b-20-panels-object-types-and-add-men-14": {
+      "id": "b-20-panels-object-types-and-add-men-14",
+      "type": "heading",
+      "props": {
+        "level": 3
+      },
+      "text": [
+        {
+          "insert": "Object types and add menu"
+        }
+      ],
+      "children": []
+    },
+    "b-20-panels-addable-object-types-i-15": {
+      "id": "b-20-panels-addable-object-types-i-15",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "ADDABLE_OBJECT_TYPES",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " is the canonical menu of types the user can add: "
+        },
+        {
+          "insert": "group",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ", "
+        },
+        {
+          "insert": "text",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ", "
+        },
+        {
+          "insert": "video",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ", "
+        },
+        {
+          "insert": "image",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ", "
+        },
+        {
+          "insert": "glyph",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ", "
+        },
+        {
+          "insert": "effect",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ", "
+        },
+        {
+          "insert": "component",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ", "
+        },
+        {
+          "insert": "audio",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ". The "
+        },
+        {
+          "insert": "+",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " button opens "
+        },
+        {
+          "insert": "AddLayerDialog",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": "; selecting "
+        },
+        {
+          "insert": "group",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " or "
+        },
+        {
+          "insert": "text",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " creates an assetless object, and selecting an asset-backed type lists compatible registry entries before creating the object."
+        }
+      ],
+      "children": []
+    },
+    "b-20-panels-new-objects-are-created-16": {
+      "id": "b-20-panels-new-objects-are-created-16",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "New objects are created through "
+        },
+        {
+          "insert": "createGroupObject",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ", "
+        },
+        {
+          "insert": "createTextObject",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ", or "
+        },
+        {
+          "insert": "createObjectFromAsset",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ", then inserted at the requested top-level or group-child position and selected."
+        }
+      ],
+      "children": []
+    },
+    "b-20-panels-click-select-17": {
+      "id": "b-20-panels-click-select-17",
+      "type": "heading",
+      "props": {
+        "level": 3
+      },
+      "text": [
+        {
+          "insert": "Click → select"
+        }
+      ],
+      "children": []
+    },
+    "b-20-panels-sets-selectedpath-to-t-18": {
+      "id": "b-20-panels-sets-selectedpath-to-t-18",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "Sets "
+        },
+        {
+          "insert": "selectedPath",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " to the clicked row's path."
+        }
+      ],
+      "children": []
+    },
+    "b-20-panels-drag-and-drop-reorder-19": {
+      "id": "b-20-panels-drag-and-drop-reorder-19",
+      "type": "heading",
+      "props": {
+        "level": 3
+      },
+      "text": [
+        {
+          "insert": "Drag-and-drop reorder"
+        }
+      ],
+      "children": []
+    },
+    "b-20-panels-native-html5-drag-and-dr-20": {
+      "id": "b-20-panels-native-html5-drag-and-dr-20",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "Native HTML5 drag-and-drop with "
+        },
+        {
+          "insert": "application/x-layer-path",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " payload. On drag-over, "
+        },
+        {
+          "insert": "computeRegion",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " decides drop zone:"
+        }
+      ],
+      "children": []
+    },
+    "b-20-panels-for-non-group-rows-top-21": {
+      "id": "b-20-panels-for-non-group-rows-top-21",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "For non-group rows: top half = "
+        },
+        {
+          "insert": "before",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ", bottom half = "
+        },
+        {
+          "insert": "after",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": "."
+        }
+      ],
+      "children": []
+    },
+    "b-20-panels-for-group-rows-childre-22": {
+      "id": "b-20-panels-for-group-rows-childre-22",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "For group rows ("
+        },
+        {
+          "insert": "children",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " is an array): top quarter = "
+        },
+        {
+          "insert": "before",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ", bottom quarter = "
+        },
+        {
+          "insert": "after",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ", middle = "
+        },
+        {
+          "insert": "into",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": "."
+        }
+      ],
+      "children": []
+    },
+    "b-20-panels-regiontotopath-transla-23": {
+      "id": "b-20-panels-regiontotopath-transla-23",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "regionToToPath",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " translates the region + target path into a destination path. "
+        },
+        {
+          "insert": "before",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " → same path. "
+        },
+        {
+          "insert": "after",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " → increment last index. "
+        },
+        {
+          "insert": "into",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " → append to the target's "
+        },
+        {
+          "insert": "children",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ". The store's "
+        },
+        {
+          "insert": "moveObject",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " handles same-container index adjustment."
+        }
+      ],
+      "children": []
+    },
+    "b-20-panels-a-drop-indicator-pat-24": {
+      "id": "b-20-panels-a-drop-indicator-pat-24",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "A drop indicator ("
+        },
+        {
+          "insert": "{ path, region }",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ") is rendered as a styled border on the targeted row during drag-over."
+        }
+      ],
+      "children": []
+    },
+    "b-20-panels-group-expansion-25": {
+      "id": "b-20-panels-group-expansion-25",
+      "type": "heading",
+      "props": {
+        "level": 3
+      },
+      "text": [
+        {
+          "insert": "Group expansion"
+        }
+      ],
+      "children": []
+    },
+    "b-20-panels-tracked-locally-in-the-p-26": {
+      "id": "b-20-panels-tracked-locally-in-the-p-26",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "Tracked locally in the panel as a "
+        },
+        {
+          "insert": "Set<string>",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " of collapsed paths. Not part of the store. Refreshing the editor expands everything."
+        }
+      ],
+      "children": []
+    },
+    "b-20-panels-scene-save-status-27": {
+      "id": "b-20-panels-scene-save-status-27",
+      "type": "heading",
+      "props": {
+        "level": 3
+      },
+      "text": [
+        {
+          "insert": "Scene Save Status"
+        }
+      ],
+      "children": []
+    },
+    "b-20-panels-the-editor-top-bar-keeps-28": {
+      "id": "b-20-panels-the-editor-top-bar-keeps-28",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "The editor top bar keeps scene save state visible without consuming hierarchy or Pi Agent space. Actual save is routed through the editor command hook, which handles the native menu command, keyboard shortcut, and shared save API."
+        }
+      ],
+      "children": []
+    },
+    "b-20-panels-scene-name-29": {
+      "id": "b-20-panels-scene-name-29",
+      "type": "heading",
+      "props": {
+        "level": 3
+      },
+      "text": [
+        {
+          "insert": "Scene Name"
+        }
+      ],
+      "children": []
+    },
+    "b-20-panels-scene-name-is-edited-in-30": {
+      "id": "b-20-panels-scene-name-is-edited-in-30",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "Scene name is edited in "
+        },
+        {
+          "insert": "SceneSettingsSection",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ", not in the hierarchy header. Changes mark the scene dirty and update the top-bar scene crumb immediately."
+        }
+      ],
+      "children": []
+    },
+    "b-20-panels-pi-agent-chat-panel-31": {
+      "id": "b-20-panels-pi-agent-chat-panel-31",
+      "type": "heading",
+      "props": {
+        "level": 3
+      },
+      "text": [
+        {
+          "insert": "Pi Agent Chat Panel"
+        }
+      ],
+      "children": []
+    },
+    "b-20-panels-app-editor-features-pi-32": {
+      "id": "b-20-panels-app-editor-features-pi-32",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "app/editor/_features/pi-agent/PiAgentChatPanel.tsx",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " is mounted at the bottom of the left sidebar. Its colocated "
+        },
+        {
+          "insert": "usePiAgentController.ts",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " reads the active project id, scene id, selected layer path, selected layer name, and selected layer type, then sends that context with user messages through "
+        },
+        {
+          "insert": "window.mainMenu.agent",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": "."
+        }
+      ],
+      "children": []
+    },
+    "b-20-panels-the-panel-renders-in-nor-33": {
+      "id": "b-20-panels-the-panel-renders-in-nor-33",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "The panel renders in normal browser sessions too, but it reports the bridge as unavailable and disables agent actions when Electron preload has not exposed "
+        },
+        {
+          "insert": "window.mainMenu.agent",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ". Native authority and SDK state live in the desktop app, documented under "
+        },
+        {
+          "insert": "Desktop App / Pi Agent",
+          "attributes": {
+            "reference": {
+              "kind": "doc",
+              "path": "10-scene-engine/20-implementation/30-desktop-app/20-pi-agent",
+              "label": "Desktop App / Pi Agent"
+            }
+          }
+        },
+        {
+          "insert": "."
+        }
+      ],
+      "children": []
+    },
+    "b-20-panels-inspector-inspectorpan-34": {
+      "id": "b-20-panels-inspector-inspectorpan-34",
+      "type": "heading",
+      "props": {
+        "level": 2
+      },
+      "text": [
+        {
+          "insert": "Inspector ("
+        },
+        {
+          "insert": "InspectorPanel.tsx",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " + "
+        },
+        {
+          "insert": "LayerForm.tsx",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ")"
+        }
+      ],
+      "children": []
+    },
+    "b-20-panels-property-editor-for-scen-35": {
+      "id": "b-20-panels-property-editor-for-scen-35",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "Property editor for scene-level settings and the object at "
+        },
+        {
+          "insert": "selectedPath",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ". "
+        },
+        {
+          "insert": "SceneSettingsSection",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " is always mounted at the top and starts collapsed. The rest of the shell resolves the selected object via "
+        },
+        {
+          "insert": "resolveObject(scene, path)",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " and delegates to "
+        },
+        {
+          "insert": "LayerForm",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " keyed by "
+        },
+        {
+          "insert": "selectedPath",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " (so forms reset cleanly when selection changes)."
+        }
+      ],
+      "children": []
+    },
+    "b-20-panels-layerform-renders-al-36": {
+      "id": "b-20-panels-layerform-renders-al-36",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "LayerForm",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " renders "
+        },
+        {
+          "insert": "always-present",
+          "attributes": {
+            "bold": true
+          }
+        },
+        {
+          "insert": " sections plus conditional ones:"
+        }
+      ],
+      "children": []
+    },
+    "b-20-panels-section-when-37-tbl": {
+      "id": "b-20-panels-section-when-37-tbl",
+      "type": "structured-table",
+      "props": {
+        "columns": [
+          "Section",
+          "When"
+        ],
+        "rows": [
+          [
+            "Header",
+            "Always: name, type chip, visibility toggle, delete."
+          ],
+          [
+            "Asset",
+            [
+              {
+                "insert": "When "
+              },
+              {
+                "insert": "layer.asset",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": " is set. Read-only id for modules; "
+              },
+              {
+                "insert": "AssetSwapDropdown",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": " for file asset containers ("
+              },
+              {
+                "insert": "audio",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": ", "
+              },
+              {
+                "insert": "image",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": ", "
+              },
+              {
+                "insert": "video",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": ", "
+              },
+              {
+                "insert": "glyph",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": ", "
+              },
+              {
+                "insert": "font",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": ")."
+              }
+            ]
+          ],
+          [
+            "Transform",
+            "Always (skipped for sub-layer overrides). Fill toggle. Fill mode → rotation + scale. Explicit → x, y, width, height, anchor, rotation, scale."
+          ],
+          [
+            "Appearance",
+            [
+              {
+                "insert": "Always (skipped for sub-layer overrides): opacity, blend, hue. Adds "
+              },
+              {
+                "insert": "fit",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": " for media types ("
+              },
+              {
+                "insert": "video",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": ", "
+              },
+              {
+                "insert": "image",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": ")."
+              }
+            ]
+          ],
+          [
+            "Properties (schema)",
+            [
+              {
+                "insert": "For components and built-in layer types: one "
+              },
+              {
+                "insert": "PropertySection",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": " per section in the resolved schema. Each section renders "
+              },
+              {
+                "insert": "PropertyField",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": " entries with clickable label → "
+              },
+              {
+                "insert": "DescriptionPopover",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": ", and can opt into collapse behavior through the schema. Orphan properties (saved but not in schema) render under an auto-generated \"General\" section with inferred inputs + console warning."
+              }
+            ]
+          ],
+          [
+            "Properties (effect)",
+            [
+              {
+                "insert": "For effects only: one "
+              },
+              {
+                "insert": "ManifestPropertyField",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": " per manifest descriptor, under a single \"Properties\" heading."
+              }
+            ]
+          ],
+          [
+            "Slots",
+            [
+              {
+                "insert": "Glyph-groups only: "
+              },
+              {
+                "insert": "SlotsSection",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": " for adding/editing exposed sub-surface fills."
+              }
+            ]
+          ],
+          [
+            "Events",
+            [
+              {
+                "insert": "Always: "
+              },
+              {
+                "insert": "EventsSection",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": " lists "
+              },
+              {
+                "insert": "events[]",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": " with add/remove and "
+              },
+              {
+                "insert": "(trigger, action, target)",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": " selects."
+              }
+            ]
+          ]
+        ]
+      },
+      "children": []
+    },
+    "b-20-panels-each-field-s-onchange-di-38": {
+      "id": "b-20-panels-each-field-s-onchange-di-38",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "Each field's onChange dispatches "
+        },
+        {
+          "insert": "mutateObjectAt(path, patchFromDottedKey('transform.x', 50))",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " or similar. The dotted-key helper builds the nested patch object that "
+        },
+        {
+          "insert": "deepMerge",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " then merges into the canonical shape."
+        }
+      ],
+      "children": []
+    },
+    "b-20-panels-section-collapse-behavio-39": {
+      "id": "b-20-panels-section-collapse-behavio-39",
+      "type": "heading",
+      "props": {
+        "level": 3
+      },
+      "text": [
+        {
+          "insert": "Section Collapse Behavior"
+        }
+      ],
+      "children": []
+    },
+    "b-20-panels-there-are-two-collapse-l-40": {
+      "id": "b-20-panels-there-are-two-collapse-l-40",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "There are two collapse layers in the inspector:"
+        }
+      ],
+      "children": []
+    },
+    "b-20-panels-inspectorsection-is-th-41": {
+      "id": "b-20-panels-inspectorsection-is-th-41",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "InspectorSection",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " is the reusable top-level editor section shell. It is open and static by default. Pass "
+        },
+        {
+          "insert": "collapsible",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " to make its header toggle the body, and "
+        },
+        {
+          "insert": "defaultOpen={false}",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " to start it closed. The main menu system opts all of its top-level authoring sections into collapse behavior; "
+        },
+        {
+          "insert": "Menu Structure",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " starts collapsed so the menu graph does not dominate the inspector."
+        }
+      ],
+      "children": []
+    },
+    "b-20-panels-propertysection-is-sch-42": {
+      "id": "b-20-panels-propertysection-is-sch-42",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "PropertySection",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " is schema-driven. It reads "
+        },
+        {
+          "insert": "collapsible",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " and "
+        },
+        {
+          "insert": "defaultOpen",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " from the "
+        },
+        {
+          "insert": "Section",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " schema type. Nested property sections collapse by default; top-level property sections remain open unless "
+        },
+        {
+          "insert": "collapsible: true",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " or "
+        },
+        {
+          "insert": "defaultOpen: false",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " is declared."
+        }
+      ],
+      "children": []
+    },
+    "b-20-panels-the-local-open-closed-st-43": {
+      "id": "b-20-panels-the-local-open-closed-st-43",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "The local open/closed state is UI-only. It is not saved in the scene JSON and resets when the editor selection remounts."
+        }
+      ],
+      "children": []
+    },
+    "b-20-panels-schema-resolution-in-la-44": {
+      "id": "b-20-panels-schema-resolution-in-la-44",
+      "type": "heading",
+      "props": {
+        "level": 3
+      },
+      "text": [
+        {
+          "insert": "Schema Resolution in "
+        },
+        {
+          "insert": "LayerForm",
+          "attributes": {
+            "code": true
+          }
+        }
+      ],
+      "children": []
+    },
+    "b-20-panels-layerform-resolves-the-45": {
+      "id": "b-20-panels-layerform-resolves-the-45",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "LayerForm",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " resolves the property schema for the selected layer:"
+        }
+      ],
+      "children": []
+    },
+    "b-20-panels-built-in-schema-g-46": {
+      "id": "b-20-panels-built-in-schema-g-46",
+      "type": "list-item",
+      "props": {
+        "ordered": true
+      },
+      "text": [
+        {
+          "insert": "Built-in schema",
+          "attributes": {
+            "bold": true
+          }
+        },
+        {
+          "insert": ", "
+        },
+        {
+          "insert": "getBuiltinPropertySchema(layerType)",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " returns a "
+        },
+        {
+          "insert": "PropertySchema",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " for "
+        },
+        {
+          "insert": "video",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ", "
+        },
+        {
+          "insert": "image",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ", "
+        },
+        {
+          "insert": "glyph-group",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ", or "
+        },
+        {
+          "insert": "audio",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ". Returns "
+        },
+        {
+          "insert": "undefined",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " for other types."
+        }
+      ],
+      "children": []
+    },
+    "b-20-panels-component-schema-i-47": {
+      "id": "b-20-panels-component-schema-i-47",
+      "type": "list-item",
+      "props": {
+        "ordered": true
+      },
+      "text": [
+        {
+          "insert": "Component schema",
+          "attributes": {
+            "bold": true
+          }
+        },
+        {
+          "insert": ". If the layer type is "
+        },
+        {
+          "insert": "component",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ", look up "
+        },
+        {
+          "insert": "componentSchemas[assetId]",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " from the Zustand store (populated by the loader at scene open)."
+        }
+      ],
+      "children": []
+    },
+    "b-20-panels-merge-layerschema-48": {
+      "id": "b-20-panels-merge-layerschema-48",
+      "type": "list-item",
+      "props": {
+        "ordered": true
+      },
+      "text": [
+        {
+          "insert": "Merge",
+          "attributes": {
+            "bold": true
+          }
+        },
+        {
+          "insert": ", "
+        },
+        {
+          "insert": "layerSchema = builtinSchema ?? componentSchema",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ". Built-in wins if both somehow exist."
+        }
+      ],
+      "children": []
+    },
+    "b-20-panels-orphan-detection-49": {
+      "id": "b-20-panels-orphan-detection-49",
+      "type": "list-item",
+      "props": {
+        "ordered": true
+      },
+      "text": [
+        {
+          "insert": "Orphan detection",
+          "attributes": {
+            "bold": true
+          }
+        },
+        {
+          "insert": ". "
+        },
+        {
+          "insert": "extractSchemaPropertyKeys(schema)",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " collects all declared keys; saved keys not in that set are orphans. "
+        },
+        {
+          "insert": "buildGeneralSection(orphans)",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " creates a General section with inferred "
+        },
+        {
+          "insert": "PropertyDef",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " entries. A "
+        },
+        {
+          "insert": "console.warn",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " names each orphan."
+        }
+      ],
+      "children": []
+    },
+    "b-20-panels-when-no-schema-exists-e-50": {
+      "id": "b-20-panels-when-no-schema-exists-e-50",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "When no schema exists (e.g., a component whose module hasn't loaded yet), all properties render under General."
+        }
+      ],
+      "children": []
+    },
+    "b-20-panels-togglefill-nextfill-51": {
+      "id": "b-20-panels-togglefill-nextfill-51",
+      "type": "heading",
+      "props": {
+        "level": 3
+      },
+      "text": [
+        {
+          "insert": "toggleFill(nextFill)",
+          "attributes": {
+            "code": true
+          }
+        }
+      ],
+      "children": []
+    },
+    "b-20-panels-switching-transform-mode-52": {
+      "id": "b-20-panels-switching-transform-mode-52",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "Switching transform mode is a single store mutation:"
+        }
+      ],
+      "children": []
+    },
+    "b-20-panels-fill-mode-fill-53": {
+      "id": "b-20-panels-fill-mode-fill-53",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "fill",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " → "
+        },
+        {
+          "insert": "mode: \"fill\"",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " and explicit fields set to "
+        },
+        {
+          "insert": "undefined",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " (so "
+        },
+        {
+          "insert": "deepMerge",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " strips them)."
+        }
+      ],
+      "children": []
+    },
+    "b-20-panels-explicit-mode-undefi-54": {
+      "id": "b-20-panels-explicit-mode-undefi-54",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "explicit → "
+        },
+        {
+          "insert": "mode: undefined",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " and seed "
+        },
+        {
+          "insert": "x: 0, y: 0, width: \"auto\", height: \"auto\", anchor: \"top-left\"",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ", preserving any existing rotation/scale."
+        }
+      ],
+      "children": []
+    },
+    "b-20-panels-the-fields-set-to-undef-55": {
+      "id": "b-20-panels-the-fields-set-to-undef-55",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "The \"fields set to undefined\" trick relies on "
+        },
+        {
+          "insert": "deepMerge",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " treating "
+        },
+        {
+          "insert": "undefined",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " as a key-clear, which is what keeps the saved JSON tidy."
+        }
+      ],
+      "children": []
+    },
+    "b-20-panels-schema-driven-components-56": {
+      "id": "b-20-panels-schema-driven-components-56",
+      "type": "heading",
+      "props": {
+        "level": 3
+      },
+      "text": [
+        {
+          "insert": "Schema-driven Components"
+        }
+      ],
+      "children": []
+    },
+    "b-20-panels-component-57-tbl": {
+      "id": "b-20-panels-component-57-tbl",
+      "type": "structured-table",
+      "props": {
+        "columns": [
+          "Component",
+          "Renders"
+        ],
+        "rows": [
+          [
+            [
+              {
+                "insert": "InspectorSection",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ],
+            [
+              {
+                "insert": "A top-level editor section shell. Static by default; "
+              },
+              {
+                "insert": "collapsible",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": " + "
+              },
+              {
+                "insert": "defaultOpen",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": " opt a section into local open/closed state."
+              }
+            ]
+          ],
+          [
+            [
+              {
+                "insert": "PropertySection",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ],
+            [
+              {
+                "insert": "A schema section: header label (clickable if section has a description), nested "
+              },
+              {
+                "insert": "PropertyField",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": " entries, recursive child "
+              },
+              {
+                "insert": "PropertySection",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": " entries, and schema-driven collapse defaults."
+              }
+            ]
+          ],
+          [
+            [
+              {
+                "insert": "PropertyField",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ],
+            [
+              {
+                "insert": "One property row: clickable label + input dispatched by the "
+              },
+              {
+                "insert": "PropertyDef.type",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": ". Maps "
+              },
+              {
+                "insert": "number",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": " → "
+              },
+              {
+                "insert": "RangedInput",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": ", "
+              },
+              {
+                "insert": "string",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": " → text input, "
+              },
+              {
+                "insert": "color",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": " → native color field + text value, "
+              },
+              {
+                "insert": "boolean",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": " → checkbox, "
+              },
+              {
+                "insert": "select",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": " → dropdown, "
+              },
+              {
+                "insert": "blend",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": " → "
+              },
+              {
+                "insert": "BlendSelect",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": ", "
+              },
+              {
+                "insert": "fit",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": " → "
+              },
+              {
+                "insert": "FitSelect",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": ", "
+              },
+              {
+                "insert": "clip",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": " → "
+              },
+              {
+                "insert": "ClipSelect",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": ", "
+              },
+              {
+                "insert": "anchor",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": " → "
+              },
+              {
+                "insert": "AnchorSelect",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": "."
+              }
+            ]
+          ],
+          [
+            [
+              {
+                "insert": "DescriptionPopover",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ],
+            "Floating popover anchored next to the clicked label. Shows the property's full label and plain-text description. Dismisses on click-outside or Escape. Used by both property labels and section labels."
+          ]
+        ]
+      },
+      "children": []
+    },
+    "b-20-panels-inputs-inputs-58": {
+      "id": "b-20-panels-inputs-inputs-58",
+      "type": "heading",
+      "props": {
+        "level": 3
+      },
+      "text": [
+        {
+          "insert": "Inputs ("
+        },
+        {
+          "insert": "inputs/",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ")"
+        }
+      ],
+      "children": []
+    },
+    "b-20-panels-component-59-tbl": {
+      "id": "b-20-panels-component-59-tbl",
+      "type": "structured-table",
+      "props": {
+        "columns": [
+          "Component",
+          "Renders"
+        ],
+        "rows": [
+          [
+            [
+              {
+                "insert": "RangedInput",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ],
+            "Slider + numeric input synced, debounced commit."
+          ],
+          [
+            "Color fields",
+            [
+              {
+                "insert": "Native "
+              },
+              {
+                "insert": "type=\"color\"",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": " picker paired with an editable text value where the property can preserve authored color text."
+              }
+            ]
+          ],
+          [
+            [
+              {
+                "insert": "BlendSelect",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ],
+            [
+              {
+                "insert": "Blend-mode dropdown (canonical CSS blend modes from "
+              },
+              {
+                "insert": "inspector-config",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": ")."
+              }
+            ]
+          ],
+          [
+            [
+              {
+                "insert": "FitSelect",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ],
+            "Object-fit dropdown."
+          ],
+          [
+            [
+              {
+                "insert": "ClipSelect",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ],
+            "Clip-path dropdown."
+          ],
+          [
+            [
+              {
+                "insert": "AnchorSelect",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ],
+            "9-position anchor selector (3×3 grid of buttons)."
+          ],
+          [
+            [
+              {
+                "insert": "EventsSection",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ],
+            [
+              {
+                "insert": "Add / remove / edit "
+              },
+              {
+                "insert": "EventBinding",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": " rows."
+              }
+            ]
+          ],
+          [
+            [
+              {
+                "insert": "ManifestPropertyField",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ],
+            "Single property field for effects; reads the manifest descriptor and dispatches to number/string/boolean/enum sub-inputs."
+          ],
+          [
+            [
+              {
+                "insert": "InspectorSection",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ],
+            [
+              {
+                "insert": "Visual shell: "
+              },
+              {
+                "insert": "InspectorHeader",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": ", "
+              },
+              {
+                "insert": "InspectorSection",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": ", "
+              },
+              {
+                "insert": "FieldRow",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": ", "
+              },
+              {
+                "insert": "ReadonlyValue",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": "."
+              }
+            ]
+          ]
+        ]
+      },
+      "children": []
+    },
+    "b-20-panels-slotssection-tsx-60": {
+      "id": "b-20-panels-slotssection-tsx-60",
+      "type": "heading",
+      "props": {
+        "level": 3
+      },
+      "text": [
+        {
+          "insert": "SlotsSection.tsx",
+          "attributes": {
+            "code": true
+          }
+        }
+      ],
+      "children": []
+    },
+    "b-20-panels-glyph-group-slots-editor-61": {
+      "id": "b-20-panels-glyph-group-slots-editor-61",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "Glyph-group slots editor. Lists each slot with its own asset selector and per-slot appearance fields. Add/remove rewrites "
+        },
+        {
+          "insert": "slots[]",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " wholesale (arrays are replaced, not merged, so the JSON stays clean)."
+        }
+      ],
+      "children": []
+    },
+    "b-20-panels-assetswapdropdown-tsx-62": {
+      "id": "b-20-panels-assetswapdropdown-tsx-62",
+      "type": "heading",
+      "props": {
+        "level": 3
+      },
+      "text": [
+        {
+          "insert": "AssetSwapDropdown.tsx",
+          "attributes": {
+            "code": true
+          }
+        }
+      ],
+      "children": []
+    },
+    "b-20-panels-for-file-asset-container-63": {
+      "id": "b-20-panels-for-file-asset-container-63",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "For file asset containers (audio/image/video/glyph/font), shows a dropdown of project-available registry entries from "
+        },
+        {
+          "insert": "/api/asset-library?project=<project-id>&type=<type>",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ". Selecting an entry calls "
+        },
+        {
+          "insert": "setObjectAssetAt",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " for object layers or "
+        },
+        {
+          "insert": "setSlotAssetAt",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " for glyph slots, a scene reference change, not a registry mutation."
+        }
+      ],
+      "children": []
+    },
+    "b-20-panels-loader-usesceneloader-64": {
+      "id": "b-20-panels-loader-usesceneloader-64",
+      "type": "heading",
+      "props": {
+        "level": 2
+      },
+      "text": [
+        {
+          "insert": "Loader ("
+        },
+        {
+          "insert": "useSceneLoader.ts",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ")"
+        }
+      ],
+      "children": []
+    },
+    "b-20-panels-custom-hook-that-fetches-65": {
+      "id": "b-20-panels-custom-hook-that-fetches-65",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "Custom hook that fetches the scene + merged registry on mount, calls "
+        },
+        {
+          "insert": "setScene",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " and "
+        },
+        {
+          "insert": "setRegistry",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ", and handles error/loading states. Lives in "
+        },
+        {
+          "insert": "app/_engine/hooks/useSceneLoader.ts",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": "."
+        }
+      ],
+      "children": []
+    },
+    "b-20-panels-source-66": {
+      "id": "b-20-panels-source-66",
+      "type": "heading",
+      "props": {
+        "level": 2
+      },
+      "text": [
+        {
+          "insert": "Source"
+        }
+      ],
+      "children": []
+    },
+    "b-20-panels-apps-scene-engine-app-e-67": {
+      "id": "b-20-panels-apps-scene-engine-app-e-67",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "apps/scene-engine/app/editor/page.tsx",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ": editor shell (3-panel grid, "
+        },
+        {
+          "insert": "useSceneLoader",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ")."
+        }
+      ],
+      "children": []
+    },
+    "b-20-panels-apps-scene-engine-app-e-68": {
+      "id": "b-20-panels-apps-scene-engine-app-e-68",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "apps/scene-engine/app/editor/_components/CanvasPanel.tsx",
+          "attributes": {
+            "code": true
+          }
+        }
+      ],
+      "children": []
+    },
+    "b-20-panels-apps-scene-engine-app-e-69": {
+      "id": "b-20-panels-apps-scene-engine-app-e-69",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "apps/scene-engine/app/editor/_components/HierarchyPanel.tsx",
+          "attributes": {
+            "code": true
+          }
+        }
+      ],
+      "children": []
+    },
+    "b-20-panels-apps-scene-engine-app-e-70": {
+      "id": "b-20-panels-apps-scene-engine-app-e-70",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "apps/scene-engine/app/editor/_components/HierarchyRow.tsx",
+          "attributes": {
+            "code": true
+          }
+        }
+      ],
+      "children": []
+    },
+    "b-20-panels-apps-scene-engine-app-e-71": {
+      "id": "b-20-panels-apps-scene-engine-app-e-71",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "apps/scene-engine/app/editor/_components/SceneSection.tsx",
+          "attributes": {
+            "code": true
+          }
+        }
+      ],
+      "children": []
+    },
+    "b-20-panels-apps-scene-engine-app-e-72": {
+      "id": "b-20-panels-apps-scene-engine-app-e-72",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "apps/scene-engine/app/editor/_components/AddLayerDialog.tsx",
+          "attributes": {
+            "code": true
+          }
+        }
+      ],
+      "children": []
+    },
+    "b-20-panels-apps-scene-engine-app-e-73": {
+      "id": "b-20-panels-apps-scene-engine-app-e-73",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "apps/scene-engine/app/editor/_components/InspectorPanel.tsx",
+          "attributes": {
+            "code": true
+          }
+        }
+      ],
+      "children": []
+    },
+    "b-20-panels-apps-scene-engine-app-e-74": {
+      "id": "b-20-panels-apps-scene-engine-app-e-74",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "apps/scene-engine/app/editor/_components/LayerForm.tsx",
+          "attributes": {
+            "code": true
+          }
+        }
+      ],
+      "children": []
+    },
+    "b-20-panels-apps-scene-engine-app-e-75": {
+      "id": "b-20-panels-apps-scene-engine-app-e-75",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "apps/scene-engine/app/editor/_components/PropertySection.tsx",
+          "attributes": {
+            "code": true
+          }
+        }
+      ],
+      "children": []
+    },
+    "b-20-panels-apps-scene-engine-app-e-76": {
+      "id": "b-20-panels-apps-scene-engine-app-e-76",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "apps/scene-engine/app/editor/_components/PropertyField.tsx",
+          "attributes": {
+            "code": true
+          }
+        }
+      ],
+      "children": []
+    },
+    "b-20-panels-apps-scene-engine-app-e-77": {
+      "id": "b-20-panels-apps-scene-engine-app-e-77",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "apps/scene-engine/app/editor/_components/DescriptionPopover.tsx",
+          "attributes": {
+            "code": true
+          }
+        }
+      ],
+      "children": []
+    },
+    "b-20-panels-apps-scene-engine-app-e-78": {
+      "id": "b-20-panels-apps-scene-engine-app-e-78",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "apps/scene-engine/app/editor/_components/SlotsSection.tsx",
+          "attributes": {
+            "code": true
+          }
+        }
+      ],
+      "children": []
+    },
+    "b-20-panels-apps-scene-engine-app-e-79": {
+      "id": "b-20-panels-apps-scene-engine-app-e-79",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "apps/scene-engine/app/editor/_components/AssetSwapDropdown.tsx",
+          "attributes": {
+            "code": true
+          }
+        }
+      ],
+      "children": []
+    },
+    "b-20-panels-apps-scene-engine-app-e-80": {
+      "id": "b-20-panels-apps-scene-engine-app-e-80",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "apps/scene-engine/app/editor/_features/pi-agent/PiAgentChatPanel.tsx",
+          "attributes": {
+            "code": true
+          }
+        }
+      ],
+      "children": []
+    },
+    "b-20-panels-apps-scene-engine-app-e-81": {
+      "id": "b-20-panels-apps-scene-engine-app-e-81",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "apps/scene-engine/app/editor/_features/pi-agent/usePiAgentController.ts",
+          "attributes": {
+            "code": true
+          }
+        }
+      ],
+      "children": []
+    },
+    "b-20-panels-apps-scene-engine-app-e-82": {
+      "id": "b-20-panels-apps-scene-engine-app-e-82",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "apps/scene-engine/app/editor/_components/inputs/",
+          "attributes": {
+            "code": true
+          }
+        }
+      ],
+      "children": []
+    },
+    "b-20-panels-apps-scene-engine-app-83": {
+      "id": "b-20-panels-apps-scene-engine-app-83",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "apps/scene-engine/app/_engine/types/property-schema.ts",
+          "attributes": {
+            "code": true
+          }
+        }
+      ],
+      "children": []
+    },
+    "b-20-panels-apps-scene-engine-app-84": {
+      "id": "b-20-panels-apps-scene-engine-app-84",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "apps/scene-engine/app/_engine/lib/builtin-property-schemas.ts",
+          "attributes": {
+            "code": true
+          }
+        }
+      ],
+      "children": []
+    },
+    "b-20-panels-apps-scene-engine-app-85": {
+      "id": "b-20-panels-apps-scene-engine-app-85",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "apps/scene-engine/app/_engine/lib/component-schema-loader.ts",
+          "attributes": {
+            "code": true
+          }
+        }
+      ],
+      "children": []
+    }
+  }
+}

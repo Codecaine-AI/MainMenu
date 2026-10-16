@@ -1,0 +1,1538 @@
+{
+  "schemaVersion": 1,
+  "id": "scene-engine-10-system-design-20-asset-registry",
+  "title": "Asset Registry",
+  "root": "b-20-asset-registry-root-58",
+  "blocks": {
+    "b-20-asset-registry-root-58": {
+      "id": "b-20-asset-registry-root-58",
+      "type": "paragraph",
+      "props": {
+        "concepts": [
+          "registry",
+          "container",
+          "asset-id",
+          "indirection",
+          "type-dispatch",
+          "swap"
+        ],
+        "covers": "The asset and module registries — split manifests, container indirection, the five file asset types, and the swap-by-id semantic that propagates file changes across scenes."
+      },
+      "children": [
+        "b-20-asset-registry-scenes-never-reference-f-2",
+        "b-20-asset-registry-there-are-two-registries-3",
+        "b-20-asset-registry-projectsettings-regis-4",
+        "b-20-asset-registry-projectsettings-regis-5",
+        "b-20-asset-registry-both-share-the-same-shap-6",
+        "b-20-asset-registry-divider-7",
+        "b-20-asset-registry-asset-vs-module-8",
+        "b-20-asset-registry-the-split-is-conceptual-9",
+        "b-20-asset-registry-the-test-would-it-make-10",
+        "b-20-asset-registry-this-split-shapes-everyt-11",
+        "b-20-asset-registry-the-container-model-12",
+        "b-20-asset-registry-a-registry-entry-is-a-13",
+        "b-20-asset-registry-ascii-14",
+        "b-20-asset-registry-the-model-is-intentional-15",
+        "b-20-asset-registry-entry-shape-16",
+        "b-20-asset-registry-asset-entries-in-proje-17",
+        "b-20-asset-registry-json-18",
+        "b-20-asset-registry-module-entries-in-proj-19",
+        "b-20-asset-registry-json-20",
+        "b-20-asset-registry-field-where-21-tbl",
+        "b-20-asset-registry-the-two-field-names-fi-22",
+        "b-20-asset-registry-why-id-based-indirection-23",
+        "b-20-asset-registry-if-scenes-embedded-paths-24",
+        "b-20-asset-registry-renaming-or-moving-an-as-25",
+        "b-20-asset-registry-a-file-swap-would-mean-e-26",
+        "b-20-asset-registry-the-registry-would-not-e-27",
+        "b-20-asset-registry-the-editor-would-have-no-28",
+        "b-20-asset-registry-type-information-would-h-29",
+        "b-20-asset-registry-indirection-turns-the-re-30",
+        "b-20-asset-registry-asset-taxonomy-five-fil-31",
+        "b-20-asset-registry-type-files-32-tbl",
+        "b-20-asset-registry-image-and-video-are-spli-33",
+        "b-20-asset-registry-lookup-semantics-34",
+        "b-20-asset-registry-when-a-scene-renders-ev-35",
+        "b-20-asset-registry-both-registries-are-load-36",
+        "b-20-asset-registry-for-each-layer-lookup-r-37",
+        "b-20-asset-registry-if-the-entry-is-missing-38",
+        "b-20-asset-registry-the-renderer-is-dispatch-39",
+        "b-20-asset-registry-if-the-same-id-appears-i-40",
+        "b-20-asset-registry-the-layer-s-type-and-t-41",
+        "b-20-asset-registry-file-swap-propagation-42",
+        "b-20-asset-registry-the-container-model-only-43",
+        "b-20-asset-registry-inspector-dropdown-44",
+        "b-20-asset-registry-upload-uploading-a-45",
+        "b-20-asset-registry-registry-patch-endpoin-46",
+        "b-20-asset-registry-normal-selection-touches-47",
+        "b-20-asset-registry-foreign-children-reuse-t-48",
+        "b-20-asset-registry-when-a-glyph-group-s-49",
+        "b-20-asset-registry-adding-an-asset-50",
+        "b-20-asset-registry-the-expected-path-is-the-51",
+        "b-20-asset-registry-the-manual-path-is-proje-52",
+        "b-20-asset-registry-what-s-not-in-the-regist-53",
+        "b-20-asset-registry-per-scene-placement-54",
+        "b-20-asset-registry-per-scene-properties-55",
+        "b-20-asset-registry-content-data-for-compo-56",
+        "b-20-asset-registry-ordering-layer-ord-57"
+      ]
+    },
+    "b-20-asset-registry-scenes-never-reference-f-2": {
+      "id": "b-20-asset-registry-scenes-never-reference-f-2",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "Scenes never reference files directly. They reference "
+        },
+        {
+          "insert": "container IDs",
+          "attributes": {
+            "bold": true
+          }
+        },
+        {
+          "insert": ", and the registry maps each ID to a "
+        },
+        {
+          "insert": "{ type, file }",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " (or "
+        },
+        {
+          "insert": "{ type, path }",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ") pair. This indirection is what lets a single file swap update every scene that uses it, lets the renderer dispatch by type, and lets the editor enumerate available material."
+        }
+      ],
+      "children": []
+    },
+    "b-20-asset-registry-there-are-two-registries-3": {
+      "id": "b-20-asset-registry-there-are-two-registries-3",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "There are two registries, split by what kind of thing they describe:"
+        }
+      ],
+      "children": []
+    },
+    "b-20-asset-registry-projectsettings-regis-4": {
+      "id": "b-20-asset-registry-projectsettings-regis-4",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "ProjectSettings/registries/assets.json",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ": uploadable file assets. Types: "
+        },
+        {
+          "insert": "audio",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ", "
+        },
+        {
+          "insert": "image",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ", "
+        },
+        {
+          "insert": "video",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ", "
+        },
+        {
+          "insert": "glyph",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ", and "
+        },
+        {
+          "insert": "font",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": "."
+        }
+      ],
+      "children": []
+    },
+    "b-20-asset-registry-projectsettings-regis-5": {
+      "id": "b-20-asset-registry-projectsettings-regis-5",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "ProjectSettings/registries/modules.json",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ": project-authored code modules. Two types: "
+        },
+        {
+          "insert": "effect",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ", "
+        },
+        {
+          "insert": "component",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": "."
+        }
+      ],
+      "children": []
+    },
+    "b-20-asset-registry-both-share-the-same-shap-6": {
+      "id": "b-20-asset-registry-both-share-the-same-shap-6",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "Both share the same shape (id → typed entry) and both contribute to the same flat namespace at runtime: scene layers cannot tell which manifest an ID came from."
+        }
+      ],
+      "children": []
+    },
+    "b-20-asset-registry-divider-7": {
+      "id": "b-20-asset-registry-divider-7",
+      "type": "divider",
+      "props": {},
+      "children": []
+    },
+    "b-20-asset-registry-asset-vs-module-8": {
+      "id": "b-20-asset-registry-asset-vs-module-8",
+      "type": "heading",
+      "props": {
+        "level": 2
+      },
+      "text": [
+        {
+          "insert": "Asset vs Module"
+        }
+      ],
+      "children": []
+    },
+    "b-20-asset-registry-the-split-is-conceptual-9": {
+      "id": "b-20-asset-registry-the-split-is-conceptual-9",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "The split is conceptual, not just organizational. An "
+        },
+        {
+          "insert": "asset",
+          "attributes": {
+            "bold": true
+          }
+        },
+        {
+          "insert": " is an external file a non-developer would recognize as something they could upload: a video clip, an image, an audio sample, an SVG glyph, or a font file. A "
+        },
+        {
+          "insert": "module",
+          "attributes": {
+            "bold": true
+          }
+        },
+        {
+          "insert": " is hand-authored project code, a CSS effect sheet or JS component, that is configured rather than uploaded."
+        }
+      ],
+      "children": []
+    },
+    "b-20-asset-registry-the-test-would-it-make-10": {
+      "id": "b-20-asset-registry-the-test-would-it-make-10",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "The test: "
+        },
+        {
+          "insert": "would it make sense to drag this onto an upload page?",
+          "attributes": {
+            "italic": true
+          }
+        },
+        {
+          "insert": " If yes, it's an asset."
+        }
+      ],
+      "children": []
+    },
+    "b-20-asset-registry-this-split-shapes-everyt-11": {
+      "id": "b-20-asset-registry-this-split-shapes-everyt-11",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "This split shapes everything downstream. The upload UI and inspector asset-selection dropdown are scoped to file assets; the add-layer dialog uses the merged registry so it can add both file assets and authored modules. For v1, authored Codecaine modules live in the Codecaine project workspace, not in a shared engine module library."
+        }
+      ],
+      "children": []
+    },
+    "b-20-asset-registry-the-container-model-12": {
+      "id": "b-20-asset-registry-the-container-model-12",
+      "type": "heading",
+      "props": {
+        "level": 2
+      },
+      "text": [
+        {
+          "insert": "The Container Model"
+        }
+      ],
+      "children": []
+    },
+    "b-20-asset-registry-a-registry-entry-is-a-13": {
+      "id": "b-20-asset-registry-a-registry-entry-is-a-13",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "A registry entry is a "
+        },
+        {
+          "insert": "container",
+          "attributes": {
+            "bold": true
+          }
+        },
+        {
+          "insert": ": a typed slot that points at a file. Scene layers reference the container by ID. Swapping the file inside the container propagates to every scene that referenced it, no scene edits needed."
+        }
+      ],
+      "children": []
+    },
+    "b-20-asset-registry-ascii-14": {
+      "id": "b-20-asset-registry-ascii-14",
+      "type": "code",
+      "props": {
+        "language": "ascii"
+      },
+      "text": [
+        {
+          "insert": "┌───────────┐    references    ┌──────────────────────┐    points to    ┌─────────────────┐\n│  Scene    │─────────────────▶│  Container (registry) │────────────────▶│  File on disk    │\n│  Layer    │ \"asset\":\"bg-vid\" │  id: \"bg-vid\"         │  file:          │  /assets/video/  │\n│           │                  │  type: \"video\"        │  \"/assets/      │  test-fire-3.mp4 │\n└───────────┘                  └──────────────────────┘  video/test...\"  └─────────────────┘"
+        }
+      ],
+      "children": []
+    },
+    "b-20-asset-registry-the-model-is-intentional-15": {
+      "id": "b-20-asset-registry-the-model-is-intentional-15",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "The model is intentionally Unity-flavored: scenes describe "
+        },
+        {
+          "insert": "intent",
+          "attributes": {
+            "italic": true
+          }
+        },
+        {
+          "insert": " (which container, what kind, how positioned); the container holds "
+        },
+        {
+          "insert": "identity",
+          "attributes": {
+            "italic": true
+          }
+        },
+        {
+          "insert": " (this is the bg-video, of type video); the file is just the current bytes for that identity."
+        }
+      ],
+      "children": []
+    },
+    "b-20-asset-registry-entry-shape-16": {
+      "id": "b-20-asset-registry-entry-shape-16",
+      "type": "heading",
+      "props": {
+        "level": 2
+      },
+      "text": [
+        {
+          "insert": "Entry Shape"
+        }
+      ],
+      "children": []
+    },
+    "b-20-asset-registry-asset-entries-in-proje-17": {
+      "id": "b-20-asset-registry-asset-entries-in-proje-17",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "Asset entries (in "
+        },
+        {
+          "insert": "ProjectSettings/registries/assets.json",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": "):"
+        }
+      ],
+      "children": []
+    },
+    "b-20-asset-registry-json-18": {
+      "id": "b-20-asset-registry-json-18",
+      "type": "code",
+      "props": {
+        "language": "json"
+      },
+      "text": [
+        {
+          "insert": "{\n  \"bg-video\":       { \"type\": \"video\", \"file\": \"/assets/video/test-fire-3.mp4\" },\n  \"in-text-fire\":   { \"type\": \"video\", \"file\": \"/assets/video/codecaine-title-fire-loop.webm\" },\n  \"codecaine-logo\": { \"type\": \"glyph\", \"file\": \"/assets/glyph/CODECAINE.css-layers.svg\" },\n  \"start-cue\":      { \"type\": \"audio\", \"file\": \"/assets/audio/start-cue/start-cue.js\" }\n}"
+        }
+      ],
+      "children": []
+    },
+    "b-20-asset-registry-module-entries-in-proj-19": {
+      "id": "b-20-asset-registry-module-entries-in-proj-19",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "Module entries (in "
+        },
+        {
+          "insert": "ProjectSettings/registries/modules.json",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": "):"
+        }
+      ],
+      "children": []
+    },
+    "b-20-asset-registry-json-20": {
+      "id": "b-20-asset-registry-json-20",
+      "type": "code",
+      "props": {
+        "language": "json"
+      },
+      "text": [
+        {
+          "insert": "{\n  \"crt-overlay\": { \"type\": \"effect\",    \"path\": \"/modules/effects/crt-overlay/crt-overlay.css\" },\n  \"press-start\": { \"type\": \"component\", \"path\": \"/modules/components/press-start/press-start.js\" }\n}"
+        }
+      ],
+      "children": []
+    },
+    "b-20-asset-registry-field-where-21-tbl": {
+      "id": "b-20-asset-registry-field-where-21-tbl",
+      "type": "structured-table",
+      "props": {
+        "columns": [
+          "Field",
+          "Where",
+          "Meaning"
+        ],
+        "rows": [
+          [
+            [
+              {
+                "insert": "type",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ],
+            "both",
+            [
+              {
+                "insert": "One of "
+              },
+              {
+                "insert": "audio",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": ", "
+              },
+              {
+                "insert": "image",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": ", "
+              },
+              {
+                "insert": "video",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": ", "
+              },
+              {
+                "insert": "glyph",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": ", "
+              },
+              {
+                "insert": "font",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": " (asset) or "
+              },
+              {
+                "insert": "effect",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": ", "
+              },
+              {
+                "insert": "component",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": " (module)."
+              }
+            ]
+          ],
+          [
+            [
+              {
+                "insert": "file",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ],
+            "asset entries",
+            "URL of the current bytes inside the container. Swappable."
+          ],
+          [
+            [
+              {
+                "insert": "path",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ],
+            "module entries",
+            "URL of the module source. Modules don't swap, so the field name reflects that."
+          ]
+        ]
+      },
+      "children": []
+    },
+    "b-20-asset-registry-the-two-field-names-fi-22": {
+      "id": "b-20-asset-registry-the-two-field-names-fi-22",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "The two field names ("
+        },
+        {
+          "insert": "file",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " vs "
+        },
+        {
+          "insert": "path",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ") are deliberate: "
+        },
+        {
+          "insert": "file",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " signals \"this is a swappable pointer in a container,\" "
+        },
+        {
+          "insert": "path",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " signals \"this is where the module source lives.\""
+        }
+      ],
+      "children": []
+    },
+    "b-20-asset-registry-why-id-based-indirection-23": {
+      "id": "b-20-asset-registry-why-id-based-indirection-23",
+      "type": "heading",
+      "props": {
+        "level": 2
+      },
+      "text": [
+        {
+          "insert": "Why ID-Based Indirection"
+        }
+      ],
+      "children": []
+    },
+    "b-20-asset-registry-if-scenes-embedded-paths-24": {
+      "id": "b-20-asset-registry-if-scenes-embedded-paths-24",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "If scenes embedded paths directly:"
+        }
+      ],
+      "children": []
+    },
+    "b-20-asset-registry-renaming-or-moving-an-as-25": {
+      "id": "b-20-asset-registry-renaming-or-moving-an-as-25",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "Renaming or moving an asset would require rewriting every scene that uses it."
+        }
+      ],
+      "children": []
+    },
+    "b-20-asset-registry-a-file-swap-would-mean-e-26": {
+      "id": "b-20-asset-registry-a-file-swap-would-mean-e-26",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "A file swap would mean editing every consuming scene by hand."
+        }
+      ],
+      "children": []
+    },
+    "b-20-asset-registry-the-registry-would-not-e-27": {
+      "id": "b-20-asset-registry-the-registry-would-not-e-27",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "The registry would not exist, so there would be no inventory of \"what's available.\""
+        }
+      ],
+      "children": []
+    },
+    "b-20-asset-registry-the-editor-would-have-no-28": {
+      "id": "b-20-asset-registry-the-editor-would-have-no-28",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "The editor would have no way to enumerate available assets and modules for the add-layer dialog."
+        }
+      ],
+      "children": []
+    },
+    "b-20-asset-registry-type-information-would-h-29": {
+      "id": "b-20-asset-registry-type-information-would-h-29",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "Type information would have to be repeated in every layer entry."
+        }
+      ],
+      "children": []
+    },
+    "b-20-asset-registry-indirection-turns-the-re-30": {
+      "id": "b-20-asset-registry-indirection-turns-the-re-30",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "Indirection turns the registry into the single inventory and the single point where file pointers can change."
+        }
+      ],
+      "children": []
+    },
+    "b-20-asset-registry-asset-taxonomy-five-fil-31": {
+      "id": "b-20-asset-registry-asset-taxonomy-five-fil-31",
+      "type": "heading",
+      "props": {
+        "level": 2
+      },
+      "text": [
+        {
+          "insert": "Asset Taxonomy: Five File Types"
+        }
+      ],
+      "children": []
+    },
+    "b-20-asset-registry-type-files-32-tbl": {
+      "id": "b-20-asset-registry-type-files-32-tbl",
+      "type": "structured-table",
+      "props": {
+        "columns": [
+          "Type",
+          "Files",
+          "Why it's its own type"
+        ],
+        "rows": [
+          [
+            [
+              {
+                "insert": "audio",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ],
+            [
+              {
+                "insert": ".mp3",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": ", "
+              },
+              {
+                "insert": ".wav",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": ", "
+              },
+              {
+                "insert": ".ogg",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ],
+            "Web Audio playback path, distinct from any visual renderer."
+          ],
+          [
+            [
+              {
+                "insert": "image",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ],
+            [
+              {
+                "insert": ".png",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": ", "
+              },
+              {
+                "insert": ".jpg",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": ", "
+              },
+              {
+                "insert": ".webp",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": ", "
+              },
+              {
+                "insert": ".gif",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ],
+            "Static raster, separate upload allowlist from video."
+          ],
+          [
+            [
+              {
+                "insert": "video",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ],
+            [
+              {
+                "insert": ".mp4",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": ", "
+              },
+              {
+                "insert": ".webm",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ],
+            "Looping playback semantics, larger upload size, separate allowlist."
+          ],
+          [
+            [
+              {
+                "insert": "glyph",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ],
+            [
+              {
+                "insert": ".svg",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ],
+            "SVG-with-CSS-layers, not a generic image; has its own renderer path."
+          ],
+          [
+            [
+              {
+                "insert": "font",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ],
+            [
+              {
+                "insert": ".otf",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": ", "
+              },
+              {
+                "insert": ".ttf",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": ", "
+              },
+              {
+                "insert": ".woff",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": ", "
+              },
+              {
+                "insert": ".woff2",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ],
+            "Project-owned typography loaded through the same registry merge."
+          ]
+        ]
+      },
+      "children": []
+    },
+    "b-20-asset-registry-image-and-video-are-spli-33": {
+      "id": "b-20-asset-registry-image-and-video-are-spli-33",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "Image and video are split (rather than collapsed under "
+        },
+        {
+          "insert": "media",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ") so the upload UI can reject mismatched files and so the renderers can diverge later."
+        }
+      ],
+      "children": []
+    },
+    "b-20-asset-registry-lookup-semantics-34": {
+      "id": "b-20-asset-registry-lookup-semantics-34",
+      "type": "heading",
+      "props": {
+        "level": 2
+      },
+      "text": [
+        {
+          "insert": "Lookup Semantics"
+        }
+      ],
+      "children": []
+    },
+    "b-20-asset-registry-when-a-scene-renders-ev-35": {
+      "id": "b-20-asset-registry-when-a-scene-renders-ev-35",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "When a scene renders, every layer's "
+        },
+        {
+          "insert": "asset",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " field is looked up in a single merged view of both manifests:"
+        }
+      ],
+      "children": []
+    },
+    "b-20-asset-registry-both-registries-are-load-36": {
+      "id": "b-20-asset-registry-both-registries-are-load-36",
+      "type": "list-item",
+      "props": {
+        "ordered": true
+      },
+      "text": [
+        {
+          "insert": "Both registries are loaded in parallel and merged into one map."
+        }
+      ],
+      "children": []
+    },
+    "b-20-asset-registry-for-each-layer-lookup-r-37": {
+      "id": "b-20-asset-registry-for-each-layer-lookup-r-37",
+      "type": "list-item",
+      "props": {
+        "ordered": true
+      },
+      "text": [
+        {
+          "insert": "For each layer, lookup returns the merged entry or "
+        },
+        {
+          "insert": "null",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": "."
+        }
+      ],
+      "children": []
+    },
+    "b-20-asset-registry-if-the-entry-is-missing-38": {
+      "id": "b-20-asset-registry-if-the-entry-is-missing-38",
+      "type": "list-item",
+      "props": {
+        "ordered": true
+      },
+      "text": [
+        {
+          "insert": "If the entry is missing, the layer is skipped with a warning. Render does not throw."
+        }
+      ],
+      "children": []
+    },
+    "b-20-asset-registry-the-renderer-is-dispatch-39": {
+      "id": "b-20-asset-registry-the-renderer-is-dispatch-39",
+      "type": "list-item",
+      "props": {
+        "ordered": true
+      },
+      "text": [
+        {
+          "insert": "The renderer is dispatched by "
+        },
+        {
+          "insert": "layer",
+          "attributes": {
+            "bold": true
+          }
+        },
+        {
+          "insert": " "
+        },
+        {
+          "insert": "type",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ", but receives the registry entry so it can fetch the entry's "
+        },
+        {
+          "insert": "file",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": "/"
+        },
+        {
+          "insert": "path",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": "."
+        }
+      ],
+      "children": []
+    },
+    "b-20-asset-registry-if-the-same-id-appears-i-40": {
+      "id": "b-20-asset-registry-if-the-same-id-appears-i-40",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "If the same ID appears in both manifests, the module entry overrides the asset entry and a warning is logged. This is treated as a misconfiguration rather than a normal flow."
+        }
+      ],
+      "children": []
+    },
+    "b-20-asset-registry-the-layer-s-type-and-t-41": {
+      "id": "b-20-asset-registry-the-layer-s-type-and-t-41",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "The layer's "
+        },
+        {
+          "insert": "type",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " and the registry entry's "
+        },
+        {
+          "insert": "type",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " are "
+        },
+        {
+          "insert": "expected",
+          "attributes": {
+            "italic": true
+          }
+        },
+        {
+          "insert": " to match in well-formed scenes. Misaligned types result in a fetch returning unusable content rather than a clean error."
+        }
+      ],
+      "children": []
+    },
+    "b-20-asset-registry-file-swap-propagation-42": {
+      "id": "b-20-asset-registry-file-swap-propagation-42",
+      "type": "heading",
+      "props": {
+        "level": 2
+      },
+      "text": [
+        {
+          "insert": "File Swap Propagation"
+        }
+      ],
+      "children": []
+    },
+    "b-20-asset-registry-the-container-model-only-43": {
+      "id": "b-20-asset-registry-the-container-model-only-43",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "The container model only earns its keep when scenes can select containers without hard-coding file paths. Three surfaces participate:"
+        }
+      ],
+      "children": []
+    },
+    "b-20-asset-registry-inspector-dropdown-44": {
+      "id": "b-20-asset-registry-inspector-dropdown-44",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "Inspector dropdown.",
+          "attributes": {
+            "bold": true
+          }
+        },
+        {
+          "insert": " Selecting an asset-type layer in the editor surfaces project-local assets of that type. Picking one updates the scene to reference the selected container ID."
+        }
+      ],
+      "children": []
+    },
+    "b-20-asset-registry-upload-uploading-a-45": {
+      "id": "b-20-asset-registry-upload-uploading-a-45",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "Upload.",
+          "attributes": {
+            "bold": true
+          }
+        },
+        {
+          "insert": " Uploading a file writes a project-local file and creates a registry entry with a unique slug. If the slug already exists, the new container receives a numeric suffix."
+        }
+      ],
+      "children": []
+    },
+    "b-20-asset-registry-registry-patch-endpoin-46": {
+      "id": "b-20-asset-registry-registry-patch-endpoin-46",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "Registry patch endpoint.",
+          "attributes": {
+            "bold": true
+          }
+        },
+        {
+          "insert": " Direct maintenance calls can move an existing container's "
+        },
+        {
+          "insert": "file",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " pointer. The current editor dropdown does not use this endpoint for normal selection."
+        }
+      ],
+      "children": []
+    },
+    "b-20-asset-registry-normal-selection-touches-47": {
+      "id": "b-20-asset-registry-normal-selection-touches-47",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "Normal selection touches scene JSON because the layer points at a different container ID. Direct registry patching touches only the registry and affects every scene that still references that container."
+        }
+      ],
+      "children": []
+    },
+    "b-20-asset-registry-foreign-children-reuse-t-48": {
+      "id": "b-20-asset-registry-foreign-children-reuse-t-48",
+      "type": "heading",
+      "props": {
+        "level": 2
+      },
+      "text": [
+        {
+          "insert": "Foreign Children Reuse the Same Lookup"
+        }
+      ],
+      "children": []
+    },
+    "b-20-asset-registry-when-a-glyph-group-s-49": {
+      "id": "b-20-asset-registry-when-a-glyph-group-s-49",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "When a "
+        },
+        {
+          "insert": "glyph-group",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": "'s "
+        },
+        {
+          "insert": "children",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " array contains a foreign asset ("
+        },
+        {
+          "insert": "{ type, asset, ... }",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": "), it goes through the same lookup as a top-level layer. There is no separate child registry. This is what makes \"the same asset on the stage\" and \"the same asset interleaved inside a glyph\" share machinery."
+        }
+      ],
+      "children": []
+    },
+    "b-20-asset-registry-adding-an-asset-50": {
+      "id": "b-20-asset-registry-adding-an-asset-50",
+      "type": "heading",
+      "props": {
+        "level": 2
+      },
+      "text": [
+        {
+          "insert": "Adding an Asset"
+        }
+      ],
+      "children": []
+    },
+    "b-20-asset-registry-the-expected-path-is-the-51": {
+      "id": "b-20-asset-registry-the-expected-path-is-the-51",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "The expected path is the "
+        },
+        {
+          "insert": "/upload",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " page: pick a file, confirm the type, the server writes the file under the selected project ("
+        },
+        {
+          "insert": "Assets/Media/{type}/",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " or "
+        },
+        {
+          "insert": "Assets/Fonts/",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ") and adds a registry entry keyed by the slugified filename. See "
+        },
+        {
+          "insert": "Asset Uploads",
+          "attributes": {
+            "reference": {
+              "kind": "doc",
+              "path": "10-scene-engine/10-system-design/60-asset-uploads",
+              "label": "Asset Uploads"
+            }
+          }
+        },
+        {
+          "insert": "."
+        }
+      ],
+      "children": []
+    },
+    "b-20-asset-registry-the-manual-path-is-proje-52": {
+      "id": "b-20-asset-registry-the-manual-path-is-proje-52",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "The manual path is project-local: drop a file under "
+        },
+        {
+          "insert": "Assets/Media/{type}/",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " or "
+        },
+        {
+          "insert": "Assets/Fonts/",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ", add an entry to "
+        },
+        {
+          "insert": "ProjectSettings/registries/assets.json",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ", and keep the entry's logical "
+        },
+        {
+          "insert": "file",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " path in "
+        },
+        {
+          "insert": "/assets/...",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " or "
+        },
+        {
+          "insert": "/fonts/...",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " form."
+        }
+      ],
+      "children": []
+    },
+    "b-20-asset-registry-what-s-not-in-the-regist-53": {
+      "id": "b-20-asset-registry-what-s-not-in-the-regist-53",
+      "type": "heading",
+      "props": {
+        "level": 2
+      },
+      "text": [
+        {
+          "insert": "What's NOT in the Registry"
+        }
+      ],
+      "children": []
+    },
+    "b-20-asset-registry-per-scene-placement-54": {
+      "id": "b-20-asset-registry-per-scene-placement-54",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "Per-scene placement",
+          "attributes": {
+            "bold": true
+          }
+        },
+        {
+          "insert": ". That's a layer's job, not a container's."
+        }
+      ],
+      "children": []
+    },
+    "b-20-asset-registry-per-scene-properties-55": {
+      "id": "b-20-asset-registry-per-scene-properties-55",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "Per-scene properties",
+          "attributes": {
+            "bold": true
+          }
+        },
+        {
+          "insert": ", the registry holds what the container "
+        },
+        {
+          "insert": "is",
+          "attributes": {
+            "italic": true
+          }
+        },
+        {
+          "insert": ", not how a scene uses it. Blend, opacity, scale, hue all live on the layer."
+        }
+      ],
+      "children": []
+    },
+    "b-20-asset-registry-content-data-for-compo-56": {
+      "id": "b-20-asset-registry-content-data-for-compo-56",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "Content data for components",
+          "attributes": {
+            "bold": true
+          }
+        },
+        {
+          "insert": ". Content lives next to the component (e.g. "
+        },
+        {
+          "insert": "press-start-data.json",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " next to "
+        },
+        {
+          "insert": "press-start.js",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": "), not in the registry."
+        }
+      ],
+      "children": []
+    },
+    "b-20-asset-registry-ordering-layer-ord-57": {
+      "id": "b-20-asset-registry-ordering-layer-ord-57",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "Ordering",
+          "attributes": {
+            "bold": true
+          }
+        },
+        {
+          "insert": ". Layer order is the scene's responsibility; the registry is a map, not a list."
+        }
+      ],
+      "children": []
+    }
+  }
+}

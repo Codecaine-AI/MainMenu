@@ -1,0 +1,1029 @@
+{
+  "schemaVersion": 1,
+  "id": "scene-engine-10-system-design-16-property-schema",
+  "title": "Property Schema",
+  "root": "b-16-property-schema-root-51",
+  "blocks": {
+    "b-16-property-schema-root-51": {
+      "id": "b-16-property-schema-root-51",
+      "type": "paragraph",
+      "props": {
+        "concepts": [
+          "property-schema",
+          "sections",
+          "collapsible-sections",
+          "property-types",
+          "color-fields",
+          "descriptions",
+          "popover",
+          "orphan",
+          "general-fallback",
+          "schema-resolution"
+        ],
+        "covers": "The property schema convention — sectioned property declarations with labels, descriptions, collapse defaults, and a locked type taxonomy. Drives the inspector for all layer types."
+      },
+      "children": [
+        "b-16-property-schema-every-layer-type-can-dec-2",
+        "b-16-property-schema-divider-3",
+        "b-16-property-schema-why-schemas-exist-4",
+        "b-16-property-schema-components-and-other-lay-5",
+        "b-16-property-schema-grouping-related-p-6",
+        "b-16-property-schema-meaning-each-prope-7",
+        "b-16-property-schema-input-type-the-sch-8",
+        "b-16-property-schema-schema-shape-9",
+        "b-16-property-schema-a-schema-is-an-ordered-l-10",
+        "b-16-property-schema-a-property-definition-de-11",
+        "b-16-property-schema-type-one-of-a-lock-12",
+        "b-16-property-schema-label-the-human-re-13",
+        "b-16-property-schema-description-option-14",
+        "b-16-property-schema-default-optional-f-15",
+        "b-16-property-schema-type-specific-constraint-16",
+        "b-16-property-schema-properties-render-in-dec-17",
+        "b-16-property-schema-the-editor-treats-defau-18",
+        "b-16-property-schema-type-taxonomy-19",
+        "b-16-property-schema-the-set-of-allowed-prope-20",
+        "b-16-property-schema-type-renders-as-21-tbl",
+        "b-16-property-schema-the-specialized-types-22",
+        "b-16-property-schema-new-widget-types-can-be-23",
+        "b-16-property-schema-where-schemas-live-24",
+        "b-16-property-schema-schemas-come-from-two-so-25",
+        "b-16-property-schema-layer-type-26-tbl",
+        "b-16-property-schema-component-schemas-are-co-27",
+        "b-16-property-schema-always-sectioned-model-28",
+        "b-16-property-schema-every-schema-is-a-list-o-29",
+        "b-16-property-schema-one-rendering-path-in-th-30",
+        "b-16-property-schema-authors-start-with-minim-31",
+        "b-16-property-schema-adding-sections-later-is-32",
+        "b-16-property-schema-section-collapsibility-33",
+        "b-16-property-schema-every-schema-section-can-34",
+        "b-16-property-schema-collapsible-true-make-35",
+        "b-16-property-schema-collapsible-false-pin-36",
+        "b-16-property-schema-defaultopen-false-sta-37",
+        "b-16-property-schema-defaultopen-true-star-38",
+        "b-16-property-schema-top-level-sections-are-o-39",
+        "b-16-property-schema-the-general-fallback-40",
+        "b-16-property-schema-when-a-layer-has-no-decl-41",
+        "b-16-property-schema-properties-that-exist-in-42",
+        "b-16-property-schema-description-popovers-43",
+        "b-16-property-schema-each-property-label-is-a-44",
+        "b-16-property-schema-this-is-an-explicit-cl-45",
+        "b-16-property-schema-sub-layer-participation-46",
+        "b-16-property-schema-sub-layer-editing-contex-47",
+        "b-16-property-schema-relationship-to-the-mani-48",
+        "b-16-property-schema-the-property-schema-syst-49",
+        "b-16-property-schema-see-authoring-surfaces-50"
+      ]
+    },
+    "b-16-property-schema-every-layer-type-can-dec-2": {
+      "id": "b-16-property-schema-every-layer-type-can-dec-2",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "Every layer type can declare a "
+        },
+        {
+          "insert": "property schema",
+          "attributes": {
+            "bold": true
+          }
+        },
+        {
+          "insert": " that structures its editable properties into named sections, attaches human-readable labels and descriptions, and locks each property to one of a fixed set of input types. The inspector renders by schema; authors control grouping, ordering, and documentation of every field."
+        }
+      ],
+      "children": []
+    },
+    "b-16-property-schema-divider-3": {
+      "id": "b-16-property-schema-divider-3",
+      "type": "divider",
+      "props": {},
+      "children": []
+    },
+    "b-16-property-schema-why-schemas-exist-4": {
+      "id": "b-16-property-schema-why-schemas-exist-4",
+      "type": "heading",
+      "props": {
+        "level": 2
+      },
+      "text": [
+        {
+          "insert": "Why Schemas Exist"
+        }
+      ],
+      "children": []
+    },
+    "b-16-property-schema-components-and-other-lay-5": {
+      "id": "b-16-property-schema-components-and-other-lay-5",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "Components and other layer types can accumulate many properties with terse or technical names. A flat list of unlabeled fields forces the author to know what every key does. Property schemas solve three problems:"
+        }
+      ],
+      "children": []
+    },
+    "b-16-property-schema-grouping-related-p-6": {
+      "id": "b-16-property-schema-grouping-related-p-6",
+      "type": "list-item",
+      "props": {
+        "ordered": true
+      },
+      "text": [
+        {
+          "insert": "Grouping",
+          "attributes": {
+            "bold": true
+          }
+        },
+        {
+          "insert": ". Related properties appear under named sections (e.g., \"Rotation\", \"3D Position\")."
+        }
+      ],
+      "children": []
+    },
+    "b-16-property-schema-meaning-each-prope-7": {
+      "id": "b-16-property-schema-meaning-each-prope-7",
+      "type": "list-item",
+      "props": {
+        "ordered": true
+      },
+      "text": [
+        {
+          "insert": "Meaning",
+          "attributes": {
+            "bold": true
+          }
+        },
+        {
+          "insert": ". Each property carries a label (human name) and an optional description (what it does)."
+        }
+      ],
+      "children": []
+    },
+    "b-16-property-schema-input-type-the-sch-8": {
+      "id": "b-16-property-schema-input-type-the-sch-8",
+      "type": "list-item",
+      "props": {
+        "ordered": true
+      },
+      "text": [
+        {
+          "insert": "Input type",
+          "attributes": {
+            "bold": true
+          }
+        },
+        {
+          "insert": ". The schema declares what kind of editor control renders for each property."
+        }
+      ],
+      "children": []
+    },
+    "b-16-property-schema-schema-shape-9": {
+      "id": "b-16-property-schema-schema-shape-9",
+      "type": "heading",
+      "props": {
+        "level": 2
+      },
+      "text": [
+        {
+          "insert": "Schema Shape"
+        }
+      ],
+      "children": []
+    },
+    "b-16-property-schema-a-schema-is-an-ordered-l-10": {
+      "id": "b-16-property-schema-a-schema-is-an-ordered-l-10",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "A schema is an ordered list of "
+        },
+        {
+          "insert": "sections",
+          "attributes": {
+            "bold": true
+          }
+        },
+        {
+          "insert": ". Each section has an identifier, a display label, an optional description, optional collapse behavior, and an ordered map of "
+        },
+        {
+          "insert": "property definitions",
+          "attributes": {
+            "bold": true
+          }
+        },
+        {
+          "insert": ". Sections can nest: a section may contain child sections in addition to properties."
+        }
+      ],
+      "children": []
+    },
+    "b-16-property-schema-a-property-definition-de-11": {
+      "id": "b-16-property-schema-a-property-definition-de-11",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "A property definition declares:"
+        }
+      ],
+      "children": []
+    },
+    "b-16-property-schema-type-one-of-a-lock-12": {
+      "id": "b-16-property-schema-type-one-of-a-lock-12",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "type",
+          "attributes": {
+            "bold": true
+          }
+        },
+        {
+          "insert": ". One of a locked set of input types."
+        }
+      ],
+      "children": []
+    },
+    "b-16-property-schema-label-the-human-re-13": {
+      "id": "b-16-property-schema-label-the-human-re-13",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "label",
+          "attributes": {
+            "bold": true
+          }
+        },
+        {
+          "insert": ". The human-readable name shown in the inspector."
+        }
+      ],
+      "children": []
+    },
+    "b-16-property-schema-description-option-14": {
+      "id": "b-16-property-schema-description-option-14",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "description",
+          "attributes": {
+            "bold": true
+          }
+        },
+        {
+          "insert": ". Optional plain text explaining what the property does."
+        }
+      ],
+      "children": []
+    },
+    "b-16-property-schema-default-optional-f-15": {
+      "id": "b-16-property-schema-default-optional-f-15",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "default",
+          "attributes": {
+            "bold": true
+          }
+        },
+        {
+          "insert": ". Optional fallback value shown by the inspector when the scene has not saved that property yet."
+        }
+      ],
+      "children": []
+    },
+    "b-16-property-schema-type-specific-constraint-16": {
+      "id": "b-16-property-schema-type-specific-constraint-16",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "Type-specific constraints (min, max, step for numbers; options for selects)."
+        }
+      ],
+      "children": []
+    },
+    "b-16-property-schema-properties-render-in-dec-17": {
+      "id": "b-16-property-schema-properties-render-in-dec-17",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "Properties render in declaration order within their section. The author controls the reading flow."
+        }
+      ],
+      "children": []
+    },
+    "b-16-property-schema-the-editor-treats-defau-18": {
+      "id": "b-16-property-schema-the-editor-treats-defau-18",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "The editor treats "
+        },
+        {
+          "insert": "default",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " as a display/editing fallback only. It does not write default values into scene JSON until the user changes a field. Runtime components should still keep their own defensive fallbacks because exported or older scenes may omit properties."
+        }
+      ],
+      "children": []
+    },
+    "b-16-property-schema-type-taxonomy-19": {
+      "id": "b-16-property-schema-type-taxonomy-19",
+      "type": "heading",
+      "props": {
+        "level": 2
+      },
+      "text": [
+        {
+          "insert": "Type Taxonomy"
+        }
+      ],
+      "children": []
+    },
+    "b-16-property-schema-the-set-of-allowed-prope-20": {
+      "id": "b-16-property-schema-the-set-of-allowed-prope-20",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "The set of allowed property types is closed:"
+        }
+      ],
+      "children": []
+    },
+    "b-16-property-schema-type-renders-as-21-tbl": {
+      "id": "b-16-property-schema-type-renders-as-21-tbl",
+      "type": "structured-table",
+      "props": {
+        "columns": [
+          "Type",
+          "Renders as"
+        ],
+        "rows": [
+          [
+            [
+              {
+                "insert": "number",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ],
+            "Slider + numeric input. Optional min, max, step."
+          ],
+          [
+            [
+              {
+                "insert": "string",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ],
+            "Single-line text field."
+          ],
+          [
+            [
+              {
+                "insert": "boolean",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ],
+            "Toggle / checkbox."
+          ],
+          [
+            [
+              {
+                "insert": "color",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ],
+            "Native color picker plus editable color text field."
+          ],
+          [
+            [
+              {
+                "insert": "select",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ],
+            "Dropdown with inline options (string list or value+label pairs)."
+          ],
+          [
+            [
+              {
+                "insert": "blend",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ],
+            "Blend-mode dropdown (canonical CSS blend modes)."
+          ],
+          [
+            [
+              {
+                "insert": "fit",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ],
+            "Object-fit dropdown."
+          ],
+          [
+            [
+              {
+                "insert": "clip",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ],
+            "Clip-path dropdown."
+          ],
+          [
+            [
+              {
+                "insert": "anchor",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ],
+            "9-position anchor selector."
+          ]
+        ]
+      },
+      "children": []
+    },
+    "b-16-property-schema-the-specialized-types-22": {
+      "id": "b-16-property-schema-the-specialized-types-22",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "The specialized types ("
+        },
+        {
+          "insert": "blend",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ", "
+        },
+        {
+          "insert": "fit",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ", "
+        },
+        {
+          "insert": "clip",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ", "
+        },
+        {
+          "insert": "anchor",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ") are shorthands: they select over the system's standard option lists without requiring the author to enumerate them inline."
+        }
+      ],
+      "children": []
+    },
+    "b-16-property-schema-new-widget-types-can-be-23": {
+      "id": "b-16-property-schema-new-widget-types-can-be-23",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "New widget types can be added by extending this taxonomy. Authors cannot supply custom editor controls via the schema."
+        }
+      ],
+      "children": []
+    },
+    "b-16-property-schema-where-schemas-live-24": {
+      "id": "b-16-property-schema-where-schemas-live-24",
+      "type": "heading",
+      "props": {
+        "level": 2
+      },
+      "text": [
+        {
+          "insert": "Where Schemas Live"
+        }
+      ],
+      "children": []
+    },
+    "b-16-property-schema-schemas-come-from-two-so-25": {
+      "id": "b-16-property-schema-schemas-come-from-two-so-25",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "Schemas come from two sources, depending on the layer type:"
+        }
+      ],
+      "children": []
+    },
+    "b-16-property-schema-layer-type-26-tbl": {
+      "id": "b-16-property-schema-layer-type-26-tbl",
+      "type": "structured-table",
+      "props": {
+        "columns": [
+          "Layer type",
+          "Schema source"
+        ],
+        "rows": [
+          [
+            [
+              {
+                "insert": "component",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ],
+            "Exported from the component's code module alongside the render function."
+          ],
+          [
+            [
+              {
+                "insert": "media",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": ", "
+              },
+              {
+                "insert": "glyph-group",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": ", "
+              },
+              {
+                "insert": "audio",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ],
+            "Declared in a central built-in schema registry maintained alongside the editor."
+          ],
+          [
+            [
+              {
+                "insert": "effect",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ],
+            [
+              {
+                "insert": "Uses the legacy "
+              },
+              {
+                "insert": "manifest convention",
+                "attributes": {
+                  "link": "10-scene-engine/10-system-design/15-component-manifest"
+                }
+              },
+              {
+                "insert": ", not the property schema system."
+              }
+            ]
+          ]
+        ]
+      },
+      "children": []
+    },
+    "b-16-property-schema-component-schemas-are-co-27": {
+      "id": "b-16-property-schema-component-schemas-are-co-27",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "Component schemas are co-located with the code they describe: one file to read, one file to edit. Built-in schemas are centralized because those layer types have no authored module to attach to."
+        }
+      ],
+      "children": []
+    },
+    "b-16-property-schema-always-sectioned-model-28": {
+      "id": "b-16-property-schema-always-sectioned-model-28",
+      "type": "heading",
+      "props": {
+        "level": 2
+      },
+      "text": [
+        {
+          "insert": "Always-Sectioned Model"
+        }
+      ],
+      "children": []
+    },
+    "b-16-property-schema-every-schema-is-a-list-o-29": {
+      "id": "b-16-property-schema-every-schema-is-a-list-o-29",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "Every schema is a list of sections. There is no \"flat mode.\" Even a layer with a single group of properties renders under one named section. This means:"
+        }
+      ],
+      "children": []
+    },
+    "b-16-property-schema-one-rendering-path-in-th-30": {
+      "id": "b-16-property-schema-one-rendering-path-in-th-30",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "One rendering path in the inspector; no branching between flat and sectioned layouts."
+        }
+      ],
+      "children": []
+    },
+    "b-16-property-schema-authors-start-with-minim-31": {
+      "id": "b-16-property-schema-authors-start-with-minim-31",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "Authors start with minimal ceremony (one section named \"General\" or after the layer type)."
+        }
+      ],
+      "children": []
+    },
+    "b-16-property-schema-adding-sections-later-is-32": {
+      "id": "b-16-property-schema-adding-sections-later-is-32",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "Adding sections later is purely additive: no structural migration."
+        }
+      ],
+      "children": []
+    },
+    "b-16-property-schema-section-collapsibility-33": {
+      "id": "b-16-property-schema-section-collapsibility-33",
+      "type": "heading",
+      "props": {
+        "level": 2
+      },
+      "text": [
+        {
+          "insert": "Section Collapsibility"
+        }
+      ],
+      "children": []
+    },
+    "b-16-property-schema-every-schema-section-can-34": {
+      "id": "b-16-property-schema-every-schema-section-can-34",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "Every schema section can declare whether it collapses and whether it starts open:"
+        }
+      ],
+      "children": []
+    },
+    "b-16-property-schema-collapsible-true-make-35": {
+      "id": "b-16-property-schema-collapsible-true-make-35",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "collapsible: true",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " makes a section header toggle its body."
+        }
+      ],
+      "children": []
+    },
+    "b-16-property-schema-collapsible-false-pin-36": {
+      "id": "b-16-property-schema-collapsible-false-pin-36",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "collapsible: false",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " pins the section open, even for nested sections."
+        }
+      ],
+      "children": []
+    },
+    "b-16-property-schema-defaultopen-false-sta-37": {
+      "id": "b-16-property-schema-defaultopen-false-sta-37",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "defaultOpen: false",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " starts a section collapsed. On top-level sections, this also opts the section into collapse behavior."
+        }
+      ],
+      "children": []
+    },
+    "b-16-property-schema-defaultopen-true-star-38": {
+      "id": "b-16-property-schema-defaultopen-true-star-38",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "defaultOpen: true",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " starts a collapsible section expanded."
+        }
+      ],
+      "children": []
+    },
+    "b-16-property-schema-top-level-sections-are-o-39": {
+      "id": "b-16-property-schema-top-level-sections-are-o-39",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "Top-level sections are open by default. Nested sections are collapsible and closed by default unless the schema says otherwise. Use nesting for meaningful ownership boundaries: for example, a broad \"Motion\" section can contain \"Selection\", \"Layer Changes\", and \"Title Prism\" subsections. Avoid using nesting only to hide unrelated settings; if a group needs to collapse, it should still live under the parent concept that owns it."
+        }
+      ],
+      "children": []
+    },
+    "b-16-property-schema-the-general-fallback-40": {
+      "id": "b-16-property-schema-the-general-fallback-40",
+      "type": "heading",
+      "props": {
+        "level": 2
+      },
+      "text": [
+        {
+          "insert": "The General Fallback"
+        }
+      ],
+      "children": []
+    },
+    "b-16-property-schema-when-a-layer-has-no-decl-41": {
+      "id": "b-16-property-schema-when-a-layer-has-no-decl-41",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "When a layer has no declared schema (or a component whose schema hasn't loaded yet), all of its saved properties render under an auto-generated "
+        },
+        {
+          "insert": "General",
+          "attributes": {
+            "bold": true
+          }
+        },
+        {
+          "insert": " section. This ensures every layer is editable immediately."
+        }
+      ],
+      "children": []
+    },
+    "b-16-property-schema-properties-that-exist-in-42": {
+      "id": "b-16-property-schema-properties-that-exist-in-42",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "Properties that exist in the saved data but are absent from the declared schema, "
+        },
+        {
+          "insert": "orphans",
+          "attributes": {
+            "bold": true
+          }
+        },
+        {
+          "insert": ", also render under General. The system infers an input type from the value's runtime type (number → slider, boolean → toggle, color-like string → color field, other string → text). A developer warning names the orphan and the schema source, so renames and removals don't go unnoticed."
+        }
+      ],
+      "children": []
+    },
+    "b-16-property-schema-description-popovers-43": {
+      "id": "b-16-property-schema-description-popovers-43",
+      "type": "heading",
+      "props": {
+        "level": 2
+      },
+      "text": [
+        {
+          "insert": "Description Popovers"
+        }
+      ],
+      "children": []
+    },
+    "b-16-property-schema-each-property-label-is-a-44": {
+      "id": "b-16-property-schema-each-property-label-is-a-44",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "Each property label is a click target. Clicking it opens a small floating popover anchored next to the label, showing the property's full label and description. Clicking outside or pressing Escape dismisses it. Section labels with a description behave the same way; sections without a description render a non-clickable header."
+        }
+      ],
+      "children": []
+    },
+    "b-16-property-schema-this-is-an-explicit-cl-45": {
+      "id": "b-16-property-schema-this-is-an-explicit-cl-45",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "This is an "
+        },
+        {
+          "insert": "explicit click affordance",
+          "attributes": {
+            "bold": true
+          }
+        },
+        {
+          "insert": ", not a hover tooltip. With many properties per inspector, hover tooltips create visual noise; the explicit popup lets the author seek information deliberately."
+        }
+      ],
+      "children": []
+    },
+    "b-16-property-schema-sub-layer-participation-46": {
+      "id": "b-16-property-schema-sub-layer-participation-46",
+      "type": "heading",
+      "props": {
+        "level": 2
+      },
+      "text": [
+        {
+          "insert": "Sub-Layer Participation"
+        }
+      ],
+      "children": []
+    },
+    "b-16-property-schema-sub-layer-editing-contex-47": {
+      "id": "b-16-property-schema-sub-layer-editing-contex-47",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "Sub-layer editing contexts (named SVG sub-layers and foreign media children nested inside glyph-groups) participate in the same sectioned schema rendering. Their schemas come from the same sources the parent uses. The editing experience is uniform regardless of nesting depth."
+        }
+      ],
+      "children": []
+    },
+    "b-16-property-schema-relationship-to-the-mani-48": {
+      "id": "b-16-property-schema-relationship-to-the-mani-48",
+      "type": "heading",
+      "props": {
+        "level": 2
+      },
+      "text": [
+        {
+          "insert": "Relationship to the Manifest Convention"
+        }
+      ],
+      "children": []
+    },
+    "b-16-property-schema-the-property-schema-syst-49": {
+      "id": "b-16-property-schema-the-property-schema-syst-49",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "The property schema system is separate from the "
+        },
+        {
+          "insert": "manifest convention",
+          "attributes": {
+            "reference": {
+              "kind": "doc",
+              "path": "10-scene-engine/10-system-design/15-component-manifest",
+              "label": "manifest convention"
+            }
+          }
+        },
+        {
+          "insert": ". Manifests ("
+        },
+        {
+          "insert": "manifest.json",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ") still declare module-level metadata (name, type, sizing hint) and are used by effects for property fields. For all other layer types, the property schema is the authoritative source of property structure and labels in the inspector."
+        }
+      ],
+      "children": []
+    },
+    "b-16-property-schema-see-authoring-surfaces-50": {
+      "id": "b-16-property-schema-see-authoring-surfaces-50",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "See "
+        },
+        {
+          "insert": "Authoring Surfaces",
+          "attributes": {
+            "reference": {
+              "kind": "doc",
+              "path": "10-scene-engine/10-system-design/40-authoring-surfaces",
+              "label": "Authoring Surfaces"
+            }
+          }
+        },
+        {
+          "insert": " for how schemas integrate into the inspector's section layout."
+        }
+      ],
+      "children": []
+    }
+  }
+}

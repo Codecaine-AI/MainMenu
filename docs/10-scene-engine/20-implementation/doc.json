@@ -1,0 +1,983 @@
+{
+  "schemaVersion": 1,
+  "id": "scene-engine-20-implementation-00-overview",
+  "title": "Scene-Engine: System Architecture (L1)",
+  "root": "b-00-overview-root-44",
+  "blocks": {
+    "b-00-overview-root-44": {
+      "id": "b-00-overview-root-44",
+      "type": "paragraph",
+      "props": {
+        "covers": "How the scene-engine codebase is organized and how its pieces fit together at the file level.",
+        "type": "overview"
+      },
+      "children": [
+        "b-00-overview-the-scene-engine-is-a-ne-2",
+        "b-00-overview-divider-3",
+        "b-00-overview-system-metaphor-mental-4",
+        "b-00-overview-think-of-scene-json-as-5",
+        "b-00-overview-the-renderer-itself-has-6",
+        "b-00-overview-high-level-architecture-7",
+        "b-00-overview-the-big-picture-8",
+        "b-00-overview-code-9",
+        "b-00-overview-mermaid-10",
+        "b-00-overview-key-architectural-decisi-11",
+        "b-00-overview-for-the-why-behind-the-12",
+        "b-00-overview-framework-free-rendere-13",
+        "b-00-overview-string-keyed-renderer-14",
+        "b-00-overview-zustand-editor-store-15",
+        "b-00-overview-next-route-handlers-16",
+        "b-00-overview-desktop-shell-around-t-17",
+        "b-00-overview-private-engine-folder-18",
+        "b-00-overview-project-registries-si-19",
+        "b-00-overview-file-tree-20",
+        "b-00-overview-code-21",
+        "b-00-overview-code-22",
+        "b-00-overview-section-index-23",
+        "b-00-overview-10-renderer-10-render-24",
+        "b-00-overview-the-print-engine-lo-25",
+        "b-00-overview-20-editor-20-editor-0-26",
+        "b-00-overview-the-word-processor-27",
+        "b-00-overview-30-desktop-app-30-des-28",
+        "b-00-overview-the-native-shell-el-29",
+        "b-00-overview-40-asset-pipeline-40-30",
+        "b-00-overview-the-intake-standalo-31",
+        "b-00-overview-99-appendix-99-append-32",
+        "b-00-overview-the-runbook-how-to-33",
+        "b-00-overview-cross-cutting-concerns-34",
+        "b-00-overview-scene-data-format-s-35",
+        "b-00-overview-asset-registry-shape-36",
+        "b-00-overview-failure-modes-see-37",
+        "b-00-overview-related-38",
+        "b-00-overview-foundation-00-found-39",
+        "b-00-overview-system-design-10-sy-40",
+        "b-00-overview-appendix-99-appendix-0-41",
+        "b-00-overview-agents-md-a-42",
+        "b-00-overview-apps-scene-engine-agen-43"
+      ]
+    },
+    "b-00-overview-the-scene-engine-is-a-ne-2": {
+      "id": "b-00-overview-the-scene-engine-is-a-ne-2",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "The scene-engine is a Next.js app under "
+        },
+        {
+          "insert": "apps/scene-engine/",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ". It has four coordinated subsystems: a "
+        },
+        {
+          "insert": "plain-JS production renderer",
+          "attributes": {
+            "bold": true
+          }
+        },
+        {
+          "insert": ", a "
+        },
+        {
+          "insert": "React/Zustand visual editor",
+          "attributes": {
+            "bold": true
+          }
+        },
+        {
+          "insert": ", "
+        },
+        {
+          "insert": "Next route handlers",
+          "attributes": {
+            "bold": true
+          }
+        },
+        {
+          "insert": " for scene, asset, registry, font, and export operations, and the "
+        },
+        {
+          "insert": "Main Menu Electron shell",
+          "attributes": {
+            "bold": true
+          }
+        },
+        {
+          "insert": " for desktop authoring, all operating on project-local "
+        },
+        {
+          "insert": "scene.json",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " files and registries discovered through a workspace catalog."
+        }
+      ],
+      "children": []
+    },
+    "b-00-overview-divider-3": {
+      "id": "b-00-overview-divider-3",
+      "type": "divider",
+      "props": {},
+      "children": []
+    },
+    "b-00-overview-system-metaphor-mental-4": {
+      "id": "b-00-overview-system-metaphor-mental-4",
+      "type": "heading",
+      "props": {
+        "level": 2
+      },
+      "text": [
+        {
+          "insert": "System Metaphor / Mental Model"
+        }
+      ],
+      "children": []
+    },
+    "b-00-overview-think-of-scene-json-as-5": {
+      "id": "b-00-overview-think-of-scene-json-as-5",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "Think of "
+        },
+        {
+          "insert": "scene.json",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " as the document and the renderer as a print engine. The editor and the agent are two different word processors that edit the document. The print engine doesn't care which produced the document; it only cares the document is valid."
+        }
+      ],
+      "children": []
+    },
+    "b-00-overview-the-renderer-itself-has-6": {
+      "id": "b-00-overview-the-renderer-itself-has-6",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "The renderer itself has no framework or virtual DOM. It dispatches by string "
+        },
+        {
+          "insert": "type",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " to small renderer functions. React owns the page/editor shells, while Zustand owns editor state and mutations."
+        }
+      ],
+      "children": []
+    },
+    "b-00-overview-high-level-architecture-7": {
+      "id": "b-00-overview-high-level-architecture-7",
+      "type": "heading",
+      "props": {
+        "level": 2
+      },
+      "text": [
+        {
+          "insert": "High-Level Architecture"
+        }
+      ],
+      "children": []
+    },
+    "b-00-overview-the-big-picture-8": {
+      "id": "b-00-overview-the-big-picture-8",
+      "type": "heading",
+      "props": {
+        "level": 3
+      },
+      "text": [
+        {
+          "insert": "The Big Picture"
+        }
+      ],
+      "children": []
+    },
+    "b-00-overview-code-9": {
+      "id": "b-00-overview-code-9",
+      "type": "code",
+      "props": {},
+      "text": [
+        {
+          "insert": "workspace catalog → project root/Assets/Scenes/<scene>/scene.json ── fetched ──> renderer ── DOM ──> stage\n   ▲\n   │ writes\n   ├── visual editor (browser) ── PUT /api/scenes/{id}?project={project} ── Next route\n   │\n   └── Pi Agent / file edits (desktop-owned SDK session)"
+        }
+      ],
+      "children": []
+    },
+    "b-00-overview-mermaid-10": {
+      "id": "b-00-overview-mermaid-10",
+      "type": "code",
+      "props": {
+        "language": "mermaid"
+      },
+      "text": [
+        {
+          "insert": "graph TD\n    SJ[scene.json files]\n    AR[project registries]\n    RND[Renderer app/_engine/renderer]\n    ED[Visual editor app/editor]\n    API[Next route handlers app/api]\n    DESK[Main Menu desktop shell]\n    AGT[Pi Agent / file edits]\n    DOM[Rendered DOM stage]\n    ZIP[Standalone export zip]\n\n    SJ --> RND\n    AR --> RND\n    RND --> DOM\n    SJ --> ED\n    AR --> ED\n    ED -->|PUT| API\n    API -->|writes| SJ\n    DESK -->|loads| ED\n    DESK -->|IPC| AGT\n    AGT -->|file write| SJ\n    AGT -->|PUT| API\n    SJ --> ZIP\n    AR --> ZIP\n    RND --> ZIP"
+        }
+      ],
+      "children": []
+    },
+    "b-00-overview-key-architectural-decisi-11": {
+      "id": "b-00-overview-key-architectural-decisi-11",
+      "type": "heading",
+      "props": {
+        "level": 3
+      },
+      "text": [
+        {
+          "insert": "Key Architectural Decisions"
+        }
+      ],
+      "children": []
+    },
+    "b-00-overview-for-the-why-behind-the-12": {
+      "id": "b-00-overview-for-the-why-behind-the-12",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "For the "
+        },
+        {
+          "insert": "why",
+          "attributes": {
+            "italic": true
+          }
+        },
+        {
+          "insert": " behind these, see "
+        },
+        {
+          "insert": "Foundation/principles",
+          "attributes": {
+            "reference": {
+              "kind": "doc",
+              "path": "10-scene-engine/00-foundation/30-principles",
+              "label": "Foundation/principles"
+            }
+          }
+        },
+        {
+          "insert": "."
+        }
+      ],
+      "children": []
+    },
+    "b-00-overview-framework-free-rendere-13": {
+      "id": "b-00-overview-framework-free-rendere-13",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "Framework-free renderer.",
+          "attributes": {
+            "bold": true
+          }
+        },
+        {
+          "insert": " ES modules throughout. The renderer is small enough that adding a framework would dominate it."
+        }
+      ],
+      "children": []
+    },
+    "b-00-overview-string-keyed-renderer-14": {
+      "id": "b-00-overview-string-keyed-renderer-14",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "String-keyed renderer registry",
+          "attributes": {
+            "bold": true
+          }
+        },
+        {
+          "insert": " ("
+        },
+        {
+          "insert": "registerRenderer(type, fn)",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": "). New layer types are an extension point: register a renderer, add an asset entry, done."
+        }
+      ],
+      "children": []
+    },
+    "b-00-overview-zustand-editor-store-15": {
+      "id": "b-00-overview-zustand-editor-store-15",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "Zustand editor store.",
+          "attributes": {
+            "bold": true
+          }
+        },
+        {
+          "insert": " Panels communicate through selectors and mutations rather than through each other directly."
+        }
+      ],
+      "children": []
+    },
+    "b-00-overview-next-route-handlers-16": {
+      "id": "b-00-overview-next-route-handlers-16",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "Next route handlers.",
+          "attributes": {
+            "bold": true
+          }
+        },
+        {
+          "insert": " The filesystem-backed APIs live under "
+        },
+        {
+          "insert": "app/api/",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ", so dev and production behavior share the same implementation."
+        }
+      ],
+      "children": []
+    },
+    "b-00-overview-desktop-shell-around-t-17": {
+      "id": "b-00-overview-desktop-shell-around-t-17",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "Desktop shell around the same app.",
+          "attributes": {
+            "bold": true
+          }
+        },
+        {
+          "insert": " Electron packages the Next standalone runtime and exposes only a typed preload bridge. The renderer remains a browser surface with "
+        },
+        {
+          "insert": "contextIsolation",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " on and Node integration off."
+        }
+      ],
+      "children": []
+    },
+    "b-00-overview-private-engine-folder-18": {
+      "id": "b-00-overview-private-engine-folder-18",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "Private engine folder.",
+          "attributes": {
+            "bold": true
+          }
+        },
+        {
+          "insert": " Shared implementation code lives under "
+        },
+        {
+          "insert": "app/_engine/",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ", a private App Router folder targeted by the "
+        },
+        {
+          "insert": "@/*",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " alias."
+        }
+      ],
+      "children": []
+    },
+    "b-00-overview-project-registries-si-19": {
+      "id": "b-00-overview-project-registries-si-19",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "Project registries, single merged map.",
+          "attributes": {
+            "bold": true
+          }
+        },
+        {
+          "insert": " "
+        },
+        {
+          "insert": "ProjectSettings/registries/assets.json",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " (uploadable file containers: audio/image/video/glyph/font), "
+        },
+        {
+          "insert": "ProjectSettings/registries/modules.json",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " (authored effects/components), and discovered project fonts are loaded in parallel and merged into one ID-keyed map. Scenes reference IDs; registries hold file/module pointers."
+        }
+      ],
+      "children": []
+    },
+    "b-00-overview-file-tree-20": {
+      "id": "b-00-overview-file-tree-20",
+      "type": "heading",
+      "props": {
+        "level": 2
+      },
+      "text": [
+        {
+          "insert": "File Tree"
+        }
+      ],
+      "children": []
+    },
+    "b-00-overview-code-21": {
+      "id": "b-00-overview-code-21",
+      "type": "code",
+      "props": {},
+      "text": [
+        {
+          "insert": "apps/scene-engine/\n├── workspace.catalog.example.json committed catalog example\n├── workspace.catalog.json      local gitignored catalog\n├── app/\n│   ├── page.tsx                dashboard\n│   ├── projects/[projectId]/page.tsx project scene list\n│   ├── scenes/[id]/page.tsx    scene preview\n│   ├── editor/                 visual editor\n│   ├── upload/                 upload page\n│   ├── api/                    route handlers\n│   └── _engine/                private shared renderer/store/lib/types/export code\n├── desktop/                    Electron main/preload/scripts/types\n└── package.json                Next scripts"
+        }
+      ],
+      "children": []
+    },
+    "b-00-overview-code-22": {
+      "id": "b-00-overview-code-22",
+      "type": "code",
+      "props": {},
+      "text": [
+        {
+          "insert": "docs/20-implementation/\n├── 00-overview.md              (this file)\n├── 10-renderer/                Production renderer + asset registry\n├── 20-editor/                  Visual editor (3 panels, state, mutations)\n├── 30-desktop-app/             Main Menu Electron shell + Pi Agent bridge\n├── 40-asset-pipeline/          Upload + asset selection routes, asset-types lib, /upload page\n└── 99-appendix/                Setup, dev workflow, quick references"
+        }
+      ],
+      "children": []
+    },
+    "b-00-overview-section-index-23": {
+      "id": "b-00-overview-section-index-23",
+      "type": "heading",
+      "props": {
+        "level": 2
+      },
+      "text": [
+        {
+          "insert": "Section Index"
+        }
+      ],
+      "children": []
+    },
+    "b-00-overview-10-renderer-10-render-24": {
+      "id": "b-00-overview-10-renderer-10-render-24",
+      "type": "heading",
+      "props": {
+        "level": 3
+      },
+      "text": [
+        {
+          "insert": "10-renderer/",
+          "attributes": {
+            "reference": {
+              "kind": "doc",
+              "path": "10-scene-engine/20-implementation/10-renderer",
+              "label": "10-renderer/"
+            }
+          }
+        }
+      ],
+      "children": []
+    },
+    "b-00-overview-the-print-engine-lo-25": {
+      "id": "b-00-overview-the-print-engine-lo-25",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "The print engine.",
+          "attributes": {
+            "bold": true
+          }
+        },
+        {
+          "insert": " Loads scenes and the asset registry, dispatches each layer to a typed renderer, builds DOM. The only place that knows how a scene becomes pixels."
+        }
+      ],
+      "children": []
+    },
+    "b-00-overview-20-editor-20-editor-0-26": {
+      "id": "b-00-overview-20-editor-20-editor-0-26",
+      "type": "heading",
+      "props": {
+        "level": 3
+      },
+      "text": [
+        {
+          "insert": "20-editor/",
+          "attributes": {
+            "reference": {
+              "kind": "doc",
+              "path": "10-scene-engine/20-implementation/20-editor",
+              "label": "20-editor/"
+            }
+          }
+        }
+      ],
+      "children": []
+    },
+    "b-00-overview-the-word-processor-27": {
+      "id": "b-00-overview-the-word-processor-27",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "The word processor.",
+          "attributes": {
+            "bold": true
+          }
+        },
+        {
+          "insert": " Three-panel browser app: canvas, hierarchy, inspector, sharing a small reactive store. Reads, mutates, saves, and exports "
+        },
+        {
+          "insert": "scene.json",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": "."
+        }
+      ],
+      "children": []
+    },
+    "b-00-overview-30-desktop-app-30-des-28": {
+      "id": "b-00-overview-30-desktop-app-30-des-28",
+      "type": "heading",
+      "props": {
+        "level": 3
+      },
+      "text": [
+        {
+          "insert": "30-desktop-app/",
+          "attributes": {
+            "reference": {
+              "kind": "doc",
+              "path": "10-scene-engine/20-implementation/30-desktop-app",
+              "label": "30-desktop-app/"
+            }
+          }
+        }
+      ],
+      "children": []
+    },
+    "b-00-overview-the-native-shell-el-29": {
+      "id": "b-00-overview-the-native-shell-el-29",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "The native shell.",
+          "attributes": {
+            "bold": true
+          }
+        },
+        {
+          "insert": " Electron app named Main Menu. It packages or locates the Next runtime, opens the editor, exposes "
+        },
+        {
+          "insert": "window.mainMenu",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ", and owns native authority for the Pi Agent session."
+        }
+      ],
+      "children": []
+    },
+    "b-00-overview-40-asset-pipeline-40-30": {
+      "id": "b-00-overview-40-asset-pipeline-40-30",
+      "type": "heading",
+      "props": {
+        "level": 3
+      },
+      "text": [
+        {
+          "insert": "40-asset-pipeline/",
+          "attributes": {
+            "reference": {
+              "kind": "doc",
+              "path": "10-scene-engine/20-implementation/40-asset-pipeline",
+              "label": "40-asset-pipeline/"
+            }
+          }
+        }
+      ],
+      "children": []
+    },
+    "b-00-overview-the-intake-standalo-31": {
+      "id": "b-00-overview-the-intake-standalo-31",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "The intake.",
+          "attributes": {
+            "bold": true
+          }
+        },
+        {
+          "insert": " Standalone "
+        },
+        {
+          "insert": "/upload",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " page, the API routes that write files and mutate the selected project's asset registry, and the shared "
+        },
+        {
+          "insert": "asset-types",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " library used by both client and server."
+        }
+      ],
+      "children": []
+    },
+    "b-00-overview-99-appendix-99-append-32": {
+      "id": "b-00-overview-99-appendix-99-append-32",
+      "type": "heading",
+      "props": {
+        "level": 3
+      },
+      "text": [
+        {
+          "insert": "99-appendix/",
+          "attributes": {
+            "reference": {
+              "kind": "doc",
+              "path": "10-scene-engine/20-implementation/99-appendix",
+              "label": "99-appendix/"
+            }
+          }
+        }
+      ],
+      "children": []
+    },
+    "b-00-overview-the-runbook-how-to-33": {
+      "id": "b-00-overview-the-runbook-how-to-33",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "The runbook.",
+          "attributes": {
+            "bold": true
+          }
+        },
+        {
+          "insert": " How to start the dev server, the URLs that matter, where files live for each piece."
+        }
+      ],
+      "children": []
+    },
+    "b-00-overview-cross-cutting-concerns-34": {
+      "id": "b-00-overview-cross-cutting-concerns-34",
+      "type": "heading",
+      "props": {
+        "level": 2
+      },
+      "text": [
+        {
+          "insert": "Cross-Cutting Concerns"
+        }
+      ],
+      "children": []
+    },
+    "b-00-overview-scene-data-format-s-35": {
+      "id": "b-00-overview-scene-data-format-s-35",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "Scene data format",
+          "attributes": {
+            "bold": true
+          }
+        },
+        {
+          "insert": ": see "
+        },
+        {
+          "insert": "System Design / Scene Data Model",
+          "attributes": {
+            "reference": {
+              "kind": "doc",
+              "path": "10-scene-engine/10-system-design/10-scene-data-model",
+              "label": "System Design / Scene Data Model"
+            }
+          }
+        },
+        {
+          "insert": ". The L4 file headers in the renderer reference back to that doc."
+        }
+      ],
+      "children": []
+    },
+    "b-00-overview-asset-registry-shape-36": {
+      "id": "b-00-overview-asset-registry-shape-36",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "Asset registry shape",
+          "attributes": {
+            "bold": true
+          }
+        },
+        {
+          "insert": ": see "
+        },
+        {
+          "insert": "System Design / Asset Registry",
+          "attributes": {
+            "reference": {
+              "kind": "doc",
+              "path": "10-scene-engine/10-system-design/20-asset-registry",
+              "label": "System Design / Asset Registry"
+            }
+          }
+        },
+        {
+          "insert": "."
+        }
+      ],
+      "children": []
+    },
+    "b-00-overview-failure-modes-see-37": {
+      "id": "b-00-overview-failure-modes-see-37",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "Failure modes",
+          "attributes": {
+            "bold": true
+          }
+        },
+        {
+          "insert": ": see "
+        },
+        {
+          "insert": "System Design / Rendering Pipeline",
+          "attributes": {
+            "reference": {
+              "kind": "doc",
+              "path": "10-scene-engine/10-system-design/30-rendering-pipeline",
+              "section": "failure-modes",
+              "label": "System Design / Rendering Pipeline"
+            }
+          }
+        },
+        {
+          "insert": ". Renderers warn-and-skip on missing assets/sub-layers; renderer dispatch throws on unregistered types."
+        }
+      ],
+      "children": []
+    },
+    "b-00-overview-related-38": {
+      "id": "b-00-overview-related-38",
+      "type": "heading",
+      "props": {
+        "level": 2
+      },
+      "text": [
+        {
+          "insert": "Related"
+        }
+      ],
+      "children": []
+    },
+    "b-00-overview-foundation-00-found-39": {
+      "id": "b-00-overview-foundation-00-found-39",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "Foundation",
+          "attributes": {
+            "reference": {
+              "kind": "doc",
+              "path": "10-scene-engine/00-foundation",
+              "label": "Foundation"
+            }
+          }
+        },
+        {
+          "insert": ": purpose, mental model, principles."
+        }
+      ],
+      "children": []
+    },
+    "b-00-overview-system-design-10-sy-40": {
+      "id": "b-00-overview-system-design-10-sy-40",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "System Design",
+          "attributes": {
+            "reference": {
+              "kind": "doc",
+              "path": "10-scene-engine/10-system-design",
+              "label": "System Design"
+            }
+          }
+        },
+        {
+          "insert": ": language-agnostic blueprint."
+        }
+      ],
+      "children": []
+    },
+    "b-00-overview-appendix-99-appendix-0-41": {
+      "id": "b-00-overview-appendix-99-appendix-0-41",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "Appendix",
+          "attributes": {
+            "reference": {
+              "kind": "doc",
+              "path": "10-scene-engine/20-implementation/99-appendix",
+              "label": "Appendix"
+            }
+          }
+        },
+        {
+          "insert": ": setup, dev URLs, references."
+        }
+      ],
+      "children": []
+    },
+    "b-00-overview-agents-md-a-42": {
+      "id": "b-00-overview-agents-md-a-42",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "`AGENTS.md`",
+          "attributes": {
+            "reference": {
+              "kind": "source",
+              "path": "AGENTS.md",
+              "label": "`AGENTS.md`"
+            }
+          }
+        },
+        {
+          "insert": ": repository-level agent instructions and scene-engine dev server assumptions."
+        }
+      ],
+      "children": []
+    },
+    "b-00-overview-apps-scene-engine-agen-43": {
+      "id": "b-00-overview-apps-scene-engine-agen-43",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "`apps/scene-engine/agents.md`",
+          "attributes": {
+            "reference": {
+              "kind": "source",
+              "path": "apps/scene-engine/agents.md",
+              "label": "`apps/scene-engine/agents.md`"
+            }
+          }
+        },
+        {
+          "insert": ": quick-start for agents authoring scenes."
+        }
+      ],
+      "children": []
+    }
+  }
+}

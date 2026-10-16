@@ -1,0 +1,660 @@
+{
+  "schemaVersion": 1,
+  "id": "scene-engine-00-foundation-20-vision",
+  "title": "Vision",
+  "root": "b-20-vision-root-36",
+  "blocks": {
+    "b-20-vision-root-36": {
+      "id": "b-20-vision-root-36",
+      "type": "paragraph",
+      "props": {
+        "concepts": [
+          "unity-scene",
+          "composition",
+          "shared-file-authoring",
+          "vertical-slice"
+        ],
+        "covers": "The Unity-style scene model the engine is built around — pages as scenes, scenes as composed asset layers, edited by human UI, desktop shell, and agent."
+      },
+      "children": [
+        "b-20-vision-a-scene-engine-that-make-2",
+        "b-20-vision-divider-3",
+        "b-20-vision-unity-scene-as-the-menta-4",
+        "b-20-vision-a-scene-corresponds-5",
+        "b-20-vision-scenes-are-not-interacti-6",
+        "b-20-vision-similarly-to-the-unity-7",
+        "b-20-vision-asset-and-module-types-8",
+        "b-20-vision-the-engine-treats-upload-9",
+        "b-20-vision-type-what-i-10-tbl",
+        "b-20-vision-tree-hierarchy-not-a-fl-11",
+        "b-20-vision-layers-form-a-tree-12",
+        "b-20-vision-groups-are-collapsible-13",
+        "b-20-vision-sub-layers-within-a-grou-14",
+        "b-20-vision-foreign-assets-can-int-15",
+        "b-20-vision-z-order-is-array-positio-16",
+        "b-20-vision-shared-file-authoring-17",
+        "b-20-vision-the-same-project-data-is-18",
+        "b-20-vision-visual-editor-brow-19",
+        "b-20-vision-main-menu-desktop-shel-20",
+        "b-20-vision-pi-agent-file-api-21",
+        "b-20-vision-no-surface-is-the-source-22",
+        "b-20-vision-the-vertical-slice-code-23",
+        "b-20-vision-one-concrete-scene-end-t-24",
+        "b-20-vision-codecaine-logo-centered-25",
+        "b-20-vision-a-texture-video-placed-26",
+        "b-20-vision-full-stage-video-backgro-27",
+        "b-20-vision-press-start-interactiv-28",
+        "b-20-vision-crt-overlay-on-top-of-ev-29",
+        "b-20-vision-audio-cue-30",
+        "b-20-vision-this-scene-exercises-eve-31",
+        "b-20-vision-output-model-32",
+        "b-20-vision-scenes-build-to-a-mult-33",
+        "b-20-vision-audience-34",
+        "b-20-vision-built-for-the-author-35"
+      ]
+    },
+    "b-20-vision-a-scene-engine-that-make-2": {
+      "id": "b-20-vision-a-scene-engine-that-make-2",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "A scene-engine that makes "
+        },
+        {
+          "insert": "composition",
+          "attributes": {
+            "bold": true
+          }
+        },
+        {
+          "insert": " the primary authoring activity. Define assets once in a project workspace, drop them into a scene, edit their properties visually or programmatically, then build the result as a deployable web page or packaged desktop authoring app. The first concrete deliverable is the Codecaine title screen: a layer-rich scene that exercises every major asset path end-to-end."
+        }
+      ],
+      "children": []
+    },
+    "b-20-vision-divider-3": {
+      "id": "b-20-vision-divider-3",
+      "type": "divider",
+      "props": {},
+      "children": []
+    },
+    "b-20-vision-unity-scene-as-the-menta-4": {
+      "id": "b-20-vision-unity-scene-as-the-menta-4",
+      "type": "heading",
+      "props": {
+        "level": 2
+      },
+      "text": [
+        {
+          "insert": "Unity Scene as the Mental Model"
+        }
+      ],
+      "children": []
+    },
+    "b-20-vision-a-scene-corresponds-5": {
+      "id": "b-20-vision-a-scene-corresponds-5",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "A "
+        },
+        {
+          "insert": "scene",
+          "attributes": {
+            "bold": true
+          }
+        },
+        {
+          "insert": " corresponds 1:1 to a page. Each scene is one full stage (1440×1080), and assets are placed "
+        },
+        {
+          "insert": "into",
+          "attributes": {
+            "italic": true
+          }
+        },
+        {
+          "insert": " the scene as typed layers. This mirrors Unity: a Scene is the actual stage of the game, and everything for that stage is placed into it as assets."
+        }
+      ],
+      "children": []
+    },
+    "b-20-vision-scenes-are-not-interacti-6": {
+      "id": "b-20-vision-scenes-are-not-interacti-6",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "Scenes are not interactive applications. They are landing pages and static websites that "
+        },
+        {
+          "insert": "feel",
+          "attributes": {
+            "italic": true
+          }
+        },
+        {
+          "insert": " like video-game UI screens: title screens, menus, selection screens. The focus is on visual richness and composition, not application logic."
+        }
+      ],
+      "children": []
+    },
+    "b-20-vision-similarly-to-the-unity-7": {
+      "id": "b-20-vision-similarly-to-the-unity-7",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "\"Similarly to the Unity naming, where a Scene is an actual stage of the game, and then everything for that stage is put in as assets into that scene.\"",
+          "attributes": {
+            "italic": true
+          }
+        }
+      ],
+      "children": []
+    },
+    "b-20-vision-asset-and-module-types-8": {
+      "id": "b-20-vision-asset-and-module-types-8",
+      "type": "heading",
+      "props": {
+        "level": 2
+      },
+      "text": [
+        {
+          "insert": "Asset And Module Types"
+        }
+      ],
+      "children": []
+    },
+    "b-20-vision-the-engine-treats-upload-9": {
+      "id": "b-20-vision-the-engine-treats-upload-9",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "The engine treats uploadable files and authored modules as separate registry entries because they are created and maintained differently:"
+        }
+      ],
+      "children": []
+    },
+    "b-20-vision-type-what-i-10-tbl": {
+      "id": "b-20-vision-type-what-i-10-tbl",
+      "type": "structured-table",
+      "props": {
+        "columns": [
+          "Type",
+          "What it is"
+        ],
+        "rows": [
+          [
+            [
+              {
+                "insert": "audio",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ],
+            "Web Audio sound (start cue, ambient loops)"
+          ],
+          [
+            [
+              {
+                "insert": "image",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ],
+            "Static raster media"
+          ],
+          [
+            [
+              {
+                "insert": "video",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ],
+            "Full-stage or interleaved video loops"
+          ],
+          [
+            [
+              {
+                "insert": "glyph",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ],
+            "Layered SVG glyph from the font pipeline"
+          ],
+          [
+            [
+              {
+                "insert": "font",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ],
+            "Project-owned font files"
+          ],
+          [
+            [
+              {
+                "insert": "effect",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ],
+            "Authored CSS effect module (CRT overlay, chromatic aberration)"
+          ],
+          [
+            [
+              {
+                "insert": "component",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ],
+            "Authored JS component module (menu, press-start, procedural shapes)"
+          ]
+        ]
+      },
+      "children": []
+    },
+    "b-20-vision-tree-hierarchy-not-a-fl-11": {
+      "id": "b-20-vision-tree-hierarchy-not-a-fl-11",
+      "type": "heading",
+      "props": {
+        "level": 2
+      },
+      "text": [
+        {
+          "insert": "Tree Hierarchy, Not a Flat Stack"
+        }
+      ],
+      "children": []
+    },
+    "b-20-vision-layers-form-a-tree-12": {
+      "id": "b-20-vision-layers-form-a-tree-12",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "Layers form a "
+        },
+        {
+          "insert": "tree",
+          "attributes": {
+            "bold": true
+          }
+        },
+        {
+          "insert": ". Most layers are leaves; some are "
+        },
+        {
+          "insert": "groups",
+          "attributes": {
+            "bold": true
+          }
+        },
+        {
+          "insert": " (e.g. the Codecaine logo, which is itself a stack of ~30 SVG sub-layers)."
+        }
+      ],
+      "children": []
+    },
+    "b-20-vision-groups-are-collapsible-13": {
+      "id": "b-20-vision-groups-are-collapsible-13",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "Groups are collapsible: one row in the layer panel by default."
+        }
+      ],
+      "children": []
+    },
+    "b-20-vision-sub-layers-within-a-grou-14": {
+      "id": "b-20-vision-sub-layers-within-a-grou-14",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "Sub-layers within a group are individually configurable (visibility, blend, hue, opacity)."
+        }
+      ],
+      "children": []
+    },
+    "b-20-vision-foreign-assets-can-int-15": {
+      "id": "b-20-vision-foreign-assets-can-int-15",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "Foreign assets can interleave between a group's sub-layers",
+          "attributes": {
+            "bold": true
+          }
+        },
+        {
+          "insert": ": for example, placing a fire-video texture between the chrome extrusion shadow and the chrome face of the logo. This is what lets z-depth be expressive at fine granularity."
+        }
+      ],
+      "children": []
+    },
+    "b-20-vision-z-order-is-array-positio-16": {
+      "id": "b-20-vision-z-order-is-array-positio-16",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "Z-order is array position. Last entry renders on top."
+        }
+      ],
+      "children": []
+    },
+    "b-20-vision-shared-file-authoring-17": {
+      "id": "b-20-vision-shared-file-authoring-17",
+      "type": "heading",
+      "props": {
+        "level": 2
+      },
+      "text": [
+        {
+          "insert": "Shared-File Authoring"
+        }
+      ],
+      "children": []
+    },
+    "b-20-vision-the-same-project-data-is-18": {
+      "id": "b-20-vision-the-same-project-data-is-18",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "The same project data is edited by multiple authoring surfaces:"
+        }
+      ],
+      "children": []
+    },
+    "b-20-vision-visual-editor-brow-19": {
+      "id": "b-20-vision-visual-editor-brow-19",
+      "type": "list-item",
+      "props": {
+        "ordered": true
+      },
+      "text": [
+        {
+          "insert": "Visual editor",
+          "attributes": {
+            "bold": true
+          }
+        },
+        {
+          "insert": ". Browser UI with drag-and-drop, layer hierarchy, property inspector, deliberate save command, asset selection, and export action."
+        }
+      ],
+      "children": []
+    },
+    "b-20-vision-main-menu-desktop-shel-20": {
+      "id": "b-20-vision-main-menu-desktop-shel-20",
+      "type": "list-item",
+      "props": {
+        "ordered": true
+      },
+      "text": [
+        {
+          "insert": "Main Menu desktop shell",
+          "attributes": {
+            "bold": true
+          }
+        },
+        {
+          "insert": ". Electron app that opens the same editor and owns local native capabilities."
+        }
+      ],
+      "children": []
+    },
+    "b-20-vision-pi-agent-file-api-21": {
+      "id": "b-20-vision-pi-agent-file-api-21",
+      "type": "list-item",
+      "props": {
+        "ordered": true
+      },
+      "text": [
+        {
+          "insert": "Pi Agent / file API",
+          "attributes": {
+            "bold": true
+          }
+        },
+        {
+          "insert": ". Desktop chat agent or external AI reads and writes project files directly, or PUTs to the Next API route."
+        }
+      ],
+      "children": []
+    },
+    "b-20-vision-no-surface-is-the-source-22": {
+      "id": "b-20-vision-no-surface-is-the-source-22",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "No surface is the source of truth. Project files are. The pattern was proven at the glyph level by the font app's "
+        },
+        {
+          "insert": "layer-recipe.json",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": "; the scene-engine generalizes it to whole-page compositions and project workspaces."
+        }
+      ],
+      "children": []
+    },
+    "b-20-vision-the-vertical-slice-code-23": {
+      "id": "b-20-vision-the-vertical-slice-code-23",
+      "type": "heading",
+      "props": {
+        "level": 2
+      },
+      "text": [
+        {
+          "insert": "The Vertical Slice: Codecaine Title Screen"
+        }
+      ],
+      "children": []
+    },
+    "b-20-vision-one-concrete-scene-end-t-24": {
+      "id": "b-20-vision-one-concrete-scene-end-t-24",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "One concrete scene end-to-end:"
+        }
+      ],
+      "children": []
+    },
+    "b-20-vision-codecaine-logo-centered-25": {
+      "id": "b-20-vision-codecaine-logo-centered-25",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "Codecaine logo, centered, top-third, idle shimmer"
+        }
+      ],
+      "children": []
+    },
+    "b-20-vision-a-texture-video-placed-26": {
+      "id": "b-20-vision-a-texture-video-placed-26",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "A texture/video placed "
+        },
+        {
+          "insert": "inside",
+          "attributes": {
+            "italic": true
+          }
+        },
+        {
+          "insert": " the logo's layer stack (interleaved sub-layer)"
+        }
+      ],
+      "children": []
+    },
+    "b-20-vision-full-stage-video-backgro-27": {
+      "id": "b-20-vision-full-stage-video-backgro-27",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "Full-stage video background"
+        }
+      ],
+      "children": []
+    },
+    "b-20-vision-press-start-interactiv-28": {
+      "id": "b-20-vision-press-start-interactiv-28",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "\"Press Start\" interactive prompt with blink animation"
+        }
+      ],
+      "children": []
+    },
+    "b-20-vision-crt-overlay-on-top-of-ev-29": {
+      "id": "b-20-vision-crt-overlay-on-top-of-ev-29",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "CRT overlay on top of everything"
+        }
+      ],
+      "children": []
+    },
+    "b-20-vision-audio-cue-30": {
+      "id": "b-20-vision-audio-cue-30",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "Audio cue"
+        }
+      ],
+      "children": []
+    },
+    "b-20-vision-this-scene-exercises-eve-31": {
+      "id": "b-20-vision-this-scene-exercises-eve-31",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "This scene exercises every mechanic the system claims to support: rich z-ordering, mixed asset types, group children with overrides, interleaved foreign assets, components, audio."
+        }
+      ],
+      "children": []
+    },
+    "b-20-vision-output-model-32": {
+      "id": "b-20-vision-output-model-32",
+      "type": "heading",
+      "props": {
+        "level": 2
+      },
+      "text": [
+        {
+          "insert": "Output Model"
+        }
+      ],
+      "children": []
+    },
+    "b-20-vision-scenes-build-to-a-mult-33": {
+      "id": "b-20-vision-scenes-build-to-a-mult-33",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "Scenes build to a "
+        },
+        {
+          "insert": "multi-page web app",
+          "attributes": {
+            "bold": true
+          }
+        },
+        {
+          "insert": " bundled with only the active media/modules/fonts required by the exported scenes. Each scene becomes one page in the built output. Not a single-file export (videos can't be inlined). Not a live-rendered CMS (scenes are authored, then built)."
+        }
+      ],
+      "children": []
+    },
+    "b-20-vision-audience-34": {
+      "id": "b-20-vision-audience-34",
+      "type": "heading",
+      "props": {
+        "level": 2
+      },
+      "text": [
+        {
+          "insert": "Audience"
+        }
+      ],
+      "children": []
+    },
+    "b-20-vision-built-for-the-author-35": {
+      "id": "b-20-vision-built-for-the-author-35",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "Built for "
+        },
+        {
+          "insert": "the author",
+          "attributes": {
+            "bold": true
+          }
+        },
+        {
+          "insert": " as primary user. Not a general-purpose website builder. Polish and documentation matter, but the system is shaped to one person's authoring workflow rather than a multi-tenant product."
+        }
+      ],
+      "children": []
+    }
+  }
+}

@@ -1,0 +1,1222 @@
+{
+  "schemaVersion": 1,
+  "id": "scene-engine-10-system-design-40-authoring-surfaces",
+  "title": "Authoring Surfaces",
+  "root": "b-40-authoring-surfaces-root-59",
+  "blocks": {
+    "b-40-authoring-surfaces-root-59": {
+      "id": "b-40-authoring-surfaces-root-59",
+      "type": "paragraph",
+      "props": {
+        "concepts": [
+          "authoring",
+          "editor",
+          "desktop-shell",
+          "pi-agent",
+          "dirty-tracking",
+          "save",
+          "inspector-sections",
+          "collapsible-sections",
+          "schema-driven",
+          "property-schema"
+        ],
+        "covers": "The authoring contract — visual editor, desktop shell, and Pi Agent editing the same project scene files. Always-present inspector sections. Schema-driven property fields with collapsible sections and description popovers."
+      },
+      "children": [
+        "b-40-authoring-surfaces-scenes-are-authored-thro-2",
+        "b-40-authoring-surfaces-visual-editor-brow-3",
+        "b-40-authoring-surfaces-main-menu-desktop-shel-4",
+        "b-40-authoring-surfaces-pi-agent-desktop-c-5",
+        "b-40-authoring-surfaces-none-of-these-surfaces-i-6",
+        "b-40-authoring-surfaces-divider-7",
+        "b-40-authoring-surfaces-visual-editor-8",
+        "b-40-authoring-surfaces-three-panel-layout-in-th-9",
+        "b-40-authoring-surfaces-panel-role-10-tbl",
+        "b-40-authoring-surfaces-state-is-held-in-a-zusta-11",
+        "b-40-authoring-surfaces-scene-the-current-sc-12",
+        "b-40-authoring-surfaces-registry-merged-asse-13",
+        "b-40-authoring-surfaces-selectedpath-a-dotte-14",
+        "b-40-authoring-surfaces-mutations-mutateobject-15",
+        "b-40-authoring-surfaces-always-present-inspector-16",
+        "b-40-authoring-surfaces-every-selected-object-sh-17",
+        "b-40-authoring-surfaces-header-name-type-18",
+        "b-40-authoring-surfaces-asset-read-only-as-19",
+        "b-40-authoring-surfaces-transform-fill-tog-20",
+        "b-40-authoring-surfaces-appearance-opacity-21",
+        "b-40-authoring-surfaces-properties-rendere-22",
+        "b-40-authoring-surfaces-slots-glyph-groups-23",
+        "b-40-authoring-surfaces-events-trigger-24",
+        "b-40-authoring-surfaces-the-always-present-rule-25",
+        "b-40-authoring-surfaces-dirty-tracking-and-save-26",
+        "b-40-authoring-surfaces-edits-set-the-dirty-flag-27",
+        "b-40-authoring-surfaces-the-dirty-flag-is-not-pe-28",
+        "b-40-authoring-surfaces-export-29",
+        "b-40-authoring-surfaces-the-project-page-s-expor-30",
+        "b-40-authoring-surfaces-desktop-shell-31",
+        "b-40-authoring-surfaces-main-menu-is-a-desktop-h-32",
+        "b-40-authoring-surfaces-an-electron-window-for-33",
+        "b-40-authoring-surfaces-a-typed-window-mainmenu-34",
+        "b-40-authoring-surfaces-packaged-runtime-startup-35",
+        "b-40-authoring-surfaces-a-writable-workspace-loc-36",
+        "b-40-authoring-surfaces-pi-agent-ipc-owned-by-th-37",
+        "b-40-authoring-surfaces-the-browser-renderer-rem-38",
+        "b-40-authoring-surfaces-pi-agent-file-surface-39",
+        "b-40-authoring-surfaces-the-pi-agent-can-read-an-40",
+        "b-40-authoring-surfaces-read-open-the-catal-41",
+        "b-40-authoring-surfaces-write-file-edit-t-42",
+        "b-40-authoring-surfaces-write-api-put-a-43",
+        "b-40-authoring-surfaces-in-the-desktop-app-the-44",
+        "b-40-authoring-surfaces-the-agent-does-not-subsc-45",
+        "b-40-authoring-surfaces-the-canonical-object-sha-46",
+        "b-40-authoring-surfaces-why-reload-based-handoff-47",
+        "b-40-authoring-surfaces-real-time-collaboration-48",
+        "b-40-authoring-surfaces-what-the-surfaces-must-k-49",
+        "b-40-authoring-surfaces-all-surfaces-must-unders-50",
+        "b-40-authoring-surfaces-the-scene-data-model-1-51",
+        "b-40-authoring-surfaces-the-project-model-05-p-52",
+        "b-40-authoring-surfaces-the-component-manifest-53",
+        "b-40-authoring-surfaces-the-rendering-pipeline-54",
+        "b-40-authoring-surfaces-the-visual-editor-does-n-55",
+        "b-40-authoring-surfaces-what-lives-where-56",
+        "b-40-authoring-surfaces-concern-editor-des-57-tbl",
+        "b-40-authoring-surfaces-the-agent-earns-its-keep-58"
+      ]
+    },
+    "b-40-authoring-surfaces-scenes-are-authored-thro-2": {
+      "id": "b-40-authoring-surfaces-scenes-are-authored-thro-2",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "Scenes are authored through three cooperating surfaces:"
+        }
+      ],
+      "children": []
+    },
+    "b-40-authoring-surfaces-visual-editor-brow-3": {
+      "id": "b-40-authoring-surfaces-visual-editor-brow-3",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "Visual editor",
+          "attributes": {
+            "bold": true
+          }
+        },
+        {
+          "insert": ". Browser UI for human layout, selection, inspection, and save."
+        }
+      ],
+      "children": []
+    },
+    "b-40-authoring-surfaces-main-menu-desktop-shel-4": {
+      "id": "b-40-authoring-surfaces-main-menu-desktop-shel-4",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "Main Menu desktop shell",
+          "attributes": {
+            "bold": true
+          }
+        },
+        {
+          "insert": ". Native wrapper that opens the same editor and owns local process authority."
+        }
+      ],
+      "children": []
+    },
+    "b-40-authoring-surfaces-pi-agent-desktop-c-5": {
+      "id": "b-40-authoring-surfaces-pi-agent-desktop-c-5",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "Pi Agent",
+          "attributes": {
+            "bold": true
+          }
+        },
+        {
+          "insert": ". Desktop chat agent that receives current project, scene, and selected-layer context, then works against the local workspace."
+        }
+      ],
+      "children": []
+    },
+    "b-40-authoring-surfaces-none-of-these-surfaces-i-6": {
+      "id": "b-40-authoring-surfaces-none-of-these-surfaces-i-6",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "None of these surfaces is the source of truth. Project files are. The contract between them is simple: edit "
+        },
+        {
+          "insert": "Assets/Scenes/<scene-id>/scene.json",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " and project-local registries, then the other surfaces pick up the change on their next load."
+        }
+      ],
+      "children": []
+    },
+    "b-40-authoring-surfaces-divider-7": {
+      "id": "b-40-authoring-surfaces-divider-7",
+      "type": "divider",
+      "props": {},
+      "children": []
+    },
+    "b-40-authoring-surfaces-visual-editor-8": {
+      "id": "b-40-authoring-surfaces-visual-editor-8",
+      "type": "heading",
+      "props": {
+        "level": 2
+      },
+      "text": [
+        {
+          "insert": "Visual Editor"
+        }
+      ],
+      "children": []
+    },
+    "b-40-authoring-surfaces-three-panel-layout-in-th-9": {
+      "id": "b-40-authoring-surfaces-three-panel-layout-in-th-9",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "Three-panel layout in the browser, whether opened from the Next dev server or inside Main Menu:"
+        }
+      ],
+      "children": []
+    },
+    "b-40-authoring-surfaces-panel-role-10-tbl": {
+      "id": "b-40-authoring-surfaces-panel-role-10-tbl",
+      "type": "structured-table",
+      "props": {
+        "columns": [
+          "Panel",
+          "Role"
+        ],
+        "rows": [
+          [
+            "Top bar",
+            "Active project link, scene name, and save state."
+          ],
+          [
+            "Hierarchy",
+            "Object tree, drag-and-drop reorder, drag-into-group, add-layer dialog, and the desktop Pi Agent panel below the tree."
+          ],
+          [
+            "Canvas",
+            "Live preview of the scene rendered by the same code path as production."
+          ],
+          [
+            "Inspector",
+            "Collapsed scene globals at the top, then the property editor for the selected object. Always renders Transform and Appearance; conditionally renders Properties, Events, Slots, Text, and Asset selection."
+          ]
+        ]
+      },
+      "children": []
+    },
+    "b-40-authoring-surfaces-state-is-held-in-a-zusta-11": {
+      "id": "b-40-authoring-surfaces-state-is-held-in-a-zusta-11",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "State is held in a Zustand store with three core pieces:"
+        }
+      ],
+      "children": []
+    },
+    "b-40-authoring-surfaces-scene-the-current-sc-12": {
+      "id": "b-40-authoring-surfaces-scene-the-current-sc-12",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "scene",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ": the current scene tree, structurally cloned on mutation."
+        }
+      ],
+      "children": []
+    },
+    "b-40-authoring-surfaces-registry-merged-asse-13": {
+      "id": "b-40-authoring-surfaces-registry-merged-asse-13",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "registry",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ": merged asset, module, and font registry."
+        }
+      ],
+      "children": []
+    },
+    "b-40-authoring-surfaces-selectedpath-a-dotte-14": {
+      "id": "b-40-authoring-surfaces-selectedpath-a-dotte-14",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "selectedPath",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ": a dotted path identifying the selected object ("
+        },
+        {
+          "insert": "2.children.1",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ")."
+        }
+      ],
+      "children": []
+    },
+    "b-40-authoring-surfaces-mutations-mutateobject-15": {
+      "id": "b-40-authoring-surfaces-mutations-mutateobject-15",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "Mutations ("
+        },
+        {
+          "insert": "mutateObjectAt",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ", "
+        },
+        {
+          "insert": "addObjectAt",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ", "
+        },
+        {
+          "insert": "removeObjectAt",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ", "
+        },
+        {
+          "insert": "moveObject",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ") replace the scene with a structurally cloned, modified copy and mark the store dirty. Components subscribe with selectors and re-render only on the slices they care about."
+        }
+      ],
+      "children": []
+    },
+    "b-40-authoring-surfaces-always-present-inspector-16": {
+      "id": "b-40-authoring-surfaces-always-present-inspector-16",
+      "type": "heading",
+      "props": {
+        "level": 3
+      },
+      "text": [
+        {
+          "insert": "Always-Present Inspector Sections"
+        }
+      ],
+      "children": []
+    },
+    "b-40-authoring-surfaces-every-selected-object-sh-17": {
+      "id": "b-40-authoring-surfaces-every-selected-object-sh-17",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "Every selected object shows the same shell, regardless of type:"
+        }
+      ],
+      "children": []
+    },
+    "b-40-authoring-surfaces-header-name-type-18": {
+      "id": "b-40-authoring-surfaces-header-name-type-18",
+      "type": "list-item",
+      "props": {
+        "ordered": true
+      },
+      "text": [
+        {
+          "insert": "Header",
+          "attributes": {
+            "bold": true
+          }
+        },
+        {
+          "insert": ". Name, type chip, visibility toggle, delete button."
+        }
+      ],
+      "children": []
+    },
+    "b-40-authoring-surfaces-asset-read-only-as-19": {
+      "id": "b-40-authoring-surfaces-asset-read-only-as-19",
+      "type": "list-item",
+      "props": {
+        "ordered": true
+      },
+      "text": [
+        {
+          "insert": "Asset",
+          "attributes": {
+            "bold": true
+          }
+        },
+        {
+          "insert": ", read-only asset id for modules, with an asset-selection dropdown when the asset is a file container ("
+        },
+        {
+          "insert": "audio",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ", "
+        },
+        {
+          "insert": "image",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ", "
+        },
+        {
+          "insert": "video",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ", "
+        },
+        {
+          "insert": "glyph",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ", "
+        },
+        {
+          "insert": "font",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": "). Modules ("
+        },
+        {
+          "insert": "effect",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ", "
+        },
+        {
+          "insert": "component",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ") are not swappable."
+        }
+      ],
+      "children": []
+    },
+    "b-40-authoring-surfaces-transform-fill-tog-20": {
+      "id": "b-40-authoring-surfaces-transform-fill-tog-20",
+      "type": "list-item",
+      "props": {
+        "ordered": true
+      },
+      "text": [
+        {
+          "insert": "Transform",
+          "attributes": {
+            "bold": true
+          }
+        },
+        {
+          "insert": ". Fill toggle. When fill: rotation + scale. When explicit: x, y, width (% or auto), height (% or auto), anchor select, rotation, scale."
+        }
+      ],
+      "children": []
+    },
+    "b-40-authoring-surfaces-appearance-opacity-21": {
+      "id": "b-40-authoring-surfaces-appearance-opacity-21",
+      "type": "list-item",
+      "props": {
+        "ordered": true
+      },
+      "text": [
+        {
+          "insert": "Appearance",
+          "attributes": {
+            "bold": true
+          }
+        },
+        {
+          "insert": ". Opacity, blend, hue. For media types ("
+        },
+        {
+          "insert": "video",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ", "
+        },
+        {
+          "insert": "image",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": "): also fit. For scene-level selection: also saturation."
+        }
+      ],
+      "children": []
+    },
+    "b-40-authoring-surfaces-properties-rendere-22": {
+      "id": "b-40-authoring-surfaces-properties-rendere-22",
+      "type": "list-item",
+      "props": {
+        "ordered": true
+      },
+      "text": [
+        {
+          "insert": "Properties",
+          "attributes": {
+            "bold": true
+          }
+        },
+        {
+          "insert": ". Rendered by the "
+        },
+        {
+          "insert": "property schema",
+          "attributes": {
+            "reference": {
+              "kind": "doc",
+              "path": "10-scene-engine/10-system-design/16-property-schema",
+              "label": "property schema"
+            }
+          }
+        },
+        {
+          "insert": ". Properties are grouped into named sections with clickable labels that open description popovers. Dense groups can be nested and collapsed where that matches the owning concept."
+        }
+      ],
+      "children": []
+    },
+    "b-40-authoring-surfaces-slots-glyph-groups-23": {
+      "id": "b-40-authoring-surfaces-slots-glyph-groups-23",
+      "type": "list-item",
+      "props": {
+        "ordered": true
+      },
+      "text": [
+        {
+          "insert": "Slots",
+          "attributes": {
+            "bold": true
+          }
+        },
+        {
+          "insert": ", glyph-groups only. Lists the SVG's exposed slots; each slot has its own asset selector and per-slot appearance fields."
+        }
+      ],
+      "children": []
+    },
+    "b-40-authoring-surfaces-events-trigger-24": {
+      "id": "b-40-authoring-surfaces-events-trigger-24",
+      "type": "list-item",
+      "props": {
+        "ordered": true
+      },
+      "text": [
+        {
+          "insert": "Events",
+          "attributes": {
+            "bold": true
+          }
+        },
+        {
+          "insert": ", trigger -> action -> target rows with add/remove. Available for any object that can plausibly receive events."
+        }
+      ],
+      "children": []
+    },
+    "b-40-authoring-surfaces-the-always-present-rule-25": {
+      "id": "b-40-authoring-surfaces-the-always-present-rule-25",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "The always-present rule keeps authoring predictable: Transform and Appearance render even when the JSON omits them, with defaults filled in. The first edit writes the section; subsequent edits patch it."
+        }
+      ],
+      "children": []
+    },
+    "b-40-authoring-surfaces-dirty-tracking-and-save-26": {
+      "id": "b-40-authoring-surfaces-dirty-tracking-and-save-26",
+      "type": "heading",
+      "props": {
+        "level": 3
+      },
+      "text": [
+        {
+          "insert": "Dirty Tracking And Save"
+        }
+      ],
+      "children": []
+    },
+    "b-40-authoring-surfaces-edits-set-the-dirty-flag-27": {
+      "id": "b-40-authoring-surfaces-edits-set-the-dirty-flag-27",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "Edits set the dirty flag. Save writes the current scene back to disk via "
+        },
+        {
+          "insert": "PUT /api/scenes/<id>?project=<project-id>",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ". Scene name is a normal editable scene field in Scene Settings. The post-save state is clean until the next mutation. In the desktop shell, native menu commands route save into the same editor command path used by browser keyboard handling."
+        }
+      ],
+      "children": []
+    },
+    "b-40-authoring-surfaces-the-dirty-flag-is-not-pe-28": {
+      "id": "b-40-authoring-surfaces-the-dirty-flag-is-not-pe-28",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "The dirty flag is not persisted. Refreshing or leaving the editor with unsaved edits is guarded before those edits are discarded. This keeps the file as the source of truth and makes save deliberate."
+        }
+      ],
+      "children": []
+    },
+    "b-40-authoring-surfaces-export-29": {
+      "id": "b-40-authoring-surfaces-export-29",
+      "type": "heading",
+      "props": {
+        "level": 3
+      },
+      "text": [
+        {
+          "insert": "Export"
+        }
+      ],
+      "children": []
+    },
+    "b-40-authoring-surfaces-the-project-page-s-expor-30": {
+      "id": "b-40-authoring-surfaces-the-project-page-s-expor-30",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "The project page's Export Project button is a one-shot action: "
+        },
+        {
+          "insert": "POST /api/export?project=<project-id>",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " returns a zip of the selected project. Export is independent of save; the export reads what is on disk, not the in-memory scene. See "
+        },
+        {
+          "insert": "Build And Distribution Output",
+          "attributes": {
+            "reference": {
+              "kind": "doc",
+              "path": "10-scene-engine/10-system-design/50-build-output",
+              "label": "Build And Distribution Output"
+            }
+          }
+        },
+        {
+          "insert": "."
+        }
+      ],
+      "children": []
+    },
+    "b-40-authoring-surfaces-desktop-shell-31": {
+      "id": "b-40-authoring-surfaces-desktop-shell-31",
+      "type": "heading",
+      "props": {
+        "level": 2
+      },
+      "text": [
+        {
+          "insert": "Desktop Shell"
+        }
+      ],
+      "children": []
+    },
+    "b-40-authoring-surfaces-main-menu-is-a-desktop-h-32": {
+      "id": "b-40-authoring-surfaces-main-menu-is-a-desktop-h-32",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "Main Menu is a desktop host for the same visual editor. It does not define another scene format or another editing model. It provides:"
+        }
+      ],
+      "children": []
+    },
+    "b-40-authoring-surfaces-an-electron-window-for-33": {
+      "id": "b-40-authoring-surfaces-an-electron-window-for-33",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "an Electron window for "
+        },
+        {
+          "insert": "/editor?project=<project-id>&scene=<scene-id>",
+          "attributes": {
+            "code": true
+          }
+        }
+      ],
+      "children": []
+    },
+    "b-40-authoring-surfaces-a-typed-window-mainmenu-34": {
+      "id": "b-40-authoring-surfaces-a-typed-window-mainmenu-34",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "a typed "
+        },
+        {
+          "insert": "window.mainMenu",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " bridge for native capabilities"
+        }
+      ],
+      "children": []
+    },
+    "b-40-authoring-surfaces-packaged-runtime-startup-35": {
+      "id": "b-40-authoring-surfaces-packaged-runtime-startup-35",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "packaged runtime startup so the desktop app does not require an already-running external browser server"
+        }
+      ],
+      "children": []
+    },
+    "b-40-authoring-surfaces-a-writable-workspace-loc-36": {
+      "id": "b-40-authoring-surfaces-a-writable-workspace-loc-36",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "a writable workspace location for project files in packaged mode"
+        }
+      ],
+      "children": []
+    },
+    "b-40-authoring-surfaces-pi-agent-ipc-owned-by-th-37": {
+      "id": "b-40-authoring-surfaces-pi-agent-ipc-owned-by-th-37",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "Pi Agent IPC owned by the native process"
+        }
+      ],
+      "children": []
+    },
+    "b-40-authoring-surfaces-the-browser-renderer-rem-38": {
+      "id": "b-40-authoring-surfaces-the-browser-renderer-rem-38",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "The browser renderer remains sandboxed. Native authority stays outside React."
+        }
+      ],
+      "children": []
+    },
+    "b-40-authoring-surfaces-pi-agent-file-surface-39": {
+      "id": "b-40-authoring-surfaces-pi-agent-file-surface-39",
+      "type": "heading",
+      "props": {
+        "level": 2
+      },
+      "text": [
+        {
+          "insert": "Pi Agent / File Surface"
+        }
+      ],
+      "children": []
+    },
+    "b-40-authoring-surfaces-the-pi-agent-can-read-an-40": {
+      "id": "b-40-authoring-surfaces-the-pi-agent-can-read-an-40",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "The Pi Agent can read and write the same "
+        },
+        {
+          "insert": "scene.json",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " directly:"
+        }
+      ],
+      "children": []
+    },
+    "b-40-authoring-surfaces-read-open-the-catal-41": {
+      "id": "b-40-authoring-surfaces-read-open-the-catal-41",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "Read",
+          "attributes": {
+            "bold": true
+          }
+        },
+        {
+          "insert": ": open the catalog project's "
+        },
+        {
+          "insert": "Assets/Scenes/{id}/scene.json",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ", or "
+        },
+        {
+          "insert": "GET /api/scenes/{id}?project={project-id}",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " from the Next dev server."
+        }
+      ],
+      "children": []
+    },
+    "b-40-authoring-surfaces-write-file-edit-t-42": {
+      "id": "b-40-authoring-surfaces-write-file-edit-t-42",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "Write (file)",
+          "attributes": {
+            "bold": true
+          }
+        },
+        {
+          "insert": ": edit the file in place."
+        }
+      ],
+      "children": []
+    },
+    "b-40-authoring-surfaces-write-api-put-a-43": {
+      "id": "b-40-authoring-surfaces-write-api-put-a-43",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "Write (API)",
+          "attributes": {
+            "bold": true
+          }
+        },
+        {
+          "insert": ": "
+        },
+        {
+          "insert": "PUT /api/scenes/{id}?project={project-id}",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " with the full scene JSON as the body."
+        }
+      ],
+      "children": []
+    },
+    "b-40-authoring-surfaces-in-the-desktop-app-the-44": {
+      "id": "b-40-authoring-surfaces-in-the-desktop-app-the-44",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "In the desktop app, the Pi Agent starts from a bottom-left sidebar chat panel. Each request includes the active project id, scene id, selected layer path, selected layer name, and selected layer type. The renderer only talks to "
+        },
+        {
+          "insert": "window.mainMenu.agent",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": "; the native process owns the SDK session, session directory, abort/reset controls, and working-directory selection."
+        }
+      ],
+      "children": []
+    },
+    "b-40-authoring-surfaces-the-agent-does-not-subsc-45": {
+      "id": "b-40-authoring-surfaces-the-agent-does-not-subsc-45",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "The agent does not subscribe to live scene updates. It edits, the human reloads the editor or page to see the change. Symmetrically, after the human saves, the agent re-reads the file on its next pass."
+        }
+      ],
+      "children": []
+    },
+    "b-40-authoring-surfaces-the-canonical-object-sha-46": {
+      "id": "b-40-authoring-surfaces-the-canonical-object-sha-46",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "The canonical object shape is the same on both sides. An agent writing a new object follows the same rules as the editor's add-object defaults."
+        }
+      ],
+      "children": []
+    },
+    "b-40-authoring-surfaces-why-reload-based-handoff-47": {
+      "id": "b-40-authoring-surfaces-why-reload-based-handoff-47",
+      "type": "heading",
+      "props": {
+        "level": 2
+      },
+      "text": [
+        {
+          "insert": "Why Reload-Based Handoff"
+        }
+      ],
+      "children": []
+    },
+    "b-40-authoring-surfaces-real-time-collaboration-48": {
+      "id": "b-40-authoring-surfaces-real-time-collaboration-48",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "Real-time collaboration would require operational transform, conflict resolution, and presence. That is a substantial increase in surface area for no current benefit. The author and the agent rarely edit at the same instant, and the file-as-source-of-truth model is enough."
+        }
+      ],
+      "children": []
+    },
+    "b-40-authoring-surfaces-what-the-surfaces-must-k-49": {
+      "id": "b-40-authoring-surfaces-what-the-surfaces-must-k-49",
+      "type": "heading",
+      "props": {
+        "level": 2
+      },
+      "text": [
+        {
+          "insert": "What The Surfaces Must Know"
+        }
+      ],
+      "children": []
+    },
+    "b-40-authoring-surfaces-all-surfaces-must-unders-50": {
+      "id": "b-40-authoring-surfaces-all-surfaces-must-unders-50",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "All surfaces must understand:"
+        }
+      ],
+      "children": []
+    },
+    "b-40-authoring-surfaces-the-scene-data-model-1-51": {
+      "id": "b-40-authoring-surfaces-the-scene-data-model-1-51",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "the "
+        },
+        {
+          "insert": "scene data model",
+          "attributes": {
+            "reference": {
+              "kind": "doc",
+              "path": "10-scene-engine/10-system-design/10-scene-data-model",
+              "label": "scene data model"
+            }
+          }
+        }
+      ],
+      "children": []
+    },
+    "b-40-authoring-surfaces-the-project-model-05-p-52": {
+      "id": "b-40-authoring-surfaces-the-project-model-05-p-52",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "the "
+        },
+        {
+          "insert": "project model",
+          "attributes": {
+            "reference": {
+              "kind": "doc",
+              "path": "10-scene-engine/10-system-design/05-project-model",
+              "label": "project model"
+            }
+          }
+        }
+      ],
+      "children": []
+    },
+    "b-40-authoring-surfaces-the-component-manifest-53": {
+      "id": "b-40-authoring-surfaces-the-component-manifest-53",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "the "
+        },
+        {
+          "insert": "component manifest convention",
+          "attributes": {
+            "reference": {
+              "kind": "doc",
+              "path": "10-scene-engine/10-system-design/15-component-manifest",
+              "label": "component manifest convention"
+            }
+          }
+        }
+      ],
+      "children": []
+    },
+    "b-40-authoring-surfaces-the-rendering-pipeline-54": {
+      "id": "b-40-authoring-surfaces-the-rendering-pipeline-54",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "the "
+        },
+        {
+          "insert": "rendering pipeline's failure modes",
+          "attributes": {
+            "reference": {
+              "kind": "doc",
+              "path": "10-scene-engine/10-system-design/30-rendering-pipeline",
+              "section": "failure-modes",
+              "label": "rendering pipeline's failure modes"
+            }
+          }
+        }
+      ],
+      "children": []
+    },
+    "b-40-authoring-surfaces-the-visual-editor-does-n-55": {
+      "id": "b-40-authoring-surfaces-the-visual-editor-does-n-55",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "The visual editor does not need to know Pi SDK details. The Pi Agent does not need to know React internals. They coordinate through project files and the narrow desktop bridge."
+        }
+      ],
+      "children": []
+    },
+    "b-40-authoring-surfaces-what-lives-where-56": {
+      "id": "b-40-authoring-surfaces-what-lives-where-56",
+      "type": "heading",
+      "props": {
+        "level": 2
+      },
+      "text": [
+        {
+          "insert": "What Lives Where"
+        }
+      ],
+      "children": []
+    },
+    "b-40-authoring-surfaces-concern-editor-des-57-tbl": {
+      "id": "b-40-authoring-surfaces-concern-editor-des-57-tbl",
+      "type": "structured-table",
+      "props": {
+        "columns": [
+          "Concern",
+          "Editor",
+          "Desktop shell",
+          "Pi Agent"
+        ],
+        "rows": [
+          [
+            "Visual placement",
+            "Primary",
+            "Hosts",
+            "Possible but awkward"
+          ],
+          [
+            "Object ordering, selection, grouping",
+            "Primary",
+            "Hosts",
+            "Possible"
+          ],
+          [
+            "Property tuning",
+            "Primary",
+            "Hosts",
+            "Primary"
+          ],
+          [
+            "Bulk edits across many objects",
+            "Awkward",
+            "Hosts",
+            "Primary"
+          ],
+          [
+            "Generating new asset combinations",
+            "Possible",
+            "Native authority",
+            "Primary"
+          ],
+          [
+            "Authoring new components/effects",
+            "Awkward",
+            "Native authority",
+            "Primary"
+          ],
+          [
+            "Computing layered SVGs / chrome tuning",
+            "Awkward",
+            "Native authority",
+            "Primary"
+          ],
+          [
+            "Wiring events",
+            "Primary",
+            "Hosts",
+            "Primary"
+          ]
+        ]
+      },
+      "children": []
+    },
+    "b-40-authoring-surfaces-the-agent-earns-its-keep-58": {
+      "id": "b-40-authoring-surfaces-the-agent-earns-its-keep-58",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "The agent earns its keep on mechanical or computationally heavy edits. The editor earns its keep on taste-driven edits that need an eye on the canvas. The desktop shell earns its keep by giving both surfaces a controlled native boundary."
+        }
+      ],
+      "children": []
+    }
+  }
+}

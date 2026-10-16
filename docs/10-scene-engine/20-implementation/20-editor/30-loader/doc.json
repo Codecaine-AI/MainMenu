@@ -1,0 +1,697 @@
+{
+  "schemaVersion": 1,
+  "id": "scene-engine-20-implementation-20-editor-30-loader",
+  "title": "Editor Loader",
+  "root": "b-30-loader-root-25",
+  "blocks": {
+    "b-30-loader-root-25": {
+      "id": "b-30-loader-root-25",
+      "type": "paragraph",
+      "props": {
+        "concepts": [
+          "loader",
+          "hook",
+          "scene-fetch",
+          "registry-merge",
+          "race-guard",
+          "component-schema",
+          "schema-preload"
+        ],
+        "covers": "app/_engine/hooks/useSceneLoader.ts — the React hook that fetches the scene + merged registry, seeds the Zustand store, and preloads component property schemas."
+      },
+      "children": [
+        "b-30-loader-usesceneloader-projecti-2",
+        "b-30-loader-divider-3",
+        "b-30-loader-flow-4",
+        "b-30-loader-load-the-registry-firs-5",
+        "b-30-loader-fetch-the-scene-ge-6",
+        "b-30-loader-seed-the-store-set-7",
+        "b-30-loader-errors-are-surfaced-8",
+        "b-30-loader-race-guard-9",
+        "b-30-loader-a-loadcount-ref-tracks-10",
+        "b-30-loader-component-schema-preload-11",
+        "b-30-loader-after-the-scene-and-regi-12",
+        "b-30-loader-schema-loading-is-asynch-13",
+        "b-30-loader-the-blob-url-import-tric-14",
+        "b-30-loader-why-registry-first-15",
+        "b-30-loader-the-add-layer-dialog-and-16",
+        "b-30-loader-reload-semantics-17",
+        "b-30-loader-usesceneloader-re-runs-18",
+        "b-30-loader-this-is-also-the-handoff-19",
+        "b-30-loader-source-20",
+        "b-30-loader-apps-scene-engine-app-21",
+        "b-30-loader-apps-scene-engine-app-22",
+        "b-30-loader-apps-scene-engine-app-23",
+        "b-30-loader-apps-scene-engine-app-a-24"
+      ]
+    },
+    "b-30-loader-usesceneloader-projecti-2": {
+      "id": "b-30-loader-usesceneloader-projecti-2",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "useSceneLoader(projectId, sceneId)",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " is the React hook the editor's "
+        },
+        {
+          "insert": "page.tsx",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " calls during mount. It loads the merged registry, fetches the scene for the selected project, and seeds the store. It also exposes "
+        },
+        {
+          "insert": "loading",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " / "
+        },
+        {
+          "insert": "error",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " flags so the shell can render placeholders."
+        }
+      ],
+      "children": []
+    },
+    "b-30-loader-divider-3": {
+      "id": "b-30-loader-divider-3",
+      "type": "divider",
+      "props": {},
+      "children": []
+    },
+    "b-30-loader-flow-4": {
+      "id": "b-30-loader-flow-4",
+      "type": "heading",
+      "props": {
+        "level": 2
+      },
+      "text": [
+        {
+          "insert": "Flow"
+        }
+      ],
+      "children": []
+    },
+    "b-30-loader-load-the-registry-firs-5": {
+      "id": "b-30-loader-load-the-registry-firs-5",
+      "type": "list-item",
+      "props": {
+        "ordered": true
+      },
+      "text": [
+        {
+          "insert": "Load the registry first.",
+          "attributes": {
+            "bold": true
+          }
+        },
+        {
+          "insert": " Dynamic-import "
+        },
+        {
+          "insert": "asset-registry.js",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " (browser-only, since it caches in module scope), set "
+        },
+        {
+          "insert": "window.MELEE_PROJECT_ID",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " when a project id is active, and call "
+        },
+        {
+          "insert": "loadRegistry({ projectId })",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ". It fetches the selected project's asset, module, and font registries through project-aware dev routes and enriches each module entry with its "
+        },
+        {
+          "insert": "manifest.json",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ". Then "
+        },
+        {
+          "insert": "setRegistry(getRegistry())",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": "."
+        }
+      ],
+      "children": []
+    },
+    "b-30-loader-fetch-the-scene-ge-6": {
+      "id": "b-30-loader-fetch-the-scene-ge-6",
+      "type": "list-item",
+      "props": {
+        "ordered": true
+      },
+      "text": [
+        {
+          "insert": "Fetch the scene.",
+          "attributes": {
+            "bold": true
+          }
+        },
+        {
+          "insert": " "
+        },
+        {
+          "insert": "GET /api/scenes/<id>?project=<project-id>",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " with "
+        },
+        {
+          "insert": "cache: 'no-store'",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " so reload always hits disk. Throw on non-OK."
+        }
+      ],
+      "children": []
+    },
+    "b-30-loader-seed-the-store-set-7": {
+      "id": "b-30-loader-seed-the-store-set-7",
+      "type": "list-item",
+      "props": {
+        "ordered": true
+      },
+      "text": [
+        {
+          "insert": "Seed the store.",
+          "attributes": {
+            "bold": true
+          }
+        },
+        {
+          "insert": " "
+        },
+        {
+          "insert": "setScene(scene)",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " and "
+        },
+        {
+          "insert": "markClean()",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": "."
+        }
+      ],
+      "children": []
+    },
+    "b-30-loader-errors-are-surfaced-8": {
+      "id": "b-30-loader-errors-are-surfaced-8",
+      "type": "list-item",
+      "props": {
+        "ordered": true
+      },
+      "text": [
+        {
+          "insert": "Errors are surfaced",
+          "attributes": {
+            "bold": true
+          }
+        },
+        {
+          "insert": " via the returned "
+        },
+        {
+          "insert": "error",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " string. The editor shell renders the message rather than a blank panel, the same warn-and-explain ethos as the renderer."
+        }
+      ],
+      "children": []
+    },
+    "b-30-loader-race-guard-9": {
+      "id": "b-30-loader-race-guard-9",
+      "type": "heading",
+      "props": {
+        "level": 2
+      },
+      "text": [
+        {
+          "insert": "Race Guard"
+        }
+      ],
+      "children": []
+    },
+    "b-30-loader-a-loadcount-ref-tracks-10": {
+      "id": "b-30-loader-a-loadcount-ref-tracks-10",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "A "
+        },
+        {
+          "insert": "loadCount",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " ref tracks the active load. If "
+        },
+        {
+          "insert": "sceneId",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " changes mid-fetch, the in-flight callback compares "
+        },
+        {
+          "insert": "thisLoad === loadCount.current",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " before writing to the store, so a stale response can't overwrite a fresher one."
+        }
+      ],
+      "children": []
+    },
+    "b-30-loader-component-schema-preload-11": {
+      "id": "b-30-loader-component-schema-preload-11",
+      "type": "heading",
+      "props": {
+        "level": 2
+      },
+      "text": [
+        {
+          "insert": "Component Schema Preload"
+        }
+      ],
+      "children": []
+    },
+    "b-30-loader-after-the-scene-and-regi-12": {
+      "id": "b-30-loader-after-the-scene-and-regi-12",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "After the scene and registry are loaded, "
+        },
+        {
+          "insert": "useSceneLoader",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " scans the scene for "
+        },
+        {
+          "insert": "component",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": "-type layers, resolves each component's module path from the registry, and calls "
+        },
+        {
+          "insert": "loadComponentSchema(modulePath)",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ". This function (in "
+        },
+        {
+          "insert": "app/_engine/lib/component-schema-loader.ts",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ") fetches the component's "
+        },
+        {
+          "insert": ".js",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " file, imports it via a Blob URL shim, reads the module's "
+        },
+        {
+          "insert": "properties",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " export, validates its shape ("
+        },
+        {
+          "insert": "{ sections: [...] }",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": "), and caches the result. The resolved schemas are written into the Zustand store's "
+        },
+        {
+          "insert": "componentSchemas",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " map keyed by asset ID."
+        }
+      ],
+      "children": []
+    },
+    "b-30-loader-schema-loading-is-asynch-13": {
+      "id": "b-30-loader-schema-loading-is-asynch-13",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "Schema loading is asynchronous. Until a component's schema arrives, the inspector renders that component's properties under the General fallback section. In practice the loading window is short: the editor already waits for the scene + registry fetch, and component modules are small."
+        }
+      ],
+      "children": []
+    },
+    "b-30-loader-the-blob-url-import-tric-14": {
+      "id": "b-30-loader-the-blob-url-import-tric-14",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "The Blob URL import trick mirrors what the production renderer already does for component modules, so there is no new import mechanism."
+        }
+      ],
+      "children": []
+    },
+    "b-30-loader-why-registry-first-15": {
+      "id": "b-30-loader-why-registry-first-15",
+      "type": "heading",
+      "props": {
+        "level": 2
+      },
+      "text": [
+        {
+          "insert": "Why Registry First"
+        }
+      ],
+      "children": []
+    },
+    "b-30-loader-the-add-layer-dialog-and-16": {
+      "id": "b-30-loader-the-add-layer-dialog-and-16",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "The add-layer dialog and the inspector both need the registry to render meaningful UI (asset names, manifest fields, asset-selection dropdowns). Loading the registry before the scene means the very first paint can render a populated inspector when the scene also arrives, instead of flashing through an \"asset unknown\" state."
+        }
+      ],
+      "children": []
+    },
+    "b-30-loader-reload-semantics-17": {
+      "id": "b-30-loader-reload-semantics-17",
+      "type": "heading",
+      "props": {
+        "level": 2
+      },
+      "text": [
+        {
+          "insert": "Reload Semantics"
+        }
+      ],
+      "children": []
+    },
+    "b-30-loader-usesceneloader-re-runs-18": {
+      "id": "b-30-loader-usesceneloader-re-runs-18",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "useSceneLoader",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " re-runs whenever "
+        },
+        {
+          "insert": "projectId",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " or "
+        },
+        {
+          "insert": "sceneId",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " changes (the "
+        },
+        {
+          "insert": "useCallback",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " dependency). There is no explicit Reload button in the current UI: refreshing the page or navigating between scenes triggers a fresh load. When the editor has unsaved edits, the command hook guards reload, close, and link navigation before those edits are discarded. The dirty flag is reset by "
+        },
+        {
+          "insert": "markClean()",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " on each successful load."
+        }
+      ],
+      "children": []
+    },
+    "b-30-loader-this-is-also-the-handoff-19": {
+      "id": "b-30-loader-this-is-also-the-handoff-19",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "This is also the handoff path from agent edits: after the agent edits "
+        },
+        {
+          "insert": "scene.json",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ", the human refreshes (or navigates to the scene) to see the change."
+        }
+      ],
+      "children": []
+    },
+    "b-30-loader-source-20": {
+      "id": "b-30-loader-source-20",
+      "type": "heading",
+      "props": {
+        "level": 2
+      },
+      "text": [
+        {
+          "insert": "Source"
+        }
+      ],
+      "children": []
+    },
+    "b-30-loader-apps-scene-engine-app-21": {
+      "id": "b-30-loader-apps-scene-engine-app-21",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "apps/scene-engine/app/_engine/hooks/useSceneLoader.ts",
+          "attributes": {
+            "code": true
+          }
+        }
+      ],
+      "children": []
+    },
+    "b-30-loader-apps-scene-engine-app-22": {
+      "id": "b-30-loader-apps-scene-engine-app-22",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "apps/scene-engine/app/_engine/lib/component-schema-loader.ts",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ": "
+        },
+        {
+          "insert": "loadComponentSchema",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ", Blob URL import, cache."
+        }
+      ],
+      "children": []
+    },
+    "b-30-loader-apps-scene-engine-app-23": {
+      "id": "b-30-loader-apps-scene-engine-app-23",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "apps/scene-engine/app/_engine/renderer/asset-registry.js",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ": "
+        },
+        {
+          "insert": "loadRegistry",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ", "
+        },
+        {
+          "insert": "getRegistry",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ", "
+        },
+        {
+          "insert": "updateEntry",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": "."
+        }
+      ],
+      "children": []
+    },
+    "b-30-loader-apps-scene-engine-app-a-24": {
+      "id": "b-30-loader-apps-scene-engine-app-a-24",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "apps/scene-engine/app/api/scenes/[id]/route.ts",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ": "
+        },
+        {
+          "insert": "GET",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " reads "
+        },
+        {
+          "insert": "Assets/Scenes/<id>/scene.json",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " through the project path adapter."
+        }
+      ],
+      "children": []
+    }
+  }
+}

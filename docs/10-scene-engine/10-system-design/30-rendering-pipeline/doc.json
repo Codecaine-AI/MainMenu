@@ -1,0 +1,1730 @@
+{
+  "schemaVersion": 1,
+  "id": "scene-engine-10-system-design-30-rendering-pipeline",
+  "title": "Rendering Pipeline",
+  "root": "b-30-rendering-pipeline-root-56",
+  "blocks": {
+    "b-30-rendering-pipeline-root-56": {
+      "id": "b-30-rendering-pipeline-root-56",
+      "type": "paragraph",
+      "props": {
+        "concepts": [
+          "rendering",
+          "type-dispatch",
+          "transform",
+          "appearance",
+          "slots",
+          "foreignObject",
+          "scene-grading",
+          "reconciliation",
+          "entrance",
+          "visibility"
+        ],
+        "covers": "How a scene becomes DOM — registry lookup, type-dispatched renderers, transform/appearance application, glyph-group slot mounting, scene-level grading, mount/update reconciliation."
+      },
+      "children": [
+        "b-30-rendering-pipeline-turning-a-scene-into-ren-2",
+        "b-30-rendering-pipeline-the-renderer-is-invoked-3",
+        "b-30-rendering-pipeline-divider-4",
+        "b-30-rendering-pipeline-end-to-end-flow-5",
+        "b-30-rendering-pipeline-mermaid-6",
+        "b-30-rendering-pipeline-renderer-dispatch-7",
+        "b-30-rendering-pipeline-renderers-are-registered-8",
+        "b-30-rendering-pipeline-type-render-9-tbl",
+        "b-30-rendering-pipeline-dispatch-is-by-the-obj-10",
+        "b-30-rendering-pipeline-universal-styling-trans-11",
+        "b-30-rendering-pipeline-after-the-renderer-retur-12",
+        "b-30-rendering-pipeline-applytransform-13",
+        "b-30-rendering-pipeline-always-sets-position-a-14",
+        "b-30-rendering-pipeline-if-transform-mode-15",
+        "b-30-rendering-pipeline-otherwise-sets-left-16",
+        "b-30-rendering-pipeline-the-css-transform-origi-17",
+        "b-30-rendering-pipeline-applyappearance-18",
+        "b-30-rendering-pipeline-opacity-css-opacity-19",
+        "b-30-rendering-pipeline-blend-css-mix-blend-20",
+        "b-30-rendering-pipeline-hue-css-filter-hue-21",
+        "b-30-rendering-pipeline-fit-css-object-fit-22",
+        "b-30-rendering-pipeline-saturation-is-honored-23",
+        "b-30-rendering-pipeline-scene-level-color-gradin-24",
+        "b-30-rendering-pipeline-before-walking-objects-25",
+        "b-30-rendering-pipeline-js-26",
+        "b-30-rendering-pipeline-this-composes-with-each-27",
+        "b-30-rendering-pipeline-glyph-groups-slot-mount-28",
+        "b-30-rendering-pipeline-the-glyph-group-render-29",
+        "b-30-rendering-pipeline-fetch-and-parse-the-30",
+        "b-30-rendering-pipeline-hide-the-background-re-31",
+        "b-30-rendering-pipeline-wrap-the-svg-in-a-32",
+        "b-30-rendering-pipeline-for-each-slot-in-obje-33",
+        "b-30-rendering-pipeline-slots-replace-the-legacy-38",
+        "b-30-rendering-pipeline-children-general-nestin-39",
+        "b-30-rendering-pipeline-for-any-non-glyph-group-40",
+        "b-30-rendering-pipeline-after-children-are-mount-41",
+        "b-30-rendering-pipeline-mount-vs-update-42",
+        "b-30-rendering-pipeline-first-call-to-rende-43",
+        "b-30-rendering-pipeline-subsequent-calls-ed-44",
+        "b-30-rendering-pipeline-on-the-fresh-mount-path-49",
+        "b-30-rendering-pipeline-this-makes-the-editor-s-50",
+        "b-30-rendering-pipeline-foreign-children-via-f-51",
+        "b-30-rendering-pipeline-slot-fills-are-mounted-u-52",
+        "b-30-rendering-pipeline-failure-modes-53",
+        "b-30-rendering-pipeline-condition-54-tbl",
+        "b-30-rendering-pipeline-the-non-throwing-behavio-55"
+      ]
+    },
+    "b-30-rendering-pipeline-turning-a-scene-into-ren-2": {
+      "id": "b-30-rendering-pipeline-turning-a-scene-into-ren-2",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "Turning a scene into rendered DOM is a small, predictable pipeline: load the registry, walk "
+        },
+        {
+          "insert": "scene.objects",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ", dispatch each one to a per-type renderer, append the returned element, then apply the universal transform/appearance styling. The only meaningful complexity lives inside the "
+        },
+        {
+          "insert": "glyph-group",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " renderer, which mounts editable slots into the SVG."
+        }
+      ],
+      "children": []
+    },
+    "b-30-rendering-pipeline-the-renderer-is-invoked-3": {
+      "id": "b-30-rendering-pipeline-the-renderer-is-invoked-3",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "The renderer is invoked twice in the editor: once to mount the scene and again on every store change to update it in place, so each step is reconciliation-aware."
+        }
+      ],
+      "children": []
+    },
+    "b-30-rendering-pipeline-divider-4": {
+      "id": "b-30-rendering-pipeline-divider-4",
+      "type": "divider",
+      "props": {},
+      "children": []
+    },
+    "b-30-rendering-pipeline-end-to-end-flow-5": {
+      "id": "b-30-rendering-pipeline-end-to-end-flow-5",
+      "type": "heading",
+      "props": {
+        "level": 2
+      },
+      "text": [
+        {
+          "insert": "End-to-End Flow"
+        }
+      ],
+      "children": []
+    },
+    "b-30-rendering-pipeline-mermaid-6": {
+      "id": "b-30-rendering-pipeline-mermaid-6",
+      "type": "code",
+      "props": {
+        "language": "mermaid"
+      },
+      "text": [
+        {
+          "insert": "flowchart TD\n    A[boot: load scene + project] --> B[loadRegistry]\n    B --> C[Set stage size and apply scene.appearance filter]\n    C --> D{First mount or update?}\n    D -->|first| R[Set stage visibility: hidden]\n    D -->|update| F[updateChildren: reconcile by id]\n    R --> E[For each object: mountObject]\n    E --> G[resolveAsset by id]\n    F --> G\n    G -->|missing| H[Warn and skip]\n    G -->|found| I[getRenderer by object.type]\n    I --> J[renderer obj entry returns DOM wrapper]\n    J --> K[applyTransform + applyAppearance]\n    K --> L[Append to parent]\n    L --> M{Has children?}\n    M -->|yes| N[Recurse for non-glyph-group]\n    M -->|no| O[done]\n    L --> P{glyph-group?}\n    P -->|yes| Q[Mount slots into SVG]\n    E --> S[reorderChildren]\n    S --> T[Restore stage visibility: '']\n    T --> U{scene.entrance and not skipped?}\n    U -->|yes| V[playEntrance: staggered opacity fade-in]\n    U -->|no| O\n    V --> O"
+        }
+      ],
+      "children": []
+    },
+    "b-30-rendering-pipeline-renderer-dispatch-7": {
+      "id": "b-30-rendering-pipeline-renderer-dispatch-7",
+      "type": "heading",
+      "props": {
+        "level": 2
+      },
+      "text": [
+        {
+          "insert": "Renderer Dispatch"
+        }
+      ],
+      "children": []
+    },
+    "b-30-rendering-pipeline-renderers-are-registered-8": {
+      "id": "b-30-rendering-pipeline-renderers-are-registered-8",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "Renderers are registered by "
+        },
+        {
+          "insert": "type",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " into a small map. Each renderer is "
+        },
+        {
+          "insert": "async (object, registryEntry) => HTMLElement",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " and returns a wrapper element with the object's primary DOM attached."
+        }
+      ],
+      "children": []
+    },
+    "b-30-rendering-pipeline-type-render-9-tbl": {
+      "id": "b-30-rendering-pipeline-type-render-9-tbl",
+      "type": "structured-table",
+      "props": {
+        "columns": [
+          "Type",
+          "Renderer reads",
+          "Produces"
+        ],
+        "rows": [
+          [
+            [
+              {
+                "insert": "video",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ],
+            [
+              {
+                "insert": "Video file at "
+              },
+              {
+                "insert": "entry.file",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ],
+            [
+              {
+                "insert": "A "
+              },
+              {
+                "insert": "<video>",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": " (autoplay, muted, looped) styled per "
+              },
+              {
+                "insert": "appearance",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": "."
+              }
+            ]
+          ],
+          [
+            [
+              {
+                "insert": "image",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ],
+            [
+              {
+                "insert": "Image file at "
+              },
+              {
+                "insert": "entry.file",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ],
+            [
+              {
+                "insert": "An "
+              },
+              {
+                "insert": "<img>",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": " styled per "
+              },
+              {
+                "insert": "appearance",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": "."
+              }
+            ]
+          ],
+          [
+            [
+              {
+                "insert": "audio",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ],
+            [
+              {
+                "insert": "Audio file at "
+              },
+              {
+                "insert": "entry.file",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ],
+            "A controller element (Web Audio playback inside)."
+          ],
+          [
+            [
+              {
+                "insert": "glyph-group",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ],
+            [
+              {
+                "insert": "SVG file at "
+              },
+              {
+                "insert": "entry.file",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ],
+            [
+              {
+                "insert": "A wrapper containing the parsed SVG, with slots mounted into "
+              },
+              {
+                "insert": "<foreignObject>",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": "."
+              }
+            ]
+          ],
+          [
+            [
+              {
+                "insert": "effect",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ],
+            [
+              {
+                "insert": "A CSS file at "
+              },
+              {
+                "insert": "entry.path",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ],
+            "A wrapper element with the stylesheet attached and properties as CSS custom props."
+          ],
+          [
+            [
+              {
+                "insert": "component",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ],
+            [
+              {
+                "insert": "A JS module at "
+              },
+              {
+                "insert": "entry.path",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ],
+            "Whatever the component's default export returns."
+          ],
+          [
+            [
+              {
+                "insert": "text",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ],
+            "n/a",
+            "A styled text element."
+          ],
+          [
+            [
+              {
+                "insert": "group",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ],
+            "n/a",
+            "An empty positioned wrapper (children render inside)."
+          ]
+        ]
+      },
+      "children": []
+    },
+    "b-30-rendering-pipeline-dispatch-is-by-the-obj-10": {
+      "id": "b-30-rendering-pipeline-dispatch-is-by-the-obj-10",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "Dispatch is by the "
+        },
+        {
+          "insert": "object's",
+          "attributes": {
+            "bold": true
+          }
+        },
+        {
+          "insert": " "
+        },
+        {
+          "insert": "type",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ". The registry entry's "
+        },
+        {
+          "insert": "type",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " is expected to agree but is not re-checked here."
+        }
+      ],
+      "children": []
+    },
+    "b-30-rendering-pipeline-universal-styling-trans-11": {
+      "id": "b-30-rendering-pipeline-universal-styling-trans-11",
+      "type": "heading",
+      "props": {
+        "level": 2
+      },
+      "text": [
+        {
+          "insert": "Universal Styling: Transform and Appearance"
+        }
+      ],
+      "children": []
+    },
+    "b-30-rendering-pipeline-after-the-renderer-retur-12": {
+      "id": "b-30-rendering-pipeline-after-the-renderer-retur-12",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "After the renderer returns a wrapper, two passes apply universal styling:"
+        }
+      ],
+      "children": []
+    },
+    "b-30-rendering-pipeline-applytransform-13": {
+      "id": "b-30-rendering-pipeline-applytransform-13",
+      "type": "heading",
+      "props": {
+        "level": 3
+      },
+      "text": [
+        {
+          "insert": "applyTransform",
+          "attributes": {
+            "code": true
+          }
+        }
+      ],
+      "children": []
+    },
+    "b-30-rendering-pipeline-always-sets-position-a-14": {
+      "id": "b-30-rendering-pipeline-always-sets-position-a-14",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "Always sets "
+        },
+        {
+          "insert": "position: absolute",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": "."
+        }
+      ],
+      "children": []
+    },
+    "b-30-rendering-pipeline-if-transform-mode-15": {
+      "id": "b-30-rendering-pipeline-if-transform-mode-15",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "If "
+        },
+        {
+          "insert": "transform.mode === \"fill\"",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ": sets "
+        },
+        {
+          "insert": "inset: 0; width: 100%; height: 100%",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " and applies any rotation/scale."
+        }
+      ],
+      "children": []
+    },
+    "b-30-rendering-pipeline-otherwise-sets-left-16": {
+      "id": "b-30-rendering-pipeline-otherwise-sets-left-16",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "Otherwise: sets "
+        },
+        {
+          "insert": "left: <x>%",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ", "
+        },
+        {
+          "insert": "top: <y>%",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ", "
+        },
+        {
+          "insert": "width",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": "/"
+        },
+        {
+          "insert": "height",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " as percentages or "
+        },
+        {
+          "insert": "auto",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ", and a CSS "
+        },
+        {
+          "insert": "transform",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " chain of "
+        },
+        {
+          "insert": "translate(<anchor>) rotate(<deg>) scale(<n>)",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ". Anchors map to translation offsets so "
+        },
+        {
+          "insert": "(x, y)",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " aligns with the named anchor point on the object's box."
+        }
+      ],
+      "children": []
+    },
+    "b-30-rendering-pipeline-the-css-transform-origi-17": {
+      "id": "b-30-rendering-pipeline-the-css-transform-origi-17",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "The CSS "
+        },
+        {
+          "insert": "transform-origin",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " is set to "
+        },
+        {
+          "insert": "0 0",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " when an anchor translation is present, so rotation/scale pivot from the anchor point, the same pivot the user sees in the editor."
+        }
+      ],
+      "children": []
+    },
+    "b-30-rendering-pipeline-applyappearance-18": {
+      "id": "b-30-rendering-pipeline-applyappearance-18",
+      "type": "heading",
+      "props": {
+        "level": 3
+      },
+      "text": [
+        {
+          "insert": "applyAppearance",
+          "attributes": {
+            "code": true
+          }
+        }
+      ],
+      "children": []
+    },
+    "b-30-rendering-pipeline-opacity-css-opacity-19": {
+      "id": "b-30-rendering-pipeline-opacity-css-opacity-19",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "opacity",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " → CSS "
+        },
+        {
+          "insert": "opacity",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": "."
+        }
+      ],
+      "children": []
+    },
+    "b-30-rendering-pipeline-blend-css-mix-blend-20": {
+      "id": "b-30-rendering-pipeline-blend-css-mix-blend-20",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "blend",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " → CSS "
+        },
+        {
+          "insert": "mix-blend-mode",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": "."
+        }
+      ],
+      "children": []
+    },
+    "b-30-rendering-pipeline-hue-css-filter-hue-21": {
+      "id": "b-30-rendering-pipeline-hue-css-filter-hue-21",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "hue",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " → CSS "
+        },
+        {
+          "insert": "filter: hue-rotate(<deg>)",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " on the wrapper."
+        }
+      ],
+      "children": []
+    },
+    "b-30-rendering-pipeline-fit-css-object-fit-22": {
+      "id": "b-30-rendering-pipeline-fit-css-object-fit-22",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "fit",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " → CSS "
+        },
+        {
+          "insert": "object-fit",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " on the inner "
+        },
+        {
+          "insert": "<video>",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " / "
+        },
+        {
+          "insert": "<img>",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " (media types only)."
+        }
+      ],
+      "children": []
+    },
+    "b-30-rendering-pipeline-saturation-is-honored-23": {
+      "id": "b-30-rendering-pipeline-saturation-is-honored-23",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "saturation",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " is honored on the "
+        },
+        {
+          "insert": "scene-level",
+          "attributes": {
+            "bold": true
+          }
+        },
+        {
+          "insert": " "
+        },
+        {
+          "insert": "appearance",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " (see below); per-object saturation is merged into the same filter chain."
+        }
+      ],
+      "children": []
+    },
+    "b-30-rendering-pipeline-scene-level-color-gradin-24": {
+      "id": "b-30-rendering-pipeline-scene-level-color-gradin-24",
+      "type": "heading",
+      "props": {
+        "level": 2
+      },
+      "text": [
+        {
+          "insert": "Scene-Level Color Grading"
+        }
+      ],
+      "children": []
+    },
+    "b-30-rendering-pipeline-before-walking-objects-25": {
+      "id": "b-30-rendering-pipeline-before-walking-objects-25",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "Before walking "
+        },
+        {
+          "insert": "objects",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ", the renderer reads "
+        },
+        {
+          "insert": "scene.appearance",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " and writes it as a CSS "
+        },
+        {
+          "insert": "filter",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " on the stage root:"
+        }
+      ],
+      "children": []
+    },
+    "b-30-rendering-pipeline-js-26": {
+      "id": "b-30-rendering-pipeline-js-26",
+      "type": "code",
+      "props": {
+        "language": "js"
+      },
+      "text": [
+        {
+          "insert": "filter: `hue-rotate(${hue}deg) saturate(${saturation})`"
+        }
+      ],
+      "children": []
+    },
+    "b-30-rendering-pipeline-this-composes-with-each-27": {
+      "id": "b-30-rendering-pipeline-this-composes-with-each-27",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "This composes with each object's per-object filter (CSS filter inheritance). It's how a single "
+        },
+        {
+          "insert": "saturation: 1.4",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " on the scene shifts the whole page without touching individual objects."
+        }
+      ],
+      "children": []
+    },
+    "b-30-rendering-pipeline-glyph-groups-slot-mount-28": {
+      "id": "b-30-rendering-pipeline-glyph-groups-slot-mount-28",
+      "type": "heading",
+      "props": {
+        "level": 2
+      },
+      "text": [
+        {
+          "insert": "Glyph Groups: Slot Mounting"
+        }
+      ],
+      "children": []
+    },
+    "b-30-rendering-pipeline-the-glyph-group-render-29": {
+      "id": "b-30-rendering-pipeline-the-glyph-group-render-29",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "The "
+        },
+        {
+          "insert": "glyph-group",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " renderer is the only one that does meaningful work beyond a wrapper:"
+        }
+      ],
+      "children": []
+    },
+    "b-30-rendering-pipeline-fetch-and-parse-the-30": {
+      "id": "b-30-rendering-pipeline-fetch-and-parse-the-30",
+      "type": "list-item",
+      "props": {
+        "ordered": true
+      },
+      "text": [
+        {
+          "insert": "Fetch and parse",
+          "attributes": {
+            "bold": true
+          }
+        },
+        {
+          "insert": " the SVG file referenced by the registry entry."
+        }
+      ],
+      "children": []
+    },
+    "b-30-rendering-pipeline-hide-the-background-re-31": {
+      "id": "b-30-rendering-pipeline-hide-the-background-re-31",
+      "type": "list-item",
+      "props": {
+        "ordered": true
+      },
+      "text": [
+        {
+          "insert": "Hide the background rect",
+          "attributes": {
+            "bold": true
+          }
+        },
+        {
+          "insert": " ("
+        },
+        {
+          "insert": "<rect id=\"background\">",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": "), an artifact of the SVG export."
+        }
+      ],
+      "children": []
+    },
+    "b-30-rendering-pipeline-wrap-the-svg-in-a-32": {
+      "id": "b-30-rendering-pipeline-wrap-the-svg-in-a-32",
+      "type": "list-item",
+      "props": {
+        "ordered": true
+      },
+      "text": [
+        {
+          "insert": "Wrap",
+          "attributes": {
+            "bold": true
+          }
+        },
+        {
+          "insert": " the SVG in a "
+        },
+        {
+          "insert": "<div>",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " sized to the SVG's "
+        },
+        {
+          "insert": "viewBox",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ". The wrapper's transform is applied later by "
+        },
+        {
+          "insert": "applyTransform",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": "."
+        }
+      ],
+      "children": []
+    },
+    "b-30-rendering-pipeline-for-each-slot-in-obje-33": {
+      "id": "b-30-rendering-pipeline-for-each-slot-in-obje-33",
+      "type": "list-item",
+      "props": {
+        "ordered": true
+      },
+      "text": [
+        {
+          "insert": "For each slot in ",
+          "attributes": {
+            "bold": true
+          }
+        },
+        {
+          "insert": "object.slots",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ":"
+        }
+      ],
+      "children": [
+        "b-30-rendering-pipeline-find-the-svg-element-wit-34",
+        "b-30-rendering-pipeline-render-the-slot-s-asset-35",
+        "b-30-rendering-pipeline-wrap-it-in-a-foreignob-36",
+        "b-30-rendering-pipeline-insert-the-foreignobje-37"
+      ]
+    },
+    "b-30-rendering-pipeline-find-the-svg-element-wit-34": {
+      "id": "b-30-rendering-pipeline-find-the-svg-element-wit-34",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "Find the SVG element with "
+        },
+        {
+          "insert": "data-slot=\"<slot-id>\"",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ", the anchor."
+        }
+      ],
+      "children": []
+    },
+    "b-30-rendering-pipeline-render-the-slot-s-asset-35": {
+      "id": "b-30-rendering-pipeline-render-the-slot-s-asset-35",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "Render the slot's asset using the renderer for the slot's leaf type (e.g. "
+        },
+        {
+          "insert": "video-fill",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " → "
+        },
+        {
+          "insert": "video",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " renderer)."
+        }
+      ],
+      "children": []
+    },
+    "b-30-rendering-pipeline-wrap-it-in-a-foreignob-36": {
+      "id": "b-30-rendering-pipeline-wrap-it-in-a-foreignob-36",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "Wrap it in a "
+        },
+        {
+          "insert": "<foreignObject>",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " of viewBox dimensions, copy the anchor's "
+        },
+        {
+          "insert": "clip-path",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " so the fill is constrained to the letter shape, and apply the slot's "
+        },
+        {
+          "insert": "appearance",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": "."
+        }
+      ],
+      "children": []
+    },
+    "b-30-rendering-pipeline-insert-the-foreignobje-37": {
+      "id": "b-30-rendering-pipeline-insert-the-foreignobje-37",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "Insert the "
+        },
+        {
+          "insert": "<foreignObject>",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " immediately after the anchor element so it composites in the right z-order with the SVG's internal layers."
+        }
+      ],
+      "children": []
+    },
+    "b-30-rendering-pipeline-slots-replace-the-legacy-38": {
+      "id": "b-30-rendering-pipeline-slots-replace-the-legacy-38",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "Slots replace the legacy 40-child "
+        },
+        {
+          "insert": "children",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " array on glyph-groups. Sub-layers that aren't tagged "
+        },
+        {
+          "insert": "data-slot",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " are baked: they render as authored, with no editor presence."
+        }
+      ],
+      "children": []
+    },
+    "b-30-rendering-pipeline-children-general-nestin-39": {
+      "id": "b-30-rendering-pipeline-children-general-nestin-39",
+      "type": "heading",
+      "props": {
+        "level": 2
+      },
+      "text": [
+        {
+          "insert": "Children: General Nesting"
+        }
+      ],
+      "children": []
+    },
+    "b-30-rendering-pipeline-for-any-non-glyph-group-40": {
+      "id": "b-30-rendering-pipeline-for-any-non-glyph-group-40",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "For any non-glyph-group object with "
+        },
+        {
+          "insert": "children",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ", the renderer recurses: each child mounts inside the parent's wrapper, with its own transform resolved against the parent's box. This produces the \"moving a group moves its children\" behavior: a CSS consequence of children being absolutely positioned inside a relatively-positioned ancestor."
+        }
+      ],
+      "children": []
+    },
+    "b-30-rendering-pipeline-after-children-are-mount-41": {
+      "id": "b-30-rendering-pipeline-after-children-are-mount-41",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "After children are mounted, the renderer reorders the wrapper's child list to match the "
+        },
+        {
+          "insert": "children[]",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " array order. Z-order within "
+        },
+        {
+          "insert": "children",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " is array order, same rule as the top level."
+        }
+      ],
+      "children": []
+    },
+    "b-30-rendering-pipeline-mount-vs-update-42": {
+      "id": "b-30-rendering-pipeline-mount-vs-update-42",
+      "type": "heading",
+      "props": {
+        "level": 2
+      },
+      "text": [
+        {
+          "insert": "Mount vs. Update"
+        }
+      ],
+      "children": []
+    },
+    "b-30-rendering-pipeline-first-call-to-rende-43": {
+      "id": "b-30-rendering-pipeline-first-call-to-rende-43",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "First call",
+          "attributes": {
+            "bold": true
+          }
+        },
+        {
+          "insert": " to "
+        },
+        {
+          "insert": "renderScene",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ": hides the stage root, clears it, mounts every top-level object via "
+        },
+        {
+          "insert": "mountObject",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ", then "
+        },
+        {
+          "insert": "reorderChildren",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " to match the array before restoring visibility. Users never see a partial async mount."
+        }
+      ],
+      "children": []
+    },
+    "b-30-rendering-pipeline-subsequent-calls-ed-44": {
+      "id": "b-30-rendering-pipeline-subsequent-calls-ed-44",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "Subsequent calls",
+          "attributes": {
+            "bold": true
+          }
+        },
+        {
+          "insert": " (editor edits): walks the stage root, builds an id-keyed map of existing wrappers, and runs "
+        },
+        {
+          "insert": "updateChildren",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ":"
+        }
+      ],
+      "children": [
+        "b-30-rendering-pipeline-wrappers-whose-ids-are-n-45",
+        "b-30-rendering-pipeline-for-each-object-in-the-n-46",
+        "b-30-rendering-pipeline-for-component-and-eff-47",
+        "b-30-rendering-pipeline-after-reconciling-reor-48"
+      ]
+    },
+    "b-30-rendering-pipeline-wrappers-whose-ids-are-n-45": {
+      "id": "b-30-rendering-pipeline-wrappers-whose-ids-are-n-45",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "Wrappers whose ids are no longer in the new "
+        },
+        {
+          "insert": "objects",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " array are removed."
+        }
+      ],
+      "children": []
+    },
+    "b-30-rendering-pipeline-for-each-object-in-the-n-46": {
+      "id": "b-30-rendering-pipeline-for-each-object-in-the-n-46",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "For each object in the new array: if a wrapper exists, re-apply transform/appearance and recurse into children. If not, "
+        },
+        {
+          "insert": "mountObject",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " it."
+        }
+      ],
+      "children": []
+    },
+    "b-30-rendering-pipeline-for-component-and-eff-47": {
+      "id": "b-30-rendering-pipeline-for-component-and-eff-47",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "For "
+        },
+        {
+          "insert": "component",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " and "
+        },
+        {
+          "insert": "effect",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " types, the wrapper is "
+        },
+        {
+          "insert": "replaced",
+          "attributes": {
+            "bold": true
+          }
+        },
+        {
+          "insert": ", not patched: components own their internal DOM, and re-running their render with new properties is the simplest correct update."
+        }
+      ],
+      "children": []
+    },
+    "b-30-rendering-pipeline-after-reconciling-reor-48": {
+      "id": "b-30-rendering-pipeline-after-reconciling-reor-48",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "After reconciling, "
+        },
+        {
+          "insert": "reorderChildren",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " ensures DOM order matches array order."
+        }
+      ],
+      "children": []
+    },
+    "b-30-rendering-pipeline-on-the-fresh-mount-path-49": {
+      "id": "b-30-rendering-pipeline-on-the-fresh-mount-path-49",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "On the fresh-mount path only, after visibility is restored, "
+        },
+        {
+          "insert": "renderScene",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " checks "
+        },
+        {
+          "insert": "scene.entrance",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " unless "
+        },
+        {
+          "insert": "options.skipEntrance",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " is set. When enabled, "
+        },
+        {
+          "insert": "playEntrance(root, scene)",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " fades each visible top-level object whose effective entrance type is not "
+        },
+        {
+          "insert": "none",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " from "
+        },
+        {
+          "insert": "opacity: 0",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " to its target opacity with a staggered CSS transition. It forces a reflow between setting the zero opacity and the target opacity so the transition fires. The promise resolves after the last transition completes and inline transition styles are cleared. Updates never run this entrance step."
+        }
+      ],
+      "children": []
+    },
+    "b-30-rendering-pipeline-this-makes-the-editor-s-50": {
+      "id": "b-30-rendering-pipeline-this-makes-the-editor-s-50",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "This makes the editor's drag/drop, property edits, and add/remove all converge to a correct DOM through one entry point."
+        }
+      ],
+      "children": []
+    },
+    "b-30-rendering-pipeline-foreign-children-via-f-51": {
+      "id": "b-30-rendering-pipeline-foreign-children-via-f-51",
+      "type": "heading",
+      "props": {
+        "level": 2
+      },
+      "text": [
+        {
+          "insert": "Foreign Children via "
+        },
+        {
+          "insert": "<foreignObject>",
+          "attributes": {
+            "code": true
+          }
+        }
+      ],
+      "children": []
+    },
+    "b-30-rendering-pipeline-slot-fills-are-mounted-u-52": {
+      "id": "b-30-rendering-pipeline-slot-fills-are-mounted-u-52",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "Slot fills are mounted using SVG's "
+        },
+        {
+          "insert": "<foreignObject>",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " so arbitrary HTML, a "
+        },
+        {
+          "insert": "<video>",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ", an effect wrapper, a component, can live inside the SVG's coordinate space and respect z-order with the SVG's internal layers. Blend mode and opacity from the slot's "
+        },
+        {
+          "insert": "appearance",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " apply on the "
+        },
+        {
+          "insert": "<foreignObject>",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " itself."
+        }
+      ],
+      "children": []
+    },
+    "b-30-rendering-pipeline-failure-modes-53": {
+      "id": "b-30-rendering-pipeline-failure-modes-53",
+      "type": "heading",
+      "props": {
+        "level": 2
+      },
+      "text": [
+        {
+          "insert": "Failure Modes"
+        }
+      ],
+      "children": []
+    },
+    "b-30-rendering-pipeline-condition-54-tbl": {
+      "id": "b-30-rendering-pipeline-condition-54-tbl",
+      "type": "structured-table",
+      "props": {
+        "columns": [
+          "Condition",
+          "Behavior"
+        ],
+        "rows": [
+          [
+            "Registry fails to load",
+            "Logged; rendering proceeds with empty registry → all lookups warn and skip."
+          ],
+          [
+            [
+              {
+                "insert": "Object's "
+              },
+              {
+                "insert": "asset",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": " not in registry"
+              }
+            ],
+            "Logged warning; object is skipped (siblings continue)."
+          ],
+          [
+            [
+              {
+                "insert": "Slot's "
+              },
+              {
+                "insert": "asset",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": " not in registry"
+              }
+            ],
+            "Logged warning; that slot is skipped; other slots continue."
+          ],
+          [
+            [
+              {
+                "insert": "Slot anchor ("
+              },
+              {
+                "insert": "data-slot=...",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": ") not found"
+              }
+            ],
+            "Logged warning; slot is skipped."
+          ],
+          [
+            "Renderer not registered for a type",
+            "Throws synchronously. (Programmer error: fail loud.)"
+          ],
+          [
+            "Component module has no default export",
+            "Logged error; renderer returns an empty placeholder wrapper."
+          ]
+        ]
+      },
+      "children": []
+    },
+    "b-30-rendering-pipeline-the-non-throwing-behavio-55": {
+      "id": "b-30-rendering-pipeline-the-non-throwing-behavio-55",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "The non-throwing behavior on missing assets/slots is intentional: a partially-broken scene should still render the parts that work, so the editor and the agent get visible feedback rather than a blank screen."
+        }
+      ],
+      "children": []
+    }
+  }
+}

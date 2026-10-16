@@ -1,0 +1,471 @@
+{
+  "schemaVersion": 1,
+  "id": "scene-engine-20-implementation-20-editor-00-overview",
+  "title": "Visual Editor",
+  "root": "b-00-overview-root-16",
+  "blocks": {
+    "b-00-overview-root-16": {
+      "id": "b-00-overview-root-16",
+      "type": "paragraph",
+      "props": {
+        "concepts": [
+          "editor",
+          "react",
+          "zustand",
+          "panels",
+          "mutations",
+          "collapsible-sections",
+          "schema-driven",
+          "property-schema"
+        ],
+        "covers": "Visual editor — Next.js client app, Zustand store, three panels, scene save/export controls, collapsible sections, schema-driven property inspector.",
+        "design_refs": [
+          "10-system-design/40-authoring-surfaces.md",
+          "10-system-design/16-property-schema.md"
+        ],
+        "type": "overview"
+      },
+      "children": [
+        "b-00-overview-a-three-panel-browser-ap-2",
+        "b-00-overview-the-design-rationale-is-3",
+        "b-00-overview-divider-4",
+        "b-00-overview-file-tree-5",
+        "b-00-overview-code-6",
+        "b-00-overview-contents-7",
+        "b-00-overview-10-state-md-10-state-m-8",
+        "b-00-overview-the-zustand-store-objec-9",
+        "b-00-overview-20-panels-md-20-panels-10",
+        "b-00-overview-the-react-components-t-11",
+        "b-00-overview-30-loader-md-30-loader-12",
+        "b-00-overview-usesceneloader-how-t-13",
+        "b-00-overview-key-concepts-14",
+        "b-00-overview-concept-15-tbl"
+      ]
+    },
+    "b-00-overview-a-three-panel-browser-ap-2": {
+      "id": "b-00-overview-a-three-panel-browser-ap-2",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "A three-panel browser app for authoring scenes, built with Next.js + React + Tailwind + Zustand. The store holds the live scene tree, the merged registry, and selection state. Panels subscribe with selectors and re-render only on relevant changes. Mutations are immutable ("
+        },
+        {
+          "insert": "structuredClone",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " then patch) and mark the store dirty."
+        }
+      ],
+      "children": []
+    },
+    "b-00-overview-the-design-rationale-is-3": {
+      "id": "b-00-overview-the-design-rationale-is-3",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "The design rationale is in "
+        },
+        {
+          "insert": "System Design / Authoring Surfaces",
+          "attributes": {
+            "reference": {
+              "kind": "doc",
+              "path": "10-scene-engine/10-system-design/40-authoring-surfaces",
+              "label": "System Design / Authoring Surfaces"
+            }
+          }
+        },
+        {
+          "insert": ". This section describes the code."
+        }
+      ],
+      "children": []
+    },
+    "b-00-overview-divider-4": {
+      "id": "b-00-overview-divider-4",
+      "type": "divider",
+      "props": {},
+      "children": []
+    },
+    "b-00-overview-file-tree-5": {
+      "id": "b-00-overview-file-tree-5",
+      "type": "heading",
+      "props": {
+        "level": 2
+      },
+      "text": [
+        {
+          "insert": "File Tree"
+        }
+      ],
+      "children": []
+    },
+    "b-00-overview-code-6": {
+      "id": "b-00-overview-code-6",
+      "type": "code",
+      "props": {},
+      "text": [
+        {
+          "insert": "apps/scene-engine/app/editor/\n├── page.tsx                            shell — 3-panel grid, useSceneLoader\n├── _features/\n│   ├── pi-agent/\n│   │   ├── PiAgentChatPanel.tsx        desktop bridge chat panel for Pi Agent\n│   │   └── usePiAgentController.ts     bridge subscription + send/abort/reset logic\n│   └── desktop-menu/\n│       ├── EditorTopBar.tsx            project/scene title + clean/dirty status\n│       ├── sceneActions.ts             shared save/export actions\n│       └── useDesktopMenuCommands.ts   keyboard, native menu, and leave guards\n└── _components/\n    ├── CanvasPanel.tsx                 live preview using the production renderer\n    ├── HierarchyPanel.tsx              object tree, drag reorder, add menu, Pi panel host\n    ├── HierarchyRow.tsx                recursive tree row\n    ├── InspectorPanel.tsx              shell that resolves selected object\n    ├── LayerForm.tsx                   always-present sections + schema-driven properties\n    ├── MainMenuConfigEditor.tsx        bespoke main-menu graph and tuning editor\n    ├── PropertySection.tsx             section header + nested properties + nested sections\n    ├── PropertyField.tsx               clickable label + input dispatch by schema type\n    ├── DescriptionPopover.tsx          floating popover (anchored, click-away/Esc dismiss)\n    ├── SlotsSection.tsx                glyph-group slot editor\n    ├── AssetSwapDropdown.tsx           project asset selector for layers/slots\n    ├── SceneSection.tsx                collapsed scene settings\n    └── inputs/\n        ├── RangedInput.tsx             slider + numeric, debounced\n        ├── BlendSelect.tsx             blend-mode dropdown\n        ├── FitSelect.tsx               object-fit dropdown\n        ├── AnchorSelect.tsx            9-position anchor selector\n        ├── ClipSelect.tsx              clip-path dropdown\n        ├── EventsSection.tsx           event binding rows\n        ├── ManifestPropertyField.tsx   one field per manifest descriptor (effects only)\n        └── InspectorSection.tsx        Header / Section / FieldRow / ReadonlyValue\n\napps/scene-engine/app/_engine/\n├── store/editor-store.ts               Zustand store + mutations + componentSchemas cache\n├── hooks/useSceneLoader.ts             fetch scene + registry, seed store, preload component schemas\n├── types/\n│   └── property-schema.ts             PropertySchema / Section / PropertyDef types\n└── lib/\n    ├── path.ts                         resolveObject, resolveLayerEl\n    ├── patch.ts                        patchFromDottedKey\n    ├── inspector-config.ts             BLEND_MODES, FIT_OPTIONS, NUMERIC_PROPERTY_STEPS\n    ├── builtin-property-schemas.ts     schemas for media / glyph-group / audio + orphan helpers\n    └── component-schema-loader.ts      dynamic-import component .js, extract properties export, cache"
+        }
+      ],
+      "children": []
+    },
+    "b-00-overview-contents-7": {
+      "id": "b-00-overview-contents-7",
+      "type": "heading",
+      "props": {
+        "level": 2
+      },
+      "text": [
+        {
+          "insert": "Contents"
+        }
+      ],
+      "children": []
+    },
+    "b-00-overview-10-state-md-10-state-m-8": {
+      "id": "b-00-overview-10-state-md-10-state-m-8",
+      "type": "heading",
+      "props": {
+        "level": 3
+      },
+      "text": [
+        {
+          "insert": "10-state.md",
+          "attributes": {
+            "reference": {
+              "kind": "doc",
+              "path": "10-scene-engine/20-implementation/20-editor/10-state",
+              "label": "10-state.md"
+            }
+          }
+        }
+      ],
+      "children": []
+    },
+    "b-00-overview-the-zustand-store-objec-9": {
+      "id": "b-00-overview-the-zustand-store-objec-9",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "The Zustand store, object-path semantics, the deep-merge patch algorithm, and each mutation ("
+        },
+        {
+          "insert": "mutateObjectAt",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ", "
+        },
+        {
+          "insert": "setObjectAssetAt",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ", "
+        },
+        {
+          "insert": "setSlotAssetAt",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ", "
+        },
+        {
+          "insert": "addObjectAt",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ", "
+        },
+        {
+          "insert": "removeObjectAt",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ", "
+        },
+        {
+          "insert": "moveObject",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ")."
+        }
+      ],
+      "children": []
+    },
+    "b-00-overview-20-panels-md-20-panels-10": {
+      "id": "b-00-overview-20-panels-md-20-panels-10",
+      "type": "heading",
+      "props": {
+        "level": 3
+      },
+      "text": [
+        {
+          "insert": "20-panels.md",
+          "attributes": {
+            "reference": {
+              "kind": "doc",
+              "path": "10-scene-engine/20-implementation/20-editor/20-panels",
+              "label": "20-panels.md"
+            }
+          }
+        }
+      ],
+      "children": []
+    },
+    "b-00-overview-the-react-components-t-11": {
+      "id": "b-00-overview-the-react-components-t-11",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "The React components. Toolbar, Canvas, Hierarchy, Inspector, including always-present sections, drag-and-drop reorder, manifest-driven property fields, slots, and events."
+        }
+      ],
+      "children": []
+    },
+    "b-00-overview-30-loader-md-30-loader-12": {
+      "id": "b-00-overview-30-loader-md-30-loader-12",
+      "type": "heading",
+      "props": {
+        "level": 3
+      },
+      "text": [
+        {
+          "insert": "30-loader.md",
+          "attributes": {
+            "reference": {
+              "kind": "doc",
+              "path": "10-scene-engine/20-implementation/20-editor/30-loader",
+              "label": "30-loader.md"
+            }
+          }
+        }
+      ],
+      "children": []
+    },
+    "b-00-overview-usesceneloader-how-t-13": {
+      "id": "b-00-overview-usesceneloader-how-t-13",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "useSceneLoader",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ": how the editor reads the project + scene IDs from query params, fetches the scene + registry, and seeds the store."
+        }
+      ],
+      "children": []
+    },
+    "b-00-overview-key-concepts-14": {
+      "id": "b-00-overview-key-concepts-14",
+      "type": "heading",
+      "props": {
+        "level": 2
+      },
+      "text": [
+        {
+          "insert": "Key Concepts"
+        }
+      ],
+      "children": []
+    },
+    "b-00-overview-concept-15-tbl": {
+      "id": "b-00-overview-concept-15-tbl",
+      "type": "structured-table",
+      "props": {
+        "columns": [
+          "Concept",
+          "Description"
+        ],
+        "rows": [
+          [
+            "Zustand store",
+            [
+              {
+                "insert": "{ scene, registry, selectedPath, dirty, componentSchemas }",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": " plus mutations. Selectors drive granular re-renders."
+              }
+            ]
+          ],
+          [
+            "Object path",
+            [
+              {
+                "insert": "Dotted string like "
+              },
+              {
+                "insert": "0",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": ", "
+              },
+              {
+                "insert": "2.children.1",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": ", "
+              },
+              {
+                "insert": "0.children.3.children.0",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": ". Encodes a position in the scene tree."
+              }
+            ]
+          ],
+          [
+            "Mutation",
+            [
+              {
+                "insert": "A function that produces a new scene tree (via "
+              },
+              {
+                "insert": "structuredClone",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": "), replaces the store's "
+              },
+              {
+                "insert": "scene",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": ", and marks dirty."
+              }
+            ]
+          ],
+          [
+            "Always-present section",
+            "Transform and Appearance render on every selection, even when the JSON omits them."
+          ],
+          [
+            "Collapsible section",
+            "Editor and schema sections can opt into local open/closed state; dense groups can start collapsed."
+          ],
+          [
+            "Schema-driven property field",
+            [
+              {
+                "insert": "Property field rendered from a "
+              },
+              {
+                "insert": "PropertySchema",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": ": sections, clickable labels, description popovers. Covers components and built-in layer types."
+              }
+            ]
+          ],
+          [
+            "Manifest-driven field",
+            [
+              {
+                "insert": "Property field generated from the asset's "
+              },
+              {
+                "insert": "manifest.json",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": " descriptor. Used only for effects."
+              }
+            ]
+          ],
+          [
+            "Slot",
+            "Glyph-group sub-surface edited under the parent object, not as a separate hierarchy entry."
+          ],
+          [
+            "Event binding",
+            [
+              {
+                "insert": "Trigger → action → target row stored on the object's "
+              },
+              {
+                "insert": "events[]",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": "."
+              }
+            ]
+          ],
+          [
+            "Dirty",
+            "A boolean toggled by mutations and reset on save. Drives scene status, save commands, and unsaved-change prompts."
+          ],
+          [
+            "Pi Agent panel",
+            [
+              {
+                "insert": "Desktop-only chat panel hosted below the hierarchy. Sends project/scene/selection context through "
+              },
+              {
+                "insert": "window.mainMenu.agent",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": "."
+              }
+            ]
+          ]
+        ]
+      },
+      "children": []
+    }
+  }
+}

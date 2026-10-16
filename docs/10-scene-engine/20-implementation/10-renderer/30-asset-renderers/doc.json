@@ -1,0 +1,1543 @@
+{
+  "schemaVersion": 1,
+  "id": "scene-engine-20-implementation-10-renderer-30-asset-renderers",
+  "title": "Asset Renderers",
+  "root": "b-30-asset-renderers-root-57",
+  "blocks": {
+    "b-30-asset-renderers-root-57": {
+      "id": "b-30-asset-renderers-root-57",
+      "type": "paragraph",
+      "props": {
+        "concepts": [
+          "renderer-registry",
+          "glyph-group",
+          "slots",
+          "foreignObject",
+          "component",
+          "effect",
+          "manifest"
+        ],
+        "covers": "The renderer registry and the per-type renderers, including the glyph-group slot mounting algorithm and the manifest-driven component contract.",
+        "design_refs": [
+          "10-system-design/30-rendering-pipeline.md",
+          "10-system-design/15-component-manifest.md"
+        ]
+      },
+      "children": [
+        "b-30-asset-renderers-each-object-type-has-one-2",
+        "b-30-asset-renderers-divider-3",
+        "b-30-asset-renderers-renderer-registry-asse-4",
+        "b-30-asset-renderers-a-map-string-fn-popu-5",
+        "b-30-asset-renderers-registered-types-video-6",
+        "b-30-asset-renderers-adding-a-new-type-7",
+        "b-30-asset-renderers-write-asset-renderers-8",
+        "b-30-asset-renderers-import-and-registerrend-9",
+        "b-30-asset-renderers-add-scene-authoring-supp-10",
+        "b-30-asset-renderers-per-type-renderers-11",
+        "b-30-asset-renderers-media-js-video-imag-12",
+        "b-30-asset-renderers-mounts-a-video-or-13",
+        "b-30-asset-renderers-audio-js-audio-14",
+        "b-30-asset-renderers-dynamically-imports-the-15",
+        "b-30-asset-renderers-css-effect-js-effect-16",
+        "b-30-asset-renderers-loads-the-effect-s-style-17",
+        "b-30-asset-renderers-component-js-compone-18",
+        "b-30-asset-renderers-renders-a-custom-js-comp-19",
+        "b-30-asset-renderers-js-20",
+        "b-30-asset-renderers-the-blob-url-import-21",
+        "b-30-asset-renderers-a-component-must-default-22",
+        "b-30-asset-renderers-the-contract-is-intentio-23",
+        "b-30-asset-renderers-glyph-group-js-glyph-24",
+        "b-30-asset-renderers-the-complex-one-algorit-25",
+        "b-30-asset-renderers-fetch-and-parse-the-26",
+        "b-30-asset-renderers-hide-the-background-re-27",
+        "b-30-asset-renderers-wrap-the-parsed-sv-28",
+        "b-30-asset-renderers-for-each-slot-in-ob-29",
+        "b-30-asset-renderers-slots-replace-the-legacy-36",
+        "b-30-asset-renderers-why-foreignobject-37",
+        "b-30-asset-renderers-foreign-elements-need-to-38",
+        "b-30-asset-renderers-text-js-text-39",
+        "b-30-asset-renderers-renders-a-styled-text-el-40",
+        "b-30-asset-renderers-group-js-group-41",
+        "b-30-asset-renderers-an-empty-positioned-wrap-42",
+        "b-30-asset-renderers-stylesheet-js-43",
+        "b-30-asset-renderers-internal-helper-ensure-44",
+        "b-30-asset-renderers-manifest-reads-45",
+        "b-30-asset-renderers-when-the-asset-registry-46",
+        "b-30-asset-renderers-source-47",
+        "b-30-asset-renderers-apps-scene-engine-app-48",
+        "b-30-asset-renderers-apps-scene-engine-app-49",
+        "b-30-asset-renderers-apps-scene-engine-app-50",
+        "b-30-asset-renderers-apps-scene-engine-app-51",
+        "b-30-asset-renderers-apps-scene-engine-app-52",
+        "b-30-asset-renderers-apps-scene-engine-app-53",
+        "b-30-asset-renderers-apps-scene-engine-app-54",
+        "b-30-asset-renderers-apps-scene-engine-app-55",
+        "b-30-asset-renderers-apps-scene-engine-app-56"
+      ]
+    },
+    "b-30-asset-renderers-each-object-type-has-one-2": {
+      "id": "b-30-asset-renderers-each-object-type-has-one-2",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "Each object type has one renderer function. They share a contract: "
+        },
+        {
+          "insert": "async (object, registryEntry) => HTMLElement",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ". The contract plus the renderer registry is the entire extension point for new object types."
+        }
+      ],
+      "children": []
+    },
+    "b-30-asset-renderers-divider-3": {
+      "id": "b-30-asset-renderers-divider-3",
+      "type": "divider",
+      "props": {},
+      "children": []
+    },
+    "b-30-asset-renderers-renderer-registry-asse-4": {
+      "id": "b-30-asset-renderers-renderer-registry-asse-4",
+      "type": "heading",
+      "props": {
+        "level": 2
+      },
+      "text": [
+        {
+          "insert": "Renderer Registry ("
+        },
+        {
+          "insert": "asset-renderers/index.js",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ")"
+        }
+      ],
+      "children": []
+    },
+    "b-30-asset-renderers-a-map-string-fn-popu-5": {
+      "id": "b-30-asset-renderers-a-map-string-fn-popu-5",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "A "
+        },
+        {
+          "insert": "Map<string, fn>",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " populated at module load. "
+        },
+        {
+          "insert": "getRenderer(type)",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " returns the function or "
+        },
+        {
+          "insert": "throws",
+          "attributes": {
+            "bold": true
+          }
+        },
+        {
+          "insert": " if the type is not registered. Throwing here is intentional: an unknown type is a programmer error (typo in the scene, missing renderer registration), not a data error."
+        }
+      ],
+      "children": []
+    },
+    "b-30-asset-renderers-registered-types-video-6": {
+      "id": "b-30-asset-renderers-registered-types-video-6",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "Registered types: "
+        },
+        {
+          "insert": "video",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ", "
+        },
+        {
+          "insert": "image",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ", "
+        },
+        {
+          "insert": "audio",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ", "
+        },
+        {
+          "insert": "glyph-group",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ", "
+        },
+        {
+          "insert": "text",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ", "
+        },
+        {
+          "insert": "effect",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ", "
+        },
+        {
+          "insert": "component",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ", "
+        },
+        {
+          "insert": "group",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": "."
+        }
+      ],
+      "children": []
+    },
+    "b-30-asset-renderers-adding-a-new-type-7": {
+      "id": "b-30-asset-renderers-adding-a-new-type-7",
+      "type": "heading",
+      "props": {
+        "level": 3
+      },
+      "text": [
+        {
+          "insert": "Adding a New Type"
+        }
+      ],
+      "children": []
+    },
+    "b-30-asset-renderers-write-asset-renderers-8": {
+      "id": "b-30-asset-renderers-write-asset-renderers-8",
+      "type": "list-item",
+      "props": {
+        "ordered": true
+      },
+      "text": [
+        {
+          "insert": "Write "
+        },
+        {
+          "insert": "asset-renderers/<type>.js",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " exporting "
+        },
+        {
+          "insert": "async function render<Type>(object, entry)",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": "."
+        }
+      ],
+      "children": []
+    },
+    "b-30-asset-renderers-import-and-registerrend-9": {
+      "id": "b-30-asset-renderers-import-and-registerrend-9",
+      "type": "list-item",
+      "props": {
+        "ordered": true
+      },
+      "text": [
+        {
+          "insert": "Import and "
+        },
+        {
+          "insert": "registerRenderer('<type>', renderXxx)",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " in "
+        },
+        {
+          "insert": "asset-renderers/index.js",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": "."
+        }
+      ],
+      "children": []
+    },
+    "b-30-asset-renderers-add-scene-authoring-supp-10": {
+      "id": "b-30-asset-renderers-add-scene-authoring-supp-10",
+      "type": "list-item",
+      "props": {
+        "ordered": true
+      },
+      "text": [
+        {
+          "insert": "Add scene authoring support: registry entries with the matching type, optional manifest, optional inspector hints."
+        }
+      ],
+      "children": []
+    },
+    "b-30-asset-renderers-per-type-renderers-11": {
+      "id": "b-30-asset-renderers-per-type-renderers-11",
+      "type": "heading",
+      "props": {
+        "level": 2
+      },
+      "text": [
+        {
+          "insert": "Per-Type Renderers"
+        }
+      ],
+      "children": []
+    },
+    "b-30-asset-renderers-media-js-video-imag-12": {
+      "id": "b-30-asset-renderers-media-js-video-imag-12",
+      "type": "heading",
+      "props": {
+        "level": 3
+      },
+      "text": [
+        {
+          "insert": "media.js",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ": video, image"
+        }
+      ],
+      "children": []
+    },
+    "b-30-asset-renderers-mounts-a-video-or-13": {
+      "id": "b-30-asset-renderers-mounts-a-video-or-13",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "Mounts a "
+        },
+        {
+          "insert": "<video>",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " or "
+        },
+        {
+          "insert": "<img>",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " from "
+        },
+        {
+          "insert": "entry.file",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ". Videos autoplay, loop, and are muted to satisfy autoplay policies. The wrapper is the media element itself; "
+        },
+        {
+          "insert": "applyTransform",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " and "
+        },
+        {
+          "insert": "applyAppearance",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " style it directly. Object-fit is applied via "
+        },
+        {
+          "insert": "appearance.fit",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " on the inner element."
+        }
+      ],
+      "children": []
+    },
+    "b-30-asset-renderers-audio-js-audio-14": {
+      "id": "b-30-asset-renderers-audio-js-audio-14",
+      "type": "heading",
+      "props": {
+        "level": 3
+      },
+      "text": [
+        {
+          "insert": "audio.js",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ": audio"
+        }
+      ],
+      "children": []
+    },
+    "b-30-asset-renderers-dynamically-imports-the-15": {
+      "id": "b-30-asset-renderers-dynamically-imports-the-15",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "Dynamically imports the audio module (or builds a Web Audio controller from the file at "
+        },
+        {
+          "insert": "entry.file",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ") and returns a small DOM stub so the object participates in the stage tree (for selection, reconciliation) without rendering anything visible."
+        }
+      ],
+      "children": []
+    },
+    "b-30-asset-renderers-css-effect-js-effect-16": {
+      "id": "b-30-asset-renderers-css-effect-js-effect-16",
+      "type": "heading",
+      "props": {
+        "level": 3
+      },
+      "text": [
+        {
+          "insert": "css-effect.js",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ": effect"
+        }
+      ],
+      "children": []
+    },
+    "b-30-asset-renderers-loads-the-effect-s-style-17": {
+      "id": "b-30-asset-renderers-loads-the-effect-s-style-17",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "Loads the effect's stylesheet (deduped via "
+        },
+        {
+          "insert": "stylesheet.js",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": "), returns a wrapper element. The object's "
+        },
+        {
+          "insert": "properties",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " are exposed as CSS custom properties on the wrapper ("
+        },
+        {
+          "insert": "--scan-line-density: 3",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ", "
+        },
+        {
+          "insert": "--rgb-fringe: 0.06",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ", …) so the stylesheet can consume them via "
+        },
+        {
+          "insert": "var(--…)",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ". Effects are typically "
+        },
+        {
+          "insert": "transform: { mode: \"fill\" }",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": "; the universal styling pass handles full-stage layout."
+        }
+      ],
+      "children": []
+    },
+    "b-30-asset-renderers-component-js-compone-18": {
+      "id": "b-30-asset-renderers-component-js-compone-18",
+      "type": "heading",
+      "props": {
+        "level": 3
+      },
+      "text": [
+        {
+          "insert": "component.js",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ": component"
+        }
+      ],
+      "children": []
+    },
+    "b-30-asset-renderers-renders-a-custom-js-comp-19": {
+      "id": "b-30-asset-renderers-renders-a-custom-js-comp-19",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "Renders a custom JS component declared by a manifest:"
+        }
+      ],
+      "children": []
+    },
+    "b-30-asset-renderers-js-20": {
+      "id": "b-30-asset-renderers-js-20",
+      "type": "code",
+      "props": {
+        "language": "js"
+      },
+      "text": [
+        {
+          "insert": "const cssPath = deriveCssPath(entry.path)        // .js → .css\nif (cssPath) ensureStylesheet(cssPath)           // load sibling stylesheet\nconst mod = await loadModule(entry.path)         // fetch + Blob URL + import()\nconst el = await mod.default({ properties: layer.properties || {}, layerId: layer.id })\nreturn el"
+        }
+      ],
+      "children": []
+    },
+    "b-30-asset-renderers-the-blob-url-import-21": {
+      "id": "b-30-asset-renderers-the-blob-url-import-21",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "The Blob-URL "
+        },
+        {
+          "insert": "import()",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " shim avoids webpack analysis warnings for runtime-discovered modules and keeps a single in-memory cache ("
+        },
+        {
+          "insert": "moduleCache",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ") so the same component module is fetched once per session."
+        }
+      ],
+      "children": []
+    },
+    "b-30-asset-renderers-a-component-must-default-22": {
+      "id": "b-30-asset-renderers-a-component-must-default-22",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "A component must default-export a function. Missing default → log error, return an empty placeholder so the rest of the scene survives."
+        }
+      ],
+      "children": []
+    },
+    "b-30-asset-renderers-the-contract-is-intentio-23": {
+      "id": "b-30-asset-renderers-the-contract-is-intentio-23",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "The contract is intentionally minimal: components own their DOM and their internal lifecycle; the renderer never patches their internals. On property changes, the "
+        },
+        {
+          "insert": "scene-renderer's update path",
+          "attributes": {
+            "reference": {
+              "kind": "doc",
+              "path": "10-scene-engine/20-implementation/10-renderer/10-scene-renderer",
+              "section": "updatechildren",
+              "label": "scene-renderer's update path"
+            }
+          }
+        },
+        {
+          "insert": " replaces the component wrapper rather than diffing inside it."
+        }
+      ],
+      "children": []
+    },
+    "b-30-asset-renderers-glyph-group-js-glyph-24": {
+      "id": "b-30-asset-renderers-glyph-group-js-glyph-24",
+      "type": "heading",
+      "props": {
+        "level": 3
+      },
+      "text": [
+        {
+          "insert": "glyph-group.js",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ": glyph-group with slots"
+        }
+      ],
+      "children": []
+    },
+    "b-30-asset-renderers-the-complex-one-algorit-25": {
+      "id": "b-30-asset-renderers-the-complex-one-algorit-25",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "The complex one. Algorithm:"
+        }
+      ],
+      "children": []
+    },
+    "b-30-asset-renderers-fetch-and-parse-the-26": {
+      "id": "b-30-asset-renderers-fetch-and-parse-the-26",
+      "type": "list-item",
+      "props": {
+        "ordered": true
+      },
+      "text": [
+        {
+          "insert": "Fetch and parse",
+          "attributes": {
+            "bold": true
+          }
+        },
+        {
+          "insert": " the SVG at "
+        },
+        {
+          "insert": "entry.file",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " via "
+        },
+        {
+          "insert": "DOMParser",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " (text result is cached in "
+        },
+        {
+          "insert": "svgTextCache",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ")."
+        }
+      ],
+      "children": []
+    },
+    "b-30-asset-renderers-hide-the-background-re-27": {
+      "id": "b-30-asset-renderers-hide-the-background-re-27",
+      "type": "list-item",
+      "props": {
+        "ordered": true
+      },
+      "text": [
+        {
+          "insert": "Hide the background rect",
+          "attributes": {
+            "bold": true
+          }
+        },
+        {
+          "insert": " ("
+        },
+        {
+          "insert": "<rect id=\"background\">",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": "), an artifact of the SVG export."
+        }
+      ],
+      "children": []
+    },
+    "b-30-asset-renderers-wrap-the-parsed-sv-28": {
+      "id": "b-30-asset-renderers-wrap-the-parsed-sv-28",
+      "type": "list-item",
+      "props": {
+        "ordered": true
+      },
+      "text": [
+        {
+          "insert": "Wrap",
+          "attributes": {
+            "bold": true
+          }
+        },
+        {
+          "insert": " the parsed "
+        },
+        {
+          "insert": "<svg>",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " in a "
+        },
+        {
+          "insert": "<div class=\"glyph-group-layer\">",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " sized to the SVG's "
+        },
+        {
+          "insert": "viewBox",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " (parsed by "
+        },
+        {
+          "insert": "parseViewBox",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ")."
+        }
+      ],
+      "children": []
+    },
+    "b-30-asset-renderers-for-each-slot-in-ob-29": {
+      "id": "b-30-asset-renderers-for-each-slot-in-ob-29",
+      "type": "list-item",
+      "props": {
+        "ordered": true
+      },
+      "text": [
+        {
+          "insert": "For each ",
+          "attributes": {
+            "bold": true
+          }
+        },
+        {
+          "insert": "slot",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " in ",
+          "attributes": {
+            "bold": true
+          }
+        },
+        {
+          "insert": "object.slots ?? []",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ":"
+        }
+      ],
+      "children": [
+        "b-30-asset-renderers-anchor-svg-queryselec-30",
+        "b-30-asset-renderers-resolve-the-slot-s-asset-31",
+        "b-30-asset-renderers-map-the-slot-s-leaf-type-32",
+        "b-30-asset-renderers-build-a-foreignobject-33",
+        "b-30-asset-renderers-apply-slot-appearance-34",
+        "b-30-asset-renderers-wrap-the-fill-in-an-xht-35"
+      ]
+    },
+    "b-30-asset-renderers-anchor-svg-queryselec-30": {
+      "id": "b-30-asset-renderers-anchor-svg-queryselec-30",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "anchor = svg.querySelector('[data-slot=\"<slot.id>\"]')",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ". Missing → warn and skip."
+        }
+      ],
+      "children": []
+    },
+    "b-30-asset-renderers-resolve-the-slot-s-asset-31": {
+      "id": "b-30-asset-renderers-resolve-the-slot-s-asset-31",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "Resolve the slot's asset; if missing, warn and skip."
+        }
+      ],
+      "children": []
+    },
+    "b-30-asset-renderers-map-the-slot-s-leaf-type-32": {
+      "id": "b-30-asset-renderers-map-the-slot-s-leaf-type-32",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "Map the slot's leaf type ("
+        },
+        {
+          "insert": "video-fill",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " → "
+        },
+        {
+          "insert": "video",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ") and call "
+        },
+        {
+          "insert": "getRenderer(leafType)(slot, entry)",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " for the fill element."
+        }
+      ],
+      "children": []
+    },
+    "b-30-asset-renderers-build-a-foreignobject-33": {
+      "id": "b-30-asset-renderers-build-a-foreignobject-33",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "Build a "
+        },
+        {
+          "insert": "<foreignObject>",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " of viewBox dimensions, copy the anchor's "
+        },
+        {
+          "insert": "clip-path",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " so the fill is constrained to the letter shape."
+        }
+      ],
+      "children": []
+    },
+    "b-30-asset-renderers-apply-slot-appearance-34": {
+      "id": "b-30-asset-renderers-apply-slot-appearance-34",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "Apply slot "
+        },
+        {
+          "insert": "appearance",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " ("
+        },
+        {
+          "insert": "opacity",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ", "
+        },
+        {
+          "insert": "blend",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ", "
+        },
+        {
+          "insert": "fit",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ", "
+        },
+        {
+          "insert": "hue",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ")."
+        }
+      ],
+      "children": []
+    },
+    "b-30-asset-renderers-wrap-the-fill-in-an-xht-35": {
+      "id": "b-30-asset-renderers-wrap-the-fill-in-an-xht-35",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "Wrap the fill in an "
+        },
+        {
+          "insert": "xhtml",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " "
+        },
+        {
+          "insert": "<div>",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " (overflow hidden) and insert the "
+        },
+        {
+          "insert": "<foreignObject>",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " immediately after the anchor."
+        }
+      ],
+      "children": []
+    },
+    "b-30-asset-renderers-slots-replace-the-legacy-36": {
+      "id": "b-30-asset-renderers-slots-replace-the-legacy-36",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "Slots replace the legacy "
+        },
+        {
+          "insert": "children",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " array on glyph-groups. Sub-layers without "
+        },
+        {
+          "insert": "data-slot",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " are baked: they render as authored, with no editor presence."
+        }
+      ],
+      "children": []
+    },
+    "b-30-asset-renderers-why-foreignobject-37": {
+      "id": "b-30-asset-renderers-why-foreignobject-37",
+      "type": "heading",
+      "props": {
+        "level": 4
+      },
+      "text": [
+        {
+          "insert": "Why "
+        },
+        {
+          "insert": "<foreignObject>",
+          "attributes": {
+            "code": true
+          }
+        }
+      ],
+      "children": []
+    },
+    "b-30-asset-renderers-foreign-elements-need-to-38": {
+      "id": "b-30-asset-renderers-foreign-elements-need-to-38",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "Foreign elements need to live "
+        },
+        {
+          "insert": "inside",
+          "attributes": {
+            "italic": true
+          }
+        },
+        {
+          "insert": " the SVG's coordinate space so they composite between named layers in render order. "
+        },
+        {
+          "insert": "<foreignObject>",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " is the only standards-compliant way to embed HTML inside SVG."
+        }
+      ],
+      "children": []
+    },
+    "b-30-asset-renderers-text-js-text-39": {
+      "id": "b-30-asset-renderers-text-js-text-39",
+      "type": "heading",
+      "props": {
+        "level": 3
+      },
+      "text": [
+        {
+          "insert": "text.js",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ": text"
+        }
+      ],
+      "children": []
+    },
+    "b-30-asset-renderers-renders-a-styled-text-el-40": {
+      "id": "b-30-asset-renderers-renders-a-styled-text-el-40",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "Renders a styled text element using the object's "
+        },
+        {
+          "insert": "properties",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " ("
+        },
+        {
+          "insert": "text",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ", "
+        },
+        {
+          "insert": "font",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ", "
+        },
+        {
+          "insert": "size",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ", "
+        },
+        {
+          "insert": "color",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": "). Implementation is a thin wrapper; the heavy lifting is CSS."
+        }
+      ],
+      "children": []
+    },
+    "b-30-asset-renderers-group-js-group-41": {
+      "id": "b-30-asset-renderers-group-js-group-41",
+      "type": "heading",
+      "props": {
+        "level": 3
+      },
+      "text": [
+        {
+          "insert": "group.js",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ": group"
+        }
+      ],
+      "children": []
+    },
+    "b-30-asset-renderers-an-empty-positioned-wrap-42": {
+      "id": "b-30-asset-renderers-an-empty-positioned-wrap-42",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "An empty positioned wrapper. Children render inside it. No asset, no manifest. Useful for arbitrary nesting and for moving multiple objects together."
+        }
+      ],
+      "children": []
+    },
+    "b-30-asset-renderers-stylesheet-js-43": {
+      "id": "b-30-asset-renderers-stylesheet-js-43",
+      "type": "heading",
+      "props": {
+        "level": 2
+      },
+      "text": [
+        {
+          "insert": "stylesheet.js",
+          "attributes": {
+            "code": true
+          }
+        }
+      ],
+      "children": []
+    },
+    "b-30-asset-renderers-internal-helper-ensure-44": {
+      "id": "b-30-asset-renderers-internal-helper-ensure-44",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "Internal helper. "
+        },
+        {
+          "insert": "ensureStylesheet(href)",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " deduplicates "
+        },
+        {
+          "insert": "<link rel=\"stylesheet\">",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " tags so multiple effect or component objects sharing a stylesheet only load it once."
+        }
+      ],
+      "children": []
+    },
+    "b-30-asset-renderers-manifest-reads-45": {
+      "id": "b-30-asset-renderers-manifest-reads-45",
+      "type": "heading",
+      "props": {
+        "level": 2
+      },
+      "text": [
+        {
+          "insert": "Manifest Reads"
+        }
+      ],
+      "children": []
+    },
+    "b-30-asset-renderers-when-the-asset-registry-46": {
+      "id": "b-30-asset-renderers-when-the-asset-registry-46",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "When the asset registry merges a project's module registry, each module entry is augmented with its sibling "
+        },
+        {
+          "insert": "manifest.json",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " if present. The renderer doesn't consult the manifest itself: "
+        },
+        {
+          "insert": "properties",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " are passed through to components/effects unchanged. The manifest exists for the "
+        },
+        {
+          "insert": "editor",
+          "attributes": {
+            "bold": true
+          }
+        },
+        {
+          "insert": " (to render property fields) and for "
+        },
+        {
+          "insert": "defaulting",
+          "attributes": {
+            "bold": true
+          }
+        },
+        {
+          "insert": " (when a new object is added, the editor seeds "
+        },
+        {
+          "insert": "properties",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " from the manifest's "
+        },
+        {
+          "insert": "default",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " values). See the "
+        },
+        {
+          "insert": "component-manifest design doc",
+          "attributes": {
+            "reference": {
+              "kind": "doc",
+              "path": "10-scene-engine/10-system-design/15-component-manifest",
+              "label": "component-manifest design doc"
+            }
+          }
+        },
+        {
+          "insert": "."
+        }
+      ],
+      "children": []
+    },
+    "b-30-asset-renderers-source-47": {
+      "id": "b-30-asset-renderers-source-47",
+      "type": "heading",
+      "props": {
+        "level": 2
+      },
+      "text": [
+        {
+          "insert": "Source"
+        }
+      ],
+      "children": []
+    },
+    "b-30-asset-renderers-apps-scene-engine-app-48": {
+      "id": "b-30-asset-renderers-apps-scene-engine-app-48",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "apps/scene-engine/app/_engine/renderer/asset-renderers/index.js",
+          "attributes": {
+            "code": true
+          }
+        }
+      ],
+      "children": []
+    },
+    "b-30-asset-renderers-apps-scene-engine-app-49": {
+      "id": "b-30-asset-renderers-apps-scene-engine-app-49",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "apps/scene-engine/app/_engine/renderer/asset-renderers/media.js",
+          "attributes": {
+            "code": true
+          }
+        }
+      ],
+      "children": []
+    },
+    "b-30-asset-renderers-apps-scene-engine-app-50": {
+      "id": "b-30-asset-renderers-apps-scene-engine-app-50",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "apps/scene-engine/app/_engine/renderer/asset-renderers/css-effect.js",
+          "attributes": {
+            "code": true
+          }
+        }
+      ],
+      "children": []
+    },
+    "b-30-asset-renderers-apps-scene-engine-app-51": {
+      "id": "b-30-asset-renderers-apps-scene-engine-app-51",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "apps/scene-engine/app/_engine/renderer/asset-renderers/glyph-group.js",
+          "attributes": {
+            "code": true
+          }
+        }
+      ],
+      "children": []
+    },
+    "b-30-asset-renderers-apps-scene-engine-app-52": {
+      "id": "b-30-asset-renderers-apps-scene-engine-app-52",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "apps/scene-engine/app/_engine/renderer/asset-renderers/component.js",
+          "attributes": {
+            "code": true
+          }
+        }
+      ],
+      "children": []
+    },
+    "b-30-asset-renderers-apps-scene-engine-app-53": {
+      "id": "b-30-asset-renderers-apps-scene-engine-app-53",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "apps/scene-engine/app/_engine/renderer/asset-renderers/audio.js",
+          "attributes": {
+            "code": true
+          }
+        }
+      ],
+      "children": []
+    },
+    "b-30-asset-renderers-apps-scene-engine-app-54": {
+      "id": "b-30-asset-renderers-apps-scene-engine-app-54",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "apps/scene-engine/app/_engine/renderer/asset-renderers/text.js",
+          "attributes": {
+            "code": true
+          }
+        }
+      ],
+      "children": []
+    },
+    "b-30-asset-renderers-apps-scene-engine-app-55": {
+      "id": "b-30-asset-renderers-apps-scene-engine-app-55",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "apps/scene-engine/app/_engine/renderer/asset-renderers/group.js",
+          "attributes": {
+            "code": true
+          }
+        }
+      ],
+      "children": []
+    },
+    "b-30-asset-renderers-apps-scene-engine-app-56": {
+      "id": "b-30-asset-renderers-apps-scene-engine-app-56",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "apps/scene-engine/app/_engine/renderer/asset-renderers/stylesheet.js",
+          "attributes": {
+            "code": true
+          }
+        }
+      ],
+      "children": []
+    }
+  }
+}

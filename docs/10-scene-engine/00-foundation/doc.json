@@ -1,0 +1,183 @@
+{
+  "schemaVersion": 1,
+  "id": "scene-engine-00-foundation-00-overview",
+  "title": "Foundation",
+  "root": "b-00-overview-root-13",
+  "blocks": {
+    "b-00-overview-root-13": {
+      "id": "b-00-overview-root-13",
+      "type": "paragraph",
+      "props": {
+        "covers": "Foundation entry point — what the scene-engine is for, who uses it, and the principles that guide it.",
+        "type": "overview"
+      },
+      "children": [
+        "b-00-overview-what-the-scene-engine-is-2",
+        "b-00-overview-divider-3",
+        "b-00-overview-contents-4",
+        "b-00-overview-05-origin-md-05-origin-5",
+        "b-00-overview-where-the-project-came-f-6",
+        "b-00-overview-10-problem-md-10-probl-7",
+        "b-00-overview-the-friction-that-motiva-8",
+        "b-00-overview-20-vision-md-20-vision-9",
+        "b-00-overview-what-success-looks-like-10",
+        "b-00-overview-30-principles-md-30-pr-11",
+        "b-00-overview-decisions-and-constraint-12"
+      ]
+    },
+    "b-00-overview-what-the-scene-engine-is-2": {
+      "id": "b-00-overview-what-the-scene-engine-is-2",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "What the scene-engine is, why it exists, and the mental model behind it. Read this before changing behavior so changes align with intent rather than just current code."
+        }
+      ],
+      "children": []
+    },
+    "b-00-overview-divider-3": {
+      "id": "b-00-overview-divider-3",
+      "type": "divider",
+      "props": {},
+      "children": []
+    },
+    "b-00-overview-contents-4": {
+      "id": "b-00-overview-contents-4",
+      "type": "heading",
+      "props": {
+        "level": 2
+      },
+      "text": [
+        {
+          "insert": "Contents"
+        }
+      ],
+      "children": []
+    },
+    "b-00-overview-05-origin-md-05-origin-5": {
+      "id": "b-00-overview-05-origin-md-05-origin-5",
+      "type": "heading",
+      "props": {
+        "level": 3
+      },
+      "text": [
+        {
+          "insert": "05-origin.md",
+          "attributes": {
+            "reference": {
+              "kind": "doc",
+              "path": "10-scene-engine/00-foundation/05-origin",
+              "label": "05-origin.md"
+            }
+          }
+        }
+      ],
+      "children": []
+    },
+    "b-00-overview-where-the-project-came-f-6": {
+      "id": "b-00-overview-where-the-project-came-f-6",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "Where the project came from: a Melee home screen recreation that outgrew hand-coding and revealed a gap between Figma and Unity for game-menu-style websites."
+        }
+      ],
+      "children": []
+    },
+    "b-00-overview-10-problem-md-10-probl-7": {
+      "id": "b-00-overview-10-problem-md-10-probl-7",
+      "type": "heading",
+      "props": {
+        "level": 3
+      },
+      "text": [
+        {
+          "insert": "10-problem.md",
+          "attributes": {
+            "reference": {
+              "kind": "doc",
+              "path": "10-scene-engine/00-foundation/10-problem",
+              "label": "10-problem.md"
+            }
+          }
+        }
+      ],
+      "children": []
+    },
+    "b-00-overview-the-friction-that-motiva-8": {
+      "id": "b-00-overview-the-friction-that-motiva-8",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "The friction that motivated the scene-engine: hand-wired pages don't compose, and the asset library has outgrown the per-page approach."
+        }
+      ],
+      "children": []
+    },
+    "b-00-overview-20-vision-md-20-vision-9": {
+      "id": "b-00-overview-20-vision-md-20-vision-9",
+      "type": "heading",
+      "props": {
+        "level": 3
+      },
+      "text": [
+        {
+          "insert": "20-vision.md",
+          "attributes": {
+            "reference": {
+              "kind": "doc",
+              "path": "10-scene-engine/00-foundation/20-vision",
+              "label": "20-vision.md"
+            }
+          }
+        }
+      ],
+      "children": []
+    },
+    "b-00-overview-what-success-looks-like-10": {
+      "id": "b-00-overview-what-success-looks-like-10",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "What success looks like: Unity-style scenes assembled from typed asset layers, authored from browser, desktop, and agent surfaces on the same project data."
+        }
+      ],
+      "children": []
+    },
+    "b-00-overview-30-principles-md-30-pr-11": {
+      "id": "b-00-overview-30-principles-md-30-pr-11",
+      "type": "heading",
+      "props": {
+        "level": 3
+      },
+      "text": [
+        {
+          "insert": "30-principles.md",
+          "attributes": {
+            "reference": {
+              "kind": "doc",
+              "path": "10-scene-engine/00-foundation/30-principles",
+              "label": "30-principles.md"
+            }
+          }
+        }
+      ],
+      "children": []
+    },
+    "b-00-overview-decisions-and-constraint-12": {
+      "id": "b-00-overview-decisions-and-constraint-12",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "Decisions and constraints that shape the system: scene = page, content separate from composition, shared-file authoring as a first-class pattern."
+        }
+      ],
+      "children": []
+    }
+  }
+}

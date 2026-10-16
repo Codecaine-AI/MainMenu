@@ -1,0 +1,1404 @@
+{
+  "schemaVersion": 1,
+  "id": "scene-engine-20-implementation-99-appendix-20-current-state",
+  "title": "Current State",
+  "root": "b-20-current-state-root-32",
+  "blocks": {
+    "b-20-current-state-root-32": {
+      "id": "b-20-current-state-root-32",
+      "type": "paragraph",
+      "props": {
+        "concepts": [
+          "snapshot",
+          "scenes",
+          "assets",
+          "inventory"
+        ],
+        "covers": "Snapshot of currently-shipped scenes and registered assets."
+      },
+      "children": [
+        "b-20-current-state-snapshot-of-what-s-in-th-2",
+        "b-20-current-state-divider-3",
+        "b-20-current-state-workspace-4",
+        "b-20-current-state-the-active-codecaine-pro-5",
+        "b-20-current-state-concern-current-valu-6-tbl",
+        "b-20-current-state-normal-authoring-and-exp-7",
+        "b-20-current-state-projects-8",
+        "b-20-current-state-id-name-9-tbl",
+        "b-20-current-state-scenes-10",
+        "b-20-current-state-id-name-11-tbl",
+        "b-20-current-state-other-pages-from-the-ret-12",
+        "b-20-current-state-assets-13",
+        "b-20-current-state-sources-of-truth-for-cod-14",
+        "b-20-current-state-id-type-15-tbl",
+        "b-20-current-state-the-main-menu-system-c-16",
+        "b-20-current-state-title-scene-layer-stack-17",
+        "b-20-current-state-outline-read-full-json-18",
+        "b-20-current-state-base-barber-cylinder-19",
+        "b-20-current-state-procedural-sphere-com-20",
+        "b-20-current-state-procedural-cylinder-c-21",
+        "b-20-current-state-codecaine-rounded-chrom-22",
+        "b-20-current-state-text-text-23",
+        "b-20-current-state-press-start-component-24",
+        "b-20-current-state-smash-style-letterbox-25",
+        "b-20-current-state-crt-effect-26",
+        "b-20-current-state-authoring-surfaces-27",
+        "b-20-current-state-surface-current-stat-28-tbl",
+        "b-20-current-state-the-desktop-app-keeps-c-29",
+        "b-20-current-state-export-and-packaging-30",
+        "b-20-current-state-output-command-end-31-tbl"
+      ]
+    },
+    "b-20-current-state-snapshot-of-what-s-in-th-2": {
+      "id": "b-20-current-state-snapshot-of-what-s-in-th-2",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "Snapshot of what's in the scene-engine right now. Update by re-reading the active workspace catalog, "
+        },
+        {
+          "insert": "ProjectSettings/project.json",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ", "
+        },
+        {
+          "insert": "ProjectSettings/registries/assets.json",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ", and "
+        },
+        {
+          "insert": "ProjectSettings/registries/modules.json",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": "."
+        }
+      ],
+      "children": []
+    },
+    "b-20-current-state-divider-3": {
+      "id": "b-20-current-state-divider-3",
+      "type": "divider",
+      "props": {},
+      "children": []
+    },
+    "b-20-current-state-workspace-4": {
+      "id": "b-20-current-state-workspace-4",
+      "type": "heading",
+      "props": {
+        "level": 2
+      },
+      "text": [
+        {
+          "insert": "Workspace"
+        }
+      ],
+      "children": []
+    },
+    "b-20-current-state-the-active-codecaine-pro-5": {
+      "id": "b-20-current-state-the-active-codecaine-pro-5",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "The active Codecaine project is an external workspace. The scene-engine repo no longer keeps an app-local Codecaine project/media/module fallback."
+        }
+      ],
+      "children": []
+    },
+    "b-20-current-state-concern-current-valu-6-tbl": {
+      "id": "b-20-current-state-concern-current-valu-6-tbl",
+      "type": "structured-table",
+      "props": {
+        "columns": [
+          "Concern",
+          "Current value"
+        ],
+        "rows": [
+          [
+            "Catalog example",
+            [
+              {
+                "insert": "apps/scene-engine/workspace.catalog.example.json",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ]
+          ],
+          [
+            "Local catalog",
+            [
+              {
+                "insert": "apps/scene-engine/workspace.catalog.json",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": " (gitignored)"
+              }
+            ]
+          ],
+          [
+            "Active project root",
+            [
+              {
+                "insert": "../codecaine-site/",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": " from the MELEE repo root"
+              }
+            ]
+          ],
+          [
+            "Project layout",
+            [
+              {
+                "insert": "ProjectSettings/",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": ", "
+              },
+              {
+                "insert": "Assets/Scenes/",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": ", "
+              },
+              {
+                "insert": "Assets/Media/",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": ", "
+              },
+              {
+                "insert": "Assets/Modules/",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": ", "
+              },
+              {
+                "insert": "Assets/Fonts/",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ]
+          ]
+        ]
+      },
+      "children": []
+    },
+    "b-20-current-state-normal-authoring-and-exp-7": {
+      "id": "b-20-current-state-normal-authoring-and-exp-7",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "Normal authoring and export resolve through the workspace catalog. If the catalog project root is missing, the app reports a workspace diagnostic instead of falling back to embedded data."
+        }
+      ],
+      "children": []
+    },
+    "b-20-current-state-projects-8": {
+      "id": "b-20-current-state-projects-8",
+      "type": "heading",
+      "props": {
+        "level": 2
+      },
+      "text": [
+        {
+          "insert": "Projects"
+        }
+      ],
+      "children": []
+    },
+    "b-20-current-state-id-name-9-tbl": {
+      "id": "b-20-current-state-id-name-9-tbl",
+      "type": "structured-table",
+      "props": {
+        "columns": [
+          "ID",
+          "Name",
+          "Entry",
+          "Scenes"
+        ],
+        "rows": [
+          [
+            "codecaine",
+            "Codecaine",
+            "title",
+            "title, menu"
+          ]
+        ]
+      },
+      "children": []
+    },
+    "b-20-current-state-scenes-10": {
+      "id": "b-20-current-state-scenes-10",
+      "type": "heading",
+      "props": {
+        "level": 2
+      },
+      "text": [
+        {
+          "insert": "Scenes"
+        }
+      ],
+      "children": []
+    },
+    "b-20-current-state-id-name-11-tbl": {
+      "id": "b-20-current-state-id-name-11-tbl",
+      "type": "structured-table",
+      "props": {
+        "columns": [
+          "ID",
+          "Name",
+          "Description"
+        ],
+        "rows": [
+          [
+            "title",
+            "Title Screen",
+            "CODECAINE chrome logo, fire interleave, PRESS START, CRT, audio."
+          ],
+          [
+            "menu",
+            "Main Menu",
+            "Main-menu background with a stateful nested main-menu component and inspector-editable menu graph."
+          ]
+        ]
+      },
+      "children": []
+    },
+    "b-20-current-state-other-pages-from-the-ret-12": {
+      "id": "b-20-current-state-other-pages-from-the-ret-12",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "Other pages from the retired "
+        },
+        {
+          "insert": "apps/frontend/",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " (projects, testimonials, links, about, guestbook) are planned migrations but not yet implemented as scenes."
+        }
+      ],
+      "children": []
+    },
+    "b-20-current-state-assets-13": {
+      "id": "b-20-current-state-assets-13",
+      "type": "heading",
+      "props": {
+        "level": 2
+      },
+      "text": [
+        {
+          "insert": "Assets"
+        }
+      ],
+      "children": []
+    },
+    "b-20-current-state-sources-of-truth-for-cod-14": {
+      "id": "b-20-current-state-sources-of-truth-for-cod-14",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "Sources of truth for Codecaine: "
+        },
+        {
+          "insert": "../codecaine-site/ProjectSettings/registries/assets.json",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " and "
+        },
+        {
+          "insert": "../codecaine-site/ProjectSettings/registries/modules.json",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": "."
+        }
+      ],
+      "children": []
+    },
+    "b-20-current-state-id-type-15-tbl": {
+      "id": "b-20-current-state-id-type-15-tbl",
+      "type": "structured-table",
+      "props": {
+        "columns": [
+          "ID",
+          "Type",
+          "Path"
+        ],
+        "rows": [
+          [
+            [
+              {
+                "insert": "bg-video",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ],
+            "video",
+            [
+              {
+                "insert": "/assets/video/test-fire-3.mp4",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ]
+          ],
+          [
+            [
+              {
+                "insert": "in-text-fire",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ],
+            "video",
+            [
+              {
+                "insert": "/assets/video/codecaine-title-fire-loop.webm",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ]
+          ],
+          [
+            [
+              {
+                "insert": "main-menu-bg-blue",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ],
+            "video",
+            [
+              {
+                "insert": "/assets/video/main-menu-backgrounds/blue.webm",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ]
+          ],
+          [
+            [
+              {
+                "insert": "main-menu-bg-green",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ],
+            "video",
+            [
+              {
+                "insert": "/assets/video/main-menu-backgrounds/green.webm",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ]
+          ],
+          [
+            [
+              {
+                "insert": "main-menu-bg-purple",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ],
+            "video",
+            [
+              {
+                "insert": "/assets/video/main-menu-backgrounds/purple.webm",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ]
+          ],
+          [
+            [
+              {
+                "insert": "main-menu-bg-red",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ],
+            "video",
+            [
+              {
+                "insert": "/assets/video/main-menu-backgrounds/red.webm",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ]
+          ],
+          [
+            [
+              {
+                "insert": "main-menu-bg-yellow",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ],
+            "video",
+            [
+              {
+                "insert": "/assets/video/main-menu-backgrounds/yellow.webm",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ]
+          ],
+          [
+            [
+              {
+                "insert": "codecaine-logo",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ],
+            "glyph",
+            [
+              {
+                "insert": "/assets/glyph/CODECAINE.css-layers.svg",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ]
+          ],
+          [
+            [
+              {
+                "insert": "codecaine-rounded-chrome-logo",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ],
+            "glyph",
+            [
+              {
+                "insert": "/assets/glyph/CODECAINE.rounded-chrome.css-layers.svg",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ]
+          ],
+          [
+            [
+              {
+                "insert": "start-cue",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ],
+            "audio",
+            [
+              {
+                "insert": "/assets/audio/start-cue/start-cue.js",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ]
+          ],
+          [
+            [
+              {
+                "insert": "ui-navigation",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ],
+            "audio",
+            [
+              {
+                "insert": "/assets/audio/ui-navigation/ui-navigation.js",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ]
+          ],
+          [
+            [
+              {
+                "insert": "ui-forward",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ],
+            "audio",
+            [
+              {
+                "insert": "/assets/audio/ui-forward/ui-forward.js",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ]
+          ],
+          [
+            [
+              {
+                "insert": "ui-back",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ],
+            "audio",
+            [
+              {
+                "insert": "/assets/audio/ui-back/ui-back.js",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ]
+          ],
+          [
+            [
+              {
+                "insert": "melee-menu-song",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ],
+            "audio",
+            [
+              {
+                "insert": "/assets/audio/melee-menu-song/melee-menu-song.js",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ]
+          ],
+          [
+            [
+              {
+                "insert": "crt-overlay",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ],
+            "effect",
+            [
+              {
+                "insert": "/modules/effects/crt-overlay/crt-overlay.css",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ]
+          ],
+          [
+            [
+              {
+                "insert": "press-start",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ],
+            "component",
+            [
+              {
+                "insert": "/modules/components/press-start/press-start.js",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ]
+          ],
+          [
+            [
+              {
+                "insert": "orbit-press-start",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ],
+            "component",
+            [
+              {
+                "insert": "/modules/components/orbit-press-start/orbit-press-start.js",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ]
+          ],
+          [
+            [
+              {
+                "insert": "codecaine-keycap-start",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ],
+            "component",
+            [
+              {
+                "insert": "/modules/components/codecaine-keycap-start/codecaine-keycap-start.js",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ]
+          ],
+          [
+            [
+              {
+                "insert": "procedural-sphere",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ],
+            "component",
+            [
+              {
+                "insert": "/modules/components/procedural-sphere/procedural-sphere.js",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ]
+          ],
+          [
+            [
+              {
+                "insert": "procedural-cylinder",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ],
+            "component",
+            [
+              {
+                "insert": "/modules/components/procedural-cylinder/procedural-cylinder.js",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ]
+          ],
+          [
+            [
+              {
+                "insert": "procedural-cylinder-strips-mask",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ],
+            "component",
+            [
+              {
+                "insert": "/modules/components/procedural-cylinder-strips/procedural-cylinder-strips-straight.js",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ]
+          ],
+          [
+            [
+              {
+                "insert": "arc-letterbox",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ],
+            "component",
+            [
+              {
+                "insert": "/modules/components/arc-letterbox/arc-letterbox.js",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ]
+          ],
+          [
+            [
+              {
+                "insert": "menu-shield",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ],
+            "component",
+            [
+              {
+                "insert": "/modules/components/menu-shield/menu-shield.js",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ]
+          ],
+          [
+            [
+              {
+                "insert": "menu-items",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ],
+            "component",
+            [
+              {
+                "insert": "/modules/components/menu-items/menu-items.js",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ]
+          ],
+          [
+            [
+              {
+                "insert": "side-menu",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ],
+            "component",
+            [
+              {
+                "insert": "/modules/components/side-menu/side-menu.js",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ]
+          ],
+          [
+            [
+              {
+                "insert": "main-menu-system",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ],
+            "component",
+            [
+              {
+                "insert": "/modules/components/main-menu-system/main-menu-system.js",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ]
+          ],
+          [
+            [
+              {
+                "insert": "main-menu-rings",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ],
+            "component",
+            [
+              {
+                "insert": "/modules/components/main-menu-rings/main-menu-rings.js",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ]
+          ],
+          [
+            [
+              {
+                "insert": "background-pulse",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ],
+            "component",
+            [
+              {
+                "insert": "/modules/components/background-pulse/background-pulse.js",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ]
+          ]
+        ]
+      },
+      "children": []
+    },
+    "b-20-current-state-the-main-menu-system-c-16": {
+      "id": "b-20-current-state-the-main-menu-system-c-16",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "The "
+        },
+        {
+          "insert": "main-menu-system",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " component now supports two configuration sources. The active scene stores an inline "
+        },
+        {
+          "insert": "properties.menu-config",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " object for editor-driven menu data, including menus, item nesting, previews, shared "
+        },
+        {
+          "insert": "menuTheming",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " for the gold row treatment/pulse, and named menu themes for shield/side-panel color changes. "
+        },
+        {
+          "insert": "/modules/components/main-menu-system/menu-config.json",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " remains the starter/fallback config when no inline graph is present."
+        }
+      ],
+      "children": []
+    },
+    "b-20-current-state-title-scene-layer-stack-17": {
+      "id": "b-20-current-state-title-scene-layer-stack-17",
+      "type": "heading",
+      "props": {
+        "level": 2
+      },
+      "text": [
+        {
+          "insert": "Title Scene Layer Stack"
+        }
+      ],
+      "children": []
+    },
+    "b-20-current-state-outline-read-full-json-18": {
+      "id": "b-20-current-state-outline-read-full-json-18",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "Outline (read full JSON in "
+        },
+        {
+          "insert": "../codecaine-site/Assets/Scenes/title/scene.json",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": "):"
+        }
+      ],
+      "children": []
+    },
+    "b-20-current-state-base-barber-cylinder-19": {
+      "id": "b-20-current-state-base-barber-cylinder-19",
+      "type": "list-item",
+      "props": {
+        "ordered": true
+      },
+      "text": [
+        {
+          "insert": "base-barber-cylinder",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " (component)"
+        }
+      ],
+      "children": []
+    },
+    "b-20-current-state-procedural-sphere-com-20": {
+      "id": "b-20-current-state-procedural-sphere-com-20",
+      "type": "list-item",
+      "props": {
+        "ordered": true
+      },
+      "text": [
+        {
+          "insert": "procedural-sphere",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " (component)"
+        }
+      ],
+      "children": []
+    },
+    "b-20-current-state-procedural-cylinder-c-21": {
+      "id": "b-20-current-state-procedural-cylinder-c-21",
+      "type": "list-item",
+      "props": {
+        "ordered": true
+      },
+      "text": [
+        {
+          "insert": "procedural-cylinder",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " (component)"
+        }
+      ],
+      "children": []
+    },
+    "b-20-current-state-codecaine-rounded-chrom-22": {
+      "id": "b-20-current-state-codecaine-rounded-chrom-22",
+      "type": "list-item",
+      "props": {
+        "ordered": true
+      },
+      "text": [
+        {
+          "insert": "codecaine-rounded-chrome-logo",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " (glyph-group)"
+        }
+      ],
+      "children": []
+    },
+    "b-20-current-state-text-text-23": {
+      "id": "b-20-current-state-text-text-23",
+      "type": "list-item",
+      "props": {
+        "ordered": true
+      },
+      "text": [
+        {
+          "insert": "text",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " (text)"
+        }
+      ],
+      "children": []
+    },
+    "b-20-current-state-press-start-component-24": {
+      "id": "b-20-current-state-press-start-component-24",
+      "type": "list-item",
+      "props": {
+        "ordered": true
+      },
+      "text": [
+        {
+          "insert": "press-start",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " (component)"
+        }
+      ],
+      "children": []
+    },
+    "b-20-current-state-smash-style-letterbox-25": {
+      "id": "b-20-current-state-smash-style-letterbox-25",
+      "type": "list-item",
+      "props": {
+        "ordered": true
+      },
+      "text": [
+        {
+          "insert": "smash-style-letterbox",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " (component)"
+        }
+      ],
+      "children": []
+    },
+    "b-20-current-state-crt-effect-26": {
+      "id": "b-20-current-state-crt-effect-26",
+      "type": "list-item",
+      "props": {
+        "ordered": true
+      },
+      "text": [
+        {
+          "insert": "crt",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " (effect)"
+        }
+      ],
+      "children": []
+    },
+    "b-20-current-state-authoring-surfaces-27": {
+      "id": "b-20-current-state-authoring-surfaces-27",
+      "type": "heading",
+      "props": {
+        "level": 2
+      },
+      "text": [
+        {
+          "insert": "Authoring Surfaces"
+        }
+      ],
+      "children": []
+    },
+    "b-20-current-state-surface-current-stat-28-tbl": {
+      "id": "b-20-current-state-surface-current-stat-28-tbl",
+      "type": "structured-table",
+      "props": {
+        "columns": [
+          "Surface",
+          "Current state"
+        ],
+        "rows": [
+          [
+            "Browser dev editor",
+            [
+              {
+                "insert": "/editor?project=codecaine&scene=title",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": " or "
+              },
+              {
+                "insert": "menu",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ]
+          ],
+          [
+            "Main Menu desktop app",
+            [
+              {
+                "insert": "Electron shell under "
+              },
+              {
+                "insert": "apps/scene-engine/desktop/",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": "; opens the same editor route"
+              }
+            ]
+          ],
+          [
+            "Pi Agent",
+            [
+              {
+                "insert": "Chat panel docked below the hierarchy in the left sidebar; available through "
+              },
+              {
+                "insert": "window.mainMenu.agent",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": " in desktop mode"
+              }
+            ]
+          ]
+        ]
+      },
+      "children": []
+    },
+    "b-20-current-state-the-desktop-app-keeps-c-29": {
+      "id": "b-20-current-state-the-desktop-app-keeps-c-29",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "The desktop app keeps "
+        },
+        {
+          "insert": "contextIsolation: true",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " and "
+        },
+        {
+          "insert": "nodeIntegration: false",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ". Pi SDK sessions are owned by Electron main, not React."
+        }
+      ],
+      "children": []
+    },
+    "b-20-current-state-export-and-packaging-30": {
+      "id": "b-20-current-state-export-and-packaging-30",
+      "type": "heading",
+      "props": {
+        "level": 2
+      },
+      "text": [
+        {
+          "insert": "Export And Packaging"
+        }
+      ],
+      "children": []
+    },
+    "b-20-current-state-output-command-end-31-tbl": {
+      "id": "b-20-current-state-output-command-end-31-tbl",
+      "type": "structured-table",
+      "props": {
+        "columns": [
+          "Output",
+          "Command / Endpoint",
+          "Current behavior"
+        ],
+        "rows": [
+          [
+            "Standalone site zip",
+            [
+              {
+                "insert": "POST /api/export?project=codecaine",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ],
+            [
+              {
+                "insert": "Exports active scenes, pruned active asset/module/font registries, "
+              },
+              {
+                "insert": "export-graph.json",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": ", "
+              },
+              {
+                "insert": "Makefile",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": ", and "
+              },
+              {
+                "insert": "server.mjs",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": "."
+              }
+            ]
+          ],
+          [
+            "Git deploy trigger",
+            [
+              {
+                "insert": "POST /api/projects/codecaine/deploy",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ],
+            [
+              {
+                "insert": "Writes "
+              },
+              {
+                "insert": "ProjectSettings/deployment.json",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": ", commits all "
+              },
+              {
+                "insert": "codecaine-site",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": " changes, and pushes the current branch for Railway."
+              }
+            ]
+          ],
+          [
+            "Local export preview",
+            [
+              {
+                "insert": "make run",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": " inside extracted zip"
+              }
+            ],
+            "Serves the static export with Node."
+          ],
+          [
+            "Desktop app",
+            [
+              {
+                "insert": "npm run desktop:pack:mac",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": " in "
+              },
+              {
+                "insert": "apps/scene-engine",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ],
+            [
+              {
+                "insert": "Builds Next standalone runtime and packages "
+              },
+              {
+                "insert": "Main Menu.app",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": " for macOS directory output."
+              }
+            ]
+          ]
+        ]
+      },
+      "children": []
+    }
+  }
+}

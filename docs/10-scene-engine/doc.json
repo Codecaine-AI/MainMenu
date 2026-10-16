@@ -1,0 +1,258 @@
+{
+  "schemaVersion": 1,
+  "id": "scene-engine-00-overview",
+  "title": "Documentation",
+  "root": "b-00-overview-root-15",
+  "blocks": {
+    "b-00-overview-root-15": {
+      "id": "b-00-overview-root-15",
+      "type": "paragraph",
+      "props": {
+        "covers": "Documentation entry point — three layers (Foundation, System Design, Implementation) for the MELEE scene-engine.",
+        "type": "overview"
+      },
+      "children": [
+        "b-00-overview-three-layer-documentatio-2",
+        "b-00-overview-read-in-order-each-laye-3",
+        "b-00-overview-divider-4",
+        "b-00-overview-layers-5",
+        "b-00-overview-00-foundation-00-foun-6",
+        "b-00-overview-why-and-what-the-pr-7",
+        "b-00-overview-10-system-design-10-s-8",
+        "b-00-overview-the-blueprint-syste-9",
+        "b-00-overview-20-implementation-20-10",
+        "b-00-overview-the-codebase-how-a-11",
+        "b-00-overview-divider-12",
+        "b-00-overview-scope-13",
+        "b-00-overview-this-documentation-cover-14"
+      ]
+    },
+    "b-00-overview-three-layer-documentatio-2": {
+      "id": "b-00-overview-three-layer-documentatio-2",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "Three-layer documentation for the MELEE scene-engine: the Next.js app and desktop shell under "
+        },
+        {
+          "insert": "apps/scene-engine/",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " that author, render, export, and package video-game-screen landing pages as composed scenes."
+        }
+      ],
+      "children": []
+    },
+    "b-00-overview-read-in-order-each-laye-3": {
+      "id": "b-00-overview-read-in-order-each-laye-3",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "Read in order. Each layer answers a different question."
+        }
+      ],
+      "children": []
+    },
+    "b-00-overview-divider-4": {
+      "id": "b-00-overview-divider-4",
+      "type": "divider",
+      "props": {},
+      "children": []
+    },
+    "b-00-overview-layers-5": {
+      "id": "b-00-overview-layers-5",
+      "type": "heading",
+      "props": {
+        "level": 2
+      },
+      "text": [
+        {
+          "insert": "Layers"
+        }
+      ],
+      "children": []
+    },
+    "b-00-overview-00-foundation-00-foun-6": {
+      "id": "b-00-overview-00-foundation-00-foun-6",
+      "type": "heading",
+      "props": {
+        "level": 3
+      },
+      "text": [
+        {
+          "insert": "00-foundation/",
+          "attributes": {
+            "reference": {
+              "kind": "doc",
+              "path": "10-scene-engine/00-foundation",
+              "label": "00-foundation/"
+            }
+          }
+        }
+      ],
+      "children": []
+    },
+    "b-00-overview-why-and-what-the-pr-7": {
+      "id": "b-00-overview-why-and-what-the-pr-7",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "Why and what.",
+          "attributes": {
+            "bold": true
+          }
+        },
+        {
+          "insert": " The problem the scene-engine solves, the mental model behind it, and the principles that shape decisions."
+        }
+      ],
+      "children": []
+    },
+    "b-00-overview-10-system-design-10-s-8": {
+      "id": "b-00-overview-10-system-design-10-s-8",
+      "type": "heading",
+      "props": {
+        "level": 3
+      },
+      "text": [
+        {
+          "insert": "10-system-design/",
+          "attributes": {
+            "reference": {
+              "kind": "doc",
+              "path": "10-scene-engine/10-system-design",
+              "label": "10-system-design/"
+            }
+          }
+        }
+      ],
+      "children": []
+    },
+    "b-00-overview-the-blueprint-syste-9": {
+      "id": "b-00-overview-the-blueprint-syste-9",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "The blueprint.",
+          "attributes": {
+            "bold": true
+          }
+        },
+        {
+          "insert": " System-agnostic description of how scenes, assets, layers, project workspaces, export, and authoring surfaces fit together. Read before changing behavior."
+        }
+      ],
+      "children": []
+    },
+    "b-00-overview-20-implementation-20-10": {
+      "id": "b-00-overview-20-implementation-20-10",
+      "type": "heading",
+      "props": {
+        "level": 3
+      },
+      "text": [
+        {
+          "insert": "20-implementation/",
+          "attributes": {
+            "reference": {
+              "kind": "doc",
+              "path": "10-scene-engine/20-implementation",
+              "label": "20-implementation/"
+            }
+          }
+        }
+      ],
+      "children": []
+    },
+    "b-00-overview-the-codebase-how-a-11": {
+      "id": "b-00-overview-the-codebase-how-a-11",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "The codebase.",
+          "attributes": {
+            "bold": true
+          }
+        },
+        {
+          "insert": " How "
+        },
+        {
+          "insert": "apps/scene-engine/",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " actually delivers the design: renderer, editor, dev server API, desktop shell, Pi Agent bridge, and appendix material."
+        }
+      ],
+      "children": []
+    },
+    "b-00-overview-divider-12": {
+      "id": "b-00-overview-divider-12",
+      "type": "divider",
+      "props": {},
+      "children": []
+    },
+    "b-00-overview-scope-13": {
+      "id": "b-00-overview-scope-13",
+      "type": "heading",
+      "props": {
+        "level": 2
+      },
+      "text": [
+        {
+          "insert": "Scope"
+        }
+      ],
+      "children": []
+    },
+    "b-00-overview-this-documentation-cover-14": {
+      "id": "b-00-overview-this-documentation-cover-14",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "This documentation covers the "
+        },
+        {
+          "insert": "scene-engine",
+          "attributes": {
+            "bold": true
+          }
+        },
+        {
+          "insert": " ("
+        },
+        {
+          "insert": "apps/scene-engine/",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": "). Asset extraction and asset\ncreation now live inside scene-engine project helper pages, with native/CLI support code under\n"
+        },
+        {
+          "insert": "apps/scene-engine/tools/",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": "."
+        }
+      ],
+      "children": []
+    }
+  }
+}

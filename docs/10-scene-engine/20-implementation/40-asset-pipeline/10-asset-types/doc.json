@@ -1,0 +1,731 @@
+{
+  "schemaVersion": 1,
+  "id": "scene-engine-20-implementation-40-asset-pipeline-10-asset-types",
+  "title": "Asset Types Library",
+  "root": "b-10-asset-types-root-27",
+  "blocks": {
+    "b-10-asset-types-root-27": {
+      "id": "b-10-asset-types-root-27",
+      "type": "paragraph",
+      "props": {
+        "concepts": [
+          "asset-type",
+          "mime",
+          "extension",
+          "slug",
+          "validate-upload"
+        ],
+        "covers": "app/_engine/lib/asset-types.ts — the shared type list, allowlists, mime inference, slugifier, and the validation gate used by both the upload UI and the upload API route.",
+        "design_refs": [
+          "10-system-design/60-asset-uploads.md"
+        ]
+      },
+      "children": [
+        "b-10-asset-types-apps-scene-engine-app-2",
+        "b-10-asset-types-divider-3",
+        "b-10-asset-types-public-api-4",
+        "b-10-asset-types-export-5-tbl",
+        "b-10-asset-types-allowlist-tables-6",
+        "b-10-asset-types-ts-7",
+        "b-10-asset-types-slug-semantics-8",
+        "b-10-asset-types-the-portion-before-the-l-9",
+        "b-10-asset-types-leading-trailing-is-10",
+        "b-10-asset-types-the-extension-after-the-11",
+        "b-10-asset-types-an-empty-slug-throws-a-12",
+        "b-10-asset-types-examples-13",
+        "b-10-asset-types-input-14-tbl",
+        "b-10-asset-types-the-throw-on-empty-is-wh-15",
+        "b-10-asset-types-validateupload-the-sin-16",
+        "b-10-asset-types-the-route-the-form-and-17",
+        "b-10-asset-types-type-is-one-of-the-fiv-18",
+        "b-10-asset-types-the-filename-s-extension-19",
+        "b-10-asset-types-the-provided-mime-is-i-20",
+        "b-10-asset-types-any-failure-returns-o-21",
+        "b-10-asset-types-the-order-matters-type-22",
+        "b-10-asset-types-why-a-single-module-23",
+        "b-10-asset-types-the-split-between-client-24",
+        "b-10-asset-types-source-25",
+        "b-10-asset-types-apps-scene-engine-app-26"
+      ]
+    },
+    "b-10-asset-types-apps-scene-engine-app-2": {
+      "id": "b-10-asset-types-apps-scene-engine-app-2",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "apps/scene-engine/app/_engine/lib/asset-types.ts",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " is the single source of truth for what counts as an asset, what file shapes are allowed for each type, and how a filename becomes a container ID. Importing it from both the client and the server keeps the upload form and the upload route in agreement without duplicating tables."
+        }
+      ],
+      "children": []
+    },
+    "b-10-asset-types-divider-3": {
+      "id": "b-10-asset-types-divider-3",
+      "type": "divider",
+      "props": {},
+      "children": []
+    },
+    "b-10-asset-types-public-api-4": {
+      "id": "b-10-asset-types-public-api-4",
+      "type": "heading",
+      "props": {
+        "level": 2
+      },
+      "text": [
+        {
+          "insert": "Public API"
+        }
+      ],
+      "children": []
+    },
+    "b-10-asset-types-export-5-tbl": {
+      "id": "b-10-asset-types-export-5-tbl",
+      "type": "structured-table",
+      "props": {
+        "columns": [
+          "Export",
+          "Purpose"
+        ],
+        "rows": [
+          [
+            [
+              {
+                "insert": "AssetType",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": " (re-exported type)"
+              }
+            ],
+            [
+              {
+                "insert": "'audio' | 'image' | 'video' | 'glyph' | 'font'",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": ". Sourced from "
+              },
+              {
+                "insert": "@/types/scene",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": "."
+              }
+            ]
+          ],
+          [
+            [
+              {
+                "insert": "ASSET_TYPES",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ],
+            "The five file asset types as a readonly tuple. Iteration order = UI order in the type select."
+          ],
+          [
+            [
+              {
+                "insert": "ASSET_TYPE_RULES",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ],
+            [
+              {
+                "insert": "Per-type "
+              },
+              {
+                "insert": "{ extensions, mimes }",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": " allowlist."
+              }
+            ]
+          ],
+          [
+            [
+              {
+                "insert": "isAssetType(value)",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ],
+            [
+              {
+                "insert": "Type-guard for narrowing untyped strings (URL params, form fields) to "
+              },
+              {
+                "insert": "AssetType",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": "."
+              }
+            ]
+          ],
+          [
+            [
+              {
+                "insert": "getTypeFromMime(mime)",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ],
+            [
+              {
+                "insert": "Returns the type whose mime allowlist contains the given mime, or "
+              },
+              {
+                "insert": "null",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": "."
+              }
+            ]
+          ],
+          [
+            [
+              {
+                "insert": "slugifyFilename(filename)",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ],
+            [
+              {
+                "insert": "Splits into "
+              },
+              {
+                "insert": "{ slug, ext }",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": ". Slug is lowercased, non-alphanumerics collapsed to "
+              },
+              {
+                "insert": "-",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": "."
+              }
+            ]
+          ],
+          [
+            [
+              {
+                "insert": "validateUpload({ type, mime, filename })",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ],
+            [
+              {
+                "insert": "The full gate: type valid, extension allowed, mime allowed. Returns discriminated "
+              },
+              {
+                "insert": "{ ok }",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": "."
+              }
+            ]
+          ]
+        ]
+      },
+      "children": []
+    },
+    "b-10-asset-types-allowlist-tables-6": {
+      "id": "b-10-asset-types-allowlist-tables-6",
+      "type": "heading",
+      "props": {
+        "level": 2
+      },
+      "text": [
+        {
+          "insert": "Allowlist Tables"
+        }
+      ],
+      "children": []
+    },
+    "b-10-asset-types-ts-7": {
+      "id": "b-10-asset-types-ts-7",
+      "type": "code",
+      "props": {
+        "language": "ts"
+      },
+      "text": [
+        {
+          "insert": "audio: { extensions: ['mp3', 'wav', 'ogg'],          mimes: ['audio/mpeg', 'audio/wav', 'audio/ogg'] }\nimage: { extensions: ['png','jpg','jpeg','webp','gif'], mimes: ['image/png', 'image/jpeg', 'image/webp', 'image/gif'] }\nvideo: { extensions: ['mp4', 'webm'],                mimes: ['video/mp4', 'video/webm'] }\nglyph: { extensions: ['svg'],                        mimes: ['image/svg+xml'] }\nfont:  { extensions: ['otf','ttf','woff','woff2'],   mimes: ['font/otf', 'font/ttf', 'font/woff', 'font/woff2', ...] }"
+        }
+      ],
+      "children": []
+    },
+    "b-10-asset-types-slug-semantics-8": {
+      "id": "b-10-asset-types-slug-semantics-8",
+      "type": "heading",
+      "props": {
+        "level": 2
+      },
+      "text": [
+        {
+          "insert": "Slug Semantics"
+        }
+      ],
+      "children": []
+    },
+    "b-10-asset-types-the-portion-before-the-l-9": {
+      "id": "b-10-asset-types-the-portion-before-the-l-9",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "The portion before the last "
+        },
+        {
+          "insert": ".",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " is lowercased and any run of non-"
+        },
+        {
+          "insert": "[a-z0-9]",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " characters is replaced with a single "
+        },
+        {
+          "insert": "-",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": "."
+        }
+      ],
+      "children": []
+    },
+    "b-10-asset-types-leading-trailing-is-10": {
+      "id": "b-10-asset-types-leading-trailing-is-10",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "Leading/trailing "
+        },
+        {
+          "insert": "-",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " is stripped."
+        }
+      ],
+      "children": []
+    },
+    "b-10-asset-types-the-extension-after-the-11": {
+      "id": "b-10-asset-types-the-extension-after-the-11",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "The extension (after the last "
+        },
+        {
+          "insert": ".",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ") is preserved and lowercased; the slug excludes it."
+        }
+      ],
+      "children": []
+    },
+    "b-10-asset-types-an-empty-slug-throws-a-12": {
+      "id": "b-10-asset-types-an-empty-slug-throws-a-12",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "An empty slug throws: a file like "
+        },
+        {
+          "insert": ".png",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " or "
+        },
+        {
+          "insert": "___",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " has no usable identity."
+        }
+      ],
+      "children": []
+    },
+    "b-10-asset-types-examples-13": {
+      "id": "b-10-asset-types-examples-13",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "Examples:"
+        }
+      ],
+      "children": []
+    },
+    "b-10-asset-types-input-14-tbl": {
+      "id": "b-10-asset-types-input-14-tbl",
+      "type": "structured-table",
+      "props": {
+        "columns": [
+          "Input",
+          "Slug",
+          "Ext"
+        ],
+        "rows": [
+          [
+            [
+              {
+                "insert": "Test Fire 3.mp4",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ],
+            [
+              {
+                "insert": "test-fire-3",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ],
+            [
+              {
+                "insert": "mp4",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ]
+          ],
+          [
+            [
+              {
+                "insert": "crt-overlay.css",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ],
+            [
+              {
+                "insert": "crt-overlay",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ],
+            [
+              {
+                "insert": "css",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ]
+          ],
+          [
+            [
+              {
+                "insert": "My_Logo.SVG",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ],
+            [
+              {
+                "insert": "my-logo",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ],
+            [
+              {
+                "insert": "svg",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ]
+          ]
+        ]
+      },
+      "children": []
+    },
+    "b-10-asset-types-the-throw-on-empty-is-wh-15": {
+      "id": "b-10-asset-types-the-throw-on-empty-is-wh-15",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "The throw on empty is what guarantees the upload route never writes a registry entry under an invalid key."
+        }
+      ],
+      "children": []
+    },
+    "b-10-asset-types-validateupload-the-sin-16": {
+      "id": "b-10-asset-types-validateupload-the-sin-16",
+      "type": "heading",
+      "props": {
+        "level": 2
+      },
+      "text": [
+        {
+          "insert": "validateUpload: the Single Gate"
+        }
+      ],
+      "children": []
+    },
+    "b-10-asset-types-the-route-the-form-and-17": {
+      "id": "b-10-asset-types-the-route-the-form-and-17",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "The route, the form, and any future programmatic uploader all funnel through "
+        },
+        {
+          "insert": "validateUpload",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ". The checks, in order:"
+        }
+      ],
+      "children": []
+    },
+    "b-10-asset-types-type-is-one-of-the-fiv-18": {
+      "id": "b-10-asset-types-type-is-one-of-the-fiv-18",
+      "type": "list-item",
+      "props": {
+        "ordered": true
+      },
+      "text": [
+        {
+          "insert": "type",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " is one of the five file asset types."
+        }
+      ],
+      "children": []
+    },
+    "b-10-asset-types-the-filename-s-extension-19": {
+      "id": "b-10-asset-types-the-filename-s-extension-19",
+      "type": "list-item",
+      "props": {
+        "ordered": true
+      },
+      "text": [
+        {
+          "insert": "The filename's extension is in the type's "
+        },
+        {
+          "insert": "extensions",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " list."
+        }
+      ],
+      "children": []
+    },
+    "b-10-asset-types-the-provided-mime-is-i-20": {
+      "id": "b-10-asset-types-the-provided-mime-is-i-20",
+      "type": "list-item",
+      "props": {
+        "ordered": true
+      },
+      "text": [
+        {
+          "insert": "The provided "
+        },
+        {
+          "insert": "mime",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " is in the type's "
+        },
+        {
+          "insert": "mimes",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " list."
+        }
+      ],
+      "children": []
+    },
+    "b-10-asset-types-any-failure-returns-o-21": {
+      "id": "b-10-asset-types-any-failure-returns-o-21",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "Any failure returns "
+        },
+        {
+          "insert": "{ ok: false, error }",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " with a human-readable message; the route surfaces that as a 400."
+        }
+      ],
+      "children": []
+    },
+    "b-10-asset-types-the-order-matters-type-22": {
+      "id": "b-10-asset-types-the-order-matters-type-22",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "The order matters: type first means the error message can name the type, extension before mime catches the most common drag-into-wrong-bucket case before falling through to the mime check."
+        }
+      ],
+      "children": []
+    },
+    "b-10-asset-types-why-a-single-module-23": {
+      "id": "b-10-asset-types-why-a-single-module-23",
+      "type": "heading",
+      "props": {
+        "level": 2
+      },
+      "text": [
+        {
+          "insert": "Why a Single Module"
+        }
+      ],
+      "children": []
+    },
+    "b-10-asset-types-the-split-between-client-24": {
+      "id": "b-10-asset-types-the-split-between-client-24",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "The split between client and server in Next.js makes it tempting to duplicate small constants. The cost of doing that here is silent drift: the form might accept a file the server rejects, or vice versa. One module imported on both sides keeps the gate honest."
+        }
+      ],
+      "children": []
+    },
+    "b-10-asset-types-source-25": {
+      "id": "b-10-asset-types-source-25",
+      "type": "heading",
+      "props": {
+        "level": 2
+      },
+      "text": [
+        {
+          "insert": "Source"
+        }
+      ],
+      "children": []
+    },
+    "b-10-asset-types-apps-scene-engine-app-26": {
+      "id": "b-10-asset-types-apps-scene-engine-app-26",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "apps/scene-engine/app/_engine/lib/asset-types.ts",
+          "attributes": {
+            "code": true
+          }
+        }
+      ],
+      "children": []
+    }
+  }
+}

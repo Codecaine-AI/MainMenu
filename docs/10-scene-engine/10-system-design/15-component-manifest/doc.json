@@ -1,0 +1,1511 @@
+{
+  "schemaVersion": 1,
+  "id": "scene-engine-10-system-design-15-component-manifest",
+  "title": "Component Manifest",
+  "root": "b-15-component-manifest-root-62",
+  "blocks": {
+    "b-15-component-manifest-root-62": {
+      "id": "b-15-component-manifest-root-62",
+      "type": "paragraph",
+      "props": {
+        "concepts": [
+          "manifest",
+          "component",
+          "effect",
+          "module",
+          "properties",
+          "sizing",
+          "extensibility"
+        ],
+        "covers": "The manifest convention for effects and components — module-level metadata, sizing hints, and effect property descriptors."
+      },
+      "children": [
+        "b-15-component-manifest-effects-and-components-s-2",
+        "b-15-component-manifest-for-components-and-b-3",
+        "b-15-component-manifest-for-effects-the-man-4",
+        "b-15-component-manifest-this-is-the-contract-tha-5",
+        "b-15-component-manifest-divider-6",
+        "b-15-component-manifest-where-manifests-live-7",
+        "b-15-component-manifest-code-8",
+        "b-15-component-manifest-projectsettings-registr-9",
+        "b-15-component-manifest-manifest-shape-10",
+        "b-15-component-manifest-json-11",
+        "b-15-component-manifest-field-require-12-tbl",
+        "b-15-component-manifest-property-descriptors-13",
+        "b-15-component-manifest-every-value-in-properti-14",
+        "b-15-component-manifest-number-15",
+        "b-15-component-manifest-json-16",
+        "b-15-component-manifest-renders-as-a-slider-nu-17",
+        "b-15-component-manifest-string-18",
+        "b-15-component-manifest-json-19",
+        "b-15-component-manifest-renders-as-a-single-line-20",
+        "b-15-component-manifest-boolean-21",
+        "b-15-component-manifest-json-22",
+        "b-15-component-manifest-renders-as-a-toggle-23",
+        "b-15-component-manifest-enum-24",
+        "b-15-component-manifest-json-25",
+        "b-15-component-manifest-renders-as-a-dropdown-of-26",
+        "b-15-component-manifest-what-manifests-do-not-de-27",
+        "b-15-component-manifest-the-manifest-is-for-co-28",
+        "b-15-component-manifest-visibility-visibl-29",
+        "b-15-component-manifest-transform-x-y-30",
+        "b-15-component-manifest-appearance-opacit-31",
+        "b-15-component-manifest-events-wired-the-s-32",
+        "b-15-component-manifest-if-a-property-isn-t-uniq-33",
+        "b-15-component-manifest-sizing-hints-34",
+        "b-15-component-manifest-sizing-controls-the-de-35",
+        "b-15-component-manifest-fill-new-objects-sta-36",
+        "b-15-component-manifest-explicit-or-omitted-37",
+        "b-15-component-manifest-this-is-a-one-time-hint-38",
+        "b-15-component-manifest-renderer-contract-39",
+        "b-15-component-manifest-effects-40",
+        "b-15-component-manifest-effects-are-pure-css-th-41",
+        "b-15-component-manifest-components-42",
+        "b-15-component-manifest-components-export-a-defa-43",
+        "b-15-component-manifest-js-44",
+        "b-15-component-manifest-the-renderer-45",
+        "b-15-component-manifest-loads-the-js-module-via-46",
+        "b-15-component-manifest-loads-the-sibling-css-fi-47",
+        "b-15-component-manifest-calls-the-default-export-48",
+        "b-15-component-manifest-mounts-the-returned-elem-49",
+        "b-15-component-manifest-no-further-coupling-co-50",
+        "b-15-component-manifest-editor-integration-51",
+        "b-15-component-manifest-effects-the-inspect-52",
+        "b-15-component-manifest-components-the-insp-53",
+        "b-15-component-manifest-when-the-add-layer-dialo-54",
+        "b-15-component-manifest-adding-a-new-module-55",
+        "b-15-component-manifest-create-a-directory-under-56",
+        "b-15-component-manifest-add-the-code-file-id-57",
+        "b-15-component-manifest-add-a-manifest-json-de-58",
+        "b-15-component-manifest-register-it-in-projects-59",
+        "b-15-component-manifest-json-60",
+        "b-15-component-manifest-that-is-the-entire-integ-61"
+      ]
+    },
+    "b-15-component-manifest-effects-and-components-s-2": {
+      "id": "b-15-component-manifest-effects-and-components-s-2",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "Effects and components ship a "
+        },
+        {
+          "insert": "manifest.json",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " next to their code. The manifest declares module-level metadata: name, type, sizing hint, and, for effects, the editable property descriptors that drive the inspector."
+        }
+      ],
+      "children": []
+    },
+    "b-15-component-manifest-for-components-and-b-3": {
+      "id": "b-15-component-manifest-for-components-and-b-3",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "For "
+        },
+        {
+          "insert": "components",
+          "attributes": {
+            "bold": true
+          }
+        },
+        {
+          "insert": " and built-in layer types (media, glyph-group, audio), property editing is driven by the "
+        },
+        {
+          "insert": "property schema convention",
+          "attributes": {
+            "reference": {
+              "kind": "doc",
+              "path": "10-scene-engine/10-system-design/16-property-schema",
+              "label": "property schema convention"
+            }
+          }
+        },
+        {
+          "insert": ", not the manifest. The manifest is still required for name, type, and sizing metadata, but component property fields come from the schema exported by the component's code module."
+        }
+      ],
+      "children": []
+    },
+    "b-15-component-manifest-for-effects-the-man-4": {
+      "id": "b-15-component-manifest-for-effects-the-man-4",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "For "
+        },
+        {
+          "insert": "effects",
+          "attributes": {
+            "bold": true
+          }
+        },
+        {
+          "insert": ", the manifest remains the authoritative source of property descriptors. Effects are pure CSS and have no code module to attach a schema to."
+        }
+      ],
+      "children": []
+    },
+    "b-15-component-manifest-this-is-the-contract-tha-5": {
+      "id": "b-15-component-manifest-this-is-the-contract-tha-5",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "This is the contract that makes the system open for extension: a new contributor can drop in a CSS file (effect) or JS file (component) plus a manifest, and it just works in both the editor and the runtime."
+        }
+      ],
+      "children": []
+    },
+    "b-15-component-manifest-divider-6": {
+      "id": "b-15-component-manifest-divider-6",
+      "type": "divider",
+      "props": {},
+      "children": []
+    },
+    "b-15-component-manifest-where-manifests-live-7": {
+      "id": "b-15-component-manifest-where-manifests-live-7",
+      "type": "heading",
+      "props": {
+        "level": 2
+      },
+      "text": [
+        {
+          "insert": "Where Manifests Live"
+        }
+      ],
+      "children": []
+    },
+    "b-15-component-manifest-code-8": {
+      "id": "b-15-component-manifest-code-8",
+      "type": "code",
+      "props": {},
+      "text": [
+        {
+          "insert": "codecaine-site/\n├── ProjectSettings/\n│   └── registries/\n│       └── modules.json\n└── Assets/\n    └── Modules/\n        ├── effects/\n        │   └── crt-overlay/\n        │       ├── crt-overlay.css\n        │       └── manifest.json\n        └── components/\n            └── press-start/\n                ├── press-start.js\n                ├── press-start.css\n                └── manifest.json"
+        }
+      ],
+      "children": []
+    },
+    "b-15-component-manifest-projectsettings-registr-9": {
+      "id": "b-15-component-manifest-projectsettings-registr-9",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "ProjectSettings/registries/modules.json",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " is the index. Each entry declares "
+        },
+        {
+          "insert": "type",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " and the logical "
+        },
+        {
+          "insert": "path",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " to the module's primary file, such as "
+        },
+        {
+          "insert": "/modules/components/press-start/press-start.js",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ". The renderer reads the manifest from the module's directory through the project file routes and merges it into the registry entry at load time."
+        }
+      ],
+      "children": []
+    },
+    "b-15-component-manifest-manifest-shape-10": {
+      "id": "b-15-component-manifest-manifest-shape-10",
+      "type": "heading",
+      "props": {
+        "level": 2
+      },
+      "text": [
+        {
+          "insert": "Manifest Shape"
+        }
+      ],
+      "children": []
+    },
+    "b-15-component-manifest-json-11": {
+      "id": "b-15-component-manifest-json-11",
+      "type": "code",
+      "props": {
+        "language": "json"
+      },
+      "text": [
+        {
+          "insert": "{\n  \"name\": \"CRT Overlay\",\n  \"type\": \"effect\",\n  \"sizing\": \"fill\",\n  \"properties\": {\n    \"scan-line-density\": { \"type\": \"number\", \"default\": 3,    \"min\": 1, \"max\": 10,  \"step\": 0.5 },\n    \"vignette-intensity\":{ \"type\": \"number\", \"default\": 0.55, \"min\": 0, \"max\": 1,   \"step\": 0.01 },\n    \"rgb-fringe\":        { \"type\": \"number\", \"default\": 0.04, \"min\": 0, \"max\": 0.2, \"step\": 0.01 }\n  }\n}"
+        }
+      ],
+      "children": []
+    },
+    "b-15-component-manifest-field-require-12-tbl": {
+      "id": "b-15-component-manifest-field-require-12-tbl",
+      "type": "structured-table",
+      "props": {
+        "columns": [
+          "Field",
+          "Required",
+          "Notes"
+        ],
+        "rows": [
+          [
+            [
+              {
+                "insert": "name",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ],
+            "yes",
+            "Human-readable display name shown in add-layer and inspector surfaces."
+          ],
+          [
+            [
+              {
+                "insert": "type",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ],
+            "yes",
+            [
+              {
+                "insert": "effect",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": " or "
+              },
+              {
+                "insert": "component",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": ". Must agree with the registry entry's "
+              },
+              {
+                "insert": "type",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": "."
+              }
+            ]
+          ],
+          [
+            [
+              {
+                "insert": "sizing",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ],
+            "no",
+            [
+              {
+                "insert": "fill",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": " or "
+              },
+              {
+                "insert": "explicit",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": ". Hints the default "
+              },
+              {
+                "insert": "transform",
+                "attributes": {
+                  "code": true
+                }
+              },
+              {
+                "insert": " mode when this module is added to a scene."
+              }
+            ]
+          ],
+          [
+            [
+              {
+                "insert": "properties",
+                "attributes": {
+                  "code": true
+                }
+              }
+            ],
+            "yes",
+            "Map of property key → property descriptor. May be empty for pure-CSS effects with no knobs."
+          ]
+        ]
+      },
+      "children": []
+    },
+    "b-15-component-manifest-property-descriptors-13": {
+      "id": "b-15-component-manifest-property-descriptors-13",
+      "type": "heading",
+      "props": {
+        "level": 2
+      },
+      "text": [
+        {
+          "insert": "Property Descriptors"
+        }
+      ],
+      "children": []
+    },
+    "b-15-component-manifest-every-value-in-properti-14": {
+      "id": "b-15-component-manifest-every-value-in-properti-14",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "Every value in "
+        },
+        {
+          "insert": "properties",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " is one descriptor object. The "
+        },
+        {
+          "insert": "type",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " field selects the input the editor renders."
+        }
+      ],
+      "children": []
+    },
+    "b-15-component-manifest-number-15": {
+      "id": "b-15-component-manifest-number-15",
+      "type": "heading",
+      "props": {
+        "level": 3
+      },
+      "text": [
+        {
+          "insert": "number",
+          "attributes": {
+            "code": true
+          }
+        }
+      ],
+      "children": []
+    },
+    "b-15-component-manifest-json-16": {
+      "id": "b-15-component-manifest-json-16",
+      "type": "code",
+      "props": {
+        "language": "json"
+      },
+      "text": [
+        {
+          "insert": "\"blink-rate\": { \"type\": \"number\", \"default\": 1.1, \"min\": 0.1, \"max\": 5, \"step\": 0.1, \"description\": \"...\" }"
+        }
+      ],
+      "children": []
+    },
+    "b-15-component-manifest-renders-as-a-slider-nu-17": {
+      "id": "b-15-component-manifest-renders-as-a-slider-nu-17",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "Renders as a slider + numeric input. "
+        },
+        {
+          "insert": "min",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": "/"
+        },
+        {
+          "insert": "max",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": "/"
+        },
+        {
+          "insert": "step",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " configure the slider; "
+        },
+        {
+          "insert": "default",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " seeds new objects. "
+        },
+        {
+          "insert": "description",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " is shown as a tooltip / help text."
+        }
+      ],
+      "children": []
+    },
+    "b-15-component-manifest-string-18": {
+      "id": "b-15-component-manifest-string-18",
+      "type": "heading",
+      "props": {
+        "level": 3
+      },
+      "text": [
+        {
+          "insert": "string",
+          "attributes": {
+            "code": true
+          }
+        }
+      ],
+      "children": []
+    },
+    "b-15-component-manifest-json-19": {
+      "id": "b-15-component-manifest-json-19",
+      "type": "code",
+      "props": {
+        "language": "json"
+      },
+      "text": [
+        {
+          "insert": "\"text\": { \"type\": \"string\", \"default\": \"PRESS  START\", \"description\": \"Button label\" }"
+        }
+      ],
+      "children": []
+    },
+    "b-15-component-manifest-renders-as-a-single-line-20": {
+      "id": "b-15-component-manifest-renders-as-a-single-line-20",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "Renders as a single-line text field."
+        }
+      ],
+      "children": []
+    },
+    "b-15-component-manifest-boolean-21": {
+      "id": "b-15-component-manifest-boolean-21",
+      "type": "heading",
+      "props": {
+        "level": 3
+      },
+      "text": [
+        {
+          "insert": "boolean",
+          "attributes": {
+            "code": true
+          }
+        }
+      ],
+      "children": []
+    },
+    "b-15-component-manifest-json-22": {
+      "id": "b-15-component-manifest-json-22",
+      "type": "code",
+      "props": {
+        "language": "json"
+      },
+      "text": [
+        {
+          "insert": "\"shimmer\": { \"type\": \"boolean\", \"default\": true }"
+        }
+      ],
+      "children": []
+    },
+    "b-15-component-manifest-renders-as-a-toggle-23": {
+      "id": "b-15-component-manifest-renders-as-a-toggle-23",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "Renders as a toggle."
+        }
+      ],
+      "children": []
+    },
+    "b-15-component-manifest-enum-24": {
+      "id": "b-15-component-manifest-enum-24",
+      "type": "heading",
+      "props": {
+        "level": 3
+      },
+      "text": [
+        {
+          "insert": "enum",
+          "attributes": {
+            "code": true
+          }
+        }
+      ],
+      "children": []
+    },
+    "b-15-component-manifest-json-25": {
+      "id": "b-15-component-manifest-json-25",
+      "type": "code",
+      "props": {
+        "language": "json"
+      },
+      "text": [
+        {
+          "insert": "\"variant\": { \"type\": \"enum\", \"default\": \"primary\", \"options\": [\"primary\", \"ghost\"] }"
+        }
+      ],
+      "children": []
+    },
+    "b-15-component-manifest-renders-as-a-dropdown-of-26": {
+      "id": "b-15-component-manifest-renders-as-a-dropdown-of-26",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "Renders as a dropdown of "
+        },
+        {
+          "insert": "options",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": "."
+        }
+      ],
+      "children": []
+    },
+    "b-15-component-manifest-what-manifests-do-not-de-27": {
+      "id": "b-15-component-manifest-what-manifests-do-not-de-27",
+      "type": "heading",
+      "props": {
+        "level": 2
+      },
+      "text": [
+        {
+          "insert": "What Manifests Do Not Declare"
+        }
+      ],
+      "children": []
+    },
+    "b-15-component-manifest-the-manifest-is-for-co-28": {
+      "id": "b-15-component-manifest-the-manifest-is-for-co-28",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "The manifest is for "
+        },
+        {
+          "insert": "component-specific",
+          "attributes": {
+            "bold": true
+          }
+        },
+        {
+          "insert": " knobs only. Universal sections are handled generically by the editor and not repeated per-module:"
+        }
+      ],
+      "children": []
+    },
+    "b-15-component-manifest-visibility-visibl-29": {
+      "id": "b-15-component-manifest-visibility-visibl-29",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "Visibility",
+          "attributes": {
+            "bold": true
+          }
+        },
+        {
+          "insert": ". "
+        },
+        {
+          "insert": "visible",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " is a universal toggle on every object."
+        }
+      ],
+      "children": []
+    },
+    "b-15-component-manifest-transform-x-y-30": {
+      "id": "b-15-component-manifest-transform-x-y-30",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "Transform",
+          "attributes": {
+            "bold": true
+          }
+        },
+        {
+          "insert": ". "
+        },
+        {
+          "insert": "x",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ", "
+        },
+        {
+          "insert": "y",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ", "
+        },
+        {
+          "insert": "width",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ", "
+        },
+        {
+          "insert": "height",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ", "
+        },
+        {
+          "insert": "anchor",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ", "
+        },
+        {
+          "insert": "rotation",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ", "
+        },
+        {
+          "insert": "scale",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ", "
+        },
+        {
+          "insert": "mode: \"fill\"",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " are always-present, edited the same way for every object type."
+        }
+      ],
+      "children": []
+    },
+    "b-15-component-manifest-appearance-opacit-31": {
+      "id": "b-15-component-manifest-appearance-opacit-31",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "Appearance",
+          "attributes": {
+            "bold": true
+          }
+        },
+        {
+          "insert": ". "
+        },
+        {
+          "insert": "opacity",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ", "
+        },
+        {
+          "insert": "blend",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ", "
+        },
+        {
+          "insert": "hue",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ", "
+        },
+        {
+          "insert": "saturation",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ", "
+        },
+        {
+          "insert": "fit",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " are universal."
+        }
+      ],
+      "children": []
+    },
+    "b-15-component-manifest-events-wired-the-s-32": {
+      "id": "b-15-component-manifest-events-wired-the-s-32",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "Events",
+          "attributes": {
+            "bold": true
+          }
+        },
+        {
+          "insert": ". Wired the same way regardless of object type."
+        }
+      ],
+      "children": []
+    },
+    "b-15-component-manifest-if-a-property-isn-t-uniq-33": {
+      "id": "b-15-component-manifest-if-a-property-isn-t-uniq-33",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "If a property isn't unique to the component, it doesn't belong in the manifest."
+        }
+      ],
+      "children": []
+    },
+    "b-15-component-manifest-sizing-hints-34": {
+      "id": "b-15-component-manifest-sizing-hints-34",
+      "type": "heading",
+      "props": {
+        "level": 2
+      },
+      "text": [
+        {
+          "insert": "Sizing Hints"
+        }
+      ],
+      "children": []
+    },
+    "b-15-component-manifest-sizing-controls-the-de-35": {
+      "id": "b-15-component-manifest-sizing-controls-the-de-35",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "sizing",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " controls the default transform when this module is added to a scene:"
+        }
+      ],
+      "children": []
+    },
+    "b-15-component-manifest-fill-new-objects-sta-36": {
+      "id": "b-15-component-manifest-fill-new-objects-sta-36",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "fill",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ": new objects start with "
+        },
+        {
+          "insert": "transform: { mode: \"fill\" }",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ". Right for full-screen effects (CRT, vignette, vortex)."
+        }
+      ],
+      "children": []
+    },
+    "b-15-component-manifest-explicit-or-omitted-37": {
+      "id": "b-15-component-manifest-explicit-or-omitted-37",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "explicit",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " (or omitted): new objects start with an explicit transform centered on the stage at sensible defaults."
+        }
+      ],
+      "children": []
+    },
+    "b-15-component-manifest-this-is-a-one-time-hint-38": {
+      "id": "b-15-component-manifest-this-is-a-one-time-hint-38",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "This is a one-time hint; the user can flip the transform mode in the inspector at any time."
+        }
+      ],
+      "children": []
+    },
+    "b-15-component-manifest-renderer-contract-39": {
+      "id": "b-15-component-manifest-renderer-contract-39",
+      "type": "heading",
+      "props": {
+        "level": 2
+      },
+      "text": [
+        {
+          "insert": "Renderer Contract"
+        }
+      ],
+      "children": []
+    },
+    "b-15-component-manifest-effects-40": {
+      "id": "b-15-component-manifest-effects-40",
+      "type": "heading",
+      "props": {
+        "level": 3
+      },
+      "text": [
+        {
+          "insert": "Effects"
+        }
+      ],
+      "children": []
+    },
+    "b-15-component-manifest-effects-are-pure-css-th-41": {
+      "id": "b-15-component-manifest-effects-are-pure-css-th-41",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "Effects are pure CSS. The renderer mounts a wrapper element, attaches the stylesheet, and lets the CSS do the work. The component's "
+        },
+        {
+          "insert": "properties",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " are exposed as CSS custom properties on the wrapper (e.g. "
+        },
+        {
+          "insert": "--rgb-fringe: 0.06",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ") that the stylesheet consumes via "
+        },
+        {
+          "insert": "var()",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": "."
+        }
+      ],
+      "children": []
+    },
+    "b-15-component-manifest-components-42": {
+      "id": "b-15-component-manifest-components-42",
+      "type": "heading",
+      "props": {
+        "level": 3
+      },
+      "text": [
+        {
+          "insert": "Components"
+        }
+      ],
+      "children": []
+    },
+    "b-15-component-manifest-components-export-a-defa-43": {
+      "id": "b-15-component-manifest-components-export-a-defa-43",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "Components export a default function called as:"
+        }
+      ],
+      "children": []
+    },
+    "b-15-component-manifest-js-44": {
+      "id": "b-15-component-manifest-js-44",
+      "type": "code",
+      "props": {
+        "language": "js"
+      },
+      "text": [
+        {
+          "insert": "export default function render({ properties, layerId }) {\n  const el = document.createElement('div')\n  // ...build the DOM, read properties...\n  return el\n}"
+        }
+      ],
+      "children": []
+    },
+    "b-15-component-manifest-the-renderer-45": {
+      "id": "b-15-component-manifest-the-renderer-45",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "The renderer:"
+        }
+      ],
+      "children": []
+    },
+    "b-15-component-manifest-loads-the-js-module-via-46": {
+      "id": "b-15-component-manifest-loads-the-js-module-via-46",
+      "type": "list-item",
+      "props": {
+        "ordered": true
+      },
+      "text": [
+        {
+          "insert": "Loads the JS module via "
+        },
+        {
+          "insert": "import()",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " (with a Blob URL shim for cache-friendly fetches)."
+        }
+      ],
+      "children": []
+    },
+    "b-15-component-manifest-loads-the-sibling-css-fi-47": {
+      "id": "b-15-component-manifest-loads-the-sibling-css-fi-47",
+      "type": "list-item",
+      "props": {
+        "ordered": true
+      },
+      "text": [
+        {
+          "insert": "Loads the sibling CSS file (same path, "
+        },
+        {
+          "insert": ".js",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " → "
+        },
+        {
+          "insert": ".css",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ") into the document."
+        }
+      ],
+      "children": []
+    },
+    "b-15-component-manifest-calls-the-default-export-48": {
+      "id": "b-15-component-manifest-calls-the-default-export-48",
+      "type": "list-item",
+      "props": {
+        "ordered": true
+      },
+      "text": [
+        {
+          "insert": "Calls the default export with "
+        },
+        {
+          "insert": "{ properties: layer.properties, layerId: layer.id }",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": "."
+        }
+      ],
+      "children": []
+    },
+    "b-15-component-manifest-mounts-the-returned-elem-49": {
+      "id": "b-15-component-manifest-mounts-the-returned-elem-49",
+      "type": "list-item",
+      "props": {
+        "ordered": true
+      },
+      "text": [
+        {
+          "insert": "Mounts the returned element inside the object's positioned wrapper."
+        }
+      ],
+      "children": []
+    },
+    "b-15-component-manifest-no-further-coupling-co-50": {
+      "id": "b-15-component-manifest-no-further-coupling-co-50",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "No further coupling. Components are responsible for their own DOM and lifecycle."
+        }
+      ],
+      "children": []
+    },
+    "b-15-component-manifest-editor-integration-51": {
+      "id": "b-15-component-manifest-editor-integration-51",
+      "type": "heading",
+      "props": {
+        "level": 2
+      },
+      "text": [
+        {
+          "insert": "Editor Integration"
+        }
+      ],
+      "children": []
+    },
+    "b-15-component-manifest-effects-the-inspect-52": {
+      "id": "b-15-component-manifest-effects-the-inspect-52",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "Effects",
+          "attributes": {
+            "bold": true
+          }
+        },
+        {
+          "insert": ": the inspector iterates the manifest's "
+        },
+        {
+          "insert": "properties",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " and renders one field per descriptor. The descriptor drives the input type, slider range, default, and tooltip."
+        }
+      ],
+      "children": []
+    },
+    "b-15-component-manifest-components-the-insp-53": {
+      "id": "b-15-component-manifest-components-the-insp-53",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "Components",
+          "attributes": {
+            "bold": true
+          }
+        },
+        {
+          "insert": ": the inspector ignores the manifest's "
+        },
+        {
+          "insert": "properties",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " (if present) and reads the component's "
+        },
+        {
+          "insert": "property schema",
+          "attributes": {
+            "reference": {
+              "kind": "doc",
+              "path": "10-scene-engine/10-system-design/16-property-schema",
+              "label": "property schema"
+            }
+          }
+        },
+        {
+          "insert": " instead: a sectioned structure exported from the component's code module that provides grouping, labels, descriptions, and a richer type taxonomy. The manifest is still used for "
+        },
+        {
+          "insert": "name",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " (display in add-layer surfaces) and "
+        },
+        {
+          "insert": "sizing",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " (default transform hint)."
+        }
+      ],
+      "children": []
+    },
+    "b-15-component-manifest-when-the-add-layer-dialo-54": {
+      "id": "b-15-component-manifest-when-the-add-layer-dialo-54",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "When the add-layer dialog lists modules, it groups by "
+        },
+        {
+          "insert": "type",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " (effect / component) and shows the manifest's "
+        },
+        {
+          "insert": "name",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ". Adding a module creates a new scene object whose "
+        },
+        {
+          "insert": "type",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " matches the module type, with the asset wired up and a transform seeded from the "
+        },
+        {
+          "insert": "sizing",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " hint."
+        }
+      ],
+      "children": []
+    },
+    "b-15-component-manifest-adding-a-new-module-55": {
+      "id": "b-15-component-manifest-adding-a-new-module-55",
+      "type": "heading",
+      "props": {
+        "level": 2
+      },
+      "text": [
+        {
+          "insert": "Adding a New Module"
+        }
+      ],
+      "children": []
+    },
+    "b-15-component-manifest-create-a-directory-under-56": {
+      "id": "b-15-component-manifest-create-a-directory-under-56",
+      "type": "list-item",
+      "props": {
+        "ordered": true
+      },
+      "text": [
+        {
+          "insert": "Create a directory under "
+        },
+        {
+          "insert": "Assets/Modules/effects/<id>/",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " or "
+        },
+        {
+          "insert": "Assets/Modules/components/<id>/",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " in the project workspace."
+        }
+      ],
+      "children": []
+    },
+    "b-15-component-manifest-add-the-code-file-id-57": {
+      "id": "b-15-component-manifest-add-the-code-file-id-57",
+      "type": "list-item",
+      "props": {
+        "ordered": true
+      },
+      "text": [
+        {
+          "insert": "Add the code file ("
+        },
+        {
+          "insert": "<id>.css",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " for effects, "
+        },
+        {
+          "insert": "<id>.js",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " for components)."
+        }
+      ],
+      "children": []
+    },
+    "b-15-component-manifest-add-a-manifest-json-de-58": {
+      "id": "b-15-component-manifest-add-a-manifest-json-de-58",
+      "type": "list-item",
+      "props": {
+        "ordered": true
+      },
+      "text": [
+        {
+          "insert": "Add a "
+        },
+        {
+          "insert": "manifest.json",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": " declaring "
+        },
+        {
+          "insert": "name",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ", "
+        },
+        {
+          "insert": "type",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ", optional "
+        },
+        {
+          "insert": "sizing",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ", and "
+        },
+        {
+          "insert": "properties",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": "."
+        }
+      ],
+      "children": []
+    },
+    "b-15-component-manifest-register-it-in-projects-59": {
+      "id": "b-15-component-manifest-register-it-in-projects-59",
+      "type": "list-item",
+      "props": {
+        "ordered": true
+      },
+      "text": [
+        {
+          "insert": "Register it in "
+        },
+        {
+          "insert": "ProjectSettings/registries/modules.json",
+          "attributes": {
+            "code": true
+          }
+        },
+        {
+          "insert": ":"
+        }
+      ],
+      "children": []
+    },
+    "b-15-component-manifest-json-60": {
+      "id": "b-15-component-manifest-json-60",
+      "type": "code",
+      "props": {
+        "language": "json"
+      },
+      "text": [
+        {
+          "insert": "   \"<id>\": { \"type\": \"effect\", \"path\": \"/modules/effects/<id>/<id>.css\" }"
+        }
+      ],
+      "children": []
+    },
+    "b-15-component-manifest-that-is-the-entire-integ-61": {
+      "id": "b-15-component-manifest-that-is-the-entire-integ-61",
+      "type": "paragraph",
+      "props": {},
+      "text": [
+        {
+          "insert": "That is the entire integration surface. No editor changes, no renderer changes, no scene-format changes."
+        }
+      ],
+      "children": []
+    }
+  }
+}
