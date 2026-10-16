@@ -259,9 +259,22 @@
           "attributes": {
             "bold": true
           }
-        },
+        }
+      ],
+      "children": [
+        "b-60-asset-uploads-pre-fill-the-type-t-12-s1",
+        "b-60-asset-uploads-pre-fill-the-type-t-12-s2"
+      ]
+    },
+    "b-60-asset-uploads-pre-fill-the-type-t-12-s1": {
+      "id": "b-60-asset-uploads-pre-fill-the-type-t-12-s1",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
         {
-          "insert": " The page inspects the file's mime and suggests a type if it matches one allowlist (e.g. "
+          "insert": "The page inspects the file's mime and suggests a type if it matches one allowlist (e.g. "
         },
         {
           "insert": "video/mp4",
@@ -279,7 +292,20 @@
           }
         },
         {
-          "insert": "). The user can override."
+          "insert": ")."
+        }
+      ],
+      "children": []
+    },
+    "b-60-asset-uploads-pre-fill-the-type-t-12-s2": {
+      "id": "b-60-asset-uploads-pre-fill-the-type-t-12-s2",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "The user can override."
         }
       ],
       "children": []
@@ -315,9 +341,35 @@
           "attributes": {
             "bold": true
           }
-        },
+        }
+      ],
+      "children": [
+        "b-60-asset-uploads-server-validates-bo-14-s1",
+        "b-60-asset-uploads-server-validates-bo-14-s2"
+      ]
+    },
+    "b-60-asset-uploads-server-validates-bo-14-s1": {
+      "id": "b-60-asset-uploads-server-validates-bo-14-s1",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
         {
-          "insert": " Both the extension and the mime must be in the allowlist for the chosen type. Mismatches reject the upload."
+          "insert": "Both the extension and the mime must be in the allowlist for the chosen type."
+        }
+      ],
+      "children": []
+    },
+    "b-60-asset-uploads-server-validates-bo-14-s2": {
+      "id": "b-60-asset-uploads-server-validates-bo-14-s2",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "Mismatches reject the upload."
         }
       ],
       "children": []
@@ -334,9 +386,36 @@
           "attributes": {
             "bold": true
           }
-        },
+        }
+      ],
+      "children": [
+        "b-60-asset-uploads-server-writes-the-file-15-s1",
+        "b-60-asset-uploads-server-writes-the-file-15-s2",
+        "b-60-asset-uploads-server-writes-the-file-15-s3"
+      ]
+    },
+    "b-60-asset-uploads-server-writes-the-file-15-s1": {
+      "id": "b-60-asset-uploads-server-writes-the-file-15-s1",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
         {
-          "insert": " Filename = a unique slug of the original filename + original extension. Media lands under the selected project root at "
+          "insert": "Filename = a unique slug of the original filename + original extension."
+        }
+      ],
+      "children": []
+    },
+    "b-60-asset-uploads-server-writes-the-file-15-s2": {
+      "id": "b-60-asset-uploads-server-writes-the-file-15-s2",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "Media lands under the selected project root at "
         },
         {
           "insert": "Assets/Media/{type}/{slug}.{ext}",
@@ -345,7 +424,20 @@
           }
         },
         {
-          "insert": "; fonts land under "
+          "insert": "."
+        }
+      ],
+      "children": []
+    },
+    "b-60-asset-uploads-server-writes-the-file-15-s3": {
+      "id": "b-60-asset-uploads-server-writes-the-file-15-s3",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "Fonts land under "
         },
         {
           "insert": "Assets/Fonts/{slug}.{ext}",
@@ -371,9 +463,23 @@
           "attributes": {
             "bold": true
           }
-        },
+        }
+      ],
+      "children": [
+        "b-60-asset-uploads-server-registers-the-c-16-s1",
+        "b-60-asset-uploads-server-registers-the-c-16-s2",
+        "b-60-asset-uploads-server-registers-the-c-16-s3"
+      ]
+    },
+    "b-60-asset-uploads-server-registers-the-c-16-s1": {
+      "id": "b-60-asset-uploads-server-registers-the-c-16-s1",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
         {
-          "insert": " A new entry is written into "
+          "insert": "A new entry is written into "
         },
         {
           "insert": "ProjectSettings/registries/assets.json",
@@ -382,7 +488,20 @@
           }
         },
         {
-          "insert": " keyed by the slug. Media entries keep logical "
+          "insert": " keyed by the slug."
+        }
+      ],
+      "children": []
+    },
+    "b-60-asset-uploads-server-registers-the-c-16-s2": {
+      "id": "b-60-asset-uploads-server-registers-the-c-16-s2",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "Media entries keep logical "
         },
         {
           "insert": "file",
@@ -400,7 +519,20 @@
           }
         },
         {
-          "insert": "; font entries use "
+          "insert": "."
+        }
+      ],
+      "children": []
+    },
+    "b-60-asset-uploads-server-registers-the-c-16-s3": {
+      "id": "b-60-asset-uploads-server-registers-the-c-16-s3",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "Font entries use "
         },
         {
           "insert": "/fonts/{slug}.{ext}",
@@ -857,7 +989,7 @@
       },
       "text": [
         {
-          "insert": "Marks the editor dirty; Save writes the scene through "
+          "insert": "Marks the editor dirty. Save writes the scene through "
         },
         {
           "insert": "PUT /api/scenes/<id>?project=<project-id>",
@@ -879,7 +1011,36 @@
       },
       "text": [
         {
-          "insert": "Leaves registry entries untouched. Containers remain stable inventory records; scenes decide which container they use."
+          "insert": "Leaves registry entries untouched."
+        }
+      ],
+      "children": [
+        "b-60-asset-uploads-leaves-registry-entries-27-s1",
+        "b-60-asset-uploads-leaves-registry-entries-27-s2"
+      ]
+    },
+    "b-60-asset-uploads-leaves-registry-entries-27-s1": {
+      "id": "b-60-asset-uploads-leaves-registry-entries-27-s1",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "Containers remain stable inventory records."
+        }
+      ],
+      "children": []
+    },
+    "b-60-asset-uploads-leaves-registry-entries-27-s2": {
+      "id": "b-60-asset-uploads-leaves-registry-entries-27-s2",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "Scenes decide which container they use."
         }
       ],
       "children": []
@@ -914,7 +1075,7 @@
       "props": {},
       "text": [
         {
-          "insert": "Upload and selection are separate concerns. The inspector is for arranging containers in a scene; introducing an upload form there would couple authoring with file management. The dropdown is the smallest UI that supports the container indirection: point the layer at a different registered container without leaving the scene."
+          "insert": "Upload and selection are separate concerns. The inspector is for arranging containers in a scene. Introducing an upload form there would couple authoring with file management. The dropdown is the smallest UI that supports the container indirection: point the layer at a different registered container without leaving the scene."
         }
       ],
       "children": []
@@ -992,9 +1153,35 @@
           "attributes": {
             "bold": true
           }
-        },
+        }
+      ],
+      "children": [
+        "b-60-asset-uploads-project-local-inventor-34-s1",
+        "b-60-asset-uploads-project-local-inventor-34-s2"
+      ]
+    },
+    "b-60-asset-uploads-project-local-inventor-34-s1": {
+      "id": "b-60-asset-uploads-project-local-inventor-34-s1",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
         {
-          "insert": " Uploads add containers under the selected project root; scenes select those containers by ID."
+          "insert": "Uploads add containers under the selected project root."
+        }
+      ],
+      "children": []
+    },
+    "b-60-asset-uploads-project-local-inventor-34-s2": {
+      "id": "b-60-asset-uploads-project-local-inventor-34-s2",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "Scenes select those containers by ID."
         }
       ],
       "children": []
@@ -1039,9 +1226,35 @@
           "attributes": {
             "bold": true
           }
-        },
+        }
+      ],
+      "children": [
+        "b-60-asset-uploads-type-discipline-val-36-s1",
+        "b-60-asset-uploads-type-discipline-val-36-s2"
+      ]
+    },
+    "b-60-asset-uploads-type-discipline-val-36-s1": {
+      "id": "b-60-asset-uploads-type-discipline-val-36-s1",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
         {
-          "insert": " Validation rejects mismatches at the boundary; the renderer doesn't have to handle a "
+          "insert": "Validation rejects mismatches at the boundary."
+        }
+      ],
+      "children": []
+    },
+    "b-60-asset-uploads-type-discipline-val-36-s2": {
+      "id": "b-60-asset-uploads-type-discipline-val-36-s2",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "The renderer doesn't have to handle a "
         },
         {
           "insert": "video",
@@ -1118,9 +1331,35 @@
           "attributes": {
             "bold": true
           }
-        },
+        }
+      ],
+      "children": [
+        "b-60-asset-uploads-custom-container-ids-a-40-s1",
+        "b-60-asset-uploads-custom-container-ids-a-40-s2"
+      ]
+    },
+    "b-60-asset-uploads-custom-container-ids-a-40-s1": {
+      "id": "b-60-asset-uploads-custom-container-ids-a-40-s1",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
         {
-          "insert": " IDs are derived from the filename slug; renaming a container is a separate manual registry edit."
+          "insert": "IDs are derived from the filename slug."
+        }
+      ],
+      "children": []
+    },
+    "b-60-asset-uploads-custom-container-ids-a-40-s2": {
+      "id": "b-60-asset-uploads-custom-container-ids-a-40-s2",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "Renaming a container is a separate manual registry edit."
         }
       ],
       "children": []

@@ -40,7 +40,7 @@
         "b-20-panels-dirty-indicator-sho-8",
         "b-20-panels-canvas-canvaspanel-tsx-9",
         "b-20-panels-renders-the-scene-live-u-10",
-        "b-20-panels-selection-clicking-insi-11",
+        "b-20-panels-selection-clicking-insi-11-li",
         "b-20-panels-hierarchy-hierarchypan-12",
         "b-20-panels-tree-view-of-scene-obje-13",
         "b-20-panels-object-types-and-add-men-14",
@@ -145,7 +145,7 @@
           }
         },
         {
-          "insert": " with selector-narrowed slices. Panels do not call each other directly; they communicate by mutating the store."
+          "insert": " with selector-narrowed slices. Panels do not call each other directly. They communicate by mutating the store."
         }
       ],
       "children": []
@@ -201,9 +201,35 @@
           "attributes": {
             "bold": true
           }
-        },
+        }
+      ],
+      "children": [
+        "b-20-panels-editortopbar-spans-6-s1",
+        "b-20-panels-editortopbar-spans-6-s2"
+      ]
+    },
+    "b-20-panels-editortopbar-spans-6-s1": {
+      "id": "b-20-panels-editortopbar-spans-6-s1",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
         {
-          "insert": ": spans the top of the editor and shows the active project, scene, and clean/dirty state. The project crumb links back to the project/scenes page."
+          "insert": "Spans the top of the editor and shows the active project, scene, and clean/dirty state."
+        }
+      ],
+      "children": []
+    },
+    "b-20-panels-editortopbar-spans-6-s2": {
+      "id": "b-20-panels-editortopbar-spans-6-s2",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "The project crumb links back to the project/scenes page."
         }
       ],
       "children": []
@@ -220,9 +246,35 @@
           "attributes": {
             "bold": true
           }
-        },
+        }
+      ],
+      "children": [
+        "b-20-panels-scenesettingssection-7-s1",
+        "b-20-panels-scenesettingssection-7-s2"
+      ]
+    },
+    "b-20-panels-scenesettingssection-7-s1": {
+      "id": "b-20-panels-scenesettingssection-7-s1",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
         {
-          "insert": ": rendered at the top of the inspector, collapsed by default. Contains editable scene name, scene ID, stage dimensions, and global appearance controls."
+          "insert": "Rendered at the top of the inspector, collapsed by default."
+        }
+      ],
+      "children": []
+    },
+    "b-20-panels-scenesettingssection-7-s2": {
+      "id": "b-20-panels-scenesettingssection-7-s2",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "Contains editable scene name, scene ID, stage dimensions, and global appearance controls."
         }
       ],
       "children": []
@@ -239,9 +291,36 @@
           "attributes": {
             "bold": true
           }
-        },
+        }
+      ],
+      "children": [
+        "b-20-panels-dirty-indicator-sho-8-s1",
+        "b-20-panels-dirty-indicator-sho-8-s2",
+        "b-20-panels-dirty-indicator-sho-8-s3"
+      ]
+    },
+    "b-20-panels-dirty-indicator-sho-8-s1": {
+      "id": "b-20-panels-dirty-indicator-sho-8-s1",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
         {
-          "insert": ": shown in the top bar; the dot color toggles on "
+          "insert": "Shown in the top bar."
+        }
+      ],
+      "children": []
+    },
+    "b-20-panels-dirty-indicator-sho-8-s2": {
+      "id": "b-20-panels-dirty-indicator-sho-8-s2",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "The dot color toggles on "
         },
         {
           "insert": "store.dirty",
@@ -250,7 +329,20 @@
           }
         },
         {
-          "insert": ". Save is handled through editor commands rather than an in-panel button."
+          "insert": "."
+        }
+      ],
+      "children": []
+    },
+    "b-20-panels-dirty-indicator-sho-8-s3": {
+      "id": "b-20-panels-dirty-indicator-sho-8-s3",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "Save is handled through editor commands rather than an in-panel button."
         }
       ],
       "children": []
@@ -333,13 +425,33 @@
       ],
       "children": []
     },
-    "b-20-panels-selection-clicking-insi-11": {
-      "id": "b-20-panels-selection-clicking-insi-11",
-      "type": "paragraph",
-      "props": {},
+    "b-20-panels-selection-clicking-insi-11-li": {
+      "id": "b-20-panels-selection-clicking-insi-11-li",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
       "text": [
         {
-          "insert": "Selection: clicking inside the stage walks up to the nearest element with "
+          "insert": "Selection",
+          "attributes": {
+            "bold": true
+          }
+        }
+      ],
+      "children": [
+        "b-20-panels-selection-clicking-insi-11-s1"
+      ]
+    },
+    "b-20-panels-selection-clicking-insi-11-s1": {
+      "id": "b-20-panels-selection-clicking-insi-11-s1",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "Clicking inside the stage walks up to the nearest element with "
         },
         {
           "insert": "dataset.layerId",
@@ -555,7 +667,7 @@
           }
         },
         {
-          "insert": "; selecting "
+          "insert": ". Selecting "
         },
         {
           "insert": "group",
@@ -699,7 +811,25 @@
       },
       "text": [
         {
-          "insert": "For non-group rows: top half = "
+          "insert": "For non-group rows",
+          "attributes": {
+            "bold": true
+          }
+        }
+      ],
+      "children": [
+        "b-20-panels-for-non-group-rows-top-21-s1"
+      ]
+    },
+    "b-20-panels-for-non-group-rows-top-21-s1": {
+      "id": "b-20-panels-for-non-group-rows-top-21-s1",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "Top half = "
         },
         {
           "insert": "before",
@@ -730,7 +860,10 @@
       },
       "text": [
         {
-          "insert": "For group rows ("
+          "insert": "For group rows (",
+          "attributes": {
+            "bold": true
+          }
         },
         {
           "insert": "children",
@@ -739,7 +872,25 @@
           }
         },
         {
-          "insert": " is an array): top quarter = "
+          "insert": " is an array)",
+          "attributes": {
+            "bold": true
+          }
+        }
+      ],
+      "children": [
+        "b-20-panels-for-group-rows-childre-22-s1"
+      ]
+    },
+    "b-20-panels-for-group-rows-childre-22-s1": {
+      "id": "b-20-panels-for-group-rows-childre-22-s1",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "Top quarter = "
         },
         {
           "insert": "before",
@@ -1163,7 +1314,7 @@
                 }
               },
               {
-                "insert": " is set. Read-only id for modules; "
+                "insert": " is set. Read-only id for modules. "
               },
               {
                 "insert": "AssetSwapDropdown",
@@ -1435,7 +1586,38 @@
           }
         },
         {
-          "insert": " is the reusable top-level editor section shell. It is open and static by default. Pass "
+          "insert": " is the reusable top-level editor section shell."
+        }
+      ],
+      "children": [
+        "b-20-panels-inspectorsection-is-th-41-s1",
+        "b-20-panels-inspectorsection-is-th-41-s2",
+        "b-20-panels-inspectorsection-is-th-41-s3",
+        "b-20-panels-inspectorsection-is-th-41-s4"
+      ]
+    },
+    "b-20-panels-inspectorsection-is-th-41-s1": {
+      "id": "b-20-panels-inspectorsection-is-th-41-s1",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "It is open and static by default."
+        }
+      ],
+      "children": []
+    },
+    "b-20-panels-inspectorsection-is-th-41-s2": {
+      "id": "b-20-panels-inspectorsection-is-th-41-s2",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "Pass "
         },
         {
           "insert": "collapsible",
@@ -1453,8 +1635,31 @@
           }
         },
         {
-          "insert": " to start it closed. The main menu system opts all of its top-level authoring sections into collapse behavior; "
-        },
+          "insert": " to start it closed."
+        }
+      ],
+      "children": []
+    },
+    "b-20-panels-inspectorsection-is-th-41-s3": {
+      "id": "b-20-panels-inspectorsection-is-th-41-s3",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "The main menu system opts all of its top-level authoring sections into collapse behavior."
+        }
+      ],
+      "children": []
+    },
+    "b-20-panels-inspectorsection-is-th-41-s4": {
+      "id": "b-20-panels-inspectorsection-is-th-41-s4",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
         {
           "insert": "Menu Structure",
           "attributes": {
@@ -1481,7 +1686,24 @@
           }
         },
         {
-          "insert": " is schema-driven. It reads "
+          "insert": " is schema-driven."
+        }
+      ],
+      "children": [
+        "b-20-panels-propertysection-is-sch-42-s1",
+        "b-20-panels-propertysection-is-sch-42-s2",
+        "b-20-panels-propertysection-is-sch-42-s3"
+      ]
+    },
+    "b-20-panels-propertysection-is-sch-42-s1": {
+      "id": "b-20-panels-propertysection-is-sch-42-s1",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "It reads "
         },
         {
           "insert": "collapsible",
@@ -1508,7 +1730,33 @@
           }
         },
         {
-          "insert": " schema type. Nested property sections collapse by default; top-level property sections remain open unless "
+          "insert": " schema type."
+        }
+      ],
+      "children": []
+    },
+    "b-20-panels-propertysection-is-sch-42-s2": {
+      "id": "b-20-panels-propertysection-is-sch-42-s2",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "Nested property sections collapse by default."
+        }
+      ],
+      "children": []
+    },
+    "b-20-panels-propertysection-is-sch-42-s3": {
+      "id": "b-20-panels-propertysection-is-sch-42-s3",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "Top-level property sections remain open unless "
         },
         {
           "insert": "collapsible: true",
@@ -1739,8 +1987,23 @@
           }
         },
         {
-          "insert": ". "
-        },
+          "insert": "."
+        }
+      ],
+      "children": [
+        "b-20-panels-orphan-detection-49-s1",
+        "b-20-panels-orphan-detection-49-s2",
+        "b-20-panels-orphan-detection-49-s3",
+        "b-20-panels-orphan-detection-49-s4"
+      ]
+    },
+    "b-20-panels-orphan-detection-49-s1": {
+      "id": "b-20-panels-orphan-detection-49-s1",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
         {
           "insert": "extractSchemaPropertyKeys(schema)",
           "attributes": {
@@ -1748,8 +2011,31 @@
           }
         },
         {
-          "insert": " collects all declared keys; saved keys not in that set are orphans. "
-        },
+          "insert": " collects all declared keys."
+        }
+      ],
+      "children": []
+    },
+    "b-20-panels-orphan-detection-49-s2": {
+      "id": "b-20-panels-orphan-detection-49-s2",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "Saved keys not in that set are orphans."
+        }
+      ],
+      "children": []
+    },
+    "b-20-panels-orphan-detection-49-s3": {
+      "id": "b-20-panels-orphan-detection-49-s3",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
         {
           "insert": "buildGeneralSection(orphans)",
           "attributes": {
@@ -1766,7 +2052,20 @@
           }
         },
         {
-          "insert": " entries. A "
+          "insert": " entries."
+        }
+      ],
+      "children": []
+    },
+    "b-20-panels-orphan-detection-49-s4": {
+      "id": "b-20-panels-orphan-detection-49-s4",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "A "
         },
         {
           "insert": "console.warn",
@@ -1957,7 +2256,7 @@
             ],
             [
               {
-                "insert": "A top-level editor section shell. Static by default; "
+                "insert": "A top-level editor section shell. Static by default. "
               },
               {
                 "insert": "collapsible",
@@ -2326,7 +2625,7 @@
                 }
               }
             ],
-            "Single property field for effects; reads the manifest descriptor and dispatches to number/string/boolean/enum sub-inputs."
+            "Single property field for effects. Reads the manifest descriptor and dispatches to number/string/boolean/enum sub-inputs."
           ],
           [
             [

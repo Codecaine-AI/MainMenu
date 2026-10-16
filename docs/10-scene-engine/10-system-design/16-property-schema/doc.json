@@ -89,7 +89,7 @@
           }
         },
         {
-          "insert": " that structures its editable properties into named sections, attaches human-readable labels and descriptions, and locks each property to one of a fixed set of input types. The inspector renders by schema; authors control grouping, ordering, and documentation of every field."
+          "insert": " that structures its editable properties into named sections, attaches human-readable labels and descriptions, and locks each property to one of a fixed set of input types. The inspector renders by schema. Authors control grouping, ordering, and documentation of every field."
         }
       ],
       "children": []
@@ -692,7 +692,7 @@
       },
       "text": [
         {
-          "insert": "One rendering path in the inspector; no branching between flat and sectioned layouts."
+          "insert": "One rendering path in the inspector. No branching between flat and sectioned layouts."
         }
       ],
       "children": []
@@ -829,7 +829,7 @@
       "props": {},
       "text": [
         {
-          "insert": "Top-level sections are open by default. Nested sections are collapsible and closed by default unless the schema says otherwise. Use nesting for meaningful ownership boundaries: for example, a broad \"Motion\" section can contain \"Selection\", \"Layer Changes\", and \"Title Prism\" subsections. Avoid using nesting only to hide unrelated settings; if a group needs to collapse, it should still live under the parent concept that owns it."
+          "insert": "Top-level sections are open by default. Nested sections are collapsible and closed by default unless the schema says otherwise. Use nesting for meaningful ownership boundaries: for example, a broad \"Motion\" section can contain \"Selection\", \"Layer Changes\", and \"Title Prism\" subsections. Avoid using nesting only to hide unrelated settings. If a group needs to collapse, it should still live under the parent concept that owns it."
         }
       ],
       "children": []
@@ -906,7 +906,7 @@
       "props": {},
       "text": [
         {
-          "insert": "Each property label is a click target. Clicking it opens a small floating popover anchored next to the label, showing the property's full label and description. Clicking outside or pressing Escape dismisses it. Section labels with a description behave the same way; sections without a description render a non-clickable header."
+          "insert": "Each property label is a click target. Clicking it opens a small floating popover anchored next to the label, showing the property's full label and description. Clicking outside or pressing Escape dismisses it. Section labels with a description behave the same way. Sections without a description render a non-clickable header."
         }
       ],
       "children": []
@@ -926,7 +926,7 @@
           }
         },
         {
-          "insert": ", not a hover tooltip. With many properties per inspector, hover tooltips create visual noise; the explicit popup lets the author seek information deliberately."
+          "insert": ", not a hover tooltip. With many properties per inspector, hover tooltips create visual noise. The explicit popup lets the author seek information deliberately."
         }
       ],
       "children": []

@@ -223,7 +223,7 @@
           ],
           [
             "Inspector",
-            "Collapsed scene globals at the top, then the property editor for the selected object. Always renders Transform and Appearance; conditionally renders Properties, Events, Slots, Text, and Asset selection."
+            "Collapsed scene globals at the top, then the property editor for the selected object. Always renders Transform and Appearance. Conditionally renders Properties, Events, Slots, Text, and Asset selection."
           ]
         ]
       },
@@ -548,7 +548,24 @@
           }
         },
         {
-          "insert": ". Rendered by the "
+          "insert": "."
+        }
+      ],
+      "children": [
+        "b-40-authoring-surfaces-properties-rendere-22-s1",
+        "b-40-authoring-surfaces-properties-rendere-22-s2",
+        "b-40-authoring-surfaces-properties-rendere-22-s3"
+      ]
+    },
+    "b-40-authoring-surfaces-properties-rendere-22-s1": {
+      "id": "b-40-authoring-surfaces-properties-rendere-22-s1",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "Rendered by the "
         },
         {
           "insert": "property schema",
@@ -561,7 +578,33 @@
           }
         },
         {
-          "insert": ". Properties are grouped into named sections with clickable labels that open description popovers. Dense groups can be nested and collapsed where that matches the owning concept."
+          "insert": "."
+        }
+      ],
+      "children": []
+    },
+    "b-40-authoring-surfaces-properties-rendere-22-s2": {
+      "id": "b-40-authoring-surfaces-properties-rendere-22-s2",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "Properties are grouped into named sections with clickable labels that open description popovers."
+        }
+      ],
+      "children": []
+    },
+    "b-40-authoring-surfaces-properties-rendere-22-s3": {
+      "id": "b-40-authoring-surfaces-properties-rendere-22-s3",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "Dense groups can be nested and collapsed where that matches the owning concept."
         }
       ],
       "children": []
@@ -580,7 +623,36 @@
           }
         },
         {
-          "insert": ", glyph-groups only. Lists the SVG's exposed slots; each slot has its own asset selector and per-slot appearance fields."
+          "insert": ", glyph-groups only."
+        }
+      ],
+      "children": [
+        "b-40-authoring-surfaces-slots-glyph-groups-23-s1",
+        "b-40-authoring-surfaces-slots-glyph-groups-23-s2"
+      ]
+    },
+    "b-40-authoring-surfaces-slots-glyph-groups-23-s1": {
+      "id": "b-40-authoring-surfaces-slots-glyph-groups-23-s1",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "Lists the SVG's exposed slots."
+        }
+      ],
+      "children": []
+    },
+    "b-40-authoring-surfaces-slots-glyph-groups-23-s2": {
+      "id": "b-40-authoring-surfaces-slots-glyph-groups-23-s2",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "Each slot has its own asset selector and per-slot appearance fields."
         }
       ],
       "children": []
@@ -610,7 +682,7 @@
       "props": {},
       "text": [
         {
-          "insert": "The always-present rule keeps authoring predictable: Transform and Appearance render even when the JSON omits them, with defaults filled in. The first edit writes the section; subsequent edits patch it."
+          "insert": "The always-present rule keeps authoring predictable: Transform and Appearance render even when the JSON omits them, with defaults filled in. The first edit writes the section. Subsequent edits patch it."
         }
       ],
       "children": []
@@ -687,7 +759,7 @@
           }
         },
         {
-          "insert": " returns a zip of the selected project. Export is independent of save; the export reads what is on disk, not the in-memory scene. See "
+          "insert": " returns a zip of the selected project. Export is independent of save. The export reads what is on disk, not the in-memory scene. See "
         },
         {
           "insert": "Build And Distribution Output",
@@ -865,9 +937,21 @@
           "attributes": {
             "bold": true
           }
-        },
+        }
+      ],
+      "children": [
+        "b-40-authoring-surfaces-read-open-the-catal-41-s1"
+      ]
+    },
+    "b-40-authoring-surfaces-read-open-the-catal-41-s1": {
+      "id": "b-40-authoring-surfaces-read-open-the-catal-41-s1",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
         {
-          "insert": ": open the catalog project's "
+          "insert": "Open the catalog project's "
         },
         {
           "insert": "Assets/Scenes/{id}/scene.json",
@@ -902,9 +986,21 @@
           "attributes": {
             "bold": true
           }
-        },
+        }
+      ],
+      "children": [
+        "b-40-authoring-surfaces-write-file-edit-t-42-s1"
+      ]
+    },
+    "b-40-authoring-surfaces-write-file-edit-t-42-s1": {
+      "id": "b-40-authoring-surfaces-write-file-edit-t-42-s1",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
         {
-          "insert": ": edit the file in place."
+          "insert": "Edit the file in place."
         }
       ],
       "children": []
@@ -921,10 +1017,19 @@
           "attributes": {
             "bold": true
           }
-        },
-        {
-          "insert": ": "
-        },
+        }
+      ],
+      "children": [
+        "b-40-authoring-surfaces-write-api-put-a-43-s1"
+      ]
+    },
+    "b-40-authoring-surfaces-write-api-put-a-43-s1": {
+      "id": "b-40-authoring-surfaces-write-api-put-a-43-s1",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
         {
           "insert": "PUT /api/scenes/{id}?project={project-id}",
           "attributes": {
@@ -952,7 +1057,7 @@
           }
         },
         {
-          "insert": "; the native process owns the SDK session, session directory, abort/reset controls, and working-directory selection."
+          "insert": ". The native process owns the SDK session, session directory, abort/reset controls, and working-directory selection."
         }
       ],
       "children": []

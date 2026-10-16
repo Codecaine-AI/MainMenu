@@ -155,7 +155,7 @@
           }
         },
         {
-          "insert": " as the document and the renderer as a print engine. The editor and the agent are two different word processors that edit the document. The print engine doesn't care which produced the document; it only cares the document is valid."
+          "insert": " as the document and the renderer as a print engine. The editor and the agent are two different word processors that edit the document. The print engine doesn't care which produced the document. It only cares the document is valid."
         }
       ],
       "children": []
@@ -382,9 +382,35 @@
           "attributes": {
             "bold": true
           }
-        },
+        }
+      ],
+      "children": [
+        "b-00-overview-desktop-shell-around-t-17-s1",
+        "b-00-overview-desktop-shell-around-t-17-s2"
+      ]
+    },
+    "b-00-overview-desktop-shell-around-t-17-s1": {
+      "id": "b-00-overview-desktop-shell-around-t-17-s1",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
         {
-          "insert": " Electron packages the Next standalone runtime and exposes only a typed preload bridge. The renderer remains a browser surface with "
+          "insert": "Electron packages the Next standalone runtime and exposes only a typed preload bridge."
+        }
+      ],
+      "children": []
+    },
+    "b-00-overview-desktop-shell-around-t-17-s2": {
+      "id": "b-00-overview-desktop-shell-around-t-17-s2",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "The renderer remains a browser surface with "
         },
         {
           "insert": "contextIsolation",
@@ -766,9 +792,22 @@
           "attributes": {
             "bold": true
           }
-        },
+        }
+      ],
+      "children": [
+        "b-00-overview-scene-data-format-s-35-s1",
+        "b-00-overview-scene-data-format-s-35-s2"
+      ]
+    },
+    "b-00-overview-scene-data-format-s-35-s1": {
+      "id": "b-00-overview-scene-data-format-s-35-s1",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
         {
-          "insert": ": see "
+          "insert": "See "
         },
         {
           "insert": "System Design / Scene Data Model",
@@ -781,7 +820,20 @@
           }
         },
         {
-          "insert": ". The L4 file headers in the renderer reference back to that doc."
+          "insert": "."
+        }
+      ],
+      "children": []
+    },
+    "b-00-overview-scene-data-format-s-35-s2": {
+      "id": "b-00-overview-scene-data-format-s-35-s2",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "The L4 file headers in the renderer reference back to that doc."
         }
       ],
       "children": []
@@ -798,9 +850,21 @@
           "attributes": {
             "bold": true
           }
-        },
+        }
+      ],
+      "children": [
+        "b-00-overview-asset-registry-shape-36-s1"
+      ]
+    },
+    "b-00-overview-asset-registry-shape-36-s1": {
+      "id": "b-00-overview-asset-registry-shape-36-s1",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
         {
-          "insert": ": see "
+          "insert": "See "
         },
         {
           "insert": "System Design / Asset Registry",
@@ -830,9 +894,23 @@
           "attributes": {
             "bold": true
           }
-        },
+        }
+      ],
+      "children": [
+        "b-00-overview-failure-modes-see-37-s1",
+        "b-00-overview-failure-modes-see-37-s2",
+        "b-00-overview-failure-modes-see-37-s3"
+      ]
+    },
+    "b-00-overview-failure-modes-see-37-s1": {
+      "id": "b-00-overview-failure-modes-see-37-s1",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
         {
-          "insert": ": see "
+          "insert": "See "
         },
         {
           "insert": "System Design / Rendering Pipeline",
@@ -846,7 +924,33 @@
           }
         },
         {
-          "insert": ". Renderers warn-and-skip on missing assets/sub-layers; renderer dispatch throws on unregistered types."
+          "insert": "."
+        }
+      ],
+      "children": []
+    },
+    "b-00-overview-failure-modes-see-37-s2": {
+      "id": "b-00-overview-failure-modes-see-37-s2",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "Renderers warn-and-skip on missing assets/sub-layers."
+        }
+      ],
+      "children": []
+    },
+    "b-00-overview-failure-modes-see-37-s3": {
+      "id": "b-00-overview-failure-modes-see-37-s3",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "Renderer dispatch throws on unregistered types."
         }
       ],
       "children": []

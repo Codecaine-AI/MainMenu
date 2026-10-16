@@ -27,7 +27,7 @@
         "b-10-scene-renderer-divider-4",
         "b-10-scene-renderer-public-surface-5",
         "b-10-scene-renderer-js-6",
-        "b-10-scene-renderer-idempotent-calling-it-t-7",
+        "b-10-scene-renderer-idempotent-calling-it-t-7-li",
         "b-10-scene-renderer-options-events-fals-8",
         "b-10-scene-renderer-the-loop-9",
         "b-10-scene-renderer-renderscene-scene-root-10",
@@ -150,7 +150,7 @@
           }
         },
         {
-          "insert": "; the export bundle calls it from "
+          "insert": ". The export bundle calls it from "
         },
         {
           "insert": "boot.js",
@@ -196,13 +196,47 @@
       ],
       "children": []
     },
-    "b-10-scene-renderer-idempotent-calling-it-t-7": {
-      "id": "b-10-scene-renderer-idempotent-calling-it-t-7",
-      "type": "paragraph",
-      "props": {},
+    "b-10-scene-renderer-idempotent-calling-it-t-7-li": {
+      "id": "b-10-scene-renderer-idempotent-calling-it-t-7-li",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
       "text": [
         {
-          "insert": "Idempotent: calling it twice with the same scene reconciles instead of re-mounting. Calling it with a different scene reuses any objects whose "
+          "insert": "Idempotent",
+          "attributes": {
+            "bold": true
+          }
+        }
+      ],
+      "children": [
+        "b-10-scene-renderer-idempotent-calling-it-t-7-s1",
+        "b-10-scene-renderer-idempotent-calling-it-t-7-s2"
+      ]
+    },
+    "b-10-scene-renderer-idempotent-calling-it-t-7-s1": {
+      "id": "b-10-scene-renderer-idempotent-calling-it-t-7-s1",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "Calling it twice with the same scene reconciles instead of re-mounting."
+        }
+      ],
+      "children": []
+    },
+    "b-10-scene-renderer-idempotent-calling-it-t-7-s2": {
+      "id": "b-10-scene-renderer-idempotent-calling-it-t-7-s2",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "Calling it with a different scene reuses any objects whose "
         },
         {
           "insert": "id",
@@ -386,13 +420,25 @@
       },
       "text": [
         {
-          "insert": "First time",
+          "insert": "First time (no tagged children)",
           "attributes": {
             "bold": true
           }
-        },
+        }
+      ],
+      "children": [
+        "b-10-scene-renderer-first-time-no-tagge-15-s1"
+      ]
+    },
+    "b-10-scene-renderer-first-time-no-tagge-15-s1": {
+      "id": "b-10-scene-renderer-first-time-no-tagge-15-s1",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
         {
-          "insert": " (no tagged children): wipe "
+          "insert": "Wipe "
         },
         {
           "insert": "root.innerHTML",
@@ -436,10 +482,19 @@
           "attributes": {
             "bold": true
           }
-        },
-        {
-          "insert": ": "
-        },
+        }
+      ],
+      "children": [
+        "b-10-scene-renderer-subsequent-calls-u-16-s1"
+      ]
+    },
+    "b-10-scene-renderer-subsequent-calls-u-16-s1": {
+      "id": "b-10-scene-renderer-subsequent-calls-u-16-s1",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
         {
           "insert": "updateChildren(root, scene.objects)",
           "attributes": {
@@ -830,7 +885,26 @@
       },
       "text": [
         {
-          "insert": "For media: if "
+          "insert": "For media",
+          "attributes": {
+            "bold": true
+          }
+        }
+      ],
+      "children": [
+        "b-10-scene-renderer-for-media-if-entry-fil-30-s1",
+        "b-10-scene-renderer-for-media-if-entry-fil-30-s2"
+      ]
+    },
+    "b-10-scene-renderer-for-media-if-entry-fil-30-s1": {
+      "id": "b-10-scene-renderer-for-media-if-entry-fil-30-s1",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "If "
         },
         {
           "insert": "entry.file",
@@ -848,7 +922,20 @@
           }
         },
         {
-          "insert": ", swap it. This is how registry container swaps propagate without re-mounting the wrapper."
+          "insert": ", swap it."
+        }
+      ],
+      "children": []
+    },
+    "b-10-scene-renderer-for-media-if-entry-fil-30-s2": {
+      "id": "b-10-scene-renderer-for-media-if-entry-fil-30-s2",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "This is how registry container swaps propagate without re-mounting the wrapper."
         }
       ],
       "children": []
@@ -984,7 +1071,7 @@
           }
         },
         {
-          "insert": "; the binder maps triggers to DOM listeners and dispatches actions:"
+          "insert": ". The binder maps triggers to DOM listeners and dispatches actions:"
         }
       ],
       "children": []
@@ -1116,7 +1203,7 @@
           }
         },
         {
-          "insert": " waits for the browser's playback-start promise; "
+          "insert": " waits for the browser's playback-start promise. "
         },
         {
           "insert": "navigate",
@@ -1329,7 +1416,7 @@
       },
       "text": [
         {
-          "insert": "Resolve its asset; if missing, skip."
+          "insert": "Resolve its asset. If missing, skip."
         }
       ],
       "children": []
@@ -1513,7 +1600,7 @@
           }
         },
         {
-          "insert": " in lockstep; if any index disagrees, re-appendChild each tagged element in array order. "
+          "insert": " in lockstep. If any index disagrees, re-appendChild each tagged element in array order. "
         },
         {
           "insert": "appendChild",
@@ -1616,17 +1703,29 @@
       },
       "text": [
         {
-          "insert": "If "
+          "insert": "If ",
+          "attributes": {
+            "bold": true
+          }
         },
         {
           "insert": "transform.mode === 'fill'",
           "attributes": {
             "code": true
           }
-        },
-        {
-          "insert": ": "
-        },
+        }
+      ],
+      "children": [
+        "b-10-scene-renderer-if-transform-mode-56-s1"
+      ]
+    },
+    "b-10-scene-renderer-if-transform-mode-56-s1": {
+      "id": "b-10-scene-renderer-if-transform-mode-56-s1",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
         {
           "insert": "inset: 0",
           "attributes": {
@@ -1999,7 +2098,7 @@
           }
         },
         {
-          "insert": " is currently honored at the scene level (composed into the root filter); per-object saturation is not separately applied here."
+          "insert": " is currently honored at the scene level (composed into the root filter). Per-object saturation is not separately applied here."
         }
       ],
       "children": []

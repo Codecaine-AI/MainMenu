@@ -304,7 +304,7 @@
           }
         },
         {
-          "insert": " when that server is already healthy; otherwise it starts a private free-port Next dev server and opens the editor route."
+          "insert": " when that server is already healthy. Otherwise it starts a private free-port Next dev server and opens the editor route."
         }
       ],
       "children": []

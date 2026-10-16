@@ -520,16 +520,31 @@
       },
       "text": [
         {
-          "insert": "If "
+          "insert": "If ",
+          "attributes": {
+            "bold": true
+          }
         },
         {
           "insert": "transform.mode === \"fill\"",
           "attributes": {
             "code": true
           }
-        },
+        }
+      ],
+      "children": [
+        "b-30-rendering-pipeline-if-transform-mode-15-s1"
+      ]
+    },
+    "b-30-rendering-pipeline-if-transform-mode-15-s1": {
+      "id": "b-30-rendering-pipeline-if-transform-mode-15-s1",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
         {
-          "insert": ": sets "
+          "insert": "Sets "
         },
         {
           "insert": "inset: 0; width: 100%; height: 100%",
@@ -551,7 +566,26 @@
       },
       "text": [
         {
-          "insert": "Otherwise: sets "
+          "insert": "Otherwise",
+          "attributes": {
+            "bold": true
+          }
+        }
+      ],
+      "children": [
+        "b-30-rendering-pipeline-otherwise-sets-left-16-s1",
+        "b-30-rendering-pipeline-otherwise-sets-left-16-s2"
+      ]
+    },
+    "b-30-rendering-pipeline-otherwise-sets-left-16-s1": {
+      "id": "b-30-rendering-pipeline-otherwise-sets-left-16-s1",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "Sets "
         },
         {
           "insert": "left: <x>%",
@@ -614,7 +648,20 @@
           }
         },
         {
-          "insert": ". Anchors map to translation offsets so "
+          "insert": "."
+        }
+      ],
+      "children": []
+    },
+    "b-30-rendering-pipeline-otherwise-sets-left-16-s2": {
+      "id": "b-30-rendering-pipeline-otherwise-sets-left-16-s2",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "Anchors map to translation offsets so "
         },
         {
           "insert": "(x, y)",
@@ -835,7 +882,7 @@
           }
         },
         {
-          "insert": " (see below); per-object saturation is merged into the same filter chain."
+          "insert": " (see below). Per-object saturation is merged into the same filter chain."
         }
       ],
       "children": []
@@ -1307,22 +1354,32 @@
       },
       "text": [
         {
-          "insert": "First call",
+          "insert": "First call to ",
           "attributes": {
             "bold": true
           }
-        },
-        {
-          "insert": " to "
         },
         {
           "insert": "renderScene",
           "attributes": {
             "code": true
           }
-        },
+        }
+      ],
+      "children": [
+        "b-30-rendering-pipeline-first-call-to-rende-43-s1",
+        "b-30-rendering-pipeline-first-call-to-rende-43-s2"
+      ]
+    },
+    "b-30-rendering-pipeline-first-call-to-rende-43-s1": {
+      "id": "b-30-rendering-pipeline-first-call-to-rende-43-s1",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
         {
-          "insert": ": hides the stage root, clears it, mounts every top-level object via "
+          "insert": "Hides the stage root, clears it, mounts every top-level object via "
         },
         {
           "insert": "mountObject",
@@ -1340,7 +1397,20 @@
           }
         },
         {
-          "insert": " to match the array before restoring visibility. Users never see a partial async mount."
+          "insert": " to match the array before restoring visibility."
+        }
+      ],
+      "children": []
+    },
+    "b-30-rendering-pipeline-first-call-to-rende-43-s2": {
+      "id": "b-30-rendering-pipeline-first-call-to-rende-43-s2",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "Users never see a partial async mount."
         }
       ],
       "children": []
@@ -1353,13 +1423,29 @@
       },
       "text": [
         {
-          "insert": "Subsequent calls",
+          "insert": "Subsequent calls (editor edits)",
           "attributes": {
             "bold": true
           }
-        },
+        }
+      ],
+      "children": [
+        "b-30-rendering-pipeline-subsequent-calls-ed-44-s1",
+        "b-30-rendering-pipeline-wrappers-whose-ids-are-n-45",
+        "b-30-rendering-pipeline-for-each-object-in-the-n-46",
+        "b-30-rendering-pipeline-for-component-and-eff-47",
+        "b-30-rendering-pipeline-after-reconciling-reor-48"
+      ]
+    },
+    "b-30-rendering-pipeline-subsequent-calls-ed-44-s1": {
+      "id": "b-30-rendering-pipeline-subsequent-calls-ed-44-s1",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
         {
-          "insert": " (editor edits): walks the stage root, builds an id-keyed map of existing wrappers, and runs "
+          "insert": "Walks the stage root, builds an id-keyed map of existing wrappers, and runs "
         },
         {
           "insert": "updateChildren",
@@ -1371,12 +1457,7 @@
           "insert": ":"
         }
       ],
-      "children": [
-        "b-30-rendering-pipeline-wrappers-whose-ids-are-n-45",
-        "b-30-rendering-pipeline-for-each-object-in-the-n-46",
-        "b-30-rendering-pipeline-for-component-and-eff-47",
-        "b-30-rendering-pipeline-after-reconciling-reor-48"
-      ]
+      "children": []
     },
     "b-30-rendering-pipeline-wrappers-whose-ids-are-n-45": {
       "id": "b-30-rendering-pipeline-wrappers-whose-ids-are-n-45",
@@ -1650,7 +1731,7 @@
         "rows": [
           [
             "Registry fails to load",
-            "Logged; rendering proceeds with empty registry → all lookups warn and skip."
+            "Logged. Rendering proceeds with empty registry → all lookups warn and skip."
           ],
           [
             [
@@ -1667,7 +1748,7 @@
                 "insert": " not in registry"
               }
             ],
-            "Logged warning; object is skipped (siblings continue)."
+            "Logged warning. Object is skipped (siblings continue)."
           ],
           [
             [
@@ -1684,7 +1765,7 @@
                 "insert": " not in registry"
               }
             ],
-            "Logged warning; that slot is skipped; other slots continue."
+            "Logged warning. That slot is skipped. Other slots continue."
           ],
           [
             [
@@ -1701,7 +1782,7 @@
                 "insert": ") not found"
               }
             ],
-            "Logged warning; slot is skipped."
+            "Logged warning. Slot is skipped."
           ],
           [
             "Renderer not registered for a type",
@@ -1709,7 +1790,7 @@
           ],
           [
             "Component module has no default export",
-            "Logged error; renderer returns an empty placeholder wrapper."
+            "Logged error. Renderer returns an empty placeholder wrapper."
           ]
         ]
       },

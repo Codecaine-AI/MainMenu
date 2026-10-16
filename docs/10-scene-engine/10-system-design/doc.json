@@ -20,11 +20,11 @@
         "b-00-overview-divider-7",
         "b-00-overview-contents-8",
         "b-00-overview-05-project-model-md-05-9",
-        "b-00-overview-the-project-manifest-ho-10",
+        "b-00-overview-the-project-manifest-ho-10-li",
         "b-00-overview-10-scene-data-model-md-11",
         "b-00-overview-the-canonical-scene-shap-12",
         "b-00-overview-15-component-manifest-m-13",
-        "b-00-overview-the-manifest-convention-14",
+        "b-00-overview-the-manifest-convention-14-li",
         "b-00-overview-16-property-schema-md-15",
         "b-00-overview-the-property-schema-conv-16",
         "b-00-overview-20-asset-registry-md-2-17",
@@ -32,7 +32,7 @@
         "b-00-overview-30-rendering-pipeline-m-19",
         "b-00-overview-how-a-scene-becomes-dom-20",
         "b-00-overview-40-authoring-surfaces-m-21",
-        "b-00-overview-the-authoring-contract-22",
+        "b-00-overview-the-authoring-contract-22-li",
         "b-00-overview-50-build-output-md-50-23",
         "b-00-overview-how-a-project-becomes-a-24",
         "b-00-overview-60-asset-uploads-md-60-25",
@@ -155,13 +155,33 @@
       ],
       "children": []
     },
-    "b-00-overview-the-project-manifest-ho-10": {
-      "id": "b-00-overview-the-project-manifest-ho-10",
-      "type": "paragraph",
-      "props": {},
+    "b-00-overview-the-project-manifest-ho-10-li": {
+      "id": "b-00-overview-the-project-manifest-ho-10-li",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
       "text": [
         {
-          "insert": "The project manifest: how multiple scenes form a deliverable site, the "
+          "insert": "The project manifest",
+          "attributes": {
+            "bold": true
+          }
+        }
+      ],
+      "children": [
+        "b-00-overview-the-project-manifest-ho-10-s1"
+      ]
+    },
+    "b-00-overview-the-project-manifest-ho-10-s1": {
+      "id": "b-00-overview-the-project-manifest-ho-10-s1",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "How multiple scenes form a deliverable site, the "
         },
         {
           "insert": "entry",
@@ -235,13 +255,34 @@
       ],
       "children": []
     },
-    "b-00-overview-the-manifest-convention-14": {
-      "id": "b-00-overview-the-manifest-convention-14",
-      "type": "paragraph",
-      "props": {},
+    "b-00-overview-the-manifest-convention-14-li": {
+      "id": "b-00-overview-the-manifest-convention-14-li",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
       "text": [
         {
-          "insert": "The manifest convention: a "
+          "insert": "The manifest convention",
+          "attributes": {
+            "bold": true
+          }
+        }
+      ],
+      "children": [
+        "b-00-overview-the-manifest-convention-14-s1",
+        "b-00-overview-the-manifest-convention-14-s2"
+      ]
+    },
+    "b-00-overview-the-manifest-convention-14-s1": {
+      "id": "b-00-overview-the-manifest-convention-14-s1",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "A "
         },
         {
           "insert": "manifest.json",
@@ -250,7 +291,20 @@
           }
         },
         {
-          "insert": " declaring module-level metadata (name, type, sizing) and, for effects, editable property descriptors. Components use the property schema instead of manifest properties."
+          "insert": " declaring module-level metadata (name, type, sizing) and, for effects, editable property descriptors."
+        }
+      ],
+      "children": []
+    },
+    "b-00-overview-the-manifest-convention-14-s2": {
+      "id": "b-00-overview-the-manifest-convention-14-s2",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "Components use the property schema instead of manifest properties."
         }
       ],
       "children": []
@@ -368,13 +422,47 @@
       ],
       "children": []
     },
-    "b-00-overview-the-authoring-contract-22": {
-      "id": "b-00-overview-the-authoring-contract-22",
-      "type": "paragraph",
-      "props": {},
+    "b-00-overview-the-authoring-contract-22-li": {
+      "id": "b-00-overview-the-authoring-contract-22-li",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
       "text": [
         {
-          "insert": "The authoring contract: visual editor, desktop shell, and Pi Agent all operate on the same project files. Always-present inspector sections, schema-driven property fields with sections and description popovers, dirty tracking, save semantics, and agent context handoff."
+          "insert": "The authoring contract",
+          "attributes": {
+            "bold": true
+          }
+        }
+      ],
+      "children": [
+        "b-00-overview-the-authoring-contract-22-s1",
+        "b-00-overview-the-authoring-contract-22-s2"
+      ]
+    },
+    "b-00-overview-the-authoring-contract-22-s1": {
+      "id": "b-00-overview-the-authoring-contract-22-s1",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "Visual editor, desktop shell, and Pi Agent all operate on the same project files."
+        }
+      ],
+      "children": []
+    },
+    "b-00-overview-the-authoring-contract-22-s2": {
+      "id": "b-00-overview-the-authoring-contract-22-s2",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "Always-present inspector sections, schema-driven property fields with sections and description popovers, dirty tracking, save semantics, and agent context handoff."
         }
       ],
       "children": []
@@ -512,7 +600,7 @@
                 }
               },
               {
-                "insert": "; optionally "
+                "insert": ". Optionally "
               },
               {
                 "insert": "appearance",

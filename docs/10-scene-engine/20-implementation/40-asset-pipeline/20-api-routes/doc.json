@@ -378,7 +378,7 @@
                 }
               },
               {
-                "insert": " restricts the entry to this project; otherwise it is global within the registry."
+                "insert": " restricts the entry to this project. Otherwise it is global within the registry."
               }
             ]
           ]
@@ -912,7 +912,7 @@
           }
         },
         {
-          "insert": " field is the bare filename; "
+          "insert": " field is the bare filename. "
         },
         {
           "insert": "file",
@@ -1457,7 +1457,7 @@
           }
         },
         {
-          "insert": ": moves an existing container's file pointer to a different file. This is a maintenance/API surface; the current inspector selection dropdown changes scene "
+          "insert": ": moves an existing container's file pointer to a different file. This is a maintenance/API surface. The current inspector selection dropdown changes scene "
         },
         {
           "insert": "asset",
@@ -1730,7 +1730,7 @@
       },
       "text": [
         {
-          "insert": "The route does not validate that the file actually exists on disk; it trusts the listing endpoint."
+          "insert": "The route does not validate that the file actually exists on disk. It trusts the listing endpoint."
         }
       ],
       "children": []

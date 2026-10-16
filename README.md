@@ -24,7 +24,7 @@ or directly as JSON, then rendered or exported as a standalone site.
 
 ```text
 apps/scene-engine/   Next.js editor, renderer, APIs, Electron shell, and tools
-docs/scene-engine/   Foundation, system-design, implementation, and runbook docs
+docs/10-scene-engine/ Foundation, system-design, implementation, and runbook docs
 dev-notes/           Dated engineering and asset-workflow notes
 panel-artwork/       Editable SVG artwork generators and style references
 to_add/              Source images and video references awaiting integration
@@ -64,6 +64,6 @@ guestbook remain planned migrations from the retired frontend. macOS directory
 packaging is available, but signing, notarization, auto-update, and installer
 distribution are not yet part of the workflow.
 
-See [`docs/scene-engine/`](docs/scene-engine/00-overview.md) for the architecture
+See [`docs/10-scene-engine/`](docs/10-scene-engine/) for the architecture
 and [`apps/scene-engine/agents.md`](apps/scene-engine/agents.md) for detailed
 authoring and verification guidance.

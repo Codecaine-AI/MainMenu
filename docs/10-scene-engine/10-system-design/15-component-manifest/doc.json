@@ -70,8 +70,8 @@
         "b-15-component-manifest-mounts-the-returned-elem-49",
         "b-15-component-manifest-no-further-coupling-co-50",
         "b-15-component-manifest-editor-integration-51",
-        "b-15-component-manifest-effects-the-inspect-52",
-        "b-15-component-manifest-components-the-insp-53",
+        "b-15-component-manifest-effects-the-inspect-52-li",
+        "b-15-component-manifest-components-the-insp-53-li",
         "b-15-component-manifest-when-the-add-layer-dialo-54",
         "b-15-component-manifest-adding-a-new-module-55",
         "b-15-component-manifest-create-a-directory-under-56",
@@ -488,7 +488,7 @@
           }
         },
         {
-          "insert": " configure the slider; "
+          "insert": " configure the slider. "
         },
         {
           "insert": "default",
@@ -969,7 +969,7 @@
       "props": {},
       "text": [
         {
-          "insert": "This is a one-time hint; the user can flip the transform mode in the inspector at any time."
+          "insert": "This is a one-time hint. The user can flip the transform mode in the inspector at any time."
         }
       ],
       "children": []
@@ -1198,19 +1198,34 @@
       ],
       "children": []
     },
-    "b-15-component-manifest-effects-the-inspect-52": {
-      "id": "b-15-component-manifest-effects-the-inspect-52",
-      "type": "paragraph",
-      "props": {},
+    "b-15-component-manifest-effects-the-inspect-52-li": {
+      "id": "b-15-component-manifest-effects-the-inspect-52-li",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
       "text": [
         {
           "insert": "Effects",
           "attributes": {
             "bold": true
           }
-        },
+        }
+      ],
+      "children": [
+        "b-15-component-manifest-effects-the-inspect-52-s1",
+        "b-15-component-manifest-effects-the-inspect-52-s2"
+      ]
+    },
+    "b-15-component-manifest-effects-the-inspect-52-s1": {
+      "id": "b-15-component-manifest-effects-the-inspect-52-s1",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
         {
-          "insert": ": the inspector iterates the manifest's "
+          "insert": "The inspector iterates the manifest's "
         },
         {
           "insert": "properties",
@@ -1219,24 +1234,52 @@
           }
         },
         {
-          "insert": " and renders one field per descriptor. The descriptor drives the input type, slider range, default, and tooltip."
+          "insert": " and renders one field per descriptor."
         }
       ],
       "children": []
     },
-    "b-15-component-manifest-components-the-insp-53": {
-      "id": "b-15-component-manifest-components-the-insp-53",
-      "type": "paragraph",
-      "props": {},
+    "b-15-component-manifest-effects-the-inspect-52-s2": {
+      "id": "b-15-component-manifest-effects-the-inspect-52-s2",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "The descriptor drives the input type, slider range, default, and tooltip."
+        }
+      ],
+      "children": []
+    },
+    "b-15-component-manifest-components-the-insp-53-li": {
+      "id": "b-15-component-manifest-components-the-insp-53-li",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
       "text": [
         {
           "insert": "Components",
           "attributes": {
             "bold": true
           }
-        },
+        }
+      ],
+      "children": [
+        "b-15-component-manifest-components-the-insp-53-s1",
+        "b-15-component-manifest-components-the-insp-53-s2"
+      ]
+    },
+    "b-15-component-manifest-components-the-insp-53-s1": {
+      "id": "b-15-component-manifest-components-the-insp-53-s1",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
         {
-          "insert": ": the inspector ignores the manifest's "
+          "insert": "The inspector ignores the manifest's "
         },
         {
           "insert": "properties",
@@ -1258,7 +1301,20 @@
           }
         },
         {
-          "insert": " instead: a sectioned structure exported from the component's code module that provides grouping, labels, descriptions, and a richer type taxonomy. The manifest is still used for "
+          "insert": " instead: a sectioned structure exported from the component's code module that provides grouping, labels, descriptions, and a richer type taxonomy."
+        }
+      ],
+      "children": []
+    },
+    "b-15-component-manifest-components-the-insp-53-s2": {
+      "id": "b-15-component-manifest-components-the-insp-53-s2",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "The manifest is still used for "
         },
         {
           "insert": "name",

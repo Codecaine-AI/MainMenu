@@ -27,7 +27,7 @@
         "b-20-asset-registry-divider-7",
         "b-20-asset-registry-asset-vs-module-8",
         "b-20-asset-registry-the-split-is-conceptual-9",
-        "b-20-asset-registry-the-test-would-it-make-10",
+        "b-20-asset-registry-the-test-would-it-make-10-li",
         "b-20-asset-registry-this-split-shapes-everyt-11",
         "b-20-asset-registry-the-container-model-12",
         "b-20-asset-registry-a-registry-entry-is-a-13",
@@ -286,22 +286,50 @@
       ],
       "children": []
     },
-    "b-20-asset-registry-the-test-would-it-make-10": {
-      "id": "b-20-asset-registry-the-test-would-it-make-10",
-      "type": "paragraph",
-      "props": {},
+    "b-20-asset-registry-the-test-would-it-make-10-li": {
+      "id": "b-20-asset-registry-the-test-would-it-make-10-li",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
       "text": [
         {
-          "insert": "The test: "
-        },
+          "insert": "The test",
+          "attributes": {
+            "bold": true
+          }
+        }
+      ],
+      "children": [
+        "b-20-asset-registry-the-test-would-it-make-10-s1",
+        "b-20-asset-registry-the-test-would-it-make-10-s2"
+      ]
+    },
+    "b-20-asset-registry-the-test-would-it-make-10-s1": {
+      "id": "b-20-asset-registry-the-test-would-it-make-10-s1",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
         {
-          "insert": "would it make sense to drag this onto an upload page?",
+          "insert": "Would it make sense to drag this onto an upload page?",
           "attributes": {
             "italic": true
           }
-        },
+        }
+      ],
+      "children": []
+    },
+    "b-20-asset-registry-the-test-would-it-make-10-s2": {
+      "id": "b-20-asset-registry-the-test-would-it-make-10-s2",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
         {
-          "insert": " If yes, it's an asset."
+          "insert": "If yes, it's an asset."
         }
       ],
       "children": []
@@ -312,7 +340,7 @@
       "props": {},
       "text": [
         {
-          "insert": "This split shapes everything downstream. The upload UI and inspector asset-selection dropdown are scoped to file assets; the add-layer dialog uses the merged registry so it can add both file assets and authored modules. For v1, authored Codecaine modules live in the Codecaine project workspace, not in a shared engine module library."
+          "insert": "This split shapes everything downstream. The upload UI and inspector asset-selection dropdown are scoped to file assets. The add-layer dialog uses the merged registry so it can add both file assets and authored modules. For v1, authored Codecaine modules live in the Codecaine project workspace, not in a shared engine module library."
         }
       ],
       "children": []
@@ -378,7 +406,7 @@
           }
         },
         {
-          "insert": " (which container, what kind, how positioned); the container holds "
+          "insert": " (which container, what kind, how positioned). The container holds "
         },
         {
           "insert": "identity",
@@ -387,7 +415,7 @@
           }
         },
         {
-          "insert": " (this is the bg-video, of type video); the file is just the current bytes for that identity."
+          "insert": " (this is the bg-video, of type video). The file is just the current bytes for that identity."
         }
       ],
       "children": []
@@ -886,7 +914,7 @@
                 }
               }
             ],
-            "SVG-with-CSS-layers, not a generic image; has its own renderer path."
+            "SVG-with-CSS-layers, not a generic image. Has its own renderer path."
           ],
           [
             [
@@ -1173,9 +1201,35 @@
           "attributes": {
             "bold": true
           }
-        },
+        }
+      ],
+      "children": [
+        "b-20-asset-registry-inspector-dropdown-44-s1",
+        "b-20-asset-registry-inspector-dropdown-44-s2"
+      ]
+    },
+    "b-20-asset-registry-inspector-dropdown-44-s1": {
+      "id": "b-20-asset-registry-inspector-dropdown-44-s1",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
         {
-          "insert": " Selecting an asset-type layer in the editor surfaces project-local assets of that type. Picking one updates the scene to reference the selected container ID."
+          "insert": "Selecting an asset-type layer in the editor surfaces project-local assets of that type."
+        }
+      ],
+      "children": []
+    },
+    "b-20-asset-registry-inspector-dropdown-44-s2": {
+      "id": "b-20-asset-registry-inspector-dropdown-44-s2",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "Picking one updates the scene to reference the selected container ID."
         }
       ],
       "children": []
@@ -1192,9 +1246,35 @@
           "attributes": {
             "bold": true
           }
-        },
+        }
+      ],
+      "children": [
+        "b-20-asset-registry-upload-uploading-a-45-s1",
+        "b-20-asset-registry-upload-uploading-a-45-s2"
+      ]
+    },
+    "b-20-asset-registry-upload-uploading-a-45-s1": {
+      "id": "b-20-asset-registry-upload-uploading-a-45-s1",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
         {
-          "insert": " Uploading a file writes a project-local file and creates a registry entry with a unique slug. If the slug already exists, the new container receives a numeric suffix."
+          "insert": "Uploading a file writes a project-local file and creates a registry entry with a unique slug."
+        }
+      ],
+      "children": []
+    },
+    "b-20-asset-registry-upload-uploading-a-45-s2": {
+      "id": "b-20-asset-registry-upload-uploading-a-45-s2",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "If the slug already exists, the new container receives a numeric suffix."
         }
       ],
       "children": []
@@ -1211,9 +1291,22 @@
           "attributes": {
             "bold": true
           }
-        },
+        }
+      ],
+      "children": [
+        "b-20-asset-registry-registry-patch-endpoin-46-s1",
+        "b-20-asset-registry-registry-patch-endpoin-46-s2"
+      ]
+    },
+    "b-20-asset-registry-registry-patch-endpoin-46-s1": {
+      "id": "b-20-asset-registry-registry-patch-endpoin-46-s1",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
         {
-          "insert": " Direct maintenance calls can move an existing container's "
+          "insert": "Direct maintenance calls can move an existing container's "
         },
         {
           "insert": "file",
@@ -1222,7 +1315,20 @@
           }
         },
         {
-          "insert": " pointer. The current editor dropdown does not use this endpoint for normal selection."
+          "insert": " pointer."
+        }
+      ],
+      "children": []
+    },
+    "b-20-asset-registry-registry-patch-endpoin-46-s2": {
+      "id": "b-20-asset-registry-registry-patch-endpoin-46-s2",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "The current editor dropdown does not use this endpoint for normal selection."
         }
       ],
       "children": []
@@ -1529,7 +1635,36 @@
           }
         },
         {
-          "insert": ". Layer order is the scene's responsibility; the registry is a map, not a list."
+          "insert": "."
+        }
+      ],
+      "children": [
+        "b-20-asset-registry-ordering-layer-ord-57-s1",
+        "b-20-asset-registry-ordering-layer-ord-57-s2"
+      ]
+    },
+    "b-20-asset-registry-ordering-layer-ord-57-s1": {
+      "id": "b-20-asset-registry-ordering-layer-ord-57-s1",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "Layer order is the scene's responsibility."
+        }
+      ],
+      "children": []
+    },
+    "b-20-asset-registry-ordering-layer-ord-57-s2": {
+      "id": "b-20-asset-registry-ordering-layer-ord-57-s2",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "The registry is a map, not a list."
         }
       ],
       "children": []

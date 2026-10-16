@@ -385,7 +385,7 @@
           ],
           [
             "Collapsible section",
-            "Editor and schema sections can opt into local open/closed state; dense groups can start collapsed."
+            "Editor and schema sections can opt into local open/closed state. Dense groups can start collapsed."
           ],
           [
             "Schema-driven property field",

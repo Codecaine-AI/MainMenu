@@ -420,7 +420,7 @@
           }
         },
         {
-          "insert": ") are scenes; future pages rebuild as scenes. Shared infrastructure (CRT, audio, menu components, media) becomes project assets/modules, not page-bootstrapped scaffolding."
+          "insert": ") are scenes. Future pages rebuild as scenes. Shared infrastructure (CRT, audio, menu components, media) becomes project assets/modules, not page-bootstrapped scaffolding."
         }
       ],
       "children": []
@@ -513,9 +513,35 @@
           "attributes": {
             "bold": true
           }
-        },
+        }
+      ],
+      "children": [
+        "b-30-principles-scene-to-scene-transit-30-s1",
+        "b-30-principles-scene-to-scene-transit-30-s2"
+      ]
+    },
+    "b-30-principles-scene-to-scene-transit-30-s1": {
+      "id": "b-30-principles-scene-to-scene-transit-30-s1",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
         {
-          "insert": " Navigation is a rendered-website concern. The editor views one scene at a time."
+          "insert": "Navigation is a rendered-website concern."
+        }
+      ],
+      "children": []
+    },
+    "b-30-principles-scene-to-scene-transit-30-s2": {
+      "id": "b-30-principles-scene-to-scene-transit-30-s2",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "The editor views one scene at a time."
         }
       ],
       "children": []

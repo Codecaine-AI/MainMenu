@@ -262,10 +262,21 @@
           "attributes": {
             "bold": true
           }
-        },
-        {
-          "insert": " "
-        },
+        }
+      ],
+      "children": [
+        "b-30-upload-page-file-selected-onfi-7-s1",
+        "b-30-upload-page-file-selected-onfi-7-s2",
+        "b-30-upload-page-file-selected-onfi-7-s3"
+      ]
+    },
+    "b-30-upload-page-file-selected-onfi-7-s1": {
+      "id": "b-30-upload-page-file-selected-onfi-7-s1",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
         {
           "insert": "onFileChange",
           "attributes": {
@@ -282,7 +293,20 @@
           }
         },
         {
-          "insert": ". If a unique match exists, "
+          "insert": "."
+        }
+      ],
+      "children": []
+    },
+    "b-30-upload-page-file-selected-onfi-7-s2": {
+      "id": "b-30-upload-page-file-selected-onfi-7-s2",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "If a unique match exists, "
         },
         {
           "insert": "type",
@@ -291,7 +315,20 @@
           }
         },
         {
-          "insert": " is set to that suggestion; the user may override with the dropdown."
+          "insert": " is set to that suggestion."
+        }
+      ],
+      "children": []
+    },
+    "b-30-upload-page-file-selected-onfi-7-s3": {
+      "id": "b-30-upload-page-file-selected-onfi-7-s3",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "The user may override with the dropdown."
         }
       ],
       "children": []

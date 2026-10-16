@@ -41,7 +41,7 @@
         "b-10-state-every-mutation-also-sets-18",
         "b-10-state-mutateobjectat-path-pa-19",
         "b-10-state-deep-merges-patch-into-20",
-        "b-10-state-deepmerge-is-recursive-21",
+        "b-10-state-deepmerge-is-recursive-21-li",
         "b-10-state-the-inspector-sends-patc-22",
         "b-10-state-setting-a-deep-field-to-23",
         "b-10-state-setobjectpropertyat-pat-24",
@@ -107,7 +107,7 @@
           }
         },
         {
-          "insert": " store per page; selectors are component-local."
+          "insert": " store per page. Selectors are component-local."
         }
       ],
       "children": []
@@ -683,7 +683,7 @@
           }
         },
         {
-          "insert": " in the store. The clone-then-replace pattern means components using selectors with default equality see a change and re-render; components using slice selectors only re-render when their slice actually changed."
+          "insert": " in the store. The clone-then-replace pattern means components using selectors with default equality see a change and re-render. Components using slice selectors only re-render when their slice actually changed."
         }
       ],
       "children": []
@@ -753,10 +753,12 @@
       ],
       "children": []
     },
-    "b-10-state-deepmerge-is-recursive-21": {
-      "id": "b-10-state-deepmerge-is-recursive-21",
-      "type": "paragraph",
-      "props": {},
+    "b-10-state-deepmerge-is-recursive-21-li": {
+      "id": "b-10-state-deepmerge-is-recursive-21-li",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
       "text": [
         {
           "insert": "deepMerge",
@@ -765,7 +767,53 @@
           }
         },
         {
-          "insert": " is recursive: object-typed branches merge, scalars and arrays replace. Arrays replace wholesale (no element-wise merging). This matters for "
+          "insert": " is recursive",
+          "attributes": {
+            "bold": true
+          }
+        }
+      ],
+      "children": [
+        "b-10-state-deepmerge-is-recursive-21-s1",
+        "b-10-state-deepmerge-is-recursive-21-s2",
+        "b-10-state-deepmerge-is-recursive-21-s3"
+      ]
+    },
+    "b-10-state-deepmerge-is-recursive-21-s1": {
+      "id": "b-10-state-deepmerge-is-recursive-21-s1",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "Object-typed branches merge, scalars and arrays replace."
+        }
+      ],
+      "children": []
+    },
+    "b-10-state-deepmerge-is-recursive-21-s2": {
+      "id": "b-10-state-deepmerge-is-recursive-21-s2",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "Arrays replace wholesale (no element-wise merging)."
+        }
+      ],
+      "children": []
+    },
+    "b-10-state-deepmerge-is-recursive-21-s3": {
+      "id": "b-10-state-deepmerge-is-recursive-21-s3",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "This matters for "
         },
         {
           "insert": "events",
@@ -1294,7 +1342,7 @@
           }
         },
         {
-          "insert": " ID and marks the scene dirty. The registry is not changed; the object now points at a different existing container."
+          "insert": " ID and marks the scene dirty. The registry is not changed. The object now points at a different existing container."
         }
       ],
       "children": []
@@ -1400,7 +1448,36 @@
       },
       "text": [
         {
-          "insert": "Validation. Patches are trusted; malformed scenes are caught by the renderer's failure modes."
+          "insert": "Validation."
+        }
+      ],
+      "children": [
+        "b-10-state-validation-patches-are-47-s1",
+        "b-10-state-validation-patches-are-47-s2"
+      ]
+    },
+    "b-10-state-validation-patches-are-47-s1": {
+      "id": "b-10-state-validation-patches-are-47-s1",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "Patches are trusted."
+        }
+      ],
+      "children": []
+    },
+    "b-10-state-validation-patches-are-47-s2": {
+      "id": "b-10-state-validation-patches-are-47-s2",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "Malformed scenes are caught by the renderer's failure modes."
         }
       ],
       "children": []

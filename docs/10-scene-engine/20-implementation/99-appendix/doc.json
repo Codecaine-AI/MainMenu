@@ -142,10 +142,19 @@
           "attributes": {
             "bold": true
           }
-        },
-        {
-          "insert": ": "
-        },
+        }
+      ],
+      "children": [
+        "b-00-overview-agent-quick-start-10-s1"
+      ]
+    },
+    "b-00-overview-agent-quick-start-10-s1": {
+      "id": "b-00-overview-agent-quick-start-10-s1",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
         {
           "insert": "`apps/scene-engine/agents.md`",
           "attributes": {
@@ -174,10 +183,19 @@
           "attributes": {
             "bold": true
           }
-        },
-        {
-          "insert": ": "
-        },
+        }
+      ],
+      "children": [
+        "b-00-overview-repository-instruction-11-s1"
+      ]
+    },
+    "b-00-overview-repository-instruction-11-s1": {
+      "id": "b-00-overview-repository-instruction-11-s1",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
         {
           "insert": "`AGENTS.md`",
           "attributes": {
@@ -206,10 +224,19 @@
           "attributes": {
             "bold": true
           }
-        },
-        {
-          "insert": ": "
-        },
+        }
+      ],
+      "children": [
+        "b-00-overview-desktop-app-docs-d-12-s1"
+      ]
+    },
+    "b-00-overview-desktop-app-docs-d-12-s1": {
+      "id": "b-00-overview-desktop-app-docs-d-12-s1",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
         {
           "insert": "Desktop App",
           "attributes": {

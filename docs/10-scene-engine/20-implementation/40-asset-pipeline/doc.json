@@ -354,7 +354,7 @@
                 }
               },
               {
-                "insert": "; "
+                "insert": ". "
               },
               {
                 "insert": "PATCH /api/registry/[id]",
@@ -380,7 +380,7 @@
                 }
               },
               {
-                "insert": "; fonts live under "
+                "insert": ". Fonts live under "
               },
               {
                 "insert": "Assets/Fonts/",
@@ -389,7 +389,7 @@
                 }
               },
               {
-                "insert": "; registry "
+                "insert": ". Registry "
               },
               {
                 "insert": "file",

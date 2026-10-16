@@ -61,7 +61,7 @@
       "props": {},
       "text": [
         {
-          "insert": "Main Menu runs the Scene Engine editor inside Electron. The editor is still served by Next; Electron supplies the native shell and chooses which Next runtime to load."
+          "insert": "Main Menu runs the Scene Engine editor inside Electron. The editor is still served by Next. Electron supplies the native shell and chooses which Next runtime to load."
         }
       ],
       "children": []

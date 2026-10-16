@@ -297,7 +297,7 @@
           }
         },
         {
-          "insert": ". Most layers are leaves; some are "
+          "insert": ". Most layers are leaves. Some are "
         },
         {
           "insert": "groups",
@@ -319,7 +319,25 @@
       },
       "text": [
         {
-          "insert": "Groups are collapsible: one row in the layer panel by default."
+          "insert": "Groups are collapsible",
+          "attributes": {
+            "bold": true
+          }
+        }
+      ],
+      "children": [
+        "b-20-vision-groups-are-collapsible-13-s1"
+      ]
+    },
+    "b-20-vision-groups-are-collapsible-13-s1": {
+      "id": "b-20-vision-groups-are-collapsible-13-s1",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "One row in the layer panel by default."
         }
       ],
       "children": []
@@ -463,7 +481,7 @@
           }
         },
         {
-          "insert": "; the scene-engine generalizes it to whole-page compositions and project workspaces."
+          "insert": ". The scene-engine generalizes it to whole-page compositions and project workspaces."
         }
       ],
       "children": []

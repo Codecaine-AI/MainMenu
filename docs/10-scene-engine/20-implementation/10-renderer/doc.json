@@ -368,7 +368,7 @@
                 }
               },
               {
-                "insert": " element; sized to "
+                "insert": " element. Sized to "
               },
               {
                 "insert": "scene.stage.{width,height}",
@@ -385,7 +385,7 @@
             "Object wrapper",
             [
               {
-                "insert": "DOM element returned by a renderer; gets "
+                "insert": "DOM element returned by a renderer. Gets "
               },
               {
                 "insert": "position: absolute",

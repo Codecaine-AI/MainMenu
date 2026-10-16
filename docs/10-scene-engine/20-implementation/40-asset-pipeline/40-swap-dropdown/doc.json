@@ -20,7 +20,7 @@
       },
       "children": [
         "b-40-swap-dropdown-apps-scene-engine-app-e-2",
-        "b-40-swap-dropdown-three-pieces-cooperate-3",
+        "b-40-swap-dropdown-three-pieces-cooperate-3-li",
         "b-40-swap-dropdown-divider-4",
         "b-40-swap-dropdown-component-assetswapdro-5",
         "b-40-swap-dropdown-prop-type-6-tbl",
@@ -66,13 +66,33 @@
       ],
       "children": []
     },
-    "b-40-swap-dropdown-three-pieces-cooperate-3": {
-      "id": "b-40-swap-dropdown-three-pieces-cooperate-3",
-      "type": "paragraph",
-      "props": {},
+    "b-40-swap-dropdown-three-pieces-cooperate-3-li": {
+      "id": "b-40-swap-dropdown-three-pieces-cooperate-3-li",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
       "text": [
         {
-          "insert": "Three pieces cooperate: the dropdown component, the "
+          "insert": "Three pieces cooperate",
+          "attributes": {
+            "bold": true
+          }
+        }
+      ],
+      "children": [
+        "b-40-swap-dropdown-three-pieces-cooperate-3-s1"
+      ]
+    },
+    "b-40-swap-dropdown-three-pieces-cooperate-3-s1": {
+      "id": "b-40-swap-dropdown-three-pieces-cooperate-3-s1",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "The dropdown component, the "
         },
         {
           "insert": "LayerForm",
@@ -214,9 +234,22 @@
           "attributes": {
             "bold": true
           }
-        },
+        }
+      ],
+      "children": [
+        "b-40-swap-dropdown-mount-fetches-api-8-s1",
+        "b-40-swap-dropdown-mount-fetches-api-8-s2"
+      ]
+    },
+    "b-40-swap-dropdown-mount-fetches-api-8-s1": {
+      "id": "b-40-swap-dropdown-mount-fetches-api-8-s1",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
         {
-          "insert": " Fetches "
+          "insert": "Fetches "
         },
         {
           "insert": "/api/asset-library?type={type}&usage=0&project={projectId}",
@@ -234,7 +267,20 @@
           }
         },
         {
-          "insert": " in local state. Cancels stale fetches on "
+          "insert": " in local state."
+        }
+      ],
+      "children": []
+    },
+    "b-40-swap-dropdown-mount-fetches-api-8-s2": {
+      "id": "b-40-swap-dropdown-mount-fetches-api-8-s2",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "Cancels stale fetches on "
         },
         {
           "insert": "assetType",
@@ -269,9 +315,22 @@
           "attributes": {
             "bold": true
           }
-        },
+        }
+      ],
+      "children": [
+        "b-40-swap-dropdown-render-shows-a-se-9-s1",
+        "b-40-swap-dropdown-render-shows-a-se-9-s2"
+      ]
+    },
+    "b-40-swap-dropdown-render-shows-a-se-9-s1": {
+      "id": "b-40-swap-dropdown-render-shows-a-se-9-s1",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
         {
-          "insert": " Shows a "
+          "insert": "Shows a "
         },
         {
           "insert": "<select>",
@@ -280,7 +339,20 @@
           }
         },
         {
-          "insert": " of matching containers by label. If the current asset id is not in the listing, it is prepended so the dropdown still reflects the saved scene."
+          "insert": " of matching containers by label."
+        }
+      ],
+      "children": []
+    },
+    "b-40-swap-dropdown-render-shows-a-se-9-s2": {
+      "id": "b-40-swap-dropdown-render-shows-a-se-9-s2",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "If the current asset id is not in the listing, it is prepended so the dropdown still reflects the saved scene."
         }
       ],
       "children": []

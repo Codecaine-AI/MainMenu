@@ -118,7 +118,7 @@
                 }
               }
             ],
-            "Async. Resolves registry URLs for an export bundle or a catalog-backed project dev route; fetches asset/module/font registries in parallel, merges into one map, and caches by registry key. Concurrent calls for the same key share one in-flight promise."
+            "Async. Resolves registry URLs for an export bundle or a catalog-backed project dev route. Fetches asset/module/font registries in parallel, merges into one map, and caches by registry key. Concurrent calls for the same key share one in-flight promise."
           ],
           [
             [

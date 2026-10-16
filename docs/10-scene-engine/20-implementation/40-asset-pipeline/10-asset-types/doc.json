@@ -41,7 +41,7 @@
         "b-10-asset-types-the-filename-s-extension-19",
         "b-10-asset-types-the-provided-mime-is-i-20",
         "b-10-asset-types-any-failure-returns-o-21",
-        "b-10-asset-types-the-order-matters-type-22",
+        "b-10-asset-types-the-order-matters-type-22-li",
         "b-10-asset-types-why-a-single-module-23",
         "b-10-asset-types-the-split-between-client-24",
         "b-10-asset-types-source-25",
@@ -388,7 +388,7 @@
           }
         },
         {
-          "insert": ") is preserved and lowercased; the slug excludes it."
+          "insert": ") is preserved and lowercased. The slug excludes it."
         }
       ],
       "children": []
@@ -658,18 +658,38 @@
           }
         },
         {
-          "insert": " with a human-readable message; the route surfaces that as a 400."
+          "insert": " with a human-readable message. The route surfaces that as a 400."
         }
       ],
       "children": []
     },
-    "b-10-asset-types-the-order-matters-type-22": {
-      "id": "b-10-asset-types-the-order-matters-type-22",
-      "type": "paragraph",
-      "props": {},
+    "b-10-asset-types-the-order-matters-type-22-li": {
+      "id": "b-10-asset-types-the-order-matters-type-22-li",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
       "text": [
         {
-          "insert": "The order matters: type first means the error message can name the type, extension before mime catches the most common drag-into-wrong-bucket case before falling through to the mime check."
+          "insert": "The order matters",
+          "attributes": {
+            "bold": true
+          }
+        }
+      ],
+      "children": [
+        "b-10-asset-types-the-order-matters-type-22-s1"
+      ]
+    },
+    "b-10-asset-types-the-order-matters-type-22-s1": {
+      "id": "b-10-asset-types-the-order-matters-type-22-s1",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "Type first means the error message can name the type, extension before mime catches the most common drag-into-wrong-bucket case before falling through to the mime check."
         }
       ],
       "children": []

@@ -78,3 +78,6 @@ objectives/*/artifacts/chrome-profile/
 apps/scene-engine/workspace.catalog.json
 
 to_add/
+# Derived Codecaine docs state (rebuildable)
+docs/.index/
+docs/.changesets/

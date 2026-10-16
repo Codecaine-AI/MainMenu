@@ -84,7 +84,7 @@
         "b-10-scene-data-model-objects-with-visible-f-59",
         "b-10-scene-data-model-example-title-scene-60",
         "b-10-scene-data-model-json-61",
-        "b-10-scene-data-model-bottom-to-top-hue-shift-62"
+        "b-10-scene-data-model-bottom-to-top-hue-shift-62-li"
       ]
     },
     "b-10-scene-data-model-a-scene-is-a-json-docume-2": {
@@ -93,7 +93,7 @@
       "props": {},
       "text": [
         {
-          "insert": "A scene is a JSON document that declares a stage and an ordered tree of typed objects. Every object follows the same canonical shape regardless of type; what differs is which sections it uses. Z-order is array order: index 0 is the back, last entry is on top, recursively, inside "
+          "insert": "A scene is a JSON document that declares a stage and an ordered tree of typed objects. Every object follows the same canonical shape regardless of type. What differs is which sections it uses. Z-order is array order: index 0 is the back, last entry is on top, recursively, inside "
         },
         {
           "insert": "children",
@@ -808,7 +808,23 @@
           }
         },
         {
-          "insert": ". One of "
+          "insert": "."
+        }
+      ],
+      "children": [
+        "b-10-scene-data-model-anchor-which-point-o-19-s1",
+        "b-10-scene-data-model-anchor-which-point-o-19-s2"
+      ]
+    },
+    "b-10-scene-data-model-anchor-which-point-o-19-s1": {
+      "id": "b-10-scene-data-model-anchor-which-point-o-19-s1",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "One of "
         },
         {
           "insert": "top-left",
@@ -889,7 +905,20 @@
           }
         },
         {
-          "insert": ". Defaults to "
+          "insert": "."
+        }
+      ],
+      "children": []
+    },
+    "b-10-scene-data-model-anchor-which-point-o-19-s2": {
+      "id": "b-10-scene-data-model-anchor-which-point-o-19-s2",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "Defaults to "
         },
         {
           "insert": "top-left",
@@ -956,7 +985,7 @@
           }
         },
         {
-          "insert": ". Children of a group are percentages of the group's box, which is itself a percentage of the stage. Pages are single-viewport game-menu screens; percentages are the natural unit."
+          "insert": ". Children of a group are percentages of the group's box, which is itself a percentage of the stage. Pages are single-viewport game-menu screens. Percentages are the natural unit."
         }
       ],
       "children": []
@@ -1019,7 +1048,7 @@
       "props": {},
       "text": [
         {
-          "insert": "Toggling between explicit and fill in the inspector is a one-click operation; the unused fields are stripped."
+          "insert": "Toggling between explicit and fill in the inspector is a one-click operation. The unused fields are stripped."
         }
       ],
       "children": []
@@ -1182,7 +1211,7 @@
                 }
               }
             ],
-            "Multiplier. Used by the scene-level appearance filter; on object appearance, treated similarly."
+            "Multiplier. Used by the scene-level appearance filter. On object appearance, treated similarly."
           ],
           [
             [
@@ -1554,7 +1583,7 @@
           }
         },
         {
-          "insert": " selects the renderer; "
+          "insert": " selects the renderer. "
         },
         {
           "insert": "asset",
@@ -1678,7 +1707,7 @@
           }
         },
         {
-          "insert": " carries component-specific values. Text, blink rate, density, hue, etc. The keys and types are not fixed by the schema; they're declared by the asset's "
+          "insert": " carries component-specific values. Text, blink rate, density, hue, etc. The keys and types are not fixed by the schema. They're declared by the asset's "
         },
         {
           "insert": "manifest.json",
@@ -2449,7 +2478,7 @@
           }
         },
         {
-          "insert": "; an object at "
+          "insert": ". An object at "
         },
         {
           "insert": "0.5",
@@ -2507,13 +2536,33 @@
       ],
       "children": []
     },
-    "b-10-scene-data-model-bottom-to-top-hue-shift-62": {
-      "id": "b-10-scene-data-model-bottom-to-top-hue-shift-62",
-      "type": "paragraph",
-      "props": {},
+    "b-10-scene-data-model-bottom-to-top-hue-shift-62-li": {
+      "id": "b-10-scene-data-model-bottom-to-top-hue-shift-62-li",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
       "text": [
         {
-          "insert": "Bottom to top: hue-shifted background video, the CODECAINE logo with an in-text fire slot, the press-start button with click bindings, and a CRT overlay (currently hidden)."
+          "insert": "Bottom to top",
+          "attributes": {
+            "bold": true
+          }
+        }
+      ],
+      "children": [
+        "b-10-scene-data-model-bottom-to-top-hue-shift-62-s1"
+      ]
+    },
+    "b-10-scene-data-model-bottom-to-top-hue-shift-62-s1": {
+      "id": "b-10-scene-data-model-bottom-to-top-hue-shift-62-s1",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "Hue-shifted background video, the CODECAINE logo with an in-text fire slot, the press-start button with click bindings, and a CRT overlay (currently hidden)."
         }
       ],
       "children": []

@@ -247,7 +247,7 @@
       "props": {},
       "text": [
         {
-          "insert": "The renderer already exists as plain JS modules and works without bundling. The scene JSON is the source of truth in production; there is nothing to compile down to. Export is a copy with path rewrites and dependency pruning."
+          "insert": "The renderer already exists as plain JS modules and works without bundling. The scene JSON is the source of truth in production. There is nothing to compile down to. Export is a copy with path rewrites and dependency pruning."
         }
       ],
       "children": []
@@ -271,7 +271,25 @@
       },
       "text": [
         {
-          "insert": "Pro: the export and editor share one renderer."
+          "insert": "Pro",
+          "attributes": {
+            "bold": true
+          }
+        }
+      ],
+      "children": [
+        "b-50-build-output-pro-the-export-and-edit-11-s1"
+      ]
+    },
+    "b-50-build-output-pro-the-export-and-edit-11-s1": {
+      "id": "b-50-build-output-pro-the-export-and-edit-11-s1",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "The export and editor share one renderer."
         }
       ],
       "children": []
@@ -284,7 +302,39 @@
       },
       "text": [
         {
-          "insert": "Pro: the output is inspectable; every file is the same kind of file the developer authored."
+          "insert": "Pro",
+          "attributes": {
+            "bold": true
+          }
+        }
+      ],
+      "children": [
+        "b-50-build-output-pro-the-output-is-inspe-12-s1",
+        "b-50-build-output-pro-the-output-is-inspe-12-s2"
+      ]
+    },
+    "b-50-build-output-pro-the-output-is-inspe-12-s1": {
+      "id": "b-50-build-output-pro-the-output-is-inspe-12-s1",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "The output is inspectable."
+        }
+      ],
+      "children": []
+    },
+    "b-50-build-output-pro-the-output-is-inspe-12-s2": {
+      "id": "b-50-build-output-pro-the-output-is-inspe-12-s2",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "Every file is the same kind of file the developer authored."
         }
       ],
       "children": []
@@ -297,7 +347,25 @@
       },
       "text": [
         {
-          "insert": "Pro: the active dependency graph keeps unused registered media out of the zip."
+          "insert": "Pro",
+          "attributes": {
+            "bold": true
+          }
+        }
+      ],
+      "children": [
+        "b-50-build-output-pro-the-active-dependen-13-s1"
+      ]
+    },
+    "b-50-build-output-pro-the-active-dependen-13-s1": {
+      "id": "b-50-build-output-pro-the-active-dependen-13-s1",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "The active dependency graph keeps unused registered media out of the zip."
         }
       ],
       "children": []
@@ -310,7 +378,25 @@
       },
       "text": [
         {
-          "insert": "Con: modules must declare dependencies that are not visible from scene references."
+          "insert": "Con",
+          "attributes": {
+            "bold": true
+          }
+        }
+      ],
+      "children": [
+        "b-50-build-output-con-modules-must-declar-14-s1"
+      ]
+    },
+    "b-50-build-output-con-modules-must-declar-14-s1": {
+      "id": "b-50-build-output-con-modules-must-declar-14-s1",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "Modules must declare dependencies that are not visible from scene references."
         }
       ],
       "children": []
@@ -1228,9 +1314,21 @@
           "attributes": {
             "bold": true
           }
-        },
+        }
+      ],
+      "children": [
+        "b-50-build-output-renderer-code-and-text-64-s1"
+      ]
+    },
+    "b-50-build-output-renderer-code-and-text-64-s1": {
+      "id": "b-50-build-output-renderer-code-and-text-64-s1",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
         {
-          "insert": ": absolute logical paths are rewritten to relative paths where needed."
+          "insert": "Absolute logical paths are rewritten to relative paths where needed."
         }
       ],
       "children": []
@@ -1247,10 +1345,19 @@
           "attributes": {
             "bold": true
           }
-        },
-        {
-          "insert": ": "
-        },
+        }
+      ],
+      "children": [
+        "b-50-build-output-registry-json-file-65-s1"
+      ]
+    },
+    "b-50-build-output-registry-json-file-65-s1": {
+      "id": "b-50-build-output-registry-json-file-65-s1",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
         {
           "insert": "file",
           "attributes": {
@@ -1473,7 +1580,25 @@
       },
       "text": [
         {
-          "insert": "if not gated: renders the scene directly"
+          "insert": "if not gated",
+          "attributes": {
+            "bold": true
+          }
+        }
+      ],
+      "children": [
+        "b-50-build-output-if-not-gated-renders-th-74-s1"
+      ]
+    },
+    "b-50-build-output-if-not-gated-renders-th-74-s1": {
+      "id": "b-50-build-output-if-not-gated-renders-th-74-s1",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
+        {
+          "insert": "Renders the scene directly"
         }
       ],
       "children": []

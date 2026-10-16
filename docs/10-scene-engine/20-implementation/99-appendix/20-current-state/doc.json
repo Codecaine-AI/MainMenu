@@ -1193,7 +1193,7 @@
                 }
               },
               {
-                "insert": "; opens the same editor route"
+                "insert": ". Opens the same editor route"
               }
             ]
           ],
@@ -1201,7 +1201,7 @@
             "Pi Agent",
             [
               {
-                "insert": "Chat panel docked below the hierarchy in the left sidebar; available through "
+                "insert": "Chat panel docked below the hierarchy in the left sidebar. Available through "
               },
               {
                 "insert": "window.mainMenu.agent",

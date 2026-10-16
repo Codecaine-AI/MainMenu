@@ -28,7 +28,7 @@
         "b-30-asset-renderers-divider-3",
         "b-30-asset-renderers-renderer-registry-asse-4",
         "b-30-asset-renderers-a-map-string-fn-popu-5",
-        "b-30-asset-renderers-registered-types-video-6",
+        "b-30-asset-renderers-registered-types-video-6-li",
         "b-30-asset-renderers-adding-a-new-type-7",
         "b-30-asset-renderers-write-asset-renderers-8",
         "b-30-asset-renderers-import-and-registerrend-9",
@@ -161,14 +161,31 @@
       ],
       "children": []
     },
-    "b-30-asset-renderers-registered-types-video-6": {
-      "id": "b-30-asset-renderers-registered-types-video-6",
-      "type": "paragraph",
-      "props": {},
+    "b-30-asset-renderers-registered-types-video-6-li": {
+      "id": "b-30-asset-renderers-registered-types-video-6-li",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
       "text": [
         {
-          "insert": "Registered types: "
-        },
+          "insert": "Registered types",
+          "attributes": {
+            "bold": true
+          }
+        }
+      ],
+      "children": [
+        "b-30-asset-renderers-registered-types-video-6-s1"
+      ]
+    },
+    "b-30-asset-renderers-registered-types-video-6-s1": {
+      "id": "b-30-asset-renderers-registered-types-video-6-s1",
+      "type": "list-item",
+      "props": {
+        "ordered": false
+      },
+      "text": [
         {
           "insert": "video",
           "attributes": {
@@ -397,7 +414,7 @@
           }
         },
         {
-          "insert": ". Videos autoplay, loop, and are muted to satisfy autoplay policies. The wrapper is the media element itself; "
+          "insert": ". Videos autoplay, loop, and are muted to satisfy autoplay policies. The wrapper is the media element itself. "
         },
         {
           "insert": "applyTransform",
@@ -547,7 +564,7 @@
           }
         },
         {
-          "insert": "; the universal styling pass handles full-stage layout."
+          "insert": ". The universal styling pass handles full-stage layout."
         }
       ],
       "children": []
@@ -641,7 +658,7 @@
       "props": {},
       "text": [
         {
-          "insert": "The contract is intentionally minimal: components own their DOM and their internal lifecycle; the renderer never patches their internals. On property changes, the "
+          "insert": "The contract is intentionally minimal: components own their DOM and their internal lifecycle. The renderer never patches their internals. On property changes, the "
         },
         {
           "insert": "scene-renderer's update path",
@@ -890,7 +907,7 @@
       },
       "text": [
         {
-          "insert": "Resolve the slot's asset; if missing, warn and skip."
+          "insert": "Resolve the slot's asset. If missing, warn and skip."
         }
       ],
       "children": []
@@ -1211,7 +1228,7 @@
           }
         },
         {
-          "insert": "). Implementation is a thin wrapper; the heavy lifting is CSS."
+          "insert": "). Implementation is a thin wrapper. The heavy lifting is CSS."
         }
       ],
       "children": []
