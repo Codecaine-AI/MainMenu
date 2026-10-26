@@ -3,12 +3,13 @@ from __future__ import annotations
 import base64
 from pathlib import Path
 
-from dotenv import load_dotenv
 from openai import OpenAI
+
+from ..env import load_env
 
 
 def client() -> OpenAI:
-    load_dotenv()
+    load_env()
     return OpenAI()
 
 

@@ -9,6 +9,7 @@ import {
 import path from 'node:path'
 import { resolveProjectPaths } from '@/lib/project-paths'
 import { discoverProjects, loadProject as loadSceneProject } from '@/lib/scenes'
+import { loadWorkspaceEnv } from '@/lib/workspace-env'
 import { buildSplitPromptDraftPrompt } from './split-prompt-draft'
 import { assertSafeId, nowIso, splitInstructionLabel, uniqueId } from './ids'
 import type {
@@ -746,6 +747,7 @@ async function editImageWithOpenAI(input: {
   quality: string
   outputFormat: 'png'
 }) {
+  loadWorkspaceEnv()
   const apiKey = process.env.OPENAI_API_KEY
   if (!apiKey) {
     throw new Error(
@@ -804,6 +806,7 @@ async function draftSplitPromptsWithModel(input: {
   parent: ExtractionNode
   instruction: string
 }): Promise<SplitPromptDraft> {
+  loadWorkspaceEnv()
   const apiKey = process.env.ANTHROPIC_API_KEY
   if (!apiKey) {
     throw new Error('ANTHROPIC_API_KEY is required to draft target and residual prompts.')

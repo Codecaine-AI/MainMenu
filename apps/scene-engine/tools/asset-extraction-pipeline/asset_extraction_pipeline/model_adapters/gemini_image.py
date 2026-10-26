@@ -5,10 +5,11 @@ from io import BytesIO
 from pathlib import Path
 from typing import Any
 
-from dotenv import load_dotenv
 from google import genai
 from google.genai import types
 from PIL import Image
+
+from ..env import load_env
 
 
 SUPPORTED_IMAGE_SIZES = {"512", "1K", "2K", "4K"}
@@ -16,7 +17,7 @@ DEFAULT_AUTO_IMAGE_SIZE = "1K"
 
 
 def client() -> genai.Client:
-    load_dotenv()
+    load_env()
     return genai.Client()
 
 

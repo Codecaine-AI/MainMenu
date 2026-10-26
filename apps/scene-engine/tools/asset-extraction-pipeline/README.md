@@ -26,4 +26,6 @@ text-directed splits from the screen workspace.
 
 Current split execution drafts target/residual prompts with the prompt model, lets the user review or edit them, then sends those exact prompts to both image edits in parallel after confirmation. Prompt drafting requires `ANTHROPIC_API_KEY` and uses `ASSET_PIPELINE_PROMPT_MODEL` or `claude-opus-4-7`. Confirmed split image edits use `ASSET_PIPELINE_IMAGE_MODEL` or `gpt-image-2`, with `ASSET_PIPELINE_IMAGE_SIZE=auto` and `ASSET_PIPELINE_IMAGE_QUALITY=high` by default. Set `ASSET_PIPELINE_IMAGE_MODE=placeholder` to skip image calls and create copied placeholder images.
 
+API keys can live in the shared workspace env file, `~/workspace/.env` (or the path in `WORKSPACE_ENV_FILE`). The Python adapters and the scene engine server read it after the repo's own `.env` and never let it override a variable that is already set.
+
 The Python CLI remains available from this directory through `uv run extract-assets`.

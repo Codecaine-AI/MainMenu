@@ -4,9 +4,10 @@ from collections.abc import Sequence
 from pathlib import Path
 from typing import TypeVar
 
-from dotenv import load_dotenv
 from mirascope import llm
 from pydantic import BaseModel
+
+from ..env import load_env
 
 T = TypeVar("T", bound=BaseModel)
 
@@ -17,7 +18,7 @@ def _build_content(prompt: str, source_images: Path | Sequence[Path]) -> list:
 
 
 def write_text_prompt(source_images: Path | Sequence[Path], prompt: str, model: str) -> str:
-    load_dotenv()
+    load_env()
     response = llm.use_model(model, max_tokens=4096).call(_build_content(prompt, source_images))
     return response.text().strip()
 
@@ -28,7 +29,7 @@ def structured_call(
     model: str,
     response_model: type[T],
 ) -> T:
-    load_dotenv()
+    load_env()
     response = llm.use_model(model, max_tokens=4096).call(
         _build_content(prompt, source_images),
         format=llm.format(response_model, mode="json"),
